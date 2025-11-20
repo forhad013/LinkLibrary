@@ -37,48 +37,37 @@ fun RootScreen() {
 
         // An entry provider converts a route into a NavEntry which contains the content for that route.
         entryProvider = { route ->
-            when (route) {
-                is RootScreens.Home -> NavEntry(route) {
-                    HomeScreen(
+            NavEntry(route) {
+                when (route) {
+                    is RootScreens.Home -> HomeScreen(
                         routeKey = route,
                         onNavigateToDetail = { linkId ->
                             backStack.add(RootScreens.LinkDetail(linkId))
                         },
                         onAddLink = { initialUrl ->
                             backStack.add(RootScreens.AddLink(initialUrl))
-                        }
-                    )
-                }
+                        })
 
-                is RootScreens.LinkDetail -> NavEntry(route) {
-                    LinkDetailScreen(
-                        routeKey = route,
-                        linkId = route.linkId,
-                        onBack = {
+
+                    is RootScreens.LinkDetail -> LinkDetailScreen(
+                        routeKey = route, linkId = route.linkId, onBack = {
                             if (backStack.size > 1) {
                                 backStack.removeLast()
                             }
-                        }
-                    )
-                }
+                        })
 
-                is RootScreens.AddLink -> NavEntry(route) {
-                    AddLinkScreen(
-                        routeKey = route,
-                        initialUrl = route.initialUrl,
-                        onBack = {
+
+                    is RootScreens.AddLink -> AddLinkScreen(
+                        routeKey = route, initialUrl = route.initialUrl, onBack = {
                             if (backStack.size > 1) {
                                 backStack.removeLast()
                             }
-                        }
-                    )
-                }
+                        })
 
-                else -> NavEntry(route) { Text("Unknown route: $route") }
+                    else -> Text("Unknown route: $route")
+                }
             }
-
         }
     )
-
 
 }
