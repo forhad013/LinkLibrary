@@ -48,7 +48,5 @@ dependencies {
     implementation(compose.ui)
     implementation(compose.uiTooling)
     implementation(compose.materialIconsExtended)
-
-    implementation(libs.decompose.router)
     debugImplementation(libs.compose.ui.tooling)
 }

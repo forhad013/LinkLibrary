@@ -1,38 +1,84 @@
 package com.greenrobotdev.linklibrary.screens.root
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
+import androidx.savedstate.serialization.SavedStateConfiguration
 import com.greenrobotdev.linklibrary.screens.add.AddLinkScreen
 import com.greenrobotdev.linklibrary.screens.details.LinkDetailScreen
 import com.greenrobotdev.linklibrary.screens.home.HomeScreen
-import io.github.xxfast.decompose.router.stack.RoutedContent
-import io.github.xxfast.decompose.router.stack.Router
-import io.github.xxfast.decompose.router.stack.rememberRouter
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+
+// Create the required serializing configuration for open polymorphism (required for KMP)
+private val config = SavedStateConfiguration {
+    serializersModule = SerializersModule {
+        polymorphic(NavKey::class) {
+            subclass(RootScreens.Home::class, RootScreens.Home.serializer())
+            subclass(RootScreens.LinkDetail::class, RootScreens.LinkDetail.serializer())
+            subclass(RootScreens.AddLink::class, RootScreens.AddLink.serializer())
+        }
+    }
+}
 
 @Composable
 fun RootScreen() {
-    val router: Router<RootScreens> = rememberRouter { listOf(RootScreens.Home) }
+    // Create the navigation back stack with proper serialization support for KMP
+    val backStack = rememberNavBackStack(config, RootScreens.Home)
 
-    RoutedContent(
-        router = router,
-    ) { screen ->
-        when (screen) {
-            is RootScreens.Home -> HomeScreen(
-                onNavigateToDetail = { linkId ->
-                    router.push(RootScreens.LinkDetail(linkId)) },
-                onAddLink = { initialUrl -> router.push(RootScreens.AddLink(initialUrl)) }
-            )
+    NavDisplay(
+        backStack = backStack,
 
-            is RootScreens.LinkDetail -> LinkDetailScreen(
-                linkId = screen.linkId,
-                onBack = { router.pop() }
-            )
+        // Specify what should happen when the user goes back
+        onBack = { backStack.removeLastOrNull() },
 
-            is RootScreens.AddLink -> AddLinkScreen(
-                initialUrl = screen.initialUrl,
-                onBack = { router.pop() },
-            )
+        // An entry provider converts a route into a NavEntry which contains the content for that route.
+        entryProvider = { route ->
+            when (route) {
+                is RootScreens.Home -> NavEntry(route) {
+                    HomeScreen(
+                        routeKey = route,
+                        onNavigateToDetail = { linkId ->
+                            backStack.add(RootScreens.LinkDetail(linkId))
+                        },
+                        onAddLink = { initialUrl ->
+                            backStack.add(RootScreens.AddLink(initialUrl))
+                        }
+                    )
+                }
+
+                is RootScreens.LinkDetail -> NavEntry(route) {
+                    LinkDetailScreen(
+                        routeKey = route,
+                        linkId = route.linkId,
+                        onBack = {
+                            if (backStack.size > 1) {
+                                backStack.removeLast()
+                            }
+                        }
+                    )
+                }
+
+                is RootScreens.AddLink -> NavEntry(route) {
+                    AddLinkScreen(
+                        routeKey = route,
+                        initialUrl = route.initialUrl,
+                        onBack = {
+                            if (backStack.size > 1) {
+                                backStack.removeLast()
+                            }
+                        }
+                    )
+                }
+
+                else -> NavEntry(route) { Text("Unknown route: $route") }
+            }
+
         }
-    }
+    )
+
+
 }

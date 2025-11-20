@@ -34,7 +34,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,22 +41,21 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.NavKey
 import com.greenrobotdev.linklibrary.model.Link
-import io.github.xxfast.decompose.router.rememberOnRoute
 
 @Composable
 fun HomeScreen(
+    routeKey: NavKey,
     onNavigateToDetail: (String) -> Unit,
     onAddLink: (String?) -> Unit
 ) {
 
-    val viewModel: HomeViewModel = rememberOnRoute() {
-        HomeViewModel(this)
-    }
+    val viewModel: HomeViewModel = viewModel<HomeViewModel>(key = routeKey.toString()) { HomeViewModel() }
 
     val state by viewModel.states.collectAsState()
 
@@ -87,20 +85,20 @@ private fun HomeView(
 
     val pullToRefreshState = rememberPullToRefreshState()
 
-    LaunchedEffect(pullToRefreshState.isRefreshing) {
-        if (pullToRefreshState.isRefreshing) {
-            onRefresh()
-        }
-    }
-
-    LaunchedEffect(state.isLoading) {
-        if (!state.isLoading) {
-            pullToRefreshState.endRefresh()
-        }
-    }
+//    LaunchedEffect(pullToRefreshState.isRefreshing) {
+//        if (pullToRefreshState.isRefreshing) {
+//            onRefresh()
+//        }
+//    }
+//
+//    LaunchedEffect(state.isLoading) {
+//        if (!state.isLoading) {
+//            pullToRefreshState.endRefresh()
+//        }
+//    }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(pullToRefreshState.nestedScrollConnection),
+        modifier = Modifier,
         topBar = {
             TopAppBar(
                 title = {
@@ -197,10 +195,11 @@ private fun HomeView(
                     }
                 }
             }
-            PullToRefreshContainer(
-                state = pullToRefreshState,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
+//            PullToRefreshBox(
+//                state = pullToRefreshState,
+//                modifier = Modifier.align(Alignment.TopCenter),
+//                isRefreshing = pullToRefreshState.isAnimating
+//            )
         }
     }
 }

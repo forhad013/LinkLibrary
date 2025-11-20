@@ -48,13 +48,20 @@ kotlin {
                 // Kotlinx DateTime
                 implementation(libs.kotlinx.datetime)
 
-                // Decompose 
-                implementation(libs.decompose.router)
+                // Kotlinx DateTime
+                implementation(libs.kotlinx.datetime)
+
                 // Molecule
                 implementation(libs.molecule.runtime)
 //                implementation(libs.molecule.compose)
+
+                // Navigation 3
+                implementation(libs.navigation3.ui)
+                implementation(libs.lifecycle.viewmodel.navigation3)
+//                implementation(libs.adaptive.navigation3)
             }
         }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(kotlin("test-common"))

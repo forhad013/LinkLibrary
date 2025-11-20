@@ -33,21 +33,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import io.github.xxfast.decompose.router.rememberOnRoute
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.NavKey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddLinkScreen(
+    routeKey: NavKey,
     initialUrl: String?,
     onBack: () -> Unit
 ) {
 
-    val viewModel: AddLinkViewModel = rememberOnRoute() {
-        AddLinkViewModel(this,initialUrl)
-    }
+    val viewModel: AddLinkViewModel = viewModel<AddLinkViewModel>(key = routeKey.toString()) { AddLinkViewModel(initialUrl) }
 
     val state by viewModel.states.collectAsState()
-    
+
 //    // Handle successful link addition
 //    LaunchedEffect(state) {
 //        if (state.isFormValid && !state.isLoading && state.error == null) {
