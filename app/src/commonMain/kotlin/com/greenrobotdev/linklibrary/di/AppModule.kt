@@ -1,9 +1,12 @@
 package com.greenrobotdev.linklibrary.di
 
-import com.greenrobotdev.linklibrary.data.repository.LinkRepositoryImpl
-import com.greenrobotdev.linklibrary.domain.repository.LinkRepository
 import org.koin.dsl.module
 
+/**
+ * Common Koin module for shared dependencies.
+ *
+ * Imports database module which provides the LinkRepository.
+ * Android-specific dependencies (like DatabaseBuilder) are provided by androidAppModule.
+ */
 val appModule = module {
-    single<LinkRepository> { LinkRepositoryImpl() }
 }

@@ -9,24 +9,29 @@ plugins {
 kotlin {
     androidTarget()
 
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "shared"
-            isStatic = true
-        }
-    }
+    // iOS and JVM targets removed - focusing on Android only for now
+    // Can be added back later when needed
 
-    jvm {
-        testRuns.named("test") {
-            executionTask.configure {
-                useJUnitPlatform()
-            }
-        }
-    }
+    // TODO: Add iOS support later
+    // listOf(
+    //     iosX64(),
+    //     iosArm64(),
+    //     iosSimulatorArm64()
+    // ).forEach { iosTarget ->
+    //     iosTarget.binaries.framework {
+    //         baseName = "shared"
+    //         isStatic = true
+    //     }
+    // }
+
+    // TODO: Add JVM support later
+    // jvm {
+    //     testRuns.named("test") {
+    //         executionTask.configure {
+    //             useJUnitPlatform()
+    //         }
+    //     }
+    // }
 
     sourceSets {
         val commonMain by getting {
@@ -44,9 +49,6 @@ kotlin {
                 // Ktor
                 implementation(libs.ktor.client.core)
                 implementation(libs.kotlinx.serialization.json)
-                
-                // Kotlinx DateTime
-                implementation(libs.kotlinx.datetime)
 
                 // Kotlinx DateTime
                 implementation(libs.kotlinx.datetime)
@@ -59,6 +61,9 @@ kotlin {
                 implementation(libs.navigation3.ui)
                 implementation(libs.lifecycle.viewmodel.navigation3)
 //                implementation(libs.adaptive.navigation3)
+
+                // Database module (includes Room runtime transitively)
+                implementation(project(":database"))
             }
         }
 
@@ -67,7 +72,14 @@ kotlin {
             implementation(kotlin("test-common"))
             implementation(kotlin("test-annotations-common"))
         }
+
+        val androidMain by getting {
+            dependencies {
+                // Android-specific dependencies
+            }
+        }
     }
+
 }
 
 android {

@@ -6,8 +6,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.linklibrary.domain.repository.LinkRepository
+import com.greenrobotdev.linklibrary.database.repository.LinkRepository
 import com.greenrobotdev.linklibrary.model.Link
+import com.greenrobotdev.linklibrary.model.toEntity
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -67,7 +68,7 @@ fun AddLinkUseCase(
                                 isFavorite = state.isFavorite,
                                 createdAt = Clock.System.now()
                             )
-                            val result = linkRepository.addLink(link)
+                            val result = linkRepository.addLink(link.toEntity())
 
                             // Reset form after successful submission
                             state = state.copy(

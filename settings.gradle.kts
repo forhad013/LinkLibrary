@@ -21,4 +21,5 @@ rootProject.name = "LinkLibrary"
 include(":app:androidApp")
 include(":app:iosApp")
 include(":app")
+include(":database")
 //include(":konsistTest")

@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.model
 
+import com.greenrobotdev.linklibrary.database.room.LinkEntity
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
@@ -44,4 +45,31 @@ data class Link(
             )
         )
     }
+}
+
+
+@OptIn(ExperimentalTime::class)
+fun Link.toEntity(): LinkEntity {
+    return LinkEntity(
+        id = id,
+        title = title,
+        url = url,
+        description = description,
+        isFavorite = isFavorite,
+        createdAt = createdAt?.toEpochMilliseconds(),
+        tags = tags
+    )
+}
+
+@OptIn(ExperimentalTime::class)
+fun LinkEntity.toDomain(): Link {
+    return Link(
+        id = id,
+        title = title,
+        url = url,
+        description = description,
+        isFavorite = isFavorite,
+        createdAt = createdAt?.let { Instant.fromEpochMilliseconds(it) },
+        tags = tags
+    )
 }

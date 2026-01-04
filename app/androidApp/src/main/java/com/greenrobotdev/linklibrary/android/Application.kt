@@ -1,7 +1,8 @@
 package com.greenrobotdev.linklibrary.android
 
 import android.app.Application
-import com.greenrobotdev.linklibrary.di.appModule
+import com.greenrobotdev.linklibrary.database.di.databaseModule
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
 class Application : Application() {
@@ -10,7 +11,10 @@ class Application : Application() {
         super.onCreate()
 
         startKoin {
-            modules(appModule)
+            androidContext(this@Application)
+            modules(
+                databaseModule,  // Data repositories (common)
+            )
         }
 
     }

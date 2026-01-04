@@ -6,7 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.linklibrary.domain.repository.LinkRepository
+import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import com.greenrobotdev.linklibrary.model.toDomain
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -24,7 +25,7 @@ fun HomeUseCase(
         isLoading = true
         linkRepository.getLinks().collect { result ->
             isLoading = false
-//            result.doIfSuccess { links = it }
+            result.onSuccess { links = it.map { it.toDomain() } }
             result.onFailure { error = it.message }
         }
     }
@@ -37,15 +38,16 @@ fun HomeUseCase(
                     linkRepository.getLinks().collect { result ->
                         isLoading = false
 
-                        result.onSuccess{ links = it }
+                        result.onSuccess{ links = it.map { entity -> entity.toDomain() } }
                         result.onFailure { error = it.message }
                     }
                 }
                 is HomeEvent.ToggleFavorite -> {
                     linkRepository.toggleFavorite(event.id).collect { result ->
                         result.onSuccess { updatedLink ->
+                            val domainLink = updatedLink.toDomain()
                             links = links?.map { link ->
-                                if (link.id == updatedLink.id) updatedLink else link
+                                if (link.id == domainLink.id) domainLink else link
                             }
                         }
                         result.onFailure { error = it.message }

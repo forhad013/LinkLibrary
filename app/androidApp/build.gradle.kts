@@ -9,7 +9,7 @@ android {
     namespace = "com.greenrobotdev.linklibrary.android"
     compileSdk = 36
     defaultConfig {
-        applicationId = "com.greenrobotdev.moneynest.android"
+        applicationId = "com.greenrobotdev.linklibrary.android"
         minSdk = 28
         targetSdk = 35
         versionCode = 1
@@ -39,6 +39,7 @@ android {
 
 dependencies {
     implementation(project(":app"))
+    implementation(project(":database"))
     implementation(libs.koin.android)
     implementation(libs.koin.core)
     implementation(libs.androidx.activity.compose)
