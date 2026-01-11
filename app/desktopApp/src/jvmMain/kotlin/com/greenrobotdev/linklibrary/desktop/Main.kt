@@ -1,13 +1,12 @@
 package com.greenrobotdev.linklibrary.desktop
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.greenrobotdev.linklibrary.database.di.databaseModule
 import com.greenrobotdev.linklibrary.screens.root.RootScreen
+import com.greenrobotdev.linklibrary.theme.MyApplicationTheme
 import org.koin.core.context.startKoin
 import kotlin.system.exitProcess
 
@@ -26,7 +25,7 @@ fun main() {
             state = windowState,
             title = "Link Library"
         ) {
-            MaterialTheme(colorScheme = darkColorScheme()) {
+            MyApplicationTheme(darkTheme = true) {
                 RootScreen()
             }
         }

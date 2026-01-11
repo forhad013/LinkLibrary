@@ -7,7 +7,7 @@ data class HomeState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val links: List<Link>? = null,
-    // Add other state properties here
+    val searchQuery: String = ""
 )
 
 sealed interface HomeEvent {
