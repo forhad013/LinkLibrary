@@ -70,14 +70,10 @@ fun AddLinkUseCase(
                             )
                             val result = linkRepository.addLink(link.toEntity())
 
-                            // Reset form after successful submission
+                            // Set success flag after successful submission
                             state = state.copy(
                                 isLoading = false,
-                                title = "",
-                                url = "",
-                                description = "",
-                                isFavorite = false,
-                                isFormValid = false
+                                success = true
                             )
                         } catch (e: Exception) {
                             state = state.copy(

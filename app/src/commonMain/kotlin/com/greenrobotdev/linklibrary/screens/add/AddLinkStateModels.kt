@@ -11,7 +11,8 @@ data class AddLinkState(
     val url: String = "",
     val description: String = "",
     val isFavorite: Boolean = false,
-    val isFormValid: Boolean = false
+    val isFormValid: Boolean = false,
+    val success: Boolean = false
 )
 
 sealed interface AddLinkEvent {

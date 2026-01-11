@@ -28,6 +28,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -48,12 +49,12 @@ fun AddLinkScreen(
 
     val state by viewModel.states.collectAsState()
 
-//    // Handle successful link addition
-//    LaunchedEffect(state) {
-//        if (state.isFormValid && !state.isLoading && state.error == null) {
-//            onBack()
-//        }
-//    }
+    // Navigate back after successful link addition
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            onBack()
+        }
+    }
 
     Scaffold(
         topBar = {
