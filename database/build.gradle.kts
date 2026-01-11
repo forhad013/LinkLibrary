@@ -42,8 +42,15 @@ kotlin {
 
         val jvmMain by getting {
             dependencies {
-                // JVM-specific dependencies can be added here
+                // Room SQLite for JVM
+                implementation(libs.androidx.sqlite.bundled)
                 implementation(libs.koin.core)
+            }
+        }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
             }
         }
     }
@@ -58,6 +65,7 @@ room {
 // Per official docs: https://developer.android.com/kotlin/multiplatform/room
 dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
+    add("kspJvm", libs.androidx.room.compiler)
 }
 
 android {

@@ -8,11 +8,9 @@ plugins {
 
 kotlin {
     androidTarget()
+    jvm() // Enable JVM target for desktop app
 
-    // iOS and JVM targets removed - focusing on Android only for now
-    // Can be added back later when needed
-
-    // TODO: Add iOS support later
+    // iOS targets removed - focusing on Android and Desktop for now
     // listOf(
     //     iosX64(),
     //     iosArm64(),
@@ -76,6 +74,13 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 // Android-specific dependencies
+            }
+        }
+
+        val jvmMain by getting {
+            dependencies {
+                // JVM-specific dependencies
+                implementation(compose.desktop.currentOs)
             }
         }
     }

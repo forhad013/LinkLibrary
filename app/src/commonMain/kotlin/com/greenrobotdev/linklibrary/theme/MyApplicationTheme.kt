@@ -1,4 +1,4 @@
-package com.greenrobotdev.linklibrary.android
+package com.greenrobotdev.linklibrary.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape

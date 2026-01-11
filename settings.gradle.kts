@@ -19,6 +19,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "LinkLibrary"
 include(":app:androidApp")
+include(":app:desktopApp")
 include(":app:iosApp")
 include(":app")
 include(":database")
