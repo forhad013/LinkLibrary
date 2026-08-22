@@ -13,9 +13,6 @@ sealed class RootScreens : NavKey {
     data object LibraryTab : RootScreens()
 
     @Serializable
-    data object CollectionsTab : RootScreens()
-
-    @Serializable
     data object SettingsTab : RootScreens()
 
     // Detail Screens
@@ -24,6 +21,20 @@ sealed class RootScreens : NavKey {
 
     @Serializable
     data class AddLink(val initialUrl: String? = null) : RootScreens()
+
+    @Serializable
+    data object AddCollection : RootScreens()
+
+    // Demo/Utility Screens
+    @Serializable
+    data object AIAssistantDemo : RootScreens()
+
+    @Serializable
+    data object Collections : RootScreens()
+
+    // Note Editor
+    @Serializable
+    data class NoteEditor(val noteId: String? = null) : RootScreens()
 }
 
 // Bottom navigation items data class
@@ -36,6 +47,5 @@ data class BottomNavItem(
 val bottomNavItems = listOf(
     BottomNavItem(RootScreens.HomeTab, "Home", "home"),
     BottomNavItem(RootScreens.LibraryTab, "Library", "library_books"),
-    BottomNavItem(RootScreens.CollectionsTab, "Collections", "collections"),
     BottomNavItem(RootScreens.SettingsTab, "Settings", "settings")
 )
