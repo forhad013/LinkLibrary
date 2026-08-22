@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.screens.share
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,6 +27,7 @@ import androidx.navigation3.runtime.NavKey
 /**
  * Maps SharingPlatform to Compose icon
  */
+@Composable
 private fun getIconForPlatform(platform: SharingPlatform): ImageVector {
     return when (platform) {
         is SharingPlatform.Twitter -> Icons.Default.ContentCopy // Placeholder - use proper Twitter icon
@@ -42,6 +44,7 @@ private fun getIconForPlatform(platform: SharingPlatform): ImageVector {
 /**
  * Gets platform-specific color
  */
+@Composable
 private fun getColorForPlatform(platform: SharingPlatform): Color {
     return when (platform) {
         is SharingPlatform.Twitter -> Color(0xFF1DA1F2)

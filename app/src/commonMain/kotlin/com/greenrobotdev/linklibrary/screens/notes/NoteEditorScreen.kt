@@ -1,8 +1,11 @@
 package com.greenrobotdev.linklibrary.screens.notes
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -10,15 +13,14 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.Bold
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Italic
+import androidx.compose.material.icons.filled.FormatBold
+import androidx.compose.material.icons.filled.FormatItalic
+import androidx.compose.material.icons.filled.FormatUnderlined
 import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Title
-import androidx.compose.material.icons.filled.Underline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,7 +36,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
-import kotlinx.datetime.Clock
 
 /**
  * Note Editor Screen - Rich text editor for annotating articles
@@ -163,12 +164,19 @@ fun NoteEditorScreen(
                             textDecoration = if (isUnderline)
                                 TextDecoration.Underline else TextDecoration.None
                         ),
-                        placeholder = {
-                            Text(
-                                "Start writing your note...",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
+                        decorationBox = { innerTextField ->
+                            Box(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                if (contentValue.text.isEmpty()) {
+                                    Text(
+                                        "Start writing your note...",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                                innerTextField()
+                            }
                         }
                     )
                 }
@@ -220,21 +228,21 @@ private fun FormattingToolbar(
     ) {
         // Bold
         FormattingButton(
-            icon = Icons.Default.Bold,
+            icon = Icons.Default.FormatBold,
             isSelected = isBold,
             onClick = { onBoldClick(!isBold) }
         )
 
         // Italic
         FormattingButton(
-            icon = Icons.Default.Italic,
+            icon = Icons.Default.FormatItalic,
             isSelected = isItalic,
             onClick = { onItalicClick(!isItalic) }
         )
 
         // Underline
         FormattingButton(
-            icon = Icons.Default.Underline,
+            icon = Icons.Default.FormatUnderlined,
             isSelected = isUnderline,
             onClick = { onUnderlineClick(!isUnderline) }
         )

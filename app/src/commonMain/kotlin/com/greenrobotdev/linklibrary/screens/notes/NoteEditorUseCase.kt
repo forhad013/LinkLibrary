@@ -1,15 +1,11 @@
 package com.greenrobotdev.linklibrary.screens.notes
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import app.cash.molecule.moleculeFlow
-import app.cash.molecule.RecompositionMode
-import com.greenrobotdev.linklibrary.data.LinkRepository
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.StateFlow
+import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Use Case for Note Editor business logic
@@ -18,45 +14,43 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun NoteEditorUseCase(
     initialState: NoteEditorState,
-    events: kotlinx.coroutines.flow.SharedFlow<NoteEditorEvent>,
-    linkRepository: com.greenrobotdev.linklibrary.data.LinkRepository
-): StateFlow<NoteEditorState> {
+    events: Flow<NoteEditorEvent>,
+    linkRepository: LinkRepository
+): NoteEditorState {
 
-    // Collect state as Compose State
-    var state by remember { mutableStateOf(initialState) }
+    var state = remember { mutableStateOf(initialState) }
 
     // Handle events
-    kotlinx.coroutines.flow.LaunchedEffect(events) {
+    LaunchedEffect(events) {
         events.collect { event ->
             when (event) {
                 is NoteEditorEvent.LoadNote -> {
                     // Load note logic
                     // For now, we start with empty note
-                    state = state.copy(isLoading = false)
+                    state.value = state.value.copy(isLoading = false)
                 }
                 is NoteEditorEvent.SaveNote -> {
-                    state = state.copy(isSaving = true)
+                    state.value = state.value.copy(isSaving = true)
                     // Save note logic here
                     kotlinx.coroutines.delay(500) // Simulate save
-                    state = state.copy(isSaving = false)
+                    state.value = state.value.copy(isSaving = false)
                 }
                 is NoteEditorEvent.ClearError -> {
-                    state = state.copy(error = null)
+                    state.value = state.value.copy(error = null)
                 }
-                is NoteEditorEvent.TitleChanged -> { title ->
-                    state = state.copy(note = state.note.copy(title = title))
+                is NoteEditorEvent.TitleChanged -> {
+                    state.value = state.value.copy(note = state.value.note.copy(title = event.title))
                 }
-                is NoteEditorEvent.ContentChanged -> { content ->
-                    state = state.copy(note = state.note.copy(content = content))
+                is NoteEditorEvent.ContentChanged -> {
+                    state.value = state.value.copy(note = state.value.note.copy(content = event.content))
                 }
-                is NoteEditorEvent.AttachLink -> { linkId ->
-                    // Attach link to note
-                    state = state.copy(note = state.note.copy(attachedLinkId = linkId))
+                is NoteEditorEvent.AttachLink -> {
+                    state.value = state.value.copy(note = state.value.note.copy(attachedLinkId = event.linkId))
                 }
                 is NoteEditorEvent.DetachLink -> {
-                    state = state.copy(note = state.note.copy(attachedLinkId = null))
+                    state.value = state.value.copy(note = state.value.note.copy(attachedLinkId = null))
                 }
-                is NoteEditorEvent.ToggleFormat -> { format ->
+                is NoteEditorEvent.ToggleFormat -> {
                     // Handle text formatting - UI layer manages this
                 }
             }
@@ -64,10 +58,10 @@ fun NoteEditorUseCase(
     }
 
     // Load available links for attaching
-    kotlinx.coroutines.flow.LaunchedEffect(Unit) {
+    LaunchedEffect(Unit) {
         linkRepository.getLinks().collect { result ->
             result.onSuccess { links ->
-                state = state.copy(
+                state.value = state.value.copy(
                     availableLinks = links.map { link ->
                         LinkSuggestion(
                             id = link.id,
@@ -80,7 +74,5 @@ fun NoteEditorUseCase(
         }
     }
 
-    return moleculeFlow(RecompositionMode.Immediate) {
-        state
-    }
+    return state.value
 }

@@ -1,7 +1,5 @@
 package com.greenrobotdev.linklibrary.screens.share
 
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
 import kotlinx.serialization.Serializable
 
 /**
@@ -15,37 +13,9 @@ data class ShareState(
     val selectedPlatform: SharingPlatform? = null,
     val customMessage: String = "",
     val isSharing: Boolean = false,
+    val isLoading: Boolean = false,
     val error: String? = null
-) {
-    companion object {
-        val Saver: Saver<ShareState, *> = listSaver(
-            saver = Saver(
-                save = { state ->
-                    listOf(
-                        state.linkId,
-                        state.linkTitle,
-                        state.linkUrl,
-                        state.selectedPlatform,
-                        state.customMessage,
-                        state.isSharing,
-                        state.error
-                    )
-                },
-                restore = { list ->
-                    ShareState(
-                        linkId = list[0] as String,
-                        linkTitle = list[1] as String,
-                        linkUrl = list[2] as String,
-                        selectedPlatform = list[3] as SharingPlatform?,
-                        customMessage = list[4] as String,
-                        isSharing = list[5] as Boolean,
-                        error = list[6] as String?
-                    )
-                }
-            )
-        )
-    }
-}
+)
 
 /**
  * Social media platforms for sharing

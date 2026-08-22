@@ -1,14 +1,12 @@
 package com.greenrobotdev.linklibrary.screens.share
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import app.cash.molecule.moleculeFlow
-import app.cash.molecule.RecompositionMode
-import com.greenrobotdev.linklibrary.data.LinkRepository
-import kotlinx.coroutines.flow.StateFlow
+import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 
 /**
  * Use Case for Share Pop-up business logic
@@ -17,58 +15,72 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun ShareUseCase(
     initialState: ShareState,
-    events: kotlinx.coroutines.flow.SharedFlow<ShareEvent>,
+    events: Flow<ShareEvent>,
     linkRepository: LinkRepository
-): StateFlow<ShareState> {
+): ShareState {
 
-    var state by remember { mutableStateOf(initialState) }
+    var state = remember { mutableStateOf(initialState) }
 
     // Handle events
-    kotlinx.coroutines.flow.LaunchedEffect(events) {
+    LaunchedEffect(events) {
         events.collect { event ->
             when (event) {
                 is ShareEvent.Initialize -> {
                     // Load link data if linkId is provided
-                    if (state.linkId.isNotEmpty()) {
-                        linkRepository.getLinkById(state.linkId).collect { result ->
-                            result.onSuccess { link ->
-                                state = state.copy(
-                                    linkTitle = link.title,
-                                    linkUrl = link.url.toString(),
-                                    customMessage = "Check out this link: ${link.title}"
+                    if (state.value.linkId.isNotEmpty()) {
+                        state.value = state.value.copy(isLoading = true)
+                        linkRepository.getLinks()
+                            .catch { e ->
+                                state.value = state.value.copy(
+                                    isLoading = false,
+                                    error = e.message ?: "Failed to load link"
                                 )
                             }
-                            result.onFailure { error ->
-                                state = state.copy(error = error.message)
+                            .collect { result ->
+                                result.fold(
+                                    onSuccess = { links ->
+                                        val link = links.find { it.id == state.value.linkId }
+                                        state.value = state.value.copy(
+                                            isLoading = false,
+                                            linkTitle = link?.title ?: "",
+                                            linkUrl = link?.url?.toString() ?: "",
+                                            customMessage = "Check out this link: ${link?.title ?: ""}",
+                                            error = if (link == null) "Link not found" else null
+                                        )
+                                    },
+                                    onFailure = { e ->
+                                        state.value = state.value.copy(
+                                            isLoading = false,
+                                            error = e.message ?: "Failed to load link"
+                                        )
+                                    }
+                                )
                             }
-                        }
                     }
                 }
-                is ShareEvent.SelectPlatform -> { platform ->
-                    state = state.copy(selectedPlatform = platform)
+                is ShareEvent.SelectPlatform -> {
+                    state.value = state.value.copy(selectedPlatform = event.platform)
                 }
-                is ShareEvent.UpdateMessage -> { message ->
-                    state = state.copy(customMessage = message)
+                is ShareEvent.UpdateMessage -> {
+                    state.value = state.value.copy(customMessage = event.message)
                 }
                 is ShareEvent.Share -> {
-                    state = state.copy(isSharing = true)
+                    state.value = state.value.copy(isSharing = true)
                     // Perform share action
                     kotlinx.coroutines.delay(500) // Simulate share
-                    state = state.copy(isSharing = false)
+                    state.value = state.value.copy(isSharing = false)
                     // Note: Actual platform-specific sharing would be handled here
                 }
                 is ShareEvent.ClearError -> {
-                    state = state.copy(error = null)
+                    state.value = state.value.copy(error = null)
                 }
                 is ShareEvent.Dismiss -> {
                     // Reset state for next time
-                    state = initialState
+                    state.value = initialState
                 }
             }
         }
     }
 
-    return moleculeFlow(RecompositionMode.Immediate) {
-        state
-    }
+    return state.value
 }
