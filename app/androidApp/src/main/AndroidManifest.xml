@@ -10,26 +10,37 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:label="@string/app_name"
             android:launchMode="singleTask">
-            <intent-filter>
+            <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
             <!-- Share intent filters for receiving shared content -->
-            <intent-filter>
+            <!-- Primary share filter for text/URL content -->
+            <intent-filter android:label="@string/app_name" android:priority="10">
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
 
-            <intent-filter>
+            <!-- Additional share filters for better compatibility -->
+            <intent-filter android:label="@string/app_name" android:priority="9">
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/*" />
             </intent-filter>
 
-            <intent-filter>
+            <intent-filter android:label="@string/app_name" android:priority="8">
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+            </intent-filter>
+
+            <!-- Support for multiple items -->
+            <intent-filter android:label="@string/app_name" android:priority="7">
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
