@@ -5,11 +5,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
-import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.savedstate.serialization.SavedStateConfiguration
@@ -22,10 +20,10 @@ private val config = SavedStateConfiguration {
         polymorphic(NavKey::class) {
             subclass(RootScreens.HomeTab::class, RootScreens.HomeTab.serializer())
             subclass(RootScreens.LibraryTab::class, RootScreens.LibraryTab.serializer())
-            subclass(RootScreens.CollectionsTab::class, RootScreens.CollectionsTab.serializer())
             subclass(RootScreens.SettingsTab::class, RootScreens.SettingsTab.serializer())
             subclass(RootScreens.LinkDetail::class, RootScreens.LinkDetail.serializer())
             subclass(RootScreens.AddLink::class, RootScreens.AddLink.serializer())
+            subclass(RootScreens.AddCollection::class, RootScreens.AddCollection.serializer())
         }
     }
 }
@@ -63,7 +61,14 @@ fun rememberNavigationState(
     topLevelRoutes: Set<NavKey>
 ): NavigationState {
 
-    val topLevelRoute = rememberSaveable { mutableStateOf(startRoute) }
+    // Use remember instead of rememberSaveable to avoid serialization crash
+    // Note: Navigation state will reset on configuration changes
+    // This is a trade-off to avoid the NavKey serialization issue
+    val currentRoute = remember { startRoute }
+
+    val topLevelRoute = remember(currentRoute) {
+        mutableStateOf(currentRoute)
+    }
 
     // Create back stack for each top level route
     val backStacks = topLevelRoutes.associateWith { route ->
