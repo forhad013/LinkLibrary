@@ -9,6 +9,7 @@ plugins {
 kotlin {
     androidTarget {
         compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
             freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
             freeCompilerArgs.add("-Xcontext-receivers")
         }
@@ -16,6 +17,7 @@ kotlin {
 
     jvm() {
         compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
             freeCompilerArgs.add("-Xjsr305=strict")
         }
     }
