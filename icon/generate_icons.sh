@@ -89,7 +89,7 @@ for item in "${densities[@]}"; do
 done
 
 # Generate adaptive icon (foreground)
-adaptive_dir="$TARGET_DIR/mipmap-anydpi-v26"
+adaptive_dir="$TARGET_DIR/drawable"
 $MAGICK_CMD "$SOURCE_ICON" -resize "108x108" -background none -gravity center -extent "108x108" "$adaptive_dir/ic_launcher_foreground.png"
 echo "  ✓ Generated adaptive icon (108x108)"
 
