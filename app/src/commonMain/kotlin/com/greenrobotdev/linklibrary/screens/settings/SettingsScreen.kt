@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,20 +29,44 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
+
+/**
+ * Maps icon type string to Compose icon
+ */
+private fun getIconForType(iconType: String): androidx.compose.ui.graphics.vector.ImageVector {
+    return when (iconType) {
+        "text_fields" -> Icons.Default.TextFields
+        "notifications" -> Icons.Default.Notifications
+        "sync" -> Icons.Default.Sync
+        "lock" -> Icons.Default.Lock
+        "info" -> Icons.Default.Info
+        else -> Icons.Default.Info
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    routeKey: NavKey
+    routeKey: NavKey,
+    onNavigateToSetting: (String) -> Unit = {},
+    onNavigateToAI: () -> Unit = {}
 ) {
+    val viewModel: SettingsViewModel = viewModel(key = routeKey.toString()) {
+        SettingsViewModel()
+    }
+    val state by viewModel.states.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -53,63 +78,127 @@ fun SettingsScreen(
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            // Profile Section
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Row(
+        when {
+            state.isLoading -> {
+                // Loading state
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxSize()
+                        .padding(padding),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Card(
-                        modifier = Modifier.size(60.dp),
-                        shape = CircleShape,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = null,
-                            modifier = Modifier.padding(16.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary
+                    )
                     Spacer(modifier = Modifier.width(16.dp))
-                    Column {
-                        Text(
-                            text = "John Doe",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text(
-                            text = "john.doe@example.com",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Text(
+                        text = "Loading settings...",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 
-            // Settings Items
-            SettingsItem(icon = Icons.Default.TextFields, title = "Reading Preferences")
-            Divider(modifier = Modifier.padding(start = 72.dp))
-            SettingsItem(icon = Icons.Default.Notifications, title = "Notifications")
-            Divider(modifier = Modifier.padding(start = 72.dp))
-            SettingsItem(icon = Icons.Default.Sync, title = "Sync & Backup")
-            Divider(modifier = Modifier.padding(start = 72.dp))
-            SettingsItem(icon = Icons.Default.Lock, title = "Privacy & Security")
-            Divider(modifier = Modifier.padding(start = 72.dp))
-            SettingsItem(icon = Icons.Default.Info, title = "About")
+            state.userProfile != null -> {
+                // Content state
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                ) {
+                    // Profile Section
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Card(
+                                modifier = Modifier.size(60.dp),
+                                shape = CircleShape,
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(16.dp),
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column {
+                                Text(
+                                    text = state.userProfile?.name.toString(),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Text(
+                                    text = state.userProfile?.email.toString(),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+
+                    // Settings Items
+                    state.settingItems.forEachIndexed { index, setting ->
+                        SettingsItem(
+                            icon = getIconForType(setting.iconType),
+                            title = setting.title,
+                            onClick = {
+                                viewModel.onEvent(SettingsEvent.NavigateToSetting(setting.id))
+                                onNavigateToSetting(setting.id)
+                            }
+                        )
+                        // Add divider except for last item
+                        if (index < state.settingItems.size - 1) {
+                            Divider(modifier = Modifier.padding(start = 72.dp))
+                        }
+                    }
+
+                    // Add AI Assistant Demo option
+                    if (state.settingItems.isNotEmpty()) {
+                        Divider(modifier = Modifier.padding(start = 72.dp))
+                    }
+                    SettingsItem(
+                        icon = Icons.Default.AutoAwesome,
+                        title = "AI Assistant Demo",
+                        onClick = { onNavigateToAI() }
+                    )
+                }
+            }
+
+            state.error != null -> {
+                // Error state
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = state.error ?: "An error occurred",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    TextButton(
+                        onClick = { viewModel.onEvent(SettingsEvent.ClearError) }
+                    ) {
+                        Text("Dismiss")
+                    }
+                }
+            }
         }
     }
 }
@@ -117,7 +206,8 @@ fun SettingsScreen(
 @Composable
 fun SettingsItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String
+    title: String,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -125,7 +215,7 @@ fun SettingsItem(
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { }) {
+        IconButton(onClick = onClick) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
