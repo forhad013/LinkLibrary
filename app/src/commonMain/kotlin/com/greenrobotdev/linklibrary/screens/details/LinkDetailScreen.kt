@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.NoteAdd
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
+import com.greenrobotdev.linklibrary.screens.share.ShareDialog
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
@@ -65,6 +67,7 @@ fun LinkDetailScreen(
     val state by viewModel.states.collectAsState()
 
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showShareDialog by remember { mutableStateOf(false) }
 
     // Navigate back after successful deletion
     LaunchedEffect(state.isDeleted) {
@@ -113,6 +116,16 @@ fun LinkDetailScreen(
                         Icon(
                             imageVector = Icons.Default.NoteAdd,
                             contentDescription = "Add note",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    IconButton(
+                        onClick = { showShareDialog = true },
+                        enabled = !state.isLoading && state.link != null
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Share link",
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -344,6 +357,15 @@ fun LinkDetailScreen(
                     Text("Cancel")
                 }
             }
+        )
+    }
+
+    // Share dialog
+    if (showShareDialog) {
+        ShareDialog(
+            routeKey = routeKey,
+            linkId = linkId,
+            onDismiss = { showShareDialog = false }
         )
     }
 }
