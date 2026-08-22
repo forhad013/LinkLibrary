@@ -1,4 +1,5 @@
 package com.greenrobotdev.linklibrary.screens.home
+
 import com.greenrobotdev.linklibrary.model.Link
 import kotlinx.serialization.Serializable
 
@@ -13,6 +14,6 @@ data class HomeState(
 sealed interface HomeEvent {
     // Define events that can be triggered from the UI
     object Refresh : HomeEvent
-    data class ToggleFavorite(val id : String) : HomeEvent
+    data class ToggleFavorite(val id: String) : HomeEvent
     // Add other events here
 }

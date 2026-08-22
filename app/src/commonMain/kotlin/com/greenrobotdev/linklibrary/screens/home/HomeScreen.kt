@@ -151,11 +151,19 @@ private fun HomeView(
                         )
                     }
 
-                    else -> ArticleGrid(
-                        links = state.links,
-                        onArticleClick = onLinkClick,
-                        onFavoriteClick = onToggleFavorite
-                    )
+                    else -> Column {
+                        Text(
+                            text = "Recent Saves",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        ArticleGrid(
+                            links = state.links,
+                            onArticleClick = onLinkClick,
+                            onFavoriteClick = onToggleFavorite
+                        )
+                    }
                 }
             }
         }

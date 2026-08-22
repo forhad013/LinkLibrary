@@ -9,7 +9,9 @@ import androidx.compose.runtime.setValue
 import com.greenrobotdev.linklibrary.database.repository.LinkRepository
 import com.greenrobotdev.linklibrary.model.toDomain
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @Composable
 fun HomeUseCase(
     initialState: HomeState,
@@ -25,7 +27,12 @@ fun HomeUseCase(
         isLoading = true
         linkRepository.getLinks().collect { result ->
             isLoading = false
-            result.onSuccess { links = it.map { it.toDomain() } }
+            result.onSuccess {
+                // Show only recent 20 links, sorted by createdAt descending
+                links = it.map { it.toDomain() }
+                    .sortedByDescending { it.createdAt }
+                    .take(20)
+            }
             result.onFailure { error = it.message }
         }
     }
@@ -37,8 +44,12 @@ fun HomeUseCase(
                     isLoading = true
                     linkRepository.getLinks().collect { result ->
                         isLoading = false
-
-                        result.onSuccess{ links = it.map { entity -> entity.toDomain() } }
+                        result.onSuccess {
+                            // Show only recent 20 links, sorted by createdAt descending
+                            links = it.map { it.toDomain() }
+                                .sortedByDescending { entity -> entity.createdAt }
+                                .take(20)
+                        }
                         result.onFailure { error = it.message }
                     }
                 }
