@@ -18,6 +18,11 @@ android {
     buildFeatures {
         compose = true
     }
+
+    // Enable resource processing for icons
+    sourceSets {
+        getByName("main").res.srcDirs("src/main/res")
+    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
