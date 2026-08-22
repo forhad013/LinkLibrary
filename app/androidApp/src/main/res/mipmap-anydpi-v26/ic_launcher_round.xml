@@ -3,5 +3,5 @@
     <!-- Background layer -->
     <background android:drawable="@color/ic_launcher_background"/>
     <!-- Foreground layer -->
-    <foreground android:drawable="@drawable/ic_launcher_foreground"/>
+    <foreground android:drawable="@mipmap-anydpi-v26/ic_launcher_foreground"/>
 </adaptive-icon>

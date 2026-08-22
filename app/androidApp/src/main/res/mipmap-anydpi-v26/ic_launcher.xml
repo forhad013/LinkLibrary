@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Launcher icons -->
-    <mipmap name="ic_launcher" src="@mipmap-anydpi-v26/ic_launcher_round" />
-</resources>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background layer -->
+    <background android:drawable="@color/ic_launcher_background"/>
+    <!-- Foreground layer -->
+    <foreground android:drawable="@mipmap-anydpi-v26/ic_launcher_foreground"/>
+</adaptive-icon>

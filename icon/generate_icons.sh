@@ -34,44 +34,14 @@ fi
 echo "✅ Found source icon: $SOURCE_ICON"
 echo ""
 
-# Check if ImageMagick is installed
-if command -v convert &> /dev/null; then
-    echo "✅ ImageMagick is installed"
-    echo "Generating app icons for all densities..."
-    echo ""
-
-    # Define icon sizes for different densities
-    declare -A sizes=(
-        ["mdpi"]="36x36"
-        ["hdpi"]="48x48"
-        ["xhdpi"]="72x72"
-        ["xxhdpi"]="96x96"
-        ["xxxhdpi"]="144x144"
-        ["xxxhdpi"]="192x192"
-    )
-
-    # Generate icons for each density
-    for density in "${!sizes[@]}"; do
-        size="${sizes[$density]}"
-        target_file="$TARGET_DIR/mipmap-$density/ic_launcher.png"
-        target_round="$TARGET_DIR/mipmap-$density/ic_launcher_round.png"
-
-        # Convert and save icon
-        convert "$SOURCE_ICON" -resize "$size" -background none -gravity center -extent "$size" "$target_file"
-        convert "$SOURCE_ICON" -resize "$size" -background none -gravity center -extent "$size" "$target_round"
-
-        echo "  ✓ Generated ${size} icons for $density"
-    done
-
-    # Generate adaptive icon (foreground)
-    adaptive_dir="$TARGET_DIR/mipmap-anydpi-v26"
-    convert "$SOURCE_ICON" -resize "108x108" -background none -gravity center -extent "108x108" "$adaptive_dir/ic_launcher_foreground.png"
-    echo "  ✓ Generated adaptive icon (108x108)"
-
-    echo ""
-    echo "✅ Icon generation complete!"
-    echo "Generated icons for all Android densities"
-
+# Check if ImageMagick is installed and determine command to use
+MAGICK_CMD=""
+if command -v magick &> /dev/null; then
+    MAGICK_CMD="magick"
+    echo "✅ ImageMagick v7+ is installed"
+elif command -v convert &> /dev/null; then
+    MAGICK_CMD="convert"
+    echo "✅ ImageMagick (legacy) is installed"
 else
     echo "❌ ImageMagick is not installed"
     echo ""
@@ -87,7 +57,45 @@ else
     echo "  - mipmap-anydpi-v26/ic_launcher_foreground.png (108x108)"
     echo ""
     echo "Then place them in: $TARGET_DIR"
+    exit 1
 fi
+
+echo "Generating app icons for all densities..."
+echo ""
+
+# Define icon sizes for different densities (density:size pairs)
+densities=(
+    "mdpi:36x36"
+    "hdpi:48x48"
+    "xhdpi:72x72"
+    "xxhdpi:96x96"
+    "xxxhdpi:144x144"
+)
+
+# Generate icons for each density
+for item in "${densities[@]}"; do
+    IFS=':' read -ra density_info <<< "$item"
+    density="${density_info[0]}"
+    size="${density_info[1]}"
+
+    target_file="$TARGET_DIR/mipmap-$density/ic_launcher.png"
+    target_round="$TARGET_DIR/mipmap-$density/ic_launcher_round.png"
+
+    # Convert and save icon
+    $MAGICK_CMD "$SOURCE_ICON" -resize "$size" -background none -gravity center -extent "$size" "$target_file"
+    $MAGICK_CMD "$SOURCE_ICON" -resize "$size" -background none -gravity center -extent "$size" "$target_round"
+
+    echo "  ✓ Generated ${size} icons for $density"
+done
+
+# Generate adaptive icon (foreground)
+adaptive_dir="$TARGET_DIR/mipmap-anydpi-v26"
+$MAGICK_CMD "$SOURCE_ICON" -resize "108x108" -background none -gravity center -extent "108x108" "$adaptive_dir/ic_launcher_foreground.png"
+echo "  ✓ Generated adaptive icon (108x108)"
+
+echo ""
+echo "✅ Icon generation complete!"
+echo "Generated icons for all Android densities"
 
 echo ""
 echo "🎨 App icon setup instructions:"
