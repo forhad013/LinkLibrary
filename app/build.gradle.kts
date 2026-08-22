@@ -7,29 +7,18 @@ plugins {
 }
 
 kotlin {
-    androidTarget()
-    jvm() // Enable JVM target for desktop app
+    androidTarget {
+        compilerOptions {
+            freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
+            freeCompilerArgs.add("-Xcontext-receivers")
+        }
+    }
 
-    // iOS targets removed - focusing on Android and Desktop for now
-    // listOf(
-    //     iosX64(),
-    //     iosArm64(),
-    //     iosSimulatorArm64()
-    // ).forEach { iosTarget ->
-    //     iosTarget.binaries.framework {
-    //         baseName = "shared"
-    //         isStatic = true
-    //     }
-    // }
-
-    // TODO: Add JVM support later
-    // jvm {
-    //     testRuns.named("test") {
-    //         executionTask.configure {
-    //             useJUnitPlatform()
-    //         }
-    //     }
-    // }
+    jvm() {
+        compilerOptions {
+            freeCompilerArgs.add("-Xjsr305=strict")
+        }
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -46,6 +35,9 @@ kotlin {
 
                 // Ktor
                 implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.json)
+                implementation(libs.ktor.client.logging)
                 implementation(libs.kotlinx.serialization.json)
 
                 // Kotlinx DateTime
@@ -96,8 +88,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
@@ -107,4 +99,17 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.4"
     }
+}
+
+// Enable incremental compilation optimization
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    compilerOptions {
+        freeCompilerArgs.add("-Xinline-optimizations")
+    }
+}
+
+// Enable Compose compiler metrics and performance monitoring
+composeCompiler {
+    metricsDestination = layout.buildDirectory.dir("compose-compiler-reports")
+    reportsDestination = layout.buildDirectory.dir("compose-compiler-reports")
 }

@@ -13,6 +13,7 @@ kotlinxDatetime = "0.7.1"
 ktorClientCore = "2.3.7"
 ktorClientContentNegotiation = "2.3.7"
 ktorSerializationJson = "2.3.7"
+ktorClientLogging = "2.3.7"
 navigationCompose = "2.8.8"
 kotest="6.0.0.M2"
 compose-plugin = "1.9.3"
@@ -44,6 +45,9 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientContentNegotiation" }
+ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorSerializationJson" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientLogging" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 
 # Room Database (KMP support per official docs)

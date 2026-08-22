@@ -68,6 +68,14 @@ dependencies {
     add("kspJvm", libs.androidx.room.compiler)
 }
 
+// KSP configuration for Room incremental processing
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+    arg("room.incremental", "true")
+    arg("room.expandProjection", "true")
+    arg("room.useKspKotlinCodegen", "true")
+}
+
 android {
     namespace = "com.greenrobotdev.linklibrary.database"
     compileSdk = 36
@@ -77,7 +85,7 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
