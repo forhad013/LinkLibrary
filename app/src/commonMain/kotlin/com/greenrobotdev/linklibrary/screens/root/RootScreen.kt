@@ -1,8 +1,10 @@
 package com.greenrobotdev.linklibrary.screens.root
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Collections
@@ -26,6 +28,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
+import com.greenrobotdev.linklibrary.model.SharedContent
 import com.greenrobotdev.linklibrary.screens.add.AddLinkScreen
 import com.greenrobotdev.linklibrary.screens.addCollection.AddCollectionScreen
 import com.greenrobotdev.linklibrary.screens.collections.CollectionsScreen
@@ -35,7 +38,6 @@ import com.greenrobotdev.linklibrary.screens.library.LibraryScreen
 import com.greenrobotdev.linklibrary.screens.notes.NoteEditorScreen
 import com.greenrobotdev.linklibrary.screens.settings.SettingsScreen
 import com.greenrobotdev.linklibrary.screens.stitch.AIAssistantDemoScreen
-import com.greenrobotdev.linklibrary.model.SharedContent
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
@@ -98,6 +100,9 @@ fun RootScreen(
                        currentRoute !is RootScreens.NoteEditor
 
     Scaffold(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .safeDrawingPadding(),
         bottomBar = {
             if (showBottomNav) {
                 BottomAppBar(
