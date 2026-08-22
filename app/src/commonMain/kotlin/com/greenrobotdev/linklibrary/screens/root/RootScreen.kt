@@ -17,6 +17,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -34,6 +35,7 @@ import com.greenrobotdev.linklibrary.screens.library.LibraryScreen
 import com.greenrobotdev.linklibrary.screens.notes.NoteEditorScreen
 import com.greenrobotdev.linklibrary.screens.settings.SettingsScreen
 import com.greenrobotdev.linklibrary.screens.stitch.AIAssistantDemoScreen
+import com.greenrobotdev.linklibrary.model.SharedContent
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
@@ -67,13 +69,26 @@ data class NavBarItem(
 )
 
 @Composable
-fun RootScreen() {
+fun RootScreen(
+    sharedContent: SharedContent? = null,
+    onSharedContentHandled: () -> Unit = {}
+) {
     val navigationState = rememberNavigationState(
         startRoute = RootScreens.HomeTab,
         topLevelRoutes = TOP_LEVEL_ROUTES.keys
     )
 
     val navigator = remember { Navigator(navigationState) }
+
+    // Handle external share content - automatically navigate to Add Link screen
+    LaunchedEffect(sharedContent) {
+        if (sharedContent != null && sharedContent.url != null) {
+            // Navigate to Add Link screen with the shared URL
+            navigator.navigate(RootScreens.AddLink(sharedContent.url))
+            // Clear the shared content after navigation
+            onSharedContentHandled()
+        }
+    }
 
     // Determine if we should show bottom navigation (hide on detail/add screens)
     val currentRoute = navigationState.backStacks[navigationState.topLevelRoute]?.last()
