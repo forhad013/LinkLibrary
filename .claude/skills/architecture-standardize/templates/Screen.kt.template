@@ -1,0 +1,539 @@
+package {{PACKAGE}}
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.NavKey
+
+/**
+ * Screen composable for {{FEATURE_NAME}}.
+ *
+ * This is the UI layer that:
+ * - Creates ViewModel using viewModel() factory
+ * - Collects state via collectAsState()
+ * - Emits events to ViewModel
+ * - Handles navigation callbacks
+ *
+ * Architecture:
+ * - Receives: NavKey for navigation, callback lambdas
+ * - Creates: ViewModel with unique key per instance
+ * - Collects: State as State for recomposition
+ * - Delegates: UI rendering to separate View composable
+ *
+ * @param routeKey Unique navigation key for this screen instance
+ * @param {{NAVIGATION_PARAMS}} Navigation callback parameters
+ */
+@Composable
+fun {{SCREEN_FUNCTION_NAME}}(
+    routeKey: NavKey,
+    {{NAVIGATION_PARAMS}}
+) {
+    // Create ViewModel with unique key per navigation instance
+    val viewModel: {{VIEWMODEL_CLASS_NAME}} = viewModel<{{VIEWMODEL_CLASS_NAME}}>(
+        key = routeKey.toString()
+    ) {
+        {{VIEWMODEL_FACTORY}}
+    }
+
+    // Collect state as Compose State
+    val state by viewModel.states.collectAsState()
+
+    // Delegate to separate View composable for cleaner architecture
+    {{VIEW_FUNCTION_NAME}}(
+        state = state,
+        {{VIEW_PARAMS}}
+    )
+}
+
+// ============================================================================
+// TEMPLATE USAGE GUIDE
+// ============================================================================
+
+## Instructions for Customizing This Template
+
+### 1. Replace Placeholders
+
+- `{{PACKAGE}}`: Screen package (e.g., `com.greenrobotdev.linklibrary.screens.home`)
+- `{{FEATURE_NAME}}`: Feature name (e.g., "Home", "Link Detail")
+- `{{SCREEN_FUNCTION_NAME}}`: Screen function (e.g., `HomeScreen`)
+- `{{VIEWMODEL_CLASS_NAME}}`: ViewModel class (e.g., `HomeViewModel`)
+- `{{VIEW_FUNCTION_NAME}}`: View function name (e.g., `HomeView`)
+- `{{VIEWMODEL_FACTORY}}`: ViewModel instantiation with parameters
+- `{{NAVIGATION_PARAMS}}`: Navigation callback parameters
+- `{{VIEW_PARAMS}}`: Event handler parameters
+
+### 2. Define Navigation Parameters
+
+Add navigation callbacks as parameters:
+
+```kotlin
+// For list screens with navigation
+fun HomeScreen(
+    routeKey: NavKey,
+    onNavigateToDetail: (String) -> Unit,
+    onAddLink: (String?) -> Unit
+)
+
+// For detail screens
+fun LinkDetailScreen(
+    routeKey: NavKey,
+    linkId: String,
+    onBack: () -> Unit
+)
+
+// For form screens
+fun AddLinkScreen(
+    routeKey: NavKey,
+    initialUrl: String?,
+    onBack: () -> Unit
+)
+
+// For settings screens
+fun SettingsScreen(
+    routeKey: NavKey,
+    onNavigateToProfile: () -> Unit
+)
+```
+
+### 3. Configure ViewModel Factory
+
+Create ViewModel with optional parameters:
+
+```kotlin
+// Simple factory (no parameters)
+val viewModel: HomeViewModel = viewModel<HomeViewModel>(
+    key = routeKey.toString()
+) { HomeViewModel() }
+
+// With navigation parameters
+val viewModel: LinkDetailViewModel = viewModel<LinkDetailViewModel>(
+    key = routeKey.toString()
+) { LinkDetailViewModel(linkId) }
+
+// With optional parameters
+val viewModel: AddLinkViewModel = viewModel<AddLinkViewModel>(
+    key = routeKey.toString()
+) { AddLinkViewModel(initialUrl) }
+```
+
+### 4. Collect State
+
+Always collect state as Compose State:
+
+```kotlin
+val state by viewModel.states.collectAsState()
+```
+
+This ensures the UI recomposes when state changes.
+
+### 5. Handle Navigation Side Effects
+
+Use LaunchedEffect for one-time navigation actions:
+
+```kotlin
+// Navigate back after successful operation
+LaunchedEffect(state.success) {
+    if (state.success) {
+        onBack()
+    }
+}
+
+// Show toast on error
+LaunchedEffect(state.error) {
+    state.error?.let { error ->
+        // Show snackbar/toast
+    }
+}
+
+// Navigate on initial load
+LaunchedEffect(state.item) {
+    state.item?.let { item ->
+        // Auto-navigate somewhere
+    }
+}
+```
+
+### 6. Delegate to View Composable
+
+Separate Screen (container) from View (UI):
+
+```kotlin
+@Composable
+fun HomeScreen(
+    routeKey: NavKey,
+    onNavigateToDetail: (String) -> Unit,
+    onAddLink: (String?) -> Unit
+) {
+    val viewModel: HomeViewModel = viewModel(key = routeKey.toString()) { HomeViewModel() }
+    val state by viewModel.states.collectAsState()
+
+    HomeView(
+        state = state,
+        onRefresh = viewModel::onRefresh,
+        onToggleFavorite = viewModel::onToggleFavorite,
+        onLinkClick = onNavigateToDetail
+    )
+}
+
+@Composable
+private fun HomeView(
+    state: HomeState,
+    onRefresh: () -> Unit,
+    onToggleFavorite: (String) -> Unit,
+    onLinkClick: (String) -> Unit
+) {
+    // UI implementation here
+}
+```
+
+### 7. Complete Examples
+
+#### Example 1: HomeScreen (List Screen)
+```kotlin
+package com.greenrobotdev.linklibrary.screens.home
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.NavKey
+
+@Composable
+fun HomeScreen(
+    routeKey: NavKey,
+    onNavigateToDetail: (String) -> Unit,
+    onAddLink: (String?) -> Unit
+) {
+    val viewModel: HomeViewModel = viewModel<HomeViewModel>(
+        key = routeKey.toString()
+    ) { HomeViewModel() }
+    val state by viewModel.states.collectAsState()
+
+    HomeView(
+        state = state,
+        onRefresh = viewModel::onRefresh,
+        onToggleFavorite = viewModel::onToggleFavorite,
+        onLinkClick = onNavigateToDetail
+    )
+}
+
+@Composable
+private fun HomeView(
+    state: HomeState,
+    onRefresh: () -> Unit,
+    onToggleFavorite: (String) -> Unit,
+    onLinkClick: (String) -> Unit
+) {
+    LaunchedEffect(Unit) {
+        onRefresh()
+    }
+
+    // UI implementation
+    Scaffold(
+        topBar = { /* TopAppBar */ }
+    ) { padding ->
+        when {
+            state.isLoading && state.links.isNullOrEmpty() -> {
+                CircularProgressIndicator()
+            }
+            state.error != null -> {
+                Text("Error: ${state.error}")
+            }
+            else -> {
+                LinkList(
+                    links = state.links ?: emptyList(),
+                    onLinkClick = onLinkClick,
+                    onFavoriteClick = onToggleFavorite
+                )
+            }
+        }
+    }
+}
+```
+
+#### Example 2: AddLinkScreen (Form Screen with Auto-Navigation)
+```kotlin
+package com.greenrobotdev.linklibrary.screens.add
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.NavKey
+
+@Composable
+fun AddLinkScreen(
+    routeKey: NavKey,
+    initialUrl: String?,
+    onBack: () -> Unit
+) {
+    val viewModel: AddLinkViewModel = viewModel<AddLinkViewModel>(
+        key = routeKey.toString()
+    ) { AddLinkViewModel(initialUrl) }
+
+    val state by viewModel.states.collectAsState()
+
+    // Navigate back after successful link addition
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            onBack()
+        }
+    }
+
+    Scaffold(
+        topBar = { /* TopAppBar with back button */ }
+    ) { padding ->
+        AddLinkForm(
+            state = state,
+            onEvent = viewModel::onEvent
+        )
+    }
+}
+
+@Composable
+private fun AddLinkForm(
+    state: AddLinkState,
+    onEvent: (AddLinkEvent) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+    ) {
+        OutlinedTextField(
+            value = state.url,
+            onValueChange = { onEvent(AddLinkEvent.UrlChanged(it)) },
+            label = { Text("URL") }
+        )
+
+        Button(
+            onClick = { onEvent(AddLinkEvent.Submit) },
+            enabled = state.isFormValid && !state.isLoading
+        ) {
+            Text("Save Link")
+        }
+    }
+}
+```
+
+#### Example 3: LinkDetailScreen (Detail Screen with ID)
+```kotlin
+package com.greenrobotdev.linklibrary.screens.detail
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.NavKey
+
+@Composable
+fun LinkDetailScreen(
+    routeKey: NavKey,
+    linkId: String,
+    onBack: () -> Unit
+) {
+    val viewModel: LinkDetailViewModel = viewModel<LinkDetailViewModel>(
+        key = routeKey.toString()
+    ) { LinkDetailViewModel(linkId) }
+
+    val state by viewModel.states.collectAsState()
+
+    // Load link on initial composition
+    LaunchedEffect(Unit) {
+        viewModel.onLoadDetail(linkId)
+    }
+
+    // Navigate back after deletion
+    LaunchedEffect(state.isDeleted) {
+        if (state.isDeleted) {
+            onBack()
+        }
+    }
+
+    Scaffold(
+        topBar = { /* TopAppBar with back button */ }
+    ) { padding ->
+        when {
+            state.isLoading -> CircularProgressIndicator()
+            state.link != null -> LinkDetailContent(
+                link = state.link,
+                onDelete = viewModel::onDelete,
+                onToggleFavorite = viewModel::onToggleFavorite
+            )
+            else -> Text("Link not found")
+        }
+    }
+}
+```
+
+### 8. Navigation Key Usage
+
+The `routeKey` ensures unique ViewModel instances:
+
+```kotlin
+// Same screen can be opened multiple times
+HomeScreen(routeKey = NavKey("home/1"), ...)
+HomeScreen(routeKey = NavKey("home/2"), ...)  // Different ViewModel instance
+
+// Pass navigation arguments as separate parameters
+LinkDetailScreen(
+    routeKey = NavKey("detail/123"),
+    linkId = "123",  // Actual data
+    onBack = { /* navigate back */ }
+)
+```
+
+### 9. Event Handling Patterns
+
+#### Direct ViewModel Method Calls
+```kotlin
+// For simple events
+HomeView(
+    state = state,
+    onRefresh = viewModel::onRefresh,
+    onToggleFavorite = viewModel::onToggleFavorite
+)
+```
+
+#### Event Object Emission
+```kotlin
+// For form screens with many events
+AddLinkForm(
+    state = state,
+    onEvent = viewModel::onEvent  // Generic handler
+)
+
+// In the form
+OutlinedTextField(
+    value = state.url,
+    onValueChange = { onEvent(AddLinkEvent.UrlChanged(it)) }
+)
+```
+
+#### Event Wrapper Functions
+```kotlin
+// For complex event transformations
+SearchView(
+    state = state,
+    onSearch = { query ->
+        viewModel.onEvent(MyEvent.SearchChanged(query.trim()))
+    }
+)
+```
+
+### 10. Common UI Patterns
+
+#### Loading/Error/Data States
+```kotlin
+when {
+    state.isLoading && state.data.isNullOrEmpty() -> {
+        CircularProgressIndicator()
+    }
+    state.error != null -> {
+        ErrorMessage(
+            message = state.error,
+            onRetry = { viewModel.onRetry() }
+        )
+    }
+    state.data.isNullOrEmpty() -> {
+        EmptyState(
+            message = "No items found",
+            onAdd = { /* navigate */ }
+        )
+    }
+    else -> {
+        ContentList(items = state.data)
+    }
+}
+```
+
+#### Pull-to-Refresh
+```kotlin
+val pullRefreshState = rememberPullRefreshState(
+    refreshing = state.isLoading,
+    onRefresh = viewModel::onRefresh
+)
+
+Box(modifier = Modifier.pullRefresh(pullRefreshState)) {
+    // Content
+}
+
+PullRefreshIndicator(
+    refreshing = state.isLoading,
+    state = pullRefreshState,
+    modifier = Modifier.align(Alignment.TopCenter)
+)
+```
+
+#### Form Validation Feedback
+```kotlin
+OutlinedTextField(
+    value = state.email,
+    onValueChange = { onEvent(FormEvent.EmailChanged(it)) },
+    isError = state.validationErrors["email"] != null,
+    enabled = !state.isLoading
+)
+
+state.validationErrors["email"]?.let { error ->
+    Text(
+        text = error,
+        color = MaterialTheme.colorScheme.error,
+        style = MaterialTheme.typography.bodySmall
+    )
+}
+```
+
+### 11. Best Practices
+
+1. **Separation of Concerns**: Screen = container, View = UI
+2. **ViewModel Factory**: Always use routeKey as factory key
+3. **State Collection**: Use collectAsState() for recomposition
+4. **Side Effects**: Use LaunchedEffect for one-time actions
+5. **Event Handling**: Pass lambdas or ViewModel methods to View
+6. **Navigation Callbacks**: Handle navigation at Screen level
+7. **No Business Logic**: Keep UI layer purely declarative
+8. **Lifecycle Awareness**: Use proper Compose lifecycle hooks
+
+### 12. Testing Screens
+
+Screens can be tested with Compose Testing:
+
+```kotlin
+@Test
+fun testHomeScreen_displaysLinks() {
+    composeTestRule.setContent {
+        val mockViewModel = mockk<HomeViewModel>()
+        every { mockViewModel.states } returns flowOf(HomeState(links = testLinks))
+        every { mockViewModel.onRefresh() } just Runs
+
+        HomeScreen(
+            routeKey = NavKey("test"),
+            onNavigateToDetail = {},
+            onAddLink = {}
+        )
+    }
+
+    composeTestRule.onNodeWithText("Test Link").assertIsDisplayed()
+}
+```
+
+### 13. Navigation Integration
+
+Ensure your screen is registered in NavigationState.kt:
+
+```kotlin
+// In NavigationState.kt
+private val config = SavedStateConfiguration {
+    serializersModule = SerializersModule {
+        polymorphic(NavKey::class) {
+            subclass(RootScreens.HomeTab::class, RootScreens.HomeTab.serializer())
+            subclass(RootScreens.LinkDetail::class, RootScreens.LinkDetail.serializer())
+        }
+    }
+}
+```

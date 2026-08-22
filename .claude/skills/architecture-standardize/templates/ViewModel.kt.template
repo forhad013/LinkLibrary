@@ -1,0 +1,439 @@
+package {{PACKAGE}}
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import app.cash.molecule.RecompositionMode
+import app.cash.molecule.moleculeFlow
+import {{REPOSITORY_PACKAGE}}
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
+/**
+ * ViewModel for {{FEATURE_NAME}} screen.
+ *
+ * This ViewModel bridges the UI (Screen) and business logic (UseCase).
+ * It uses Molecule to create a state machine from the UseCase composable.
+ *
+ * Architecture:
+ * - Extends: ViewModel() for lifecycle management
+ * - Implements: KoinComponent for dependency injection
+ * - Uses: moleculeFlow() to run UseCase as state machine
+ * - Provides: StateFlow for reactive state observation
+ * - Handles: Event emission from UI layer
+ *
+ * Lifecycle:
+ * - Created by Screen with viewModel() factory
+ * - Survives configuration changes
+ * - Cleared when screen is finished
+ *
+ * @param {{INITIAL_PARAM}} Optional initial parameter from navigation
+ */
+class {{VIEWMODEL_CLASS_NAME}}(
+    private val {{INITIAL_PARAM}}: {{INITIAL_PARAM_TYPE}}? = null
+) : ViewModel(), KoinComponent {
+
+    // Initial state - used for stateIn() default value
+    private val initialState: {{STATE_CLASS_NAME}} = {{STATE_INITIALIZER}}
+
+    // Event flow - receives events from UI layer
+    private val eventsFlow: MutableSharedFlow<{{EVENT_CLASS_NAME}}> =
+        MutableSharedFlow(extraBufferCapacity = {{EVENT_BUFFER_SIZE}})
+
+    // Dependency injection via Koin
+    private val {{REPOSITORY_NAME}}: {{REPOSITORY_TYPE}} by inject()
+
+    /**
+     * StateFlow representing the screen state.
+     * Created using Molecule to run UseCase as a state machine.
+     *
+     * The flow:
+     * 1. Runs UseCase with moleculeFlow (RecompositionMode.Immediate)
+     * 2. Converts to StateFlow with stateIn
+     * 3. Starts lazily when first collected
+     * 4. Shares state across multiple collectors
+     * 5. Cancellable when ViewModel is cleared
+     */
+    val states by lazy {
+        moleculeFlow(RecompositionMode.Immediate) {
+            {{USECASE_FUNCTION_NAME}}(
+                initialState = initialState,
+                events = eventsFlow,
+                {{USECASE_PARAMS}}{{REPOSITORY_NAME}}
+            )
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = initialState
+        )
+    }
+
+    // ============================================================================
+    // EVENT EMITTERS
+    // ============================================================================
+
+    /**
+     * Emit events to the UseCase.
+     * These methods are called by the Screen layer.
+     */
+
+    {{EVENT_EMITTERS}}
+
+    // Generic event emitter for events without specific methods
+    fun onEvent(event: {{EVENT_CLASS_NAME}}) {
+        viewModelScope.launch { eventsFlow.emit(event) }
+    }
+}
+
+// ============================================================================
+// TEMPLATE USAGE GUIDE
+// ============================================================================
+
+## Instructions for Customizing This Template
+
+### 1. Replace Placeholders
+
+- `{{PACKAGE}}`: Screen package (e.g., `com.greenrobotdev.linklibrary.screens.home`)
+- `{{FEATURE_NAME}}`: Feature name (e.g., "Home", "Link Detail")
+- `{{VIEWMODEL_CLASS_NAME}}`: ViewModel class (e.g., `HomeViewModel`)
+- `{{STATE_CLASS_NAME}}`: State class (e.g., `HomeState`)
+- `{{EVENT_CLASS_NAME}}`: Event interface (e.g., `HomeEvent`)
+- `{{USECASE_FUNCTION_NAME}}`: UseCase function (e.g., `HomeUseCase`)
+- `{{REPOSITORY_NAME}}`: Repository variable name (e.g., `linkRepository`)
+- `{{REPOSITORY_TYPE}}`: Repository type (e.g., `LinkRepository`)
+- `{{REPOSITORY_PACKAGE}}`: Repository package path
+- `{{INITIAL_PARAM}}`: Optional navigation parameter name
+- `{{INITIAL_PARAM_TYPE}}`: Parameter type (e.g., `String`)
+- `{{EVENT_BUFFER_SIZE}}`: Buffer size for event flow (typically 5-10)
+- `{{USECASE_PARAMS}}`: Additional UseCase parameters
+
+### 2. Configure Initial State
+
+Define the initial state for your screen:
+
+```kotlin
+// Simple initialization
+private val initialState: HomeState = HomeState()
+
+// With initial parameters
+private val initialState: AddLinkState = AddLinkState(
+    url = initialUrl ?: ""
+)
+
+// For detail screens
+private val initialState: LinkDetailState = LinkDetailState(
+    linkId = initialLinkId
+)
+```
+
+### 3. Inject Dependencies
+
+Use Koin to inject repositories:
+
+```kotlin
+private val linkRepository: LinkRepository by inject()
+
+// Multiple dependencies
+private val linkRepository: LinkRepository by inject()
+private val collectionRepository: CollectionRepository by inject()
+
+// Custom injection with parameters
+private val repository: MyRepository by inject {
+    parametersOf(userId)
+}
+```
+
+### 4. Configure Molecule Flow
+
+The moleculeFlow setup is consistent across all ViewModels:
+
+```kotlin
+val states by lazy {
+    moleculeFlow(RecompositionMode.Immediate) {
+        HomeUseCase(
+            initialState = initialState,
+            events = eventsFlow,
+            linkRepository = linkRepository
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = initialState
+    )
+}
+```
+
+#### Parameters Explained
+
+**moleculeFlow:**
+- `RecompositionMode.Immediate`: Recompose immediately when state changes
+- UseCase runs as a composable state machine
+- Returns Flow<State>
+
+**stateIn:**
+- `viewModelScope`: Cancel when ViewModel is cleared
+- `SharingStarted.Lazily`: Start when first subscriber collects
+- `initialState`: Default value before first emission
+
+### 5. Define Event Emitters
+
+Create convenience methods for each event:
+
+```kotlin
+// Simple event (no parameters)
+fun onRefresh() {
+    viewModelScope.launch { eventsFlow.emit(HomeEvent.Refresh) }
+}
+
+// Event with parameters
+fun onToggleFavorite(linkId: String) {
+    viewModelScope.launch { eventsFlow.emit(HomeEvent.ToggleFavorite(linkId)) }
+}
+
+// Form field changes
+fun onUrlChanged(url: String) {
+    viewModelScope.launch { eventsFlow.emit(AddLinkEvent.UrlChanged(url)) }
+}
+```
+
+#### Event Emitter Patterns
+
+**For List Screens:**
+```kotlin
+fun onRefresh() { viewModelScope.launch { eventsFlow.emit(HomeEvent.Refresh) } }
+fun onToggleFavorite(id: String) { viewModelScope.launch { eventsFlow.emit(HomeEvent.ToggleFavorite(id)) } }
+fun onSearch(query: String) { viewModelScope.launch { eventsFlow.emit(HomeEvent.SearchChanged(query)) } }
+fun onLoadMore() { viewModelScope.launch { eventsFlow.emit(HomeEvent.LoadMore) } }
+```
+
+**For Form Screens:**
+```kotlin
+fun onUrlChanged(url: String) { viewModelScope.launch { eventsFlow.emit(AddLinkEvent.UrlChanged(url)) } }
+fun onTitleChanged(title: String) { viewModelScope.launch { eventsFlow.emit(AddLinkEvent.TitleChanged(title)) } }
+fun onToggleFavorite(isFavorite: Boolean) { viewModelScope.launch { eventsFlow.emit(AddLinkEvent.ToggleFavorite(isFavorite)) } }
+fun onSubmit() { viewModelScope.launch { eventsFlow.emit(AddLinkEvent.Submit) } }
+fun onClearError() { viewModelScope.launch { eventsFlow.emit(AddLinkEvent.ClearError) } }
+```
+
+**For Detail Screens:**
+```kotlin
+fun onLoadDetail(id: String) { viewModelScope.launch { eventsFlow.emit(LinkDetailEvent.LoadLink(id)) } }
+fun onDelete() { viewModelScope.launch { eventsFlow.emit(LinkDetailEvent.DeleteLink) } }
+fun onToggleFavorite(id: String) { viewModelScope.launch { eventsFlow.emit(LinkDetailEvent.ToggleFavorite(id)) } }
+```
+
+### 6. Complete Examples
+
+#### Example 1: HomeViewModel (List Screen)
+```kotlin
+package com.greenrobotdev.linklibrary.screens.home
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import app.cash.molecule.RecompositionMode
+import app.cash.molecule.moleculeFlow
+import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
+class HomeViewModel : ViewModel(), KoinComponent {
+
+    private val initialState: HomeState = HomeState()
+
+    private val eventsFlow: MutableSharedFlow<HomeEvent> = MutableSharedFlow(5)
+    private val linkRepository: LinkRepository by inject()
+
+    val states by lazy {
+        moleculeFlow(RecompositionMode.Immediate) {
+            HomeUseCase(initialState, eventsFlow, linkRepository)
+        }.stateIn(viewModelScope, SharingStarted.Lazily, initialState)
+    }
+
+    fun onRefresh() { viewModelScope.launch { eventsFlow.emit(HomeEvent.Refresh) } }
+    fun onToggleFavorite(linkId: String) { viewModelScope.launch { eventsFlow.emit(HomeEvent.ToggleFavorite(linkId)) } }
+}
+```
+
+#### Example 2: AddLinkViewModel (Form Screen with Parameters)
+```kotlin
+package com.greenrobotdev.linklibrary.screens.add
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import app.cash.molecule.RecompositionMode
+import app.cash.molecule.moleculeFlow
+import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
+class AddLinkViewModel(
+    private val initialUrl: String? = null
+) : ViewModel(), KoinComponent {
+
+    private val initialState: AddLinkState = AddLinkState()
+
+    private val eventsFlow: MutableSharedFlow<AddLinkEvent> = MutableSharedFlow(10)
+    private val linkRepository: LinkRepository by inject()
+
+    val states by lazy {
+        moleculeFlow(RecompositionMode.Immediate) {
+            AddLinkUseCase(initialState, eventsFlow, linkRepository, initialUrl)
+        }.stateIn(this.viewModelScope, SharingStarted.Lazily, initialState)
+    }
+
+    fun onEvent(event: AddLinkEvent) {
+        this.viewModelScope.launch { eventsFlow.emit(event) }
+    }
+}
+```
+
+#### Example 3: LinkDetailViewModel (Detail Screen with ID)
+```kotlin
+package com.greenrobotdev.linklibrary.screens.detail
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import app.cash.molecule.RecompositionMode
+import app.cash.molecule.moleculeFlow
+import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
+class LinkDetailViewModel(
+    private val linkId: String
+) : ViewModel(), KoinComponent {
+
+    private val initialState: LinkDetailState = LinkDetailState(
+        linkId = linkId
+    )
+
+    private val eventsFlow: MutableSharedFlow<LinkDetailEvent> = MutableSharedFlow(5)
+    private val linkRepository: LinkRepository by inject()
+
+    val states by lazy {
+        moleculeFlow(RecompositionMode.Immediate) {
+            LinkDetailUseCase(initialState, eventsFlow, linkRepository)
+        }.stateIn(viewModelScope, SharingStarted.Lazily, initialState)
+    }
+
+    fun onDelete() { viewModelScope.launch { eventsFlow.emit(LinkDetailEvent.DeleteLink) } }
+    fun onToggleFavorite(id: String) { viewModelScope.launch { eventsFlow.emit(LinkDetailEvent.ToggleFavorite(id)) } }
+}
+```
+
+### 7. Koin Integration
+
+ViewModels are automatically created by the `viewModel()` factory.
+For custom initialization, define in Koin module:
+
+```kotlin
+// In your Koin module
+val homeModule = module {
+    viewModel { HomeViewModel() }
+
+    viewModel { (initialUrl: String?) ->
+        AddLinkViewModel(initialUrl)
+    }
+
+    viewModel { (linkId: String) ->
+        LinkDetailViewModel(linkId)
+    }
+}
+```
+
+### 8. Event Flow Buffer Size
+
+Choose appropriate buffer size based on event frequency:
+
+- **5**: For low-frequency events (screens with few user interactions)
+- **10**: For medium-frequency events (forms, detail screens)
+- **20**: For high-frequency events (search, list scrolling)
+
+```kotlin
+private val eventsFlow: MutableSharedFlow<HomeEvent> = MutableSharedFlow(5)
+```
+
+### 9. Best Practices
+
+1. **Thin ViewModels**: Keep ViewModels minimal, just Molecule wrapping
+2. **No Business Logic**: All logic in UseCase
+3. **Event Emitters**: Provide type-safe methods for common events
+4. **Generic Fallback**: Include generic `onEvent()` for flexibility
+5. **Lazy Initialization**: Use `by lazy` for states to defer creation
+6. **Scope Awareness**: Use viewModelScope for automatic cancellation
+7. **Koin Integration**: Inject dependencies via KoinComponent
+
+### 10. Testing ViewModels
+
+ViewModels can be tested with JUnit:
+
+```kotlin
+@Test
+fun testHomeViewModel_emitsRefreshEvent() = runTest {
+    // Given
+    val viewModel = HomeViewModel()
+
+    // When
+    viewModel.onRefresh()
+
+    // Then
+    val state = viewModel.states.value
+    assertThat(state.isLoading).isTrue()
+}
+```
+
+### 11. Common Patterns
+
+#### With Multiple Repositories
+```kotlin
+private val linkRepository: LinkRepository by inject()
+private val collectionRepository: CollectionRepository by inject()
+
+val states by lazy {
+    moleculeFlow(RecompositionMode.Immediate) {
+        LibraryUseCase(
+            initialState = initialState,
+            events = eventsFlow,
+            linkRepository = linkRepository,
+            collectionRepository = collectionRepository
+        )
+    }.stateIn(viewModelScope, SharingStarted.Lazily, initialState)
+}
+```
+
+#### With UseCase Parameters
+```kotlin
+val states by lazy {
+    moleculeFlow(RecompositionMode.Immediate) {
+        AddLinkUseCase(
+            initialState = initialState,
+            events = eventsFlow,
+            linkRepository = linkRepository,
+            initialUrl = initialUrl  // Pass additional parameter
+        )
+    }.stateIn(viewModelScope, SharingStarted.Lazily, initialState)
+}
+```
+
+### 12. Error Handling
+
+ViewModel automatically propagates errors from UseCase:
+- Errors appear in state.error field
+- UI displays error messages based on state
+- Use `onEvent(ClearError)` to dismiss errors

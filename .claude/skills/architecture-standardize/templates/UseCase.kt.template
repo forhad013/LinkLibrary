@@ -1,0 +1,525 @@
+package {{PACKAGE}}
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import {{REPOSITORY_PACKAGE}}
+import kotlinx.coroutines.flow.Flow
+
+/**
+ * UseCase for {{FEATURE_NAME}} screen.
+ *
+ * This composable function encapsulates all business logic for {{FEATURE_NAME}}.
+ * It manages state using Compose's mutableStateOf and reacts to events.
+ *
+ * Architecture:
+ * - Receives: Initial state, events flow, dependencies (repositories)
+ * - Manages: State updates via remember { mutableStateOf() }
+ * - Returns: Current state for UI rendering
+ *
+ * @param initialState The initial state (typically from ViewModel)
+ * @param events Flow of events from the UI layer
+ * @param {{REPOSITORY_NAME}} Repository for data operations
+ * @return Current state for UI rendering
+ */
+@Composable
+fun {{USECASE_FUNCTION_NAME}}(
+    initialState: {{STATE_CLASS_NAME}},
+    events: Flow<{{EVENT_CLASS_NAME}}>,
+    {{REPOSITORY_NAME}}: {{REPOSITORY_TYPE}}
+): {{STATE_CLASS_NAME}} {
+
+    // State management with Compose
+    var {{STATE_VARIABLE_NAME}} by remember { mutableStateOf(initialState) }
+
+    // INITIAL DATA LOADING
+    // Use LaunchedEffect(Unit) for one-time setup
+    LaunchedEffect(Unit) {
+        {{STATE_VARIABLE_NAME}} = {{STATE_VARIABLE_NAME}}.copy(isLoading = true)
+        {{REPOSITORY_NAME}}.{{GET_DATA_METHOD}}().collect { result ->
+            {{STATE_VARIABLE_NAME}} = {{STATE_VARIABLE_NAME}}.copy(isLoading = false)
+            result.onSuccess { data ->
+                {{STATE_VARIABLE_NAME}} = {{STATE_VARIABLE_NAME}}.copy(
+                    {{DATA_FIELD}} = data.{{TRANSFORM_FUNCTION}}(),
+                    error = null
+                )
+            }
+            result.onFailure { error ->
+                {{STATE_VARIABLE_NAME}} = {{STATE_VARIABLE_NAME}}.copy(
+                    error = error.message
+                )
+            }
+        }
+    }
+
+    // EVENT HANDLING
+    // Collect and process all user events
+    LaunchedEffect(Unit) {
+        events.collect { event ->
+            when (event) {
+                {{EVENT_HANDLING}}
+            }
+        }
+    }
+
+    return {{STATE_VARIABLE_NAME}}
+}
+
+// ============================================================================
+// TEMPLATE USAGE GUIDE
+// ============================================================================
+
+## Instructions for Customizing This Template
+
+### 1. Replace Placeholders
+
+- `{{PACKAGE}}`: Screen package (e.g., `com.greenrobotdev.linklibrary.screens.home`)
+- `{{FEATURE_NAME}}`: Feature name (e.g., "Home", "Link Detail")
+- `{{STATE_CLASS_NAME}}`: State class (e.g., `HomeState`)
+- `{{EVENT_CLASS_NAME}}`: Event interface (e.g., `HomeEvent`)
+- `{{USECASE_FUNCTION_NAME}}`: Function name (e.g., `HomeUseCase`)
+- `{{REPOSITORY_PACKAGE}}`: Repository package
+- `{{REPOSITORY_NAME}}`: Repository variable name (e.g., `linkRepository`)
+- `{{REPOSITORY_TYPE}}`: Repository type (e.g., `LinkRepository`)
+
+### 2. Define State Variables
+
+Create a mutable state variable for each state property:
+
+```kotlin
+var isLoading by remember { mutableStateOf(initialState.isLoading) }
+var error by remember { mutableStateOf(initialState.error) }
+var links by remember { mutableStateOf(initialState.links) }
+var searchQuery by remember { mutableStateOf(initialState.searchQuery) }
+```
+
+### 3. Implement Initial Data Loading
+
+Use `LaunchedEffect(Unit)` for one-time setup:
+
+```kotlin
+LaunchedEffect(Unit) {
+    isLoading = true
+    linkRepository.getLinks().collect { result ->
+        isLoading = false
+        result.onSuccess { entities ->
+            links = entities.map { it.toDomain() }
+                .sortedByDescending { it.createdAt }
+                .take(20)
+        }
+        result.onFailure { error = it.message }
+    }
+}
+```
+
+#### Patterns for Different Screen Types
+
+**List Screen:**
+```kotlin
+LaunchedEffect(Unit) {
+    isLoading = true
+    repository.getItems().collect { result ->
+        isLoading = false
+        result.onSuccess { items = it }
+        result.onFailure { error = it.message }
+    }
+}
+```
+
+**Detail Screen (with ID parameter):**
+```kotlin
+LaunchedEffect(initialState.itemId) {
+    if (initialState.itemId != null) {
+        isLoading = true
+        repository.getItem(initialState.itemId).collect { result ->
+            isLoading = false
+            result.onSuccess { item = it }
+            result.onFailure { error = it.message }
+        }
+    }
+}
+```
+
+**Form Screen:**
+```kotlin
+// Form screens typically don't load data initially
+// They validate user input and handle submission
+```
+
+**Settings Screen:**
+```kotlin
+LaunchedEffect(Unit) {
+    repository.getSettings().collect { result ->
+        result.onSuccess { settings = it }
+    }
+}
+```
+
+### 4. Implement Event Handling
+
+Process events in the `when` block:
+
+```kotlin
+when (event) {
+    is HomeEvent.Refresh -> {
+        isLoading = true
+        linkRepository.getLinks().collect { result ->
+            isLoading = false
+            result.onSuccess { links = it }
+            result.onFailure { error = it.message }
+        }
+    }
+    is HomeEvent.ToggleFavorite -> {
+        linkRepository.toggleFavorite(event.id).collect { result ->
+            result.onSuccess { updatedLink ->
+                links = links?.map { link ->
+                    if (link.id == updatedLink.id) updatedLink else link
+                }
+            }
+        }
+    }
+}
+```
+
+#### Common Event Patterns
+
+**Refresh/Reload:**
+```kotlin
+is Event.Refresh -> {
+    isLoading = true
+    repository.getData().collect { result ->
+        isLoading = false
+        result.onSuccess { data = it }
+        result.onFailure { error = it.message }
+    }
+}
+```
+
+**Search/Filter:**
+```kotlin
+is Event.SearchChanged -> {
+    searchQuery = event.query
+    filteredItems = items.filter { it.name.contains(query, ignoreCase = true) }
+}
+```
+
+**Form Field Changes:**
+```kotlin
+is Event.UrlChanged -> {
+    url = event.url
+    isFormValid = validateUrl(url)
+}
+```
+
+**Form Submission:**
+```kotlin
+is Event.Submit -> {
+    isLoading = true
+    repository.save(formData).collect { result ->
+        isLoading = false
+        result.onSuccess {
+            success = true
+            error = null
+        }
+        result.onFailure { error = it.message }
+    }
+}
+```
+
+**Delete Operation:**
+```kotlin
+is Event.Delete -> {
+    repository.delete(event.id).collect { result ->
+        result.onSuccess {
+            items = items.filter { it.id != event.id }
+        }
+        result.onFailure { error = it.message }
+    }
+}
+```
+
+**Toggle State:**
+```kotlin
+is Event.ToggleFavorite -> {
+    repository.toggleFavorite(event.id).collect { result ->
+        result.onSuccess { updatedItem ->
+            items = items.map {
+                if (it.id == updatedItem.id) updatedItem else it
+            }
+        }
+    }
+}
+```
+
+**Clear Error:**
+```kotlin
+is Event.ClearError -> {
+    error = null
+}
+```
+
+### 5. Return State
+
+Always return the current state:
+
+```kotlin
+return HomeState(
+    isLoading = isLoading,
+    error = error,
+    links = links,
+    searchQuery = searchQuery
+)
+```
+
+### 6. Complete Examples
+
+#### Example 1: HomeUseCase (List Screen)
+```kotlin
+package com.greenrobotdev.linklibrary.screens.home
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import com.greenrobotdev.linklibrary.model.toDomain
+import kotlinx.coroutines.flow.Flow
+
+@Composable
+fun HomeUseCase(
+    initialState: HomeState,
+    events: Flow<HomeEvent>,
+    linkRepository: LinkRepository
+): HomeState {
+
+    var links by remember { mutableStateOf(initialState.links) }
+    var isLoading by remember { mutableStateOf(initialState.isLoading) }
+    var error by remember { mutableStateOf(initialState.error) }
+
+    LaunchedEffect(Unit) {
+        isLoading = true
+        linkRepository.getLinks().collect { result ->
+            isLoading = false
+            result.onSuccess {
+                links = it.map { entity -> entity.toDomain() }
+                    .sortedByDescending { link -> link.createdAt }
+                    .take(20)
+            }
+            result.onFailure { error = it.message }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        events.collect { event ->
+            when (event) {
+                is HomeEvent.Refresh -> {
+                    isLoading = true
+                    linkRepository.getLinks().collect { result ->
+                        isLoading = false
+                        result.onSuccess {
+                            links = it.map { entity -> entity.toDomain() }
+                                .sortedByDescending { entity -> entity.createdAt }
+                                .take(20)
+                        }
+                        result.onFailure { error = it.message }
+                    }
+                }
+                is HomeEvent.ToggleFavorite -> {
+                    linkRepository.toggleFavorite(event.id).collect { result ->
+                        result.onSuccess { updatedLink ->
+                            val domainLink = updatedLink.toDomain()
+                            links = links?.map { link ->
+                                if (link.id == domainLink.id) domainLink else link
+                            }
+                        }
+                        result.onFailure { error = it.message }
+                    }
+                }
+            }
+        }
+    }
+
+    return HomeState(
+        isLoading = isLoading,
+        error = error,
+        links = links
+    )
+}
+```
+
+#### Example 2: AddLinkUseCase (Form Screen)
+```kotlin
+package com.greenrobotdev.linklibrary.screens.add
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import kotlinx.coroutines.flow.Flow
+
+@Composable
+fun AddLinkUseCase(
+    initialState: AddLinkState,
+    events: Flow<AddLinkEvent>,
+    linkRepository: LinkRepository,
+    initialUrl: String? = null
+): AddLinkState {
+
+    var url by remember { mutableStateOf(initialState.url) }
+    var title by remember { mutableStateOf(initialState.title) }
+    var description by remember { mutableStateOf(initialState.description) }
+    var isFavorite by remember { mutableStateOf(initialState.isFavorite) }
+    var isLoading by remember { mutableStateOf(initialState.isLoading) }
+    var error by remember { mutableStateOf(initialState.error) }
+    var success by remember { mutableStateOf(initialState.success) }
+    var isFormValid by remember { mutableStateOf(initialState.isFormValid) }
+
+    // Set initial URL if provided
+    LaunchedEffect(initialUrl) {
+        initialUrl?.let {
+            url = it
+            isFormValid = isValidUrl(it)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        events.collect { event ->
+            when (event) {
+                is AddLinkEvent.UrlChanged -> {
+                    url = event.url
+                    isFormValid = isValidUrl(event.url)
+                }
+                is AddLinkEvent.TitleChanged -> {
+                    title = event.title
+                }
+                is AddLinkEvent.DescriptionChanged -> {
+                    description = event.description
+                }
+                is AddLinkEvent.ToggleFavorite -> {
+                    isFavorite = event.isFavorite
+                }
+                is AddLinkEvent.Submit -> {
+                    isLoading = true
+                    linkRepository.addLink(url, title, description, isFavorite)
+                        .collect { result ->
+                            isLoading = false
+                            result.onSuccess {
+                                success = true
+                                error = null
+                            }
+                            result.onFailure { error = it.message }
+                        }
+                }
+                is AddLinkEvent.ClearError -> {
+                    error = null
+                }
+            }
+        }
+    }
+
+    return AddLinkState(
+        isLoading = isLoading,
+        error = error,
+        title = title,
+        url = url,
+        description = description,
+        isFavorite = isFavorite,
+        isFormValid = isFormValid,
+        success = success
+    )
+}
+
+private fun isValidUrl(url: String): Boolean {
+    return url.isNotBlank() && (url.startsWith("http://") || url.startsWith("https://"))
+}
+```
+
+### 7. Best Practices
+
+1. **One Responsibility**: UseCase only handles business logic
+2. **No UI Dependencies**: Never import Compose UI components
+3. **State Synchronization**: Update all related state together
+4. **Error Handling**: Always handle both success and failure cases
+5. **Immutability**: Use `copy()` for state updates
+6. **Reactive**: Use Flow for repository operations
+7. **Side Effects**: Launch coroutines for repository calls
+8. **Testing**: Keep UseCase pure and testable
+
+### 8. Common Patterns
+
+#### Form Validation
+```kotlin
+var isFormValid by remember { mutableStateOf(false) }
+
+LaunchedEffect(url, title) {
+    isFormValid = url.isNotBlank() && title.isNotBlank()
+}
+```
+
+#### Optimistic Updates
+```kotlin
+is Event.ToggleFavorite -> {
+    // Update UI immediately
+    items = items.map {
+        if (it.id == event.id) it.copy(isFavorite = !it.isFavorite) else it
+    }
+    // Then sync with repository
+    repository.toggleFavorite(event.id).collect { result ->
+        result.onFailure {
+            // Revert on failure
+            items = items.map {
+                if (it.id == event.id) it.copy(isFavorite = !it.isFavorite) else it
+            }
+        }
+    }
+}
+```
+
+#### Pagination
+```kotlin
+var hasMore by remember { mutableStateOf(true) }
+val pageSize = 20
+
+is Event.LoadMore -> {
+    if (!isLoading && hasMore) {
+        isLoading = true
+        repository.getItems(items.size, pageSize).collect { result ->
+            isLoading = false
+            result.onSuccess { newItems ->
+                items = items + newItems
+                hasMore = newItems.size == pageSize
+            }
+        }
+    }
+}
+```
+
+### 9. Testing UseCases
+
+UseCases can be tested without Android dependencies:
+
+```kotlin
+@Test
+fun testHomeUseCase_refreshUpdatesLinks() = runTest {
+    // Given
+    val initialState = HomeState()
+    val events = MutableSharedFlow<HomeEvent>()
+    val fakeRepository = FakeLinkRepository()
+
+    // When
+    val state = HomeUseCase(initialState, events, fakeRepository)
+    events.emit(HomeEvent.Refresh)
+
+    // Then
+    assertThat(state.links).isNotEmpty()
+    assertThat(state.isLoading).isFalse()
+}
+```

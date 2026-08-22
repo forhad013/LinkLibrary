@@ -1,0 +1,290 @@
+package {{PACKAGE}}
+
+import kotlinx.serialization.Serializable
+
+/**
+ * Immutable state for {{FEATURE_NAME}} screen.
+ * Must be @Serializable for Navigation 3 support.
+ *
+ * @param isLoading Whether data is being loaded
+ * @param error Error message if operation failed
+ * {{STATE_PROPERTIES_DOC}}
+ */
+@Serializable
+data class {{STATE_CLASS_NAME}}(
+    val isLoading: Boolean = false,
+    val error: String? = null
+    {{STATE_PROPERTIES}}
+)
+
+/**
+ * Sealed interface for all events that can be triggered from {{FEATURE_NAME}} UI.
+ * Events represent user intentions and are processed by UseCase.
+ */
+sealed interface {{EVENT_CLASS_NAME}} {
+    {{EVENT_DEFINITIONS}}
+}
+
+// ============================================================================
+// TEMPLATE USAGE GUIDE
+// ============================================================================
+
+## Instructions for Customizing This Template
+
+### 1. Replace Placeholders
+
+- `{{PACKAGE}}`: Your screen's package (e.g., `com.greenrobotdev.linklibrary.screens.home`)
+- `{{FEATURE_NAME}}`: Human-readable feature name (e.g., "Home", "Link Detail")
+- `{{STATE_CLASS_NAME}}`: State class name (e.g., `HomeState`, `LinkDetailState`)
+- `{{EVENT_CLASS_NAME}}`: Event class name (e.g., `HomeEvent`, `LinkDetailEvent`)
+
+### 2. Add State Properties
+
+Add your state properties after `error` field:
+
+```kotlin
+@Serializable
+data class HomeState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    // Add your properties here:
+    val links: List<Link>? = null,
+    val searchQuery: String = ""
+)
+```
+
+#### Common State Properties
+
+**For List Screens:**
+```kotlin
+val items: List<Item> = emptyList()
+val filteredItems: List<Item> = emptyList()
+val searchQuery: String = ""
+val hasMore: Boolean = false
+```
+
+**For Detail Screens:**
+```kotlin
+val item: Item? = null
+val itemId: String? = null
+val isFavorite: Boolean = false
+```
+
+**For Form Screens:**
+```kotlin
+val url: String = ""
+val title: String = ""
+val description: String = ""
+val isFormValid: Boolean = false
+val success: Boolean = false  // For one-time success signal
+```
+
+**For Settings Screens:**
+```kotlin
+val settings: UserSettings = UserSettings()
+val hasChanges: Boolean = false
+```
+
+### 3. Define Events
+
+Add events inside the sealed interface:
+
+```kotlin
+sealed interface HomeEvent {
+    // Simple events (no parameters)
+    object Refresh : HomeEvent
+    object Submit : HomeEvent
+    object ClearError : HomeEvent
+
+    // Data events (with parameters)
+    data class SearchChanged(val query: String) : HomeEvent
+    data class ToggleFavorite(val id: String) : HomeEvent
+    data class ItemClicked(val id: String) : HomeEvent
+
+    // Navigation events
+    object NavigateBack : HomeEvent
+    data class NavigateToDetail(val id: String) : HomeEvent
+}
+```
+
+#### Event Categories
+
+**Data Fetching:**
+- `Refresh`: Reload data from repository
+- `LoadMore`: Paginated data loading
+- `Retry`: Retry failed operation
+
+**User Input:**
+- `FieldChanged`: Form field updates
+- `SearchChanged`: Search query updates
+- `ToggleSomething`: Boolean state changes
+
+**User Actions:**
+- `Submit`: Form submission
+- `Delete`: Item deletion
+- `Save`: Save changes
+- `Cancel`: Cancel operation
+
+**Navigation:**
+- `NavigateBack`: Go to previous screen
+- `NavigateToDetail`: Open detail view
+- `NavigateToEdit`: Open edit form
+
+**UI Interactions:**
+- `ShowSnackbar`: Display temporary message
+- `DismissDialog`: Close dialog
+- `ClearError`: Clear error state
+
+### 4. Navigation Integration
+
+For screens that receive navigation arguments, add them to state:
+
+```kotlin
+@Serializable
+data class LinkDetailState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    // Navigation argument (set in ViewModel, not constructor)
+    val linkId: String? = null,
+    val link: Link? = null
+)
+```
+
+### 5. Example: Complete StateModels
+
+#### List Screen Example (HomeStateModels.kt)
+```kotlin
+package com.greenrobotdev.linklibrary.screens.home
+
+import com.greenrobotdev.linklibrary.model.Link
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class HomeState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val links: List<Link>? = null,
+    val searchQuery: String = ""
+)
+
+sealed interface HomeEvent {
+    object Refresh : HomeEvent
+    data class ToggleFavorite(val id: String) : HomeEvent
+}
+```
+
+#### Form Screen Example (AddLinkStateModels.kt)
+```kotlin
+package com.greenrobotdev.linklibrary.screens.add
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class AddLinkState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val title: String = "",
+    val url: String = "",
+    val description: String = "",
+    val isFavorite: Boolean = false,
+    val isFormValid: Boolean = false,
+    val success: Boolean = false
+)
+
+sealed interface AddLinkEvent {
+    data class TitleChanged(val title: String) : AddLinkEvent
+    data class UrlChanged(val url: String) : AddLinkEvent
+    data class DescriptionChanged(val description: String) : AddLinkEvent
+    data class ToggleFavorite(val isFavorite: Boolean) : AddLinkEvent
+    object Submit : AddLinkEvent
+    object ClearError : AddLinkEvent
+}
+```
+
+#### Detail Screen Example (LinkDetailStateModels.kt)
+```kotlin
+package com.greenrobotdev.linklibrary.screens.detail
+
+import com.greenrobotdev.linklibrary.model.Link
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class LinkDetailState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val linkId: String? = null,
+    val link: Link? = null
+)
+
+sealed interface LinkDetailEvent {
+    data class LoadLink(val id: String) : LinkDetailEvent
+    object DeleteLink : LinkDetailEvent
+    data class ToggleFavorite(val id: String) : LinkDetailEvent
+}
+```
+
+### 6. Best Practices
+
+1. **Keep State Flat**: Avoid nested state objects
+2. **Default Values**: Always provide sensible defaults
+3. **Nullable vs Empty**: Use `emptyList()` instead of `null` for lists
+4. **Type Safety**: Use sealed interfaces for events
+5. **Navigation Safe**: Always mark state with `@Serializable`
+6. **Immutable**: State is immutable, updates use `copy()`
+
+### 7. State Updates in UseCase
+
+State is updated in UseCase using `copy()`:
+
+```kotlin
+// Simple update
+state = state.copy(isLoading = true)
+
+// Multiple fields
+state = state.copy(
+    isLoading = false,
+    links = fetchedLinks,
+    error = null
+)
+
+// With derived values
+state = state.copy(
+    items = items,
+    isEmpty = items.isEmpty(),
+    isFormValid = validateForm(items)
+)
+```
+
+### 8. Common Patterns
+
+#### Loading/Error/Data Pattern
+```kotlin
+@Serializable
+data class MyState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val data: List<Item> = emptyList()
+)
+```
+
+#### Form with Validation
+```kotlin
+@Serializable
+data class FormState(
+    val field1: String = "",
+    val field2: String = "",
+    val isFormValid: Boolean = false,
+    val validationErrors: Map<String, String> = emptyMap()
+)
+```
+
+#### Success/Failure States
+```kotlin
+@Serializable
+data class OperationState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val success: Boolean = false,
+    val message: String? = null
+)
+```
