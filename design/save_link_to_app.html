@@ -1,0 +1,337 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Add/Edit Link - Link Library</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "primary-container": "#2771df",
+                  "secondary-fixed": "#d6e3ff",
+                  "primary-fixed": "#d8e2ff",
+                  "surface-tint": "#005ac1",
+                  "on-primary-container": "#fefcff",
+                  "secondary-fixed-dim": "#a9c7ff",
+                  "on-primary-fixed": "#001a41",
+                  "tertiary-fixed-dim": "#6ddd81",
+                  "background": "#faf9fd",
+                  "on-tertiary": "#ffffff",
+                  "secondary-container": "#83b1ff",
+                  "primary": "#0058bd",
+                  "on-tertiary-fixed": "#002108",
+                  "on-surface": "#1a1b1e",
+                  "tertiary": "#006b2b",
+                  "surface-container-highest": "#e3e2e6",
+                  "surface-dim": "#dbd9dd",
+                  "tertiary-container": "#008738",
+                  "surface-container-low": "#f4f3f7",
+                  "tertiary-fixed": "#89fa9b",
+                  "on-secondary-fixed-variant": "#00468c",
+                  "on-background": "#1a1b1e",
+                  "surface-container-high": "#e9e7eb",
+                  "outline-variant": "#c2c6d5",
+                  "on-error-container": "#93000a",
+                  "error": "#ba1a1a",
+                  "surface-variant": "#e3e2e6",
+                  "outline": "#727785",
+                  "on-secondary-fixed": "#001b3d",
+                  "surface": "#faf9fd",
+                  "on-error": "#ffffff",
+                  "on-tertiary-fixed-variant": "#005320",
+                  "secondary": "#295ea6",
+                  "on-surface-variant": "#424753",
+                  "on-secondary-container": "#004285",
+                  "on-secondary": "#ffffff",
+                  "surface-container-lowest": "#ffffff",
+                  "surface-bright": "#faf9fd",
+                  "error-container": "#ffdad6",
+                  "on-primary": "#ffffff",
+                  "on-tertiary-container": "#f7fff2",
+                  "surface-container": "#efedf1",
+                  "primary-fixed-dim": "#adc6ff",
+                  "inverse-primary": "#adc6ff",
+                  "inverse-on-surface": "#f1f0f4",
+                  "on-primary-fixed-variant": "#004494",
+                  "inverse-surface": "#2f3033"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "xs": "4px",
+                  "unit": "4px",
+                  "sm": "8px",
+                  "lg": "24px",
+                  "xl": "32px",
+                  "margin-desktop": "32px",
+                  "md": "16px",
+                  "gutter": "24px",
+                  "margin-mobile": "16px"
+          },
+          "fontFamily": {
+                  "headline-lg": [
+                          "Inter"
+                  ],
+                  "label-lg": [
+                          "Inter"
+                  ],
+                  "headline-lg-mobile": [
+                          "Inter"
+                  ],
+                  "body-md": [
+                          "Inter"
+                  ],
+                  "title-lg": [
+                          "Inter"
+                  ],
+                  "title-md": [
+                          "Inter"
+                  ],
+                  "body-lg": [
+                          "Inter"
+                  ],
+                  "display-lg": [
+                          "Inter"
+                  ],
+                  "label-sm": [
+                          "Inter"
+                  ]
+          },
+          "fontSize": {
+                  "headline-lg": [
+                          "32px",
+                          {
+                                  "lineHeight": "40px",
+                                  "letterSpacing": "0px",
+                                  "fontWeight": "400"
+                          }
+                  ],
+                  "label-lg": [
+                          "14px",
+                          {
+                                  "lineHeight": "20px",
+                                  "letterSpacing": "0.1px",
+                                  "fontWeight": "500"
+                          }
+                  ],
+                  "headline-lg-mobile": [
+                          "28px",
+                          {
+                                  "lineHeight": "36px",
+                                  "letterSpacing": "0px",
+                                  "fontWeight": "400"
+                          }
+                  ],
+                  "body-md": [
+                          "14px",
+                          {
+                                  "lineHeight": "20px",
+                                  "letterSpacing": "0.25px",
+                                  "fontWeight": "400"
+                          }
+                  ],
+                  "title-lg": [
+                          "22px",
+                          {
+                                  "lineHeight": "28px",
+                                  "letterSpacing": "0px",
+                                  "fontWeight": "500"
+                          }
+                  ],
+                  "title-md": [
+                          "16px",
+                          {
+                                  "lineHeight": "24px",
+                                  "letterSpacing": "0.15px",
+                                  "fontWeight": "500"
+                          }
+                  ],
+                  "body-lg": [
+                          "16px",
+                          {
+                                  "lineHeight": "24px",
+                                  "letterSpacing": "0.5px",
+                                  "fontWeight": "400"
+                          }
+                  ],
+                  "display-lg": [
+                          "57px",
+                          {
+                                  "lineHeight": "64px",
+                                  "letterSpacing": "-0.25px",
+                                  "fontWeight": "400"
+                          }
+                  ],
+                  "label-sm": [
+                          "11px",
+                          {
+                                  "lineHeight": "16px",
+                                  "letterSpacing": "0.5px",
+                                  "fontWeight": "500"
+                          }
+                  ]
+          }
+  },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24
+    }
+  </style>
+  <style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-lg min-h-screen flex flex-col">
+<!-- Top App Bar -->
+<header class="w-full sticky top-0 z-40 bg-surface text-primary font-title-lg text-title-lg flex items-center justify-between px-margin-mobile md:px-margin-desktop h-16 w-full shadow-sm">
+  <div class="flex items-center gap-4">
+    <button class="p-2 rounded-full hover:bg-surface-container-low transition-colors active:opacity-80 text-on-surface-variant flex items-center justify-center">
+      <span class="material-symbols-outlined" data-icon="close">close</span>
+    </button>
+    <span class="font-title-lg text-title-lg font-bold text-primary">Add New Link</span>
+  </div>
+  <div class="flex items-center">
+    <button class="bg-primary text-on-primary font-label-lg text-label-lg px-6 py-2 rounded-full hover:shadow-md transition-shadow active:opacity-80" style="background-color: rgb(66, 133, 244);">
+      Save
+    </button>
+  </div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col items-center pt-8 pb-32 px-margin-mobile md:px-margin-desktop w-full">
+  <div class="w-full max-w-[800px] flex flex-col gap-8">
+    <!-- URL Input Section -->
+    <section class="w-full flex flex-col gap-2">
+      <label class="font-label-lg text-label-lg text-on-surface" for="url-input">URL</label>
+      <div class="flex gap-4 items-start w-full">
+        <div class="relative w-full">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="link">link</span>
+          <input class="w-full pl-12 pr-4 py-4 rounded-xl border border-outline-variant bg-surface text-on-surface font-body-lg focus:border-primary focus:ring-2 focus:ring-primary-container transition-all outline-none" id="url-input" placeholder="https://example.com" type="url" value="">
+        </div>
+        <button class="shrink-0 flex items-center gap-2 bg-secondary-container text-on-secondary-container px-6 py-4 rounded-xl font-label-lg text-label-lg hover:bg-primary-fixed transition-colors">
+          <span class="material-symbols-outlined text-[20px]" data-icon="autorenew">autorenew</span>
+          <span class="hidden sm:inline">Auto-fetch</span>
+        </button>
+      </div>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-1 ml-1">Paste a URL to automatically fetch title and description.</p>
+    </section>
+    <div class="h-[1px] w-full bg-surface-container-highest my-2"></div>
+    <!-- Metadata Section -->
+    <section class="w-full flex flex-col gap-6">
+      <!-- Title -->
+      <div class="w-full flex flex-col gap-2">
+        <label class="font-label-lg text-label-lg text-on-surface" for="title-input">Title</label>
+        <input class="w-full px-4 py-4 rounded-xl border border-outline-variant bg-surface text-on-surface font-body-lg focus:border-primary focus:ring-2 focus:ring-primary-container transition-all outline-none" id="title-input" placeholder="Enter link title" type="text">
+      </div>
+      <!-- Description -->
+      <div class="w-full flex flex-col gap-2">
+        <label class="font-label-lg text-label-lg text-on-surface" for="desc-input">Description</label>
+        <textarea class="w-full px-4 py-4 rounded-xl border border-outline-variant bg-surface text-on-surface font-body-lg focus:border-primary focus:ring-2 focus:ring-primary-container transition-all outline-none resize-y" id="desc-input" placeholder="Add a short description..." rows="3"></textarea>
+      </div>
+    </section>
+    <!-- Organization Section -->
+    <section class="w-full flex flex-col gap-8 bg-surface-container-lowest p-6 rounded-2xl border border-surface-container-highest shadow-sm mt-4">
+      <h3 class="font-title-md text-title-md text-on-surface mb-2">Organization</h3>
+      <!-- Collection Dropdown -->
+      <div class="w-full flex flex-col gap-2">
+        <label class="font-label-lg text-label-lg text-on-surface-variant" for="collection-select">Collection</label>
+        <div class="relative">
+          <select class="w-full px-4 py-4 rounded-xl border border-outline-variant bg-surface text-on-surface font-body-lg focus:border-primary focus:ring-2 focus:ring-primary-container transition-all outline-none appearance-none pr-12" id="collection-select">
+            <option disabled="" selected="" value="">Select a collection</option>
+            <option value="design">Design Resources</option>
+            <option value="dev">Development Docs</option>
+            <option value="inspiration">Inspiration</option>
+            <option value="read-later">Read Later</option>
+          </select>
+          <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+        </div>
+      </div>
+      <!-- Tags -->
+      <div class="w-full flex flex-col gap-3">
+        <label class="font-label-lg text-label-lg text-on-surface-variant">Tags</label>
+        <div class="flex flex-wrap gap-2 items-center">
+          <!-- Active Tag -->
+          <div class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-tertiary-fixed-dim bg-tertiary-fixed-dim/10 text-tertiary font-label-lg text-label-lg cursor-pointer hover:bg-tertiary-fixed-dim/20 transition-colors">
+            <span class="">UI Design</span>
+            <span class="material-symbols-outlined text-[16px]" data-icon="close">close</span>
+          </div>
+          <!-- Active Tag -->
+          <div class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-tertiary-fixed-dim bg-tertiary-fixed-dim/10 text-tertiary font-label-lg text-label-lg cursor-pointer hover:bg-tertiary-fixed-dim/20 transition-colors">
+            <span class="">Reference</span>
+            <span class="material-symbols-outlined text-[16px]" data-icon="close">close</span>
+          </div>
+          <!-- Available Tags (Inactive) -->
+          <div class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant font-label-lg text-label-lg cursor-pointer hover:bg-surface-container transition-colors">
+            <span class="">Typography</span>
+          </div>
+          <div class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant font-label-lg text-label-lg cursor-pointer hover:bg-surface-container transition-colors">
+            <span class="">CSS</span>
+          </div>
+          <!-- Add New Tag Button -->
+          <button class="flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-primary text-primary hover:bg-primary/5 transition-colors ml-2">
+            <span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+          </button>
+        </div>
+      </div>
+    </section>
+    <!-- Notes Section -->
+    <section class="w-full flex flex-col gap-2 mt-4">
+      <label class="font-label-lg text-label-lg text-on-surface" for="notes-input">Personal Notes</label>
+      <textarea class="w-full px-4 py-4 rounded-xl border border-outline-variant bg-surface text-on-surface font-body-lg focus:border-primary focus:ring-2 focus:ring-primary-container transition-all outline-none resize-y" id="notes-input" placeholder="Add any personal notes, reminders, or context here..." rows="5"></textarea>
+    </section><section class="w-full flex flex-col gap-6 bg-surface-container-lowest p-6 rounded-2xl border border-surface-container-highest shadow-sm mt-4">
+    <div class="flex items-center justify-between">
+      <h3 class="font-title-md text-title-md text-on-surface">Add to Tasks</h3>
+      <div class="flex items-center gap-3">
+        <span class="text-label-lg font-label-lg text-on-surface-variant">Mark as Task</span>
+        <button aria-checked="true" class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary transition-colors focus:outline-none" role="switch">
+          <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+        </button>
+      </div>
+    </div>
+    <!-- Priority Selection -->
+    <div class="w-full flex flex-col gap-3">
+      <label class="font-label-lg text-label-lg text-on-surface-variant">Priority</label>
+      <div class="flex gap-2"><button class="flex-grow py-2 px-4 rounded-lg border border-outline-variant text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container transition-colors">Low</button><button class="flex-grow py-2 px-4 rounded-lg bg-secondary-container text-on-secondary-container font-label-lg text-label-lg shadow-sm">Medium</button><button class="flex-grow py-2 px-4 rounded-lg border border-outline-variant text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container transition-colors">High</button></div>
+    </div>
+    <!-- Due Time -->
+    <div class="w-full flex flex-col gap-2">
+      <label class="font-label-lg text-label-lg text-on-surface-variant" for="reminder-time">Due Time</label>
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary" data-icon="schedule">schedule</span>
+        <input class="w-full pl-12 pr-4 py-4 rounded-xl border border-outline-variant bg-surface text-on-surface font-body-lg focus:border-primary focus:ring-2 focus:ring-primary-container transition-all outline-none" id="reminder-time" type="time" value="09:00">
+      </div>
+    </div>
+  </section>
+  </div>
+</main>
+<!-- Bottom Actions (Mobile focused, visible on desktop too as requested by typical form flow) -->
+<div class="fixed bottom-0 left-0 w-full bg-surface-container border-t border-surface-container-highest p-4 flex justify-end gap-4 shadow-lg z-50">
+  <button class="px-6 py-2.5 rounded-full text-primary font-label-lg text-label-lg hover:bg-primary/10 transition-colors">
+    Cancel
+  </button>
+  <button class="bg-primary text-on-primary font-label-lg text-label-lg px-8 py-2.5 rounded-full hover:shadow-md transition-shadow active:opacity-80" style="background-color: rgb(66, 133, 244);">
+    Save Link
+  </button>
+</div>
+
+
+</body></html>

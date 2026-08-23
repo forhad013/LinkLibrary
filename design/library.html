@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Library - Link Library</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "primary-container": "#2771df",
+                  "secondary-fixed": "#d6e3ff",
+                  "primary-fixed": "#d8e2ff",
+                  "surface-tint": "#005ac1",
+                  "on-primary-container": "#fefcff",
+                  "secondary-fixed-dim": "#a9c7ff",
+                  "on-primary-fixed": "#001a41",
+                  "tertiary-fixed-dim": "#6ddd81",
+                  "background": "#faf9fd",
+                  "on-tertiary": "#ffffff",
+                  "secondary-container": "#83b1ff",
+                  "primary": "#0058bd",
+                  "on-tertiary-fixed": "#002108",
+                  "on-surface": "#1a1b1e",
+                  "tertiary": "#006b2b",
+                  "surface-container-highest": "#e3e2e6",
+                  "surface-dim": "#dbd9dd",
+                  "tertiary-container": "#008738",
+                  "surface-container-low": "#f4f3f7",
+                  "tertiary-fixed": "#89fa9b",
+                  "on-secondary-fixed-variant": "#00468c",
+                  "on-background": "#1a1b1e",
+                  "surface-container-high": "#e9e7eb",
+                  "outline-variant": "#c2c6d5",
+                  "on-error-container": "#93000a",
+                  "error": "#ba1a1a",
+                  "surface-variant": "#e3e2e6",
+                  "outline": "#727785",
+                  "on-secondary-fixed": "#001b3d",
+                  "surface": "#faf9fd",
+                  "on-error": "#ffffff",
+                  "on-tertiary-fixed-variant": "#005320",
+                  "secondary": "#295ea6",
+                  "on-surface-variant": "#424753",
+                  "on-secondary-container": "#004285",
+                  "on-secondary": "#ffffff",
+                  "surface-container-lowest": "#ffffff",
+                  "surface-bright": "#faf9fd",
+                  "error-container": "#ffdad6",
+                  "on-primary": "#ffffff",
+                  "on-tertiary-container": "#f7fff2",
+                  "surface-container": "#efedf1",
+                  "primary-fixed-dim": "#adc6ff",
+                  "inverse-primary": "#adc6ff",
+                  "inverse-on-surface": "#f1f0f4",
+                  "on-primary-fixed-variant": "#004494",
+                  "inverse-surface": "#2f3033"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "xs": "4px",
+                  "unit": "4px",
+                  "sm": "8px",
+                  "lg": "24px",
+                  "xl": "32px",
+                  "margin-desktop": "32px",
+                  "md": "16px",
+                  "gutter": "24px",
+                  "margin-mobile": "16px"
+          },
+          "fontFamily": {
+                  "headline-lg": [
+                          "Inter"
+                  ],
+                  "label-lg": [
+                          "Inter"
+                  ],
+                  "headline-lg-mobile": [
+                          "Inter"
+                  ],
+                  "body-md": [
+                          "Inter"
+                  ],
+                  "title-lg": [
+                          "Inter"
+                  ],
+                  "title-md": [
+                          "Inter"
+                  ],
+                  "body-lg": [
+                          "Inter"
+                  ],
+                  "display-lg": [
+                          "Inter"
+                  ],
+                  "label-sm": [
+                          "Inter"
+                  ]
+          },
+          "fontSize": {
+                  "headline-lg": [
+                          "32px",
+                          {
+                                  "lineHeight": "40px",
+                                  "letterSpacing": "0px",
+                                  "fontWeight": "400"
+                          }
+                  ],
+                  "label-lg": [
+                          "14px",
+                          {
+                                  "lineHeight": "20px",
+                                  "letterSpacing": "0.1px",
+                                  "fontWeight": "500"
+                          }
+                  ],
+                  "headline-lg-mobile": [
+                          "28px",
+                          {
+                                  "lineHeight": "36px",
+                                  "letterSpacing": "0px",
+                                  "fontWeight": "400"
+                          }
+                  ],
+                  "body-md": [
+                          "14px",
+                          {
+                                  "lineHeight": "20px",
+                                  "letterSpacing": "0.25px",
+                                  "fontWeight": "400"
+                          }
+                  ],
+                  "title-lg": [
+                          "22px",
+                          {
+                                  "lineHeight": "28px",
+                                  "letterSpacing": "0px",
+                                  "fontWeight": "500"
+                          }
+                  ],
+                  "title-md": [
+                          "16px",
+                          {
+                                  "lineHeight": "24px",
+                                  "letterSpacing": "0.15px",
+                                  "fontWeight": "500"
+                          }
+                  ],
+                  "body-lg": [
+                          "16px",
+                          {
+                                  "lineHeight": "24px",
+                                  "letterSpacing": "0.5px",
+                                  "fontWeight": "400"
+                          }
+                  ],
+                  "display-lg": [
+                          "57px",
+                          {
+                                  "lineHeight": "64px",
+                                  "letterSpacing": "-0.25px",
+                                  "fontWeight": "400"
+                          }
+                  ],
+                  "label-sm": [
+                          "11px",
+                          {
+                                  "lineHeight": "16px",
+                                  "letterSpacing": "0.5px",
+                                  "fontWeight": "500"
+                          }
+                  ]
+          }
+  },
+      },
+    }
+  </script>
+  <style>
+    body {
+      background-color: #faf9fd;
+    }
+    .link-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .link-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-24 md:pb-0 font-body-md text-body-md antialiased">
+<!-- Top App Bar -->
+<header class="bg-surface dark:bg-surface w-full sticky top-0 z-40 flex items-center justify-between px-margin-mobile md:px-margin-desktop h-16 flat no shadows">
+  <div class="flex items-center gap-4">
+    <button class="p-2 -ml-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <h1 class="font-title-lg text-title-lg font-bold text-primary dark:text-primary-fixed-dim">Link Library</h1>
+  </div>
+  <div class="flex items-center gap-2">
+    <button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant">
+      <span class="material-symbols-outlined">search</span>
+    </button>
+    <button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant hidden md:block">
+      <span class="material-symbols-outlined">account_circle</span>
+    </button>
+  </div>
+</header>
+<!-- Main Content -->
+<main class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-lg">
+  <!-- Controls Bar -->
+  <div class="flex flex-col md:flex-row gap-md justify-between items-start md:items-center mb-lg">
+    <!-- Search and Filter -->
+    <div class="w-full md:w-1/2 lg:w-1/3 flex gap-sm">
+      <div class="relative flex-grow">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+        <input class="w-full pl-10 pr-4 py-3 bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-primary focus:ring-0 rounded-t-lg transition-colors font-body-lg text-body-lg text-on-surface bg-opacity-40" placeholder="Search links..." type="text"/>
+      </div>
+      <button class="p-3 bg-surface-container-lowest border-0 border-b-2 border-outline-variant rounded-t-lg hover:bg-surface-container-low transition-colors text-on-surface-variant flex items-center justify-center">
+        <span class="material-symbols-outlined">filter_list</span>
+      </button>
+    </div>
+    <!-- View and Sort -->
+    <div class="flex items-center gap-md w-full md:w-auto justify-between md:justify-end">
+      <div class="flex items-center bg-surface-container-lowest rounded-full p-1 border border-outline-variant">
+        <button class="px-4 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-lg text-label-lg transition-colors">Grid</button>
+        <button class="px-4 py-1 rounded-full hover:bg-surface-container-low text-on-surface-variant font-label-lg text-label-lg transition-colors">List</button>
+      </div>
+      <select class="bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-2 pl-3 pr-8 rounded-t-lg font-body-lg text-body-lg text-on-surface focus:border-primary focus:ring-0">
+        <option>Recent</option>
+        <option>Title (A-Z)</option>
+        <option>Priority</option>
+      </select>
+    </div>
+  </div>
+  <!-- Links Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-gutter">
+    <!-- Card 1 -->
+    <article class="link-card bg-surface border border-outline-variant rounded-xl overflow-hidden flex flex-col h-full group relative">
+      <div class="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+        <input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+      </div>
+      <div class="h-40 w-full relative overflow-hidden bg-surface-container-low">
+        <img class="object-cover w-full h-full" data-alt="A clean, modern geometric abstract digital illustration in a light mode palette, featuring overlapping translucent blue and grey shapes on a white background, suggesting technology and organization, highly detailed and sharp." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqdf9KLo3QN2lPbXVoUn4ym7-qDNna3CalqM3BSqyrzDjygMnBjkrTS3aRZQGBcomV3z6IzD-PZ2Cp7-UX7KBXdISUVm7XX_y-ASswcULISWGP0_Oxo7aajuOjHCpy07os7mw53TIsu5S6ObkZsclsDj9F9kw9vopK4NY3mVs6Eu7xkDQj2VGtK8iwrF5qM5TeNBzRdMkP-WiNAtNOUJecCt_gCnVpYzOD70T5aB890joPxcwOA1kY"/>
+      </div>
+      <div class="p-4 flex flex-col flex-grow">
+        <div class="flex justify-between items-start mb-2">
+          <h2 class="font-title-md text-title-md text-on-surface font-semibold line-clamp-2">Material Design 3 Guidelines &amp; Resources</h2>
+          <button class="text-on-surface-variant hover:text-primary transition-colors p-1 -mt-1 -mr-1 rounded-full hover:bg-surface-container-low">
+            <span class="material-symbols-outlined">more_vert</span>
+          </button>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4 flex-grow">Complete documentation and design tokens for the latest version of Google's design system.</p>
+        <div class="flex flex-wrap gap-2 mt-auto">
+          <span class="px-2 py-1 rounded-md border border-outline-variant font-label-sm text-label-sm text-on-surface-variant">Design</span>
+          <span class="px-2 py-1 rounded-md border border-outline-variant font-label-sm text-label-sm text-on-surface-variant">UI/UX</span>
+        </div>
+      </div>
+    </article>
+    <!-- Card 2 -->
+    <article class="link-card bg-surface border border-outline-variant rounded-xl overflow-hidden flex flex-col h-full group relative">
+      <div class="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+        <input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+      </div>
+      <div class="h-40 w-full relative overflow-hidden bg-surface-container-low">
+        <img class="object-cover w-full h-full" data-alt="A macro shot of a sleek, modern keyboard with soft, diffused bright white studio lighting, emphasizing the minimalist aesthetic of a professional developer setup, highly detailed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4DkHp-j_ym9fWObaRFqz6fUkAxfqri4vVrde1ICNIgp68D59Tv2yrohUTVSe29qGJBAka2BBfZyKR4iMJ_WfrsB8JTvndihFm0Spn5wK9qCRC1OyAWo6I99tixJLLnEzV4MOt_OkV-gkGwBY087xqkkWy2O0T-6MK1IWu_6qDNKp9rKt4pqDFbsW8qjIB8wbLUsTTZBnbTKp6ImSUCrgHYD7pPaPIunRLTmnm06VXapF7UYtQRaT6"/>
+      </div>
+      <div class="p-4 flex flex-col flex-grow">
+        <div class="flex justify-between items-start mb-2">
+          <h2 class="font-title-md text-title-md text-on-surface font-semibold line-clamp-2">Tailwind CSS Documentation</h2>
+          <button class="text-on-surface-variant hover:text-primary transition-colors p-1 -mt-1 -mr-1 rounded-full hover:bg-surface-container-low">
+            <span class="material-symbols-outlined">more_vert</span>
+          </button>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4 flex-grow">Rapidly build modern websites without ever leaving your HTML.</p>
+        <div class="flex flex-wrap gap-2 mt-auto">
+          <span class="px-2 py-1 rounded-md border border-outline-variant font-label-sm text-label-sm text-on-surface-variant">CSS</span>
+          <span class="px-2 py-1 rounded-md border border-outline-variant font-label-sm text-label-sm text-on-surface-variant">Dev</span>
+        </div>
+      </div>
+    </article>
+    <!-- Card 3 -->
+    <article class="link-card bg-surface border border-outline-variant rounded-xl overflow-hidden flex flex-col h-full group relative">
+      <div class="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+        <input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+      </div>
+      <div class="h-40 w-full relative overflow-hidden bg-surface-container-low flex items-center justify-center">
+        <span class="material-symbols-outlined text-[64px] text-on-surface-variant opacity-50">article</span>
+      </div>
+      <div class="p-4 flex flex-col flex-grow">
+        <div class="flex justify-between items-start mb-2">
+          <h2 class="font-title-md text-title-md text-on-surface font-semibold line-clamp-2">Best Practices for API Design</h2>
+          <button class="text-on-surface-variant hover:text-primary transition-colors p-1 -mt-1 -mr-1 rounded-full hover:bg-surface-container-low">
+            <span class="material-symbols-outlined">more_vert</span>
+          </button>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4 flex-grow">A comprehensive guide on designing RESTful APIs that are scalable and maintainable over time.</p>
+        <div class="flex flex-wrap gap-2 mt-auto">
+          <span class="px-2 py-1 rounded-md border border-outline-variant font-label-sm text-label-sm text-on-surface-variant">Backend</span>
+          <span class="px-2 py-1 rounded-md bg-tertiary text-on-tertiary bg-opacity-10 font-label-sm text-label-sm">Reading List</span>
+        </div>
+      </div>
+    </article>
+    <!-- Card 4 -->
+    <article class="link-card bg-surface border border-outline-variant rounded-xl overflow-hidden flex flex-col h-full group relative">
+      <div class="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+        <input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+      </div>
+      <div class="h-40 w-full relative overflow-hidden bg-surface-container-low">
+        <img class="object-cover w-full h-full" data-alt="A clean, minimalist 3D render of a folder icon with glowing neon accents in a pristine white studio environment, suggesting digital organization and modern cloud storage, high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMDscEQlbDpyWL7j_rVts8Ps-YgFHjakHZoShLJLvABP8Uix7XvuB1FFZwfq0R1BjoP-T6IEFn6z9802LmUw9kQIX-W0PJl6GX81zmai0nPNXvhDOvyrMf5SxdfVfavq0OBAnAfAZdiaQqWObyRJ-00iYxp3h9O9Jylp-kBLC9ystBRkfhKQ7745HKxawZnHWLoU1Voui3qggNl_lOTFBqVPnqWqXG1zkw9Wq6E9lAE0I3YrTUZ_ca"/>
+      </div>
+      <div class="p-4 flex flex-col flex-grow">
+        <div class="flex justify-between items-start mb-2">
+          <h2 class="font-title-md text-title-md text-on-surface font-semibold line-clamp-2">Project Ideas Repository</h2>
+          <button class="text-on-surface-variant hover:text-primary transition-colors p-1 -mt-1 -mr-1 rounded-full hover:bg-surface-container-low">
+            <span class="material-symbols-outlined">more_vert</span>
+          </button>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4 flex-grow">Collection of open-source projects for inspiration.</p>
+        <div class="flex flex-wrap gap-2 mt-auto">
+          <span class="px-2 py-1 rounded-md border border-outline-variant font-label-sm text-label-sm text-on-surface-variant">Inspiration</span>
+        </div>
+      </div>
+    </article>
+  </div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 md:bottom-8 right-6 md:right-8 w-14 h-14 bg-primary-container text-on-primary-container rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center z-50">
+  <span class="material-symbols-outlined text-[28px]">add</span>
+</button>
+<!-- Bottom Nav Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-2 pb-safe bg-surface-container dark:bg-surface-container-low shadow-[0_-2px_10px_rgba(0,0,0,0.05)] border-t-0">
+  <button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container dark:bg-primary-container dark:text-on-primary-container rounded-full px-5 py-1 active:scale-95 transition-transform duration-100">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">book_4</span>
+    <span class="font-label-sm text-label-sm mt-1">Library</span>
+  </button>
+  <button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-100">
+    <span class="material-symbols-outlined">label</span>
+    <span class="font-label-sm text-label-sm mt-1">Tags</span>
+  </button>
+  <button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-100">
+    <span class="material-symbols-outlined">checklist</span>
+    <span class="font-label-sm text-label-sm mt-1">Tasks</span>
+  </button>
+  <button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-100">
+    <span class="material-symbols-outlined">settings</span>
+    <span class="font-label-sm text-label-sm mt-1">Settings</span>
+  </button>
+</nav>
+</body></html>

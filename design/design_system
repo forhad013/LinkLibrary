@@ -1,0 +1,146 @@
+---
+name: Lords of Links
+colors:
+  surface: '#f9f9ff'
+  surface-dim: '#d0daf0'
+  surface-bright: '#f9f9ff'
+  surface-container-lowest: '#ffffff'
+  surface-container-low: '#f0f3ff'
+  surface-container: '#e7eeff'
+  surface-container-high: '#dee8ff'
+  surface-container-highest: '#d9e3f9'
+  on-surface: '#121c2c'
+  on-surface-variant: '#43474e'
+  inverse-surface: '#273141'
+  inverse-on-surface: '#ebf1ff'
+  outline: '#74777f'
+  outline-variant: '#c4c6cf'
+  surface-tint: '#455f88'
+  primary: '#002045'
+  on-primary: '#ffffff'
+  primary-container: '#1a365d'
+  on-primary-container: '#86a0cd'
+  inverse-primary: '#adc7f7'
+  secondary: '#735c00'
+  on-secondary: '#ffffff'
+  secondary-container: '#fed65b'
+  on-secondary-container: '#745c00'
+  tertiary: '#20211f'
+  on-tertiary: '#ffffff'
+  tertiary-container: '#353634'
+  on-tertiary-container: '#9f9e9c'
+  error: '#ba1a1a'
+  on-error: '#ffffff'
+  error-container: '#ffdad6'
+  on-error-container: '#93000a'
+  primary-fixed: '#d6e3ff'
+  primary-fixed-dim: '#adc7f7'
+  on-primary-fixed: '#001b3c'
+  on-primary-fixed-variant: '#2d476f'
+  secondary-fixed: '#ffe088'
+  secondary-fixed-dim: '#e9c349'
+  on-secondary-fixed: '#241a00'
+  on-secondary-fixed-variant: '#574500'
+  tertiary-fixed: '#e4e2df'
+  tertiary-fixed-dim: '#c8c6c4'
+  on-tertiary-fixed: '#1b1c1a'
+  on-tertiary-fixed-variant: '#474745'
+  background: '#f9f9ff'
+  on-background: '#121c2c'
+  surface-variant: '#d9e3f9'
+typography:
+  display-lg:
+    fontFamily: Inter
+    fontSize: 48px
+    fontWeight: '800'
+    lineHeight: 56px
+    letterSpacing: -0.02em
+  headline-lg:
+    fontFamily: Inter
+    fontSize: 32px
+    fontWeight: '700'
+    lineHeight: 40px
+    letterSpacing: -0.01em
+  headline-lg-mobile:
+    fontFamily: Inter
+    fontSize: 28px
+    fontWeight: '700'
+    lineHeight: 36px
+    letterSpacing: -0.01em
+  headline-md:
+    fontFamily: Inter
+    fontSize: 24px
+    fontWeight: '700'
+    lineHeight: 32px
+  body-lg:
+    fontFamily: Inter
+    fontSize: 18px
+    fontWeight: '400'
+    lineHeight: 28px
+  body-md:
+    fontFamily: Inter
+    fontSize: 16px
+    fontWeight: '400'
+    lineHeight: 24px
+  label-md:
+    fontFamily: Inter
+    fontSize: 14px
+    fontWeight: '600'
+    lineHeight: 20px
+    letterSpacing: 0.05em
+  label-sm:
+    fontFamily: Inter
+    fontSize: 12px
+    fontWeight: '500'
+    lineHeight: 16px
+rounded:
+  sm: 0.125rem
+  DEFAULT: 0.25rem
+  md: 0.375rem
+  lg: 0.5rem
+  xl: 0.75rem
+  full: 9999px
+spacing:
+  unit: 8px
+  container-max: 1280px
+  gutter: 24px
+  margin-desktop: 64px
+  margin-mobile: 20px
+---
+
+## Brand & Style
+The brand personality is authoritative, curated, and inherently premium. This design system moves away from generic SaaS aesthetics toward a "Regal Minimalist" style. It evokes the feeling of an exclusive digital library or a high-end concierge service for information management.
+
+The UI relies on a sophisticated mix of expansive whitespace, precision-weighted typography, and subtle metallic accents. It balances the functional efficiency of a link-management tool with the dignified presence of a luxury institution. The emotional response should be one of total confidence and intellectual order.
+
+## Colors
+The palette is anchored by **Royal Blue**, providing a foundation of stability and institutional trust. **Champagne Gold** is used sparingly as a "prestige accent" for high-value actions, verified states, and iconography.
+
+The surface strategy uses a warm, paper-like off-white (#fcfaf7) to reduce ocular strain and differentiate the product from clinical white interfaces. Text is rendered in a deep charcoal neutral to maintain high legibility without the harshness of pure black. Success, warning, and error states should be desaturated to align with the sophisticated tone.
+
+## Typography
+This design system utilizes **Inter** exclusively to maintain functional clarity, but applies it with editorial intentionality. Headlines are characterized by heavy weights (700-800) and tight tracking to create a sense of "commanding presence."
+
+Body text remains open and legible. Labels and metadata should utilize the semi-bold uppercase style to mimic the look of traditional archival labeling. For mobile devices, display type scales down aggressively to maintain the structured, non-scrolling feel of a dashboard.
+
+## Layout & Spacing
+The layout follows a **Fixed Grid** philosophy on desktop to reinforce the "contained and curated" brand promise. Content is centered within a 1280px maximum width container.
+
+The rhythm is built on an 8px base unit. Generous external margins (64px) on desktop create a "frame" effect around the content, elevating the UI's perceived value. On mobile, margins tighten to 20px, but vertical rhythm remains spacious to ensure a premium, unhurried browsing experience.
+
+## Elevation & Depth
+Depth is communicated through **Tonal Layers** and **Low-Contrast Outlines** rather than heavy shadows. Surfaces are stacked using subtle shifts in value:
+- The base background is the warmest tone.
+- Primary containers (cards, sidebars) use a pure white surface with a 1px border colored in a very faint version of Royal Blue (approx 10% opacity).
+- Interactive elements utilize a "micro-shadow"—a highly diffused 2px blur with low opacity—to signal pressability without breaking the flat, sophisticated aesthetic.
+
+## Shapes
+The shape language is **Soft (0.25rem)**. This slight rounding provides a hint of modern accessibility while maintaining the architectural discipline of sharp corners. Larger components like modal containers or hero cards may use `rounded-lg` (0.5rem) to soften the overall composition, but the "Lords of Links" vibe generally favors more precise, structured geometry over playful curves.
+
+## Components
+- **Buttons:** Primary buttons are Royal Blue with white text. Secondary buttons use a Champagne Gold 1px border with Royal Blue text. All buttons use semi-bold labels.
+- **Chips/Tags:** Used for link categorization. They should have a background color that is a 5% tint of Royal Blue, with a 1px solid border.
+- **Input Fields:** Use a 1px Royal Blue border on focus. Placeholders should be a muted neutral. Labels sit strictly above the input in the `label-md` uppercase style.
+- **Cards:** White background, 1px faint border, no shadow. Hover states should introduce the Champagne Gold as a thin top-border (2px) to signify selection.
+- **Icons:** All icons should be rendered in Champagne Gold or Royal Blue. Use a consistent 2px stroke weight to match the "authoritative" weight of the typography.
+- **Status Indicators:** Use small, high-contrast dots. "Verified" or "Premium" links should utilize a Champagne Gold star icon.
