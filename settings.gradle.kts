@@ -24,3 +24,6 @@ include(":app:iosApp")
 include(":app")
 include(":database")
 //include(":konsistTest")
+
+// Convention plugins (composite build)
+includeBuild("build-logic")
