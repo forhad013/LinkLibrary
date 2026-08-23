@@ -36,7 +36,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -54,7 +53,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -196,14 +194,14 @@ fun TagsScreen(
                             value = searchQuery,
                             onValueChange = { searchQuery = it },
                             modifier = Modifier.width(200.dp),
-                            placeholder = { Text("Search tags...") },
-                            leadingIcon = {
-                                Icon(Icons.Default.Search, contentDescription = null)
-                            },
-                            colors = OutlinedTextFieldDefaults(
-                                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
-                            ),
+//                            placeholder = { Text("Search tags...") },
+//                            leadingIcon = {
+//                                Icon(Icons.Default.Search, contentDescription = null)
+//                            },
+//                            colors = OutlinedTextFieldDefaults(
+//                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+//                                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+//                            ),
                             shape = RoundedCornerShape(24.dp),
                             singleLine = true
                         )
@@ -259,7 +257,7 @@ fun TagsScreen(
                                 Column(
                                     modifier = Modifier.fillMaxSize(),
                                     horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalArrangement = Arrangement.Center
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Add,
