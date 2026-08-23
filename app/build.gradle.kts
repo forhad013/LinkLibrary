@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.kotlinSerialization)
+    // alias(libs.plugins.kotlinSerialization) // Temporarily disabled for WASM prototype
     alias(libs.plugins.compose.compiler)
 }
 
@@ -19,6 +19,17 @@ kotlin {
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
             freeCompilerArgs.add("-Xjsr305=strict")
+        }
+    }
+
+    js("wasm") {
+        browser {
+            commonWebpackConfig {
+                cssSupport {
+                    enabled.set(true)
+                }
+            }
+            binaries.executable()
         }
     }
 
@@ -54,8 +65,8 @@ kotlin {
                 implementation(libs.lifecycle.viewmodel.navigation3)
 //                implementation(libs.adaptive.navigation3)
 
-                // Database module (includes Room runtime transitively)
-                implementation(project(":database"))
+                // Database module (includes Room runtime transitively) - only for JVM/Android targets
+                // implementation(project(":database"))
             }
         }
 
@@ -67,14 +78,33 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                // Android-specific dependencies
+                // Database module for Android
+                implementation(project(":database"))
             }
         }
 
         val jvmMain by getting {
             dependencies {
-                // JVM-specific dependencies
                 implementation(compose.desktop.currentOs)
+                // Database module for JVM/Desktop
+                implementation(project(":database"))
+            }
+        }
+
+        val wasmMain by getting {
+            dependencies {
+                implementation(compose.html.core)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.ui)
+                implementation(compose.materialIconsExtended)
+            }
+        }
+
+        val wasmTest by getting {
+            dependencies {
+                implementation(kotlin("test-js"))
             }
         }
     }

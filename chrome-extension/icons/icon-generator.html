@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Generator</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        canvas { border: 1px solid #ccc; margin: 10px; }
+        button { background: #6200EE; color: white; padding: 10px 20px; border: none; cursor: pointer; margin: 5px; }
+        button:hover { background: #5200CD; }
+    </style>
+</head>
+<body>
+    <h1>LinkLibrary Icon Generator</h1>
+    <p>Click the buttons below to generate and download the required icon sizes:</p>
+
+    <button onclick="generateIcon(16)">Generate 16x16 Icon</button>
+    <button onclick="generateIcon(48)">Generate 48x48 Icon</button>
+    <button onclick="generateIcon(128)">Generate 128x128 Icon</button>
+
+    <div id="canvas-container"></div>
+
+    <script>
+        function generateIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Background - purple circle
+            ctx.fillStyle = '#6200EE';
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Letter "L" in white
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = `bold ${size * 0.6}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('L', size/2, size/2 + size * 0.05);
+
+            // Convert to image and download
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = `icon${size}.png`;
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+            });
+
+            // Show preview
+            const container = document.getElementById('canvas-container');
+            const preview = document.createElement('div');
+            preview.innerHTML = `
+                <h3>${size}x${size} Preview:</h3>
+                <img src="${canvas.toDataURL()}" width="${size * 2}" height="${size * 2}">
+            `;
+            container.appendChild(preview);
+        }
+    </script>
+</body>
+</html>

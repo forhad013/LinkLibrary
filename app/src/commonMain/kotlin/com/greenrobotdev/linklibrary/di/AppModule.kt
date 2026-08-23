@@ -5,14 +5,10 @@ import org.koin.dsl.module
 /**
  * Common Koin module for shared dependencies.
  *
- * Includes:
- * - Database module (via import) which provides the LinkRepository
- * - Stitch module for Google Stitch AI integration
- * - Other shared app dependencies
- *
- * Android-specific dependencies (like DatabaseBuilder) are provided by androidAppModule.
+ * Note: Stitch module integration removed for WASM prototype
+ * Will be re-integrated for production with proper WASM support
  */
 val appModule = module {
-    // Include Stitch module for AI capabilities
-    includes(stitchModule)
+    // Core dependencies will be added here
+    // Stitch module temporarily excluded for WASM prototype
 }
