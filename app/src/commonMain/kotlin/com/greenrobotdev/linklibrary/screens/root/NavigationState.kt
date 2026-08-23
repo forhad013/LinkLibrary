@@ -24,6 +24,8 @@ private val config = SavedStateConfiguration {
             subclass(RootScreens.LinkDetail::class, RootScreens.LinkDetail.serializer())
             subclass(RootScreens.AddLink::class, RootScreens.AddLink.serializer())
             subclass(RootScreens.AddCollection::class, RootScreens.AddCollection.serializer())
+            subclass(RootScreens.Tags::class, RootScreens.Tags.serializer())
+            subclass(RootScreens.AddTag::class, RootScreens.AddTag.serializer())
         }
     }
 }

@@ -35,6 +35,13 @@ sealed class RootScreens : NavKey {
     // Note Editor
     @Serializable
     data class NoteEditor(val noteId: String? = null) : RootScreens()
+
+    // Tags Management
+    @Serializable
+    data object Tags : RootScreens()
+
+    @Serializable
+    data object AddTag : RootScreens()
 }
 
 // Bottom navigation items data class

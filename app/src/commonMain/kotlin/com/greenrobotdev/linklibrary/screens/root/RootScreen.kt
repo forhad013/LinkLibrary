@@ -31,6 +31,7 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 import com.greenrobotdev.linklibrary.model.SharedContent
 import com.greenrobotdev.linklibrary.screens.add.AddLinkScreen
 import com.greenrobotdev.linklibrary.screens.addCollection.AddCollectionScreen
+import com.greenrobotdev.linklibrary.screens.addTag.AddTagScreen
 import com.greenrobotdev.linklibrary.screens.collections.CollectionsScreen
 import com.greenrobotdev.linklibrary.screens.details.LinkDetailScreen
 import com.greenrobotdev.linklibrary.screens.home.HomeScreen
@@ -38,6 +39,7 @@ import com.greenrobotdev.linklibrary.screens.library.LibraryScreen
 import com.greenrobotdev.linklibrary.screens.notes.NoteEditorScreen
 import com.greenrobotdev.linklibrary.screens.settings.SettingsScreen
 import com.greenrobotdev.linklibrary.screens.stitch.AIAssistantDemoScreen
+import com.greenrobotdev.linklibrary.screens.tags.TagsScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
@@ -54,6 +56,8 @@ private val config = SavedStateConfiguration {
             subclass(RootScreens.AIAssistantDemo::class, RootScreens.AIAssistantDemo.serializer())
             subclass(RootScreens.Collections::class, RootScreens.Collections.serializer())
             subclass(RootScreens.NoteEditor::class, RootScreens.NoteEditor.serializer())
+            subclass(RootScreens.Tags::class, RootScreens.Tags.serializer())
+            subclass(RootScreens.AddTag::class, RootScreens.AddTag.serializer())
         }
     }
 }
@@ -97,7 +101,9 @@ fun RootScreen(
     val showBottomNav = currentRoute !is RootScreens.LinkDetail &&
                        currentRoute !is RootScreens.AddLink &&
                        currentRoute !is RootScreens.AddCollection &&
-                       currentRoute !is RootScreens.NoteEditor
+                       currentRoute !is RootScreens.NoteEditor &&
+                       currentRoute !is RootScreens.Tags &&
+                       currentRoute !is RootScreens.AddTag
 
     Scaffold(
         modifier = Modifier
@@ -155,7 +161,8 @@ fun RootScreen(
                                 onNavigateToDetail = { linkId -> navigator.navigate(RootScreens.LinkDetail(linkId)) },
                                 onAddLink = { initialUrl -> navigator.navigate(RootScreens.AddLink(initialUrl)) },
                                 onAddCollection = { navigator.navigate(RootScreens.AddCollection) },
-                                onNavigateToCollections = { navigator.navigate(RootScreens.Collections) }
+                                onNavigateToCollections = { navigator.navigate(RootScreens.Collections) },
+                                onNavigateToTags = { navigator.navigate(RootScreens.Tags) }
                             )
 
                             // Settings Tab
@@ -200,6 +207,18 @@ fun RootScreen(
                             is RootScreens.NoteEditor -> NoteEditorScreen(
                                 routeKey = route,
                                 noteId = route.noteId,
+                                onBack = { navigator.goBack() }
+                            )
+
+                            // Tags Screens
+                            is RootScreens.Tags -> TagsScreen(
+                                routeKey = route,
+                                onBack = { navigator.goBack() },
+                                onCreateTag = { navigator.navigate(RootScreens.AddTag) }
+                            )
+
+                            is RootScreens.AddTag -> AddTagScreen(
+                                routeKey = route,
                                 onBack = { navigator.goBack() }
                             )
 

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,7 +55,8 @@ fun LibraryScreen(
     onNavigateToDetail: (String) -> Unit,
     onAddLink: (String?) -> Unit,
     onAddCollection: () -> Unit,
-    onNavigateToCollections: () -> Unit = {}
+    onNavigateToCollections: () -> Unit = {},
+    onNavigateToTags: () -> Unit = {}
 ) {
     val viewModel: LibraryViewModel = viewModel<LibraryViewModel>(key = routeKey.toString()) { LibraryViewModel() }
     val state by viewModel.states.collectAsState()
@@ -71,6 +73,9 @@ fun LibraryScreen(
             TopAppBar(
                 title = { Text("Library") },
                 actions = {
+                    IconButton(onClick = onNavigateToTags) {
+                        Icon(Icons.Default.Tag, contentDescription = "View tags")
+                    }
                     IconButton(onClick = onNavigateToCollections) {
                         Icon(Icons.Default.Collections, contentDescription = "View collections")
                     }
