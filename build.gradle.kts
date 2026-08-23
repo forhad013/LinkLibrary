@@ -10,7 +10,6 @@ plugins {
     alias(libs.plugins.compose.compiler).apply(false)
 
 }
-
 repositories {
     mavenCentral()
     gradlePluginPortal()
