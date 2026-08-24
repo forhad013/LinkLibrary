@@ -61,6 +61,13 @@ fun AddLinkScreen(
         }
     }
 
+    // Auto-fetch metadata when URL is entered and valid
+    LaunchedEffect(state.url) {
+        if (state.url.isNotBlank() && state.url.startsWith("http") && !state.isFetching && state.title.isBlank()) {
+            viewModel.onEvent(AddLinkEvent.FetchMetadata)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -79,6 +86,27 @@ fun AddLinkScreen(
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
+        },
+        bottomBar = {
+            // Save button at bottom
+            Button(
+                onClick = { viewModel.onEvent(AddLinkEvent.Submit) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                enabled = state.isFormValid && !state.isLoading
+            ) {
+                if (state.isLoading) {
+                    Text("Saving...")
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text("Save Link")
+                }
+            }
         }
     ) { padding ->
         Column(
@@ -136,8 +164,8 @@ fun AddLinkScreen(
                 enabled = !state.isLoading
             )
 
-            // Description Field
-            OutlinedTextField(
+            // Description Field - Hidden for now
+            /*OutlinedTextField(
                 value = state.description,
                 onValueChange = { viewModel.onEvent(AddLinkEvent.DescriptionChanged(it)) },
                 label = { Text("Description (optional)") },
@@ -145,7 +173,7 @@ fun AddLinkScreen(
                     .fillMaxWidth()
                     .height(120.dp),
                 enabled = !state.isLoading
-            )
+            )*/
 
             // Tag and Collection Selector
             CompactTagCollectionSelector(
@@ -177,29 +205,7 @@ fun AddLinkScreen(
                 Text("Add to favorites")
             }
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Submit Button
-            Button(
-                onClick = { viewModel.onEvent(AddLinkEvent.Submit) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                enabled = state.isFormValid && !state.isLoading
-            ) {
-                if (state.isLoading) {
-                    Text("Saving...")
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    Text("Save Link")
-                }
-            }
-
-            // Error message
+            // Error message (moved up since save button is now in bottom bar)
             state.error?.let { error ->
                 Text(
                     text = error,

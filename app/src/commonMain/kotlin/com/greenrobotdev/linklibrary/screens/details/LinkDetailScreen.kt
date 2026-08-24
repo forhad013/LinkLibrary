@@ -481,6 +481,71 @@ fun LinkDetailScreen(
                                 }
                             }
                         }
+
+                        // Collections Card
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Text(
+                                        text = "Collections",
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+
+                                if (state.link?.collections?.isNotEmpty() == true) {
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        state.link?.collections?.take(3)?.forEach { collection ->
+                                            FilterChip(
+                                                selected = false,
+                                                onClick = { },
+                                                label = { Text(collection) },
+                                                colors = FilterChipDefaults.filterChipColors(
+                                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                                    labelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                                ),
+                                                border = null
+                                            )
+                                        }
+                                        if ((state.link?.collections?.size ?: 0) > 3) {
+                                            Text(
+                                                text = "+${state.link?.collections?.size?.minus(3)} more",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    Text(
+                                        text = "No collections",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     // Notes Section

@@ -319,9 +319,9 @@ fun CollectionSelector(
                             } else null,
                             modifier = Modifier.height(32.dp),
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                selectedLabelColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                selectedLeadingIconColor = MaterialTheme.colorScheme.tertiary
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                selectedLeadingIconColor = MaterialTheme.colorScheme.primary
                             ),
                             shape = RoundedCornerShape(16.dp)
                         )
@@ -333,7 +333,7 @@ fun CollectionSelector(
                     Text(
                         text = "${selectedCollections.size} collection${if (selectedCollections.size > 1) "s" else ""} selected",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.tertiary,
+                        color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(start = 4.dp)
                     )
                 }
