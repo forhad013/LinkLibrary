@@ -1,7 +1,11 @@
 package com.greenrobotdev.linklibrary.database.di
 
+import com.greenrobotdev.linklibrary.database.repository.CollectionRepository
 import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import com.greenrobotdev.linklibrary.database.repository.RoomCollectionRepository
 import com.greenrobotdev.linklibrary.database.repository.RoomLinkRepository
+import com.greenrobotdev.linklibrary.database.repository.RoomTagRepository
+import com.greenrobotdev.linklibrary.database.repository.TagRepository
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -19,9 +23,23 @@ expect val platformModule: Module
  * Works across all platforms (Android, JVM, iOS when added).
  */
 val databaseDataModule: Module = module {
+    single<TagRepository> {
+        RoomTagRepository(
+            databaseBuilder = get() // Gets platformModule's DatabaseBuilder
+        )
+    }
+
+    single<CollectionRepository> {
+        RoomCollectionRepository(
+            databaseBuilder = get() // Gets platformModule's DatabaseBuilder
+        )
+    }
+
     single<LinkRepository> {
         RoomLinkRepository(
-            databaseBuilder = get() // Gets platformModule's DatabaseBuilder
+            databaseBuilder = get(), // Gets platformModule's DatabaseBuilder
+            tagRepository = get(),  // Gets TagRepository from above
+            collectionRepository = get() // Gets CollectionRepository from above
         )
     }
 }

@@ -15,14 +15,24 @@ import androidx.room.RoomDatabaseConstructor
  * @see androidx.room.constructor.ConstructedBy
  */
 @Database(
-    entities = [LinkEntity::class],
-    version = 1,
+    entities = [
+        LinkEntity::class,
+        TagEntity::class,
+        CollectionEntity::class,
+        LinkTagEntity::class,
+        LinkCollectionEntity::class
+    ],
+    version = 2,
     exportSchema = false
 )
 @ConstructedBy(LinkDatabaseConstructor::class)
 abstract class LinkDatabase : RoomDatabase() {
 
     abstract fun linkDao(): LinkDao
+    abstract fun tagDao(): TagDao
+    abstract fun collectionDao(): CollectionDao
+    abstract fun linkTagDao(): LinkTagDao
+    abstract fun linkCollectionDao(): LinkCollectionDao
 
     companion object {
         const val DATABASE_NAME = "link_library.db"

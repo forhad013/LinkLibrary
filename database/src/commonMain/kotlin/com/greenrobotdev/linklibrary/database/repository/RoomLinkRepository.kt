@@ -5,6 +5,7 @@ import com.greenrobotdev.linklibrary.database.room.LinkDatabase
 import com.greenrobotdev.linklibrary.database.room.LinkEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlin.uuid.ExperimentalUuidApi
@@ -19,9 +20,13 @@ import kotlin.uuid.Uuid
  * - JVM/Desktop: Can provide JvmDatabaseBuilder when needed
  *
  * @param databaseBuilder Platform-specific implementation of DatabaseBuilder interface
+ * @param tagRepository Repository for loading tags associated with links
+ * @param collectionRepository Repository for loading collections associated with links
  */
 class RoomLinkRepository(
-    private val databaseBuilder: DatabaseBuilder
+    private val databaseBuilder: DatabaseBuilder,
+    private val tagRepository: TagRepository,
+    private val collectionRepository: CollectionRepository
 ) : LinkRepository {
 
     private val database: LinkDatabase = databaseBuilder.getDatabaseBuilder().build()
@@ -32,6 +37,24 @@ class RoomLinkRepository(
         return linkDao.getAllLinks()
             .map { entities -> Result.success(entities) }
             .catch { e -> emit(Result.failure(e)) }
+    }
+
+    override suspend fun getLinksWithTags(): Flow<Result<List<LinkEntity>>> {
+        return flow {
+            try {
+                linkDao.getAllLinks().collect { entities ->
+                    val entitiesWithTags = entities.map { entity ->
+                        val tagsResult = tagRepository.getTagsForLink(entity.id).first()
+                        val tagEntities = tagsResult.getOrElse { emptyList() }
+                        val tagNames = tagEntities.map { it.name }
+                        entity.copy(tags = tagNames)
+                    }
+                    emit(Result.success(entitiesWithTags))
+                }
+            } catch (e: Exception) {
+                emit(Result.failure(e))
+            }
+        }
     }
 
     override suspend fun toggleFavorite(linkId: String): Flow<Result<LinkEntity>> {
