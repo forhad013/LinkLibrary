@@ -13,6 +13,7 @@ data class AddLinkState(
     val title: String = "",
     val url: String = "",
     val description: String = "",
+    val notes: String? = null,
     val isFavorite: Boolean = false,
     val isFormValid: Boolean = false,
     val success: Boolean = false,
@@ -25,13 +26,18 @@ data class AddLinkState(
     val selectedCollections: Set<String> = emptySet(),
     val availableTags: List<Tag> = emptyList(),
     val availableCollections: List<Collection> = emptyList(),
-    val isLoadingTagsAndCollections: Boolean = false
+    val isLoadingTagsAndCollections: Boolean = false,
+    // Task-related fields
+    val isTask: Boolean = false,
+    val taskPriority: String = "Medium",
+    val dueTime: String = "09:00"
 )
 
 sealed interface AddLinkEvent {
     data class TitleChanged(val title: String) : AddLinkEvent
     data class UrlChanged(val url: String) : AddLinkEvent
     data class DescriptionChanged(val description: String) : AddLinkEvent
+    data class NotesChanged(val notes: String) : AddLinkEvent
     data class ToggleFavorite(val isFavorite: Boolean) : AddLinkEvent
     object Submit : AddLinkEvent
     object ClearError : AddLinkEvent
@@ -44,4 +50,8 @@ sealed interface AddLinkEvent {
     object LoadAvailableTagsAndCollections : AddLinkEvent
     data class ToggleTag(val tagId: String) : AddLinkEvent
     data class ToggleCollection(val collectionId: String) : AddLinkEvent
+    // Task-related events
+    data class ToggleTask(val isTask: Boolean) : AddLinkEvent
+    data class SetTaskPriority(val priority: String) : AddLinkEvent
+    data class SetDueTime(val time: String) : AddLinkEvent
 }

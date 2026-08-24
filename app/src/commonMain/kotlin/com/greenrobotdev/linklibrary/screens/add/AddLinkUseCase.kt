@@ -217,6 +217,20 @@ fun AddLinkUseCase(
                     }
                     state = state.copy(selectedCollections = newSelectedCollections)
                 }
+                // Task-related event handlers
+                is AddLinkEvent.ToggleTask -> {
+                    state = state.copy(isTask = event.isTask)
+                }
+                is AddLinkEvent.SetTaskPriority -> {
+                    state = state.copy(taskPriority = event.priority)
+                }
+                is AddLinkEvent.SetDueTime -> {
+                    state = state.copy(dueTime = event.time)
+                }
+                // Notes event handler
+                is AddLinkEvent.NotesChanged -> {
+                    state = state.copy(notes = event.notes)
+                }
             }
         }
     }
