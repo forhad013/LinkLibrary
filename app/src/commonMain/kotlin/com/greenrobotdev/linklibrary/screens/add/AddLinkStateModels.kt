@@ -12,7 +12,6 @@ data class AddLinkState(
     val error: String? = null,
     val title: String = "",
     val url: String = "",
-    val description: String = "",
     val notes: String? = null,
     val isFavorite: Boolean = false,
     val isFormValid: Boolean = false,
@@ -36,7 +35,6 @@ data class AddLinkState(
 sealed interface AddLinkEvent {
     data class TitleChanged(val title: String) : AddLinkEvent
     data class UrlChanged(val url: String) : AddLinkEvent
-    data class DescriptionChanged(val description: String) : AddLinkEvent
     data class NotesChanged(val notes: String) : AddLinkEvent
     data class ToggleFavorite(val isFavorite: Boolean) : AddLinkEvent
     object Submit : AddLinkEvent

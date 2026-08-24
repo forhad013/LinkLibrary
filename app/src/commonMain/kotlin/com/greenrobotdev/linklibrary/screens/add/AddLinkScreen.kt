@@ -12,9 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -22,11 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.TaskAlt
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -39,17 +34,15 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
+import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -80,7 +73,7 @@ fun AddLinkScreen(
 
     val viewModel: AddLinkViewModel = viewModel<AddLinkViewModel>(key = routeKey.toString()) { AddLinkViewModel(initialUrl) }
 
-    val state by viewModel.states.collectAsState()
+    val state by viewModel.models.collectAsState()
 
     // Task state - now using state from viewModel
     val isTaskEnabled = state.isTask
@@ -97,7 +90,7 @@ fun AddLinkScreen(
     // Auto-fetch metadata when URL is entered and valid
     LaunchedEffect(state.url) {
         if (state.url.isNotBlank() && state.url.startsWith("http") && !state.isFetching && state.title.isBlank()) {
-            viewModel.onEvent(AddLinkEvent.FetchMetadata)
+            viewModel.take(AddLinkEvent.FetchMetadata)
         }
     }
 
@@ -116,7 +109,7 @@ fun AddLinkScreen(
                 },
                 actions = {
                     Button(
-                        onClick = { viewModel.onEvent(AddLinkEvent.Submit) },
+                        onClick = { viewModel.take(AddLinkEvent.Submit) },
                         enabled = state.isFormValid && !state.isLoading,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(66, 133, 244)
@@ -153,7 +146,7 @@ fun AddLinkScreen(
                         Text("Cancel")
                     }
                     Button(
-                        onClick = { viewModel.onEvent(AddLinkEvent.Submit) },
+                        onClick = { viewModel.take(AddLinkEvent.Submit) },
                         enabled = state.isFormValid && !state.isLoading,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(66, 133, 244)
@@ -172,7 +165,7 @@ fun AddLinkScreen(
                 .padding(padding)
                 .padding(16.dp, 8.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // URL Input Section
             Column {
@@ -188,7 +181,7 @@ fun AddLinkScreen(
                 ) {
                     OutlinedTextField(
                         value = state.url,
-                        onValueChange = { viewModel.onEvent(AddLinkEvent.UrlChanged(it)) },
+                        onValueChange = { viewModel.take(AddLinkEvent.UrlChanged(it)) },
                         placeholder = { Text("https://example.com") },
                         leadingIcon = {
                             Icon(
@@ -210,7 +203,7 @@ fun AddLinkScreen(
 
                     AutoFetchButton(
                         isFetching = state.isFetching,
-                        onClick = { viewModel.onEvent(AddLinkEvent.FetchMetadata) },
+                        onClick = { viewModel.take(AddLinkEvent.FetchMetadata) },
                         enabled = state.url.isNotBlank() && !state.isLoading
                     )
                 }
@@ -236,7 +229,7 @@ fun AddLinkScreen(
                     )
                     OutlinedTextField(
                         value = state.title,
-                        onValueChange = { viewModel.onEvent(AddLinkEvent.TitleChanged(it)) },
+                        onValueChange = { viewModel.take(AddLinkEvent.TitleChanged(it)) },
                         placeholder = { Text("Enter link title") },
                         leadingIcon = {
                             Icon(
@@ -247,30 +240,6 @@ fun AddLinkScreen(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        enabled = !state.isLoading,
-                        shape = RoundedCornerShape(12.dp),
-                        colors = TextFieldDefaults.colors(
-                            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                            unfocusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant
-                        )
-                    )
-                }
-
-                // Description Field
-                Column {
-                    Text(
-                        text = "Description",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    OutlinedTextField(
-                        value = state.description,
-                        onValueChange = { viewModel.onEvent(AddLinkEvent.DescriptionChanged(it)) },
-                        placeholder = { Text("Add a short description...") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(120.dp),
                         enabled = !state.isLoading,
                         shape = RoundedCornerShape(12.dp),
                         colors = TextFieldDefaults.colors(
@@ -316,7 +285,7 @@ fun AddLinkScreen(
                             collections = state.availableCollections,
                             selectedCollections = state.selectedCollections,
                             onCollectionToggle = { collectionId ->
-                                viewModel.onEvent(AddLinkEvent.ToggleCollection(collectionId))
+                                viewModel.take(AddLinkEvent.ToggleCollection(collectionId))
                             },
                             onAddCollection = onAddCollection,
                             isLoading = state.isLoadingTagsAndCollections
@@ -344,7 +313,7 @@ fun AddLinkScreen(
                                 tag?.let {
                                     InputChip(
                                         selected = true,
-                                        onClick = { viewModel.onEvent(AddLinkEvent.ToggleTag(tagId)) },
+                                        onClick = { viewModel.take(AddLinkEvent.ToggleTag(tagId)) },
                                         label = { Text(tag.name) },
                                         avatar = {
                                             Icon(
@@ -370,7 +339,7 @@ fun AddLinkScreen(
                                 .forEach { tag ->
                                     FilterChip(
                                         selected = false,
-                                        onClick = { viewModel.onEvent(AddLinkEvent.ToggleTag(tag.id)) },
+                                        onClick = { viewModel.take(AddLinkEvent.ToggleTag(tag.id)) },
                                         label = { Text(tag.name) },
                                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                                         colors = FilterChipDefaults.filterChipColors(
@@ -408,7 +377,7 @@ fun AddLinkScreen(
                 )
                 OutlinedTextField(
                     value = state.notes ?: "",
-                    onValueChange = { viewModel.onEvent(AddLinkEvent.NotesChanged(it)) },
+                    onValueChange = { viewModel.take(AddLinkEvent.NotesChanged(it)) },
                     placeholder = { Text("Add any personal notes, reminders, or context here...") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -459,7 +428,7 @@ fun AddLinkScreen(
                             )
                             Switch(
                                 checked = isTaskEnabled,
-                                onCheckedChange = { viewModel.onEvent(AddLinkEvent.ToggleTask(it)) }
+                                onCheckedChange = { viewModel.take(AddLinkEvent.ToggleTask(it)) }
                             )
                         }
                     }
@@ -481,7 +450,7 @@ fun AddLinkScreen(
                                     listOf("Low", "Medium", "High").forEach { priority ->
                                         val isSelected = selectedPriority == priority
                                         OutlinedButton(
-                                            onClick = { viewModel.onEvent(AddLinkEvent.SetTaskPriority(priority)) },
+                                            onClick = { viewModel.take(AddLinkEvent.SetTaskPriority(priority)) },
                                             modifier = Modifier.weight(1f),
                                             shape = RoundedCornerShape(8.dp),
                                             colors = if (isSelected) {
@@ -515,7 +484,7 @@ fun AddLinkScreen(
                                 )
                                 OutlinedTextField(
                                     value = dueTime,
-                                    onValueChange = { viewModel.onEvent(AddLinkEvent.SetDueTime(it)) },
+                                    onValueChange = { viewModel.take(AddLinkEvent.SetDueTime(it)) },
                                     leadingIcon = {
                                         Icon(
                                             Icons.Default.AccessTime,
@@ -574,7 +543,7 @@ private fun Divider() {
 
 @Composable
 private fun CollectionSelector(
-    collections: List<com.greenrobotdev.linklibrary.model.Collection>,
+    collections: List<com.greenrobotdev.linklibrary.screens.collections.Collection>,
     selectedCollections: Set<String>,
     onCollectionToggle: (String) -> Unit,
     onAddCollection: () -> Unit,

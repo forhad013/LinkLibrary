@@ -22,7 +22,7 @@ import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 @Composable
-fun AddLinkUseCase(
+fun AddLinkPresenter(
     initialState: AddLinkState,
     events: Flow<AddLinkEvent>,
     linkRepository: LinkRepository,
@@ -95,9 +95,8 @@ fun AddLinkUseCase(
                                 id = Uuid.random().toString(),
                                 title = state.title.ifBlank { state.url },
                                 url = state.url,
-                                description = state.description,
+                                description = "", // Empty string since we removed the description field
                                 isFavorite = state.isFavorite,
-                                createdAt = System.currentTimeMillis()
                             )
                             val result = linkRepository.addLink(link.toEntity())
 
@@ -143,7 +142,7 @@ fun AddLinkUseCase(
                             val result = metadataFetchService.fetchMetadata(state.url).first()
                             result.fold(
                                 onSuccess = { metadata ->
-                                    // Auto-fill title and description from metadata
+                                    // Auto-fill title from metadata (description removed)
                                     val autoTitle = if (metadata.title.isNotBlank()) metadata.title else {
                                         // Fallback: generate title from URL
                                         extractTitleFromUrl(state.url)
@@ -152,8 +151,7 @@ fun AddLinkUseCase(
                                         isFetching = false,
                                         fetchedMetadata = metadata,
                                         title = if (metadata.title.isNotBlank()) metadata.title else autoTitle,
-                                        description = if (metadata.description.isNotBlank()) metadata.description else state.description,
-                                        isFormValid = isFormValid(state.url, autoTitle, if (metadata.description.isNotBlank()) metadata.description else state.description)
+                                        isFormValid = isFormValid(state.url, autoTitle, "")
                                     )
                                 },
                                 onFailure = { error ->
@@ -163,7 +161,7 @@ fun AddLinkUseCase(
                                         isFetching = false,
                                         fetchError = error.message ?: "Failed to fetch metadata. Using fallback title.",
                                         title = fallbackTitle,
-                                        isFormValid = isFormValid(state.url, fallbackTitle, state.description)
+                                        isFormValid = isFormValid(state.url, fallbackTitle, "")
                                     )
                                 }
                             )
@@ -174,7 +172,7 @@ fun AddLinkUseCase(
                                 isFetching = false,
                                 fetchError = e.message ?: "Failed to fetch metadata. Using fallback title.",
                                 title = fallbackTitle,
-                                isFormValid = isFormValid(state.url, fallbackTitle, state.description)
+                                isFormValid = isFormValid(state.url, fallbackTitle, "")
                             )
                         }
                     }
@@ -239,7 +237,7 @@ fun AddLinkUseCase(
 }
 
 private fun isFormValid(url: String, title: String, description: String): Boolean {
-    return url.isNotBlank() && (title.isNotBlank() || description.isNotBlank())
+    return url.isNotBlank() && title.isNotBlank()
 }
 
 /**
