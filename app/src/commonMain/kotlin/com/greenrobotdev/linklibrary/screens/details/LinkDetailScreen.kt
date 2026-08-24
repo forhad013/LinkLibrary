@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Article
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Label
@@ -62,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import com.greenrobotdev.linklibrary.screens.share.ShareDialog
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
@@ -642,12 +642,12 @@ fun LinkDetailScreen(
 }
 
 @OptIn(ExperimentalTime::class)
-private fun formatTimestamp(timestamp: kotlinx.datetime.Instant?): String {
+private fun formatTimestamp(timestamp: Long?): String {
     if (timestamp == null) return "Unknown"
 
-    val now = kotlin.time.Clock.System.now()
-    val difference = now - timestamp
-    val days = difference.inWholeDays
+    val now = Clock.System.now().toEpochMilliseconds()
+    val differenceMs = now - timestamp
+    val days = differenceMs / (24 * 60 * 60 * 1000)
 
     return when {
         days == 0L -> "Today"

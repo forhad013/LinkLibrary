@@ -2,38 +2,56 @@ package com.greenrobotdev.linklibrary.screens.collections
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.greenrobotdev.linklibrary.database.repository.CollectionRepository
+import com.greenrobotdev.linklibrary.model.toCollection
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import org.koin.compose.koinInject
 
 /**
  * Use case for Collections screen
- * Loads and displays collections
- * Note: Currently using static data, can be extended to use CollectionRepository when available
+ * Loads and displays collections using CollectionRepository
  */
 @Composable
 fun CollectionsUseCase(
     initialState: CollectionsState,
-    events: Flow<CollectionsEvent>
+    events: Flow<CollectionsEvent>,
+    collectionRepository: CollectionRepository = koinInject()
 ): CollectionsState {
-    var state = remember { mutableStateOf(initialState) }
+    var state by remember { mutableStateOf(initialState) }
 
     // Load collections on init
     LaunchedEffect(Unit) {
-        state.value = state.value.copy(
+        state = state.copy(
             isLoading = true,
             error = null
         )
         try {
-            // TODO: Replace with repository call when CollectionRepository is available
-            // val collections = collectionRepository.getAllCollections()
-            val collections = loadStaticCollections()
-            state.value = state.value.copy(
-                isLoading = false,
-                collections = collections
+            val result = collectionRepository.getCollections().first()
+            result.fold(
+                onSuccess = { collectionEntities ->
+                    // Convert entities to UI models with counts
+                    val collections = collectionEntities.map { entity ->
+                        entity.toCollection(count = 0) // TODO: Fetch actual counts
+                    }
+                    state = state.copy(
+                        isLoading = false,
+                        collections = collections
+                    )
+                },
+                onFailure = { error ->
+                    state = state.copy(
+                        isLoading = false,
+                        error = error.message ?: "Failed to load collections"
+                    )
+                }
             )
         } catch (e: Exception) {
-            state.value = state.value.copy(
+            state = state.copy(
                 isLoading = false,
                 error = e.message ?: "Failed to load collections"
             )
@@ -45,15 +63,28 @@ fun CollectionsUseCase(
         events.collect { event ->
             when (event) {
                 is CollectionsEvent.LoadCollections -> {
-                    state.value = state.value.copy(isLoading = true, error = null)
+                    state = state.copy(isLoading = true, error = null)
                     try {
-                        val collections = loadStaticCollections()
-                        state.value = state.value.copy(
-                            isLoading = false,
-                            collections = collections
+                        val result = collectionRepository.getCollections().first()
+                        result.fold(
+                            onSuccess = { collectionEntities ->
+                                val collections = collectionEntities.map { entity ->
+                                    entity.toCollection(count = 0) // TODO: Fetch actual counts
+                                }
+                                state = state.copy(
+                                    isLoading = false,
+                                    collections = collections
+                                )
+                            },
+                            onFailure = { error ->
+                                state = state.copy(
+                                    isLoading = false,
+                                    error = error.message ?: "Failed to load collections"
+                                )
+                            }
                         )
                     } catch (e: Exception) {
-                        state.value = state.value.copy(
+                        state = state.copy(
                             isLoading = false,
                             error = e.message ?: "Failed to load collections"
                         )
@@ -61,46 +92,11 @@ fun CollectionsUseCase(
                 }
 
                 is CollectionsEvent.ClearError -> {
-                    state.value = state.value.copy(error = null)
+                    state = state.copy(error = null)
                 }
             }
         }
     }
 
-    return state.value
+    return state
 }
-
-/**
- * Static collections data
- * TODO: Remove this when CollectionRepository is implemented
- */
-private fun loadStaticCollections(): List<Collection> = listOf(
-    Collection(
-        id = "1",
-        name = "AI & Tech",
-        description = "Artificial intelligence and technology articles",
-        count = 12,
-        iconType = "psychology"
-    ),
-    Collection(
-        id = "2",
-        name = "Design",
-        description = "UI/UX and graphic design resources",
-        count = 8,
-        iconType = "psychology"
-    ),
-    Collection(
-        id = "3",
-        name = "Business",
-        description = "Business and entrepreneurship articles",
-        count = 15,
-        iconType = "psychology"
-    ),
-    Collection(
-        id = "4",
-        name = "Science",
-        description = "Scientific research and discoveries",
-        count = 6,
-        iconType = "psychology"
-    )
-)

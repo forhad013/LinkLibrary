@@ -451,12 +451,12 @@ fun LibraryLinkItem(
 }
 
 @OptIn(ExperimentalTime::class)
-fun getRelativeTimeString(timestamp: kotlinx.datetime.Instant?): String {
+fun getRelativeTimeString(timestamp: Long?): String {
     if (timestamp == null) return "Saved recently"
 
-    val now = Clock.System.now()
-    val difference = now - timestamp
-    val days = difference.inWholeDays
+    val now = Clock.System.now().toEpochMilliseconds()
+    val differenceMs = now - timestamp
+    val days = differenceMs / (24 * 60 * 60 * 1000)
 
     return when {
         days == 0L -> "Saved today"

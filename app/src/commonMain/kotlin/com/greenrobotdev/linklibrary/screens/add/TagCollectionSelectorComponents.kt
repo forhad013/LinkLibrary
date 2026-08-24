@@ -50,25 +50,42 @@ fun TagSelector(
     selectedTags: Set<String>,
     onTagToggle: (String) -> Unit,
     isLoading: Boolean = false,
+    onAddTag: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Icon(
-                imageVector = Icons.Default.Label,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Tags",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Label,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Tags",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            IconButton(
+                onClick = onAddTag,
+                enabled = !isLoading
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add new tag",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         }
 
         when {
@@ -93,6 +110,7 @@ fun TagSelector(
             tags.isEmpty() -> {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
+                    onClick = onAddTag,
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
                     ),
@@ -183,25 +201,42 @@ fun CollectionSelector(
     selectedCollections: Set<String>,
     onCollectionToggle: (String) -> Unit,
     isLoading: Boolean = false,
+    onAddCollection: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Icon(
-                imageVector = Icons.Default.FolderOpen,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Collections",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FolderOpen,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Collections",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            IconButton(
+                onClick = onAddCollection,
+                enabled = !isLoading
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add new collection",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         }
 
         when {
@@ -226,6 +261,7 @@ fun CollectionSelector(
             collections.isEmpty() -> {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
+                    onClick = onAddCollection,
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
                     ),
@@ -318,6 +354,8 @@ fun CompactTagCollectionSelector(
     onTagToggle: (String) -> Unit,
     onCollectionToggle: (String) -> Unit,
     isLoading: Boolean = false,
+    onAddTag: () -> Unit = {},
+    onAddCollection: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -328,14 +366,16 @@ fun CompactTagCollectionSelector(
             tags = tags,
             selectedTags = selectedTags,
             onTagToggle = onTagToggle,
-            isLoading = isLoading
+            isLoading = isLoading,
+            onAddTag = onAddTag
         )
 
         CollectionSelector(
             collections = collections,
             selectedCollections = selectedCollections,
             onCollectionToggle = onCollectionToggle,
-            isLoading = isLoading
+            isLoading = isLoading,
+            onAddCollection = onAddCollection
         )
     }
 }

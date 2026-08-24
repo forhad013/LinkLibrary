@@ -2,6 +2,7 @@ package com.greenrobotdev.linklibrary.screens.add
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,13 +37,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
+import com.greenrobotdev.linklibrary.components.form.AutoFetchButton
+import com.greenrobotdev.linklibrary.screens.add.CompactTagCollectionSelector
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddLinkScreen(
     routeKey: NavKey,
     initialUrl: String?,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onAddTag: () -> Unit = {},
+    onAddCollection: () -> Unit = {}
 ) {
 
     val viewModel: AddLinkViewModel = viewModel<AddLinkViewModel>(key = routeKey.toString()) { AddLinkViewModel(initialUrl) }
@@ -84,17 +89,41 @@ fun AddLinkScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // URL Field
-            OutlinedTextField(
-                value = state.url,
-                onValueChange = { viewModel.onEvent(AddLinkEvent.UrlChanged(it)) },
-                label = { Text("URL") },
-                leadingIcon = { Icon(Icons.Default.Link, contentDescription = null) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                isError = state.error != null,
-                enabled = !state.isLoading
-            )
+            // URL Field with Auto-fetch
+            Column {
+                OutlinedTextField(
+                    value = state.url,
+                    onValueChange = { viewModel.onEvent(AddLinkEvent.UrlChanged(it)) },
+                    label = { Text("URL") },
+                    leadingIcon = { Icon(Icons.Default.Link, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    isError = state.error != null,
+                    enabled = !state.isLoading
+                )
+
+                // Auto-fetch button
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    AutoFetchButton(
+                        isFetching = state.isFetching,
+                        onClick = { viewModel.onEvent(AddLinkEvent.FetchMetadata) },
+                        enabled = state.url.isNotBlank() && !state.isLoading
+                    )
+                }
+
+                // Fetch error message
+                state.fetchError?.let { error ->
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
+            }
 
             // Title Field
             OutlinedTextField(
@@ -116,6 +145,19 @@ fun AddLinkScreen(
                     .fillMaxWidth()
                     .height(120.dp),
                 enabled = !state.isLoading
+            )
+
+            // Tag and Collection Selector
+            CompactTagCollectionSelector(
+                tags = state.availableTags,
+                collections = state.availableCollections,
+                selectedTags = state.selectedTags,
+                selectedCollections = state.selectedCollections,
+                onTagToggle = { tagId -> viewModel.onEvent(AddLinkEvent.ToggleTag(tagId)) },
+                onCollectionToggle = { collectionId -> viewModel.onEvent(AddLinkEvent.ToggleCollection(collectionId)) },
+                isLoading = state.isLoadingTagsAndCollections,
+                onAddTag = onAddTag,
+                onAddCollection = onAddCollection
             )
 
             // Favorite Toggle

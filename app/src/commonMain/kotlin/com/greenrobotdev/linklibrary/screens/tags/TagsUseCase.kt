@@ -2,38 +2,56 @@ package com.greenrobotdev.linklibrary.screens.tags
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.greenrobotdev.linklibrary.database.repository.TagRepository
+import com.greenrobotdev.linklibrary.model.toTag
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import org.koin.compose.koinInject
 
 /**
  * Use case for Tags screen
- * Loads and displays tags
- * Note: Currently using static data, can be extended to use TagRepository when available
+ * Loads and displays tags using TagRepository
  */
 @Composable
 fun TagsUseCase(
     initialState: TagsState,
-    events: Flow<TagsEvent>
+    events: Flow<TagsEvent>,
+    tagRepository: TagRepository = koinInject()
 ): TagsState {
-    var state = remember { mutableStateOf(initialState) }
+    var state by remember { mutableStateOf(initialState) }
 
     // Load tags on init
     LaunchedEffect(Unit) {
-        state.value = state.value.copy(
+        state = state.copy(
             isLoading = true,
             error = null
         )
         try {
-            // TODO: Replace with repository call when TagRepository is available
-            // val tags = tagRepository.getAllTags()
-            val tags = loadStaticTags()
-            state.value = state.value.copy(
-                isLoading = false,
-                tags = tags
+            val result = tagRepository.getTags().first()
+            result.fold(
+                onSuccess = { tagEntities ->
+                    // Convert entities to UI models with counts
+                    val tags = tagEntities.map { entity ->
+                        entity.toTag(count = 0) // TODO: Fetch actual counts
+                    }
+                    state = state.copy(
+                        isLoading = false,
+                        tags = tags
+                    )
+                },
+                onFailure = { error ->
+                    state = state.copy(
+                        isLoading = false,
+                        error = error.message ?: "Failed to load tags"
+                    )
+                }
             )
         } catch (e: Exception) {
-            state.value = state.value.copy(
+            state = state.copy(
                 isLoading = false,
                 error = e.message ?: "Failed to load tags"
             )
@@ -45,15 +63,28 @@ fun TagsUseCase(
         events.collect { event ->
             when (event) {
                 is TagsEvent.LoadTags -> {
-                    state.value = state.value.copy(isLoading = true, error = null)
+                    state = state.copy(isLoading = true, error = null)
                     try {
-                        val tags = loadStaticTags()
-                        state.value = state.value.copy(
-                            isLoading = false,
-                            tags = tags
+                        val result = tagRepository.getTags().first()
+                        result.fold(
+                            onSuccess = { tagEntities ->
+                                val tags = tagEntities.map { entity ->
+                                    entity.toTag(count = 0) // TODO: Fetch actual counts
+                                }
+                                state = state.copy(
+                                    isLoading = false,
+                                    tags = tags
+                                )
+                            },
+                            onFailure = { error ->
+                                state = state.copy(
+                                    isLoading = false,
+                                    error = error.message ?: "Failed to load tags"
+                                )
+                            }
                         )
                     } catch (e: Exception) {
-                        state.value = state.value.copy(
+                        state = state.copy(
                             isLoading = false,
                             error = e.message ?: "Failed to load tags"
                         )
@@ -61,46 +92,11 @@ fun TagsUseCase(
                 }
 
                 is TagsEvent.ClearError -> {
-                    state.value = state.value.copy(error = null)
+                    state = state.copy(error = null)
                 }
             }
         }
     }
 
-    return state.value
+    return state
 }
-
-/**
- * Static tags data
- * TODO: Remove this when TagRepository is implemented
- */
-private fun loadStaticTags(): List<Tag> = listOf(
-    Tag(
-        id = "1",
-        name = "AI & Tech",
-        description = "Artificial intelligence and technology articles",
-        count = 12,
-        iconType = "psychology"
-    ),
-    Tag(
-        id = "2",
-        name = "Design",
-        description = "UI/UX and graphic design resources",
-        count = 8,
-        iconType = "psychology"
-    ),
-    Tag(
-        id = "3",
-        name = "Business",
-        description = "Business and entrepreneurship articles",
-        count = 15,
-        iconType = "psychology"
-    ),
-    Tag(
-        id = "4",
-        name = "Science",
-        description = "Scientific research and discoveries",
-        count = 6,
-        iconType = "psychology"
-    )
-)
