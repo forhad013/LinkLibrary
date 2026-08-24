@@ -94,70 +94,76 @@ fun AddLinkScreen(
         }
     }
 
+    // Custom colors matching HTML design exactly
+    val primary = Color(0xFF0058BD) // rgb(0, 88, 189)
+    val primaryBlue = Color(0xFF4285F4) // rgb(66, 133, 244) - used for Save button
+    val background = Color(0xFFFAF9FD) // rgb(250, 249, 253)
+    val surface = Color(0xFFFAF9FD) // rgb(250, 249, 253)
+    val onBackground = Color(0xFF1A1B1E) // rgb(26, 27, 30)
+    val onSurface = Color(0xFF1A1B1E) // rgb(26, 27, 30)
+    val onSurfaceVariant = Color(0xFF424753) // rgb(66, 71, 83)
+    val surfaceContainerLowest = Color(0xFFFFFFFF) // rgb(255, 255, 255)
+    val surfaceContainerLow = Color(0xFFF4F3F7) // rgb(244, 243, 247)
+    val surfaceContainer = Color(0xFFEFEDF1) // rgb(239, 237, 241)
+    val surfaceContainerHighest = Color(0xFFE3E2E6) // rgb(227, 226, 230)
+    val outlineVariant = Color(0xFFC2C6D5) // rgb(194, 198, 213)
+    val secondaryContainer = Color(0xFF83B1FF) // rgb(131, 177, 255)
+    val onSecondaryContainer = Color(0xFF004285) // rgb(0, 66, 133)
+    val tertiary = Color(0xFF006B2B) // rgb(0, 107, 43)
+    val tertiaryFixedDim = Color(0xFF6DDD81) // rgb(109, 221, 129)
+    val onPrimary = Color(0xFFFFFFFF) // rgb(255, 255, 255)
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Add New Link", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                },
-                actions = {
-                    Button(
-                        onClick = { viewModel.take(AddLinkEvent.Submit) },
-                        enabled = state.isFormValid && !state.isLoading,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(66, 133, 244)
-                        ),
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
-                        Text("Save")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.primary
-                )
-            )
-        },
-        bottomBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surfaceContainer,
-                tonalElevation = 2.dp,
-                shadowElevation = 8.dp
+                color = surface,
+                tonalElevation = 0.dp
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.End,
+                        .height(64.dp)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(
-                        onClick = onBack,
-                        modifier = Modifier.padding(end = 8.dp)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Cancel")
+                        IconButton(
+                            onClick = onBack,
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                tint = onSurfaceVariant
+                            )
+                        }
+                        Text(
+                            text = "Add New Link",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = primary
+                        )
                     }
+
                     Button(
                         onClick = { viewModel.take(AddLinkEvent.Submit) },
                         enabled = state.isFormValid && !state.isLoading,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(66, 133, 244)
+                            containerColor = primaryBlue
                         ),
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
-                        Text("Save Link")
+                        Text("Save", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
         }
+    },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -172,7 +178,7 @@ fun AddLinkScreen(
                 Text(
                     text = "URL",
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = onSurface,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Row(
@@ -187,7 +193,7 @@ fun AddLinkScreen(
                             Icon(
                                 Icons.Default.Link,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                tint = onSurfaceVariant
                             )
                         },
                         modifier = Modifier.weight(1f),
@@ -196,8 +202,8 @@ fun AddLinkScreen(
                         enabled = !state.isLoading,
                         shape = RoundedCornerShape(12.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                            unfocusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant
+                            focusedIndicatorColor = primary,
+                            unfocusedIndicatorColor = outlineVariant
                         )
                     )
 
@@ -210,7 +216,7 @@ fun AddLinkScreen(
                 Text(
                     text = "Paste a URL to automatically fetch title and description.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = onSurfaceVariant,
                     modifier = Modifier.padding(start = 4.dp, top = 4.dp)
                 )
             }
@@ -224,7 +230,7 @@ fun AddLinkScreen(
                     Text(
                         text = "Title",
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = onSurface,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     OutlinedTextField(
@@ -235,7 +241,7 @@ fun AddLinkScreen(
                             Icon(
                                 Icons.Default.Title,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                tint = onSurfaceVariant
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -243,8 +249,8 @@ fun AddLinkScreen(
                         enabled = !state.isLoading,
                         shape = RoundedCornerShape(12.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                            unfocusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant
+                            focusedIndicatorColor = primary,
+                            unfocusedIndicatorColor = outlineVariant
                         )
                     )
                 }
@@ -255,9 +261,9 @@ fun AddLinkScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
+                    containerColor = surfaceContainerLowest
                 ),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceContainerHighest),
+                border = BorderStroke(1.dp, surfaceContainerHighest),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
@@ -268,7 +274,7 @@ fun AddLinkScreen(
                         text = "Organization",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = onSurface
                     )
 
                     // Collection Dropdown
@@ -276,7 +282,7 @@ fun AddLinkScreen(
                         Text(
                             text = "Collection",
                             style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
@@ -297,7 +303,7 @@ fun AddLinkScreen(
                         Text(
                             text = "Tags",
                             style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 12.dp)
                         )
 
@@ -323,9 +329,9 @@ fun AddLinkScreen(
                                             )
                                         },
                                         colors = InputChipDefaults.inputChipColors(
-                                            containerColor = MaterialTheme.colorScheme.tertiaryFixedDim.copy(alpha = 0.1f),
-                                            labelColor = MaterialTheme.colorScheme.tertiary,
-                                            leadingIconColor = MaterialTheme.colorScheme.tertiary
+                                            containerColor = tertiaryFixedDim.copy(alpha = 0.1f),
+                                            labelColor = tertiary,
+                                            leadingIconColor = tertiary
                                         ),
                                         border = null
                                     )
@@ -341,9 +347,9 @@ fun AddLinkScreen(
                                         selected = false,
                                         onClick = { viewModel.take(AddLinkEvent.ToggleTag(tag.id)) },
                                         label = { Text(tag.name) },
-                                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                                        border = BorderStroke(1.dp, outlineVariant),
                                         colors = FilterChipDefaults.filterChipColors(
-                                            containerColor = MaterialTheme.colorScheme.surface
+                                            containerColor = surface
                                         )
                                     )
                                 }
@@ -358,7 +364,7 @@ fun AddLinkScreen(
                                 Icon(
                                     Icons.Default.Add,
                                     contentDescription = "Add tag",
-                                    tint = MaterialTheme.colorScheme.primary,
+                                    tint = primary,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -372,7 +378,7 @@ fun AddLinkScreen(
                 Text(
                     text = "Personal Notes",
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = onSurface,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 OutlinedTextField(
@@ -385,8 +391,8 @@ fun AddLinkScreen(
                     enabled = !state.isLoading,
                     shape = RoundedCornerShape(12.dp),
                     colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                        unfocusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant
+                        focusedIndicatorColor = primary,
+                        unfocusedIndicatorColor = outlineVariant
                     )
                 )
             }
@@ -396,9 +402,9 @@ fun AddLinkScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
+                    containerColor = surfaceContainerLowest
                 ),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceContainerHighest),
+                border = BorderStroke(1.dp, surfaceContainerHighest),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
@@ -414,7 +420,7 @@ fun AddLinkScreen(
                             text = "Add to Tasks",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = onSurface
                         )
 
                         Row(
@@ -424,7 +430,7 @@ fun AddLinkScreen(
                             Text(
                                 text = "Mark as Task",
                                 style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = onSurfaceVariant
                             )
                             Switch(
                                 checked = isTaskEnabled,
@@ -440,7 +446,7 @@ fun AddLinkScreen(
                                 Text(
                                     text = "Priority",
                                     style = MaterialTheme.typography.labelLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    color = onSurfaceVariant,
                                     modifier = Modifier.padding(bottom = 8.dp)
                                 )
                                 Row(
@@ -455,17 +461,17 @@ fun AddLinkScreen(
                                             shape = RoundedCornerShape(8.dp),
                                             colors = if (isSelected) {
                                                 ButtonDefaults.buttonColors(
-                                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                                                    containerColor = secondaryContainer,
+                                                    contentColor = onSecondaryContainer
                                                 )
                                             } else {
                                                 ButtonDefaults.outlinedButtonColors(
-                                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    contentColor = onSurfaceVariant
                                                 )
                                             },
                                             border = if (isSelected) null else BorderStroke(
                                                 1.dp,
-                                                MaterialTheme.colorScheme.outlineVariant
+                                                outlineVariant
                                             )
                                         ) {
                                             Text(priority)
@@ -479,7 +485,7 @@ fun AddLinkScreen(
                                 Text(
                                     text = "Due Time",
                                     style = MaterialTheme.typography.labelLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    color = onSurfaceVariant,
                                     modifier = Modifier.padding(bottom = 8.dp)
                                 )
                                 OutlinedTextField(
@@ -489,7 +495,7 @@ fun AddLinkScreen(
                                         Icon(
                                             Icons.Default.AccessTime,
                                             contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.primary
+                                            tint = primary
                                         )
                                     },
                                     modifier = Modifier.fillMaxWidth(),
@@ -497,8 +503,8 @@ fun AddLinkScreen(
                                     shape = RoundedCornerShape(12.dp),
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                                     colors = TextFieldDefaults.colors(
-                                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                                        unfocusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant
+                                        focusedIndicatorColor = primary,
+                                        unfocusedIndicatorColor = outlineVariant
                                     )
                                 )
                             }
@@ -537,7 +543,7 @@ private fun Divider() {
         modifier = Modifier
             .fillMaxWidth()
             .height(1.dp)
-            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+            .background(surfaceContainerHighest)
     )
 }
 
@@ -552,7 +558,7 @@ private fun CollectionSelector(
     // Simplified collection selector - can be enhanced with dropdown
     Column {
         if (isLoading) {
-            Text("Loading collections...", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("Loading collections...", color = onSurfaceVariant)
         } else {
             if (collections.isEmpty()) {
                 OutlinedButton(
@@ -569,9 +575,9 @@ private fun CollectionSelector(
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                            .background(surfaceContainerLow)
                             .padding(16.dp)
-                            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp)),
+                            .border(1.dp, outlineVariant, RoundedCornerShape(12.dp)),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
