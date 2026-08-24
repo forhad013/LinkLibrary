@@ -39,20 +39,28 @@ class MetadataFetchService(private val httpClient: HttpClient) {
                 header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
                 // Follow redirects
                 header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+                // Add more headers to look like a real browser
+                header("Accept-Language", "en-US,en;q=0.9")
+                header("Accept-Encoding", "gzip, deflate, br")
+                header("Connection", "keep-alive")
             }
 
             when (response.status) {
-                HttpStatusCode.OK, HttpStatusCode.MovedPermanently, HttpStatusCode.Found -> {
+                HttpStatusCode.OK, HttpStatusCode.MovedPermanently, HttpStatusCode.Found, HttpStatusCode.TemporaryRedirect, HttpStatusCode.PermanentRedirect -> {
                     val htmlContent = response.body<String>()
-                    val metadata = extractMetadata(htmlContent, url)
-                    emit(Result.success(metadata))
+                    if (htmlContent.isNotBlank()) {
+                        val metadata = extractMetadata(htmlContent, url)
+                        emit(Result.success(metadata))
+                    } else {
+                        emit(Result.failure(Exception("Empty response from server")))
+                    }
                 }
                 else -> {
                     emit(Result.failure(Exception("HTTP ${response.status.value}: ${response.status.description}")))
                 }
             }
         } catch (e: Exception) {
-            emit(Result.failure(e))
+            emit(Result.failure(Exception("Network error: ${e.message}")))
         }
     }
 
@@ -212,7 +220,12 @@ class MetadataFetchService(private val httpClient: HttpClient) {
      * Validates URL format
      */
     private fun isValidUrl(url: String): Boolean {
-        return url.matches(Regex("^https?://[\\w\\-._~:/?#[\\]@!$&'()*+,;=]+$"))
+        return try {
+            val urlRegex = Regex("^https?://.+", RegexOption.IGNORE_CASE)
+            urlRegex.matches(url) && url.length > 10
+        } catch (e: Exception) {
+            false
+        }
     }
 }
 

@@ -27,25 +27,27 @@ fun AutoFetchButton(
         modifier = modifier,
         enabled = enabled && !isFetching,
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+            contentColor = MaterialTheme.colorScheme.primary
         )
     ) {
         if (isFetching) {
             CircularProgressIndicator(
                 modifier = Modifier.width(20.dp),
-                strokeWidth = 2.dp
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.primary
             )
         } else {
             Icon(
                 Icons.Default.Schedule,
                 contentDescription = "Auto-fetch metadata",
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "Auto-fetch",
                 style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

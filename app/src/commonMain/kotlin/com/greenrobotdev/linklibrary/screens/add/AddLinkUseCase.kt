@@ -144,25 +144,37 @@ fun AddLinkUseCase(
                             result.fold(
                                 onSuccess = { metadata ->
                                     // Auto-fill title and description from metadata
+                                    val autoTitle = if (metadata.title.isNotBlank()) metadata.title else {
+                                        // Fallback: generate title from URL
+                                        extractTitleFromUrl(state.url)
+                                    }
                                     state = state.copy(
                                         isFetching = false,
                                         fetchedMetadata = metadata,
-                                        title = if (metadata.title.isNotBlank()) metadata.title else state.title,
+                                        title = if (metadata.title.isNotBlank()) metadata.title else autoTitle,
                                         description = if (metadata.description.isNotBlank()) metadata.description else state.description,
-                                        isFormValid = isFormValid(state.url, if (metadata.title.isNotBlank()) metadata.title else state.title, if (metadata.description.isNotBlank()) metadata.description else state.description)
+                                        isFormValid = isFormValid(state.url, autoTitle, if (metadata.description.isNotBlank()) metadata.description else state.description)
                                     )
                                 },
                                 onFailure = { error ->
+                                    // Provide fallback title even on failure
+                                    val fallbackTitle = extractTitleFromUrl(state.url)
                                     state = state.copy(
                                         isFetching = false,
-                                        fetchError = error.message ?: "Failed to fetch metadata"
+                                        fetchError = error.message ?: "Failed to fetch metadata. Using fallback title.",
+                                        title = fallbackTitle,
+                                        isFormValid = isFormValid(state.url, fallbackTitle, state.description)
                                     )
                                 }
                             )
                         } catch (e: Exception) {
+                            // Provide fallback title even on exception
+                            val fallbackTitle = extractTitleFromUrl(state.url)
                             state = state.copy(
                                 isFetching = false,
-                                fetchError = e.message ?: "Failed to fetch metadata"
+                                fetchError = e.message ?: "Failed to fetch metadata. Using fallback title.",
+                                title = fallbackTitle,
+                                isFormValid = isFormValid(state.url, fallbackTitle, state.description)
                             )
                         }
                     }
@@ -214,4 +226,40 @@ fun AddLinkUseCase(
 
 private fun isFormValid(url: String, title: String, description: String): Boolean {
     return url.isNotBlank() && (title.isNotBlank() || description.isNotBlank())
+}
+
+/**
+ * Extracts a readable title from URL when metadata fetch fails
+ * Falls back to generating a title from the hostname and path
+ */
+private fun extractTitleFromUrl(url: String): String {
+    return try {
+        val cleanUrl = url.removePrefix("https://").removePrefix("http://").removePrefix("www.")
+        val parts = cleanUrl.split("/")
+
+        val host = parts.firstOrNull() ?: "Unknown Site"
+        val path = parts.drop(1).lastOrNull()
+
+        if (path.isNullOrBlank() || path.isEmpty()) {
+            host.replaceFirstChar { it.uppercaseChar() }
+        } else {
+            // Convert path to readable title (e.g., "my-article" -> "My Article")
+            val readablePath = path.split("-")
+                .joinToString(" ") { word ->
+                    if (word.isNotEmpty()) word.replaceFirstChar { it.uppercaseChar() } else ""
+                }
+            "$host - $readablePath"
+        }
+    } catch (e: Exception) {
+        // Final fallback: use part of URL
+        try {
+            val cleanUrl = url.removePrefix("https://").removePrefix("http://").removePrefix("www.")
+            val domainAndPath = cleanUrl.split("/").take(2).joinToString(" - ") { part ->
+                if (part.isNotEmpty()) part.replaceFirstChar { it.uppercaseChar() } else ""
+            }
+            domainAndPath
+        } catch (e: Exception) {
+            "Link from ${url.take(30)}..."
+        }
+    }
 }
