@@ -38,26 +38,26 @@ import com.greenrobotdev.linklibrary.screens.home.HomeScreen
 import com.greenrobotdev.linklibrary.screens.library.LibraryScreen
 import com.greenrobotdev.linklibrary.screens.notes.NoteEditorScreen
 import com.greenrobotdev.linklibrary.screens.settings.SettingsScreen
-import com.greenrobotdev.linklibrary.screens.stitch.AIAssistantDemoScreen
 import com.greenrobotdev.linklibrary.screens.tags.TagsScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.serializer
 
 // Configuration for serialization
 private val config = SavedStateConfiguration {
     serializersModule = SerializersModule {
         polymorphic(NavKey::class) {
-            subclass(RootScreens.HomeTab::class, RootScreens.HomeTab.serializer())
-            subclass(RootScreens.LibraryTab::class, RootScreens.LibraryTab.serializer())
-            subclass(RootScreens.SettingsTab::class, RootScreens.SettingsTab.serializer())
-            subclass(RootScreens.LinkDetail::class, RootScreens.LinkDetail.serializer())
-            subclass(RootScreens.AddLink::class, RootScreens.AddLink.serializer())
-            subclass(RootScreens.AddCollection::class, RootScreens.AddCollection.serializer())
-            subclass(RootScreens.AIAssistantDemo::class, RootScreens.AIAssistantDemo.serializer())
-            subclass(RootScreens.Collections::class, RootScreens.Collections.serializer())
-            subclass(RootScreens.NoteEditor::class, RootScreens.NoteEditor.serializer())
-            subclass(RootScreens.Tags::class, RootScreens.Tags.serializer())
-            subclass(RootScreens.AddTag::class, RootScreens.AddTag.serializer())
+            subclass(RootScreens.HomeTab::class, serializer<RootScreens.HomeTab>())
+            subclass(RootScreens.LibraryTab::class, serializer<RootScreens.LibraryTab>())
+            subclass(RootScreens.SettingsTab::class, serializer<RootScreens.SettingsTab>())
+            subclass(RootScreens.LinkDetail::class, serializer<RootScreens.LinkDetail>())
+            subclass(RootScreens.AddLink::class, serializer<RootScreens.AddLink>())
+            subclass(RootScreens.AddCollection::class, serializer<RootScreens.AddCollection>())
+            subclass(RootScreens.AIAssistantDemo::class, serializer<RootScreens.AIAssistantDemo>())
+            subclass(RootScreens.Collections::class, serializer<RootScreens.Collections>())
+            subclass(RootScreens.NoteEditor::class, serializer<RootScreens.NoteEditor>())
+            subclass(RootScreens.Tags::class, serializer<RootScreens.Tags>())
+            subclass(RootScreens.AddTag::class, serializer<RootScreens.AddTag>())
         }
     }
 }
@@ -90,7 +90,7 @@ fun RootScreen(
     LaunchedEffect(sharedContent) {
         if (sharedContent != null && sharedContent.url != null) {
             // Navigate to Add Link screen with the shared URL
-            navigator.navigate(RootScreens.AddLink(sharedContent.url))
+            navigator.navigateToNew(RootScreens.AddLink(sharedContent.url))
             // Clear the shared content after navigation
             onSharedContentHandled()
         }
@@ -135,7 +135,7 @@ fun RootScreen(
         floatingActionButton = {
             if (showBottomNav) {
                 FloatingActionButton(
-                    onClick = { navigator.navigate(RootScreens.AddLink(null)) },
+                    onClick = { navigator.navigateToNew(RootScreens.AddLink(null)) },
                     containerColor = MaterialTheme.colorScheme.tertiary
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add Link")
@@ -152,14 +152,14 @@ fun RootScreen(
                             is RootScreens.HomeTab -> HomeScreen(
                                 routeKey = route,
                                 onNavigateToDetail = { linkId -> navigator.navigate(RootScreens.LinkDetail(linkId)) },
-                                onAddLink = { initialUrl -> navigator.navigate(RootScreens.AddLink(initialUrl)) }
+                                onAddLink = { initialUrl -> navigator.navigateToNew(RootScreens.AddLink(initialUrl)) }
                             )
 
                             // Library Tab
                             is RootScreens.LibraryTab -> LibraryScreen(
                                 routeKey = route,
                                 onNavigateToDetail = { linkId -> navigator.navigate(RootScreens.LinkDetail(linkId)) },
-                                onAddLink = { initialUrl -> navigator.navigate(RootScreens.AddLink(initialUrl)) },
+                                onAddLink = { initialUrl -> navigator.navigateToNew(RootScreens.AddLink(initialUrl)) },
                                 onAddCollection = { navigator.navigate(RootScreens.AddCollection) },
                                 onNavigateToCollections = { navigator.navigate(RootScreens.Collections) },
                                 onNavigateToTags = { navigator.navigate(RootScreens.Tags) }
@@ -184,16 +184,12 @@ fun RootScreen(
                             is RootScreens.AddLink -> AddLinkScreen(
                                 routeKey = route,
                                 initialUrl = route.initialUrl,
-                                onBack = { navigator.goBack() }
+                                onBack = { navigator.goBack() },
+                                onAddTag = { navigator.navigate(RootScreens.AddTag) },
+                                onAddCollection = { navigator.navigate(RootScreens.AddCollection) }
                             )
 
                             is RootScreens.AddCollection -> AddCollectionScreen(
-                                routeKey = route,
-                                onBack = { navigator.goBack() }
-                            )
-
-                            // Demo/Utility Screens
-                            is RootScreens.AIAssistantDemo -> AIAssistantDemoScreen(
                                 routeKey = route,
                                 onBack = { navigator.goBack() }
                             )

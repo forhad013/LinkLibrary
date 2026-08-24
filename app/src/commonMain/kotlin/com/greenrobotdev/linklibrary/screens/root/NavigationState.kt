@@ -11,6 +11,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.savedstate.serialization.SavedStateConfiguration
+import kotlinx.serialization.serializer
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
@@ -18,14 +19,14 @@ import kotlinx.serialization.modules.polymorphic
 private val config = SavedStateConfiguration {
     serializersModule = SerializersModule {
         polymorphic(NavKey::class) {
-            subclass(RootScreens.HomeTab::class, RootScreens.HomeTab.serializer())
-            subclass(RootScreens.LibraryTab::class, RootScreens.LibraryTab.serializer())
-            subclass(RootScreens.SettingsTab::class, RootScreens.SettingsTab.serializer())
-            subclass(RootScreens.LinkDetail::class, RootScreens.LinkDetail.serializer())
-            subclass(RootScreens.AddLink::class, RootScreens.AddLink.serializer())
-            subclass(RootScreens.AddCollection::class, RootScreens.AddCollection.serializer())
-            subclass(RootScreens.Tags::class, RootScreens.Tags.serializer())
-            subclass(RootScreens.AddTag::class, RootScreens.AddTag.serializer())
+            subclass(RootScreens.HomeTab::class, serializer<RootScreens.HomeTab>())
+            subclass(RootScreens.LibraryTab::class, serializer<RootScreens.LibraryTab>())
+            subclass(RootScreens.SettingsTab::class, serializer<RootScreens.SettingsTab>())
+            subclass(RootScreens.LinkDetail::class, serializer<RootScreens.LinkDetail>())
+            subclass(RootScreens.AddLink::class, serializer<RootScreens.AddLink>())
+            subclass(RootScreens.AddCollection::class, serializer<RootScreens.AddCollection>())
+            subclass(RootScreens.Tags::class, serializer<RootScreens.Tags>())
+            subclass(RootScreens.AddTag::class, serializer<RootScreens.AddTag>())
         }
     }
 }
@@ -102,6 +103,22 @@ class Navigator(val state: NavigationState) {
             // Add to current top level route's back stack
             state.backStacks[state.topLevelRoute]?.add(route)
         }
+    }
+
+    fun navigateToNew(route: NavKey) {
+        // Remove the last route if it's the same type as the one we're navigating to
+        val currentStack = state.backStacks[state.topLevelRoute]
+            ?: error("Stack for ${state.topLevelRoute} not found")
+
+        if (currentStack.isNotEmpty()) {
+            val lastRoute = currentStack.last()
+            if (lastRoute::class == route::class) {
+                currentStack.removeLast()
+            }
+        }
+
+        // Add the new route instance
+        state.backStacks[state.topLevelRoute]?.add(route)
     }
 
     fun goBack() {
