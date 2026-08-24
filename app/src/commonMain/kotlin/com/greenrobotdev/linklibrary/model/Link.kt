@@ -14,5 +14,6 @@ data class Link(
     val description: String = "",
     val isFavorite: Boolean = false,
     val createdAt: Long? = null,
-    val tags: List<String> = emptyList()
+    val tags: List<String> = emptyList(),
+    val collections: List<String> = emptyList()
 )

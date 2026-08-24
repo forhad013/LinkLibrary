@@ -39,17 +39,25 @@ class RoomLinkRepository(
             .catch { e -> emit(Result.failure(e)) }
     }
 
-    override suspend fun getLinksWithTags(): Flow<Result<List<LinkEntity>>> {
+    override suspend fun getLinksWithTagsAndCollections(): Flow<Result<List<LinkEntity>>> {
         return flow {
             try {
                 linkDao.getAllLinks().collect { entities ->
-                    val entitiesWithTags = entities.map { entity ->
+                    val entitiesWithTagsAndCollections = entities.map { entity ->
+                        // Load tags for this link
                         val tagsResult = tagRepository.getTagsForLink(entity.id).first()
                         val tagEntities = tagsResult.getOrElse { emptyList() }
                         val tagNames = tagEntities.map { it.name }
-                        entity.copy(tags = tagNames)
+
+                        // Load collections for this link
+                        val collectionsResult = collectionRepository.getCollectionsForLink(entity.id).first()
+                        val collectionEntities = collectionsResult.getOrElse { emptyList() }
+                        val collectionNames = collectionEntities.map { it.name }
+
+                        // Create new entity with tags and collections populated
+                        entity.copy(tags = tagNames, collections = collectionNames)
                     }
-                    emit(Result.success(entitiesWithTags))
+                    emit(Result.success(entitiesWithTagsAndCollections))
                 }
             } catch (e: Exception) {
                 emit(Result.failure(e))

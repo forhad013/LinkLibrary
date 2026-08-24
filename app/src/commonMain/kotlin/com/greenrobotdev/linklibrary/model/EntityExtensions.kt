@@ -29,7 +29,8 @@ fun LinkEntity.toDomain() = Link(
     description = description,
     isFavorite = isFavorite,
     createdAt = createdAt,
-    tags = tags ?: emptyList()
+    tags = tags ?: emptyList(),
+    collections = collections ?: emptyList()
 )
 
 // Tag extensions
