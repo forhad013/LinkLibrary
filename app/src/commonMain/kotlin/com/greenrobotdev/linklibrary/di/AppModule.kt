@@ -17,28 +17,17 @@ import org.koin.dsl.module
  * Will be re-integrated for production with proper WASM support
  */
 val appModule = module {
-    // HTTP Client for metadata fetching
-    single<HttpClient> {
-        HttpClient {
-            install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true
-                    isLenient = true
-                })
-            }
-            install(Logging) {
-                level = LogLevel.INFO
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        println("KTOR: $message")
-                    }
-                }
-            }
-        }
-    }
+    // HTTP Client for metadata fetching (platform-specific implementation)
+    single<HttpClient> { createHttpClient() }
 
     // Metadata fetch service for auto-fetch functionality
     single { MetadataFetchService(get()) }
 
     // Stitch module temporarily excluded for WASM prototype
 }
+
+/**
+ * Platform-specific HTTP client creation
+ * Each platform provides its own implementation with appropriate engine
+ */
+expect fun createHttpClient(): HttpClient

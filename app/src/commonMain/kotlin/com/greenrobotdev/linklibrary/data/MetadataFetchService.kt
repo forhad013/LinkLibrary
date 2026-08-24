@@ -22,6 +22,8 @@ class MetadataFetchService(private val httpClient: HttpClient) {
      * Returns Flow<Result> to support coroutines and error handling
      */
     suspend fun fetchMetadata(url: String): Flow<Result<LinkMetadata>> = flow {
+        println("🔍 MetadataFetchService: Starting fetch for URL: $url")
+
         if (url.isBlank()) {
             emit(Result.failure(IllegalArgumentException("URL cannot be blank")))
             return@flow
@@ -34,6 +36,7 @@ class MetadataFetchService(private val httpClient: HttpClient) {
         }
 
         try {
+            println("🌐 MetadataFetchService: Making HTTP request to $url")
             val response: HttpResponse = httpClient.get(url) {
                 // Set user agent to avoid being blocked
                 header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
@@ -47,20 +50,40 @@ class MetadataFetchService(private val httpClient: HttpClient) {
 
             when (response.status) {
                 HttpStatusCode.OK, HttpStatusCode.MovedPermanently, HttpStatusCode.Found, HttpStatusCode.TemporaryRedirect, HttpStatusCode.PermanentRedirect -> {
+                    println("✅ MetadataFetchService: Got response ${response.status}")
                     val htmlContent = response.body<String>()
+                    println("📄 MetadataFetchService: Received ${htmlContent.length} characters")
+
                     if (htmlContent.isNotBlank()) {
                         val metadata = extractMetadata(htmlContent, url)
+                        println("🎯 MetadataFetchService: Extracted title: ${metadata.title}")
                         emit(Result.success(metadata))
                     } else {
+                        println("⚠️ MetadataFetchService: Empty response from server")
                         emit(Result.failure(Exception("Empty response from server")))
                     }
                 }
                 else -> {
+                    println("❌ MetadataFetchService: HTTP error ${response.status.value}: ${response.status.description}")
                     emit(Result.failure(Exception("HTTP ${response.status.value}: ${response.status.description}")))
                 }
             }
         } catch (e: Exception) {
-            emit(Result.failure(Exception("Network error: ${e.message}")))
+            println("❌ MetadataFetchService: Exception - ${e.javaClass.simpleName}: ${e.message}")
+            e.printStackTrace()
+
+            val errorMessage = when {
+                e.message?.contains("ConnectException", ignoreCase = true) == true ->
+                    "Network connection failed. Check your internet connection."
+                e.message?.contains("SocketTimeoutException", ignoreCase = true) == true ->
+                    "Request timed out. The server took too long to respond."
+                e.message?.contains("UnknownHostException", ignoreCase = true) == true ->
+                    "Unable to reach the server. Please check the URL."
+                e.message?.contains("SSL", ignoreCase = true) == true ->
+                    "Security certificate error. The site may not be secure."
+                else -> "Network error: ${e.message}"
+            }
+            emit(Result.failure(Exception(errorMessage)))
         }
     }
 
