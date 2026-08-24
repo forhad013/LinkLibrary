@@ -19,9 +19,9 @@ fun LibraryUseCase(
     var state by remember { mutableStateOf(initialState) }
     val links = remember { mutableStateListOf<com.greenrobotdev.linklibrary.model.Link>() }
 
-    // Load links on first composition
+    // Load links on first composition using the new method that includes tags
     LaunchedEffect(Unit) {
-        linkRepository.getLinks().collect { result ->
+        linkRepository.getLinksWithTags().collect { result ->
             result.onSuccess { entities ->
                 links.clear()
                 links.addAll(entities.map { it.toDomain() })

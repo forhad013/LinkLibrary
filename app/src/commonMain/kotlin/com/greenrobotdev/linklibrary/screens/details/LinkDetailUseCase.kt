@@ -27,7 +27,7 @@ fun LinkDetailUseCase(
     LaunchedEffect(linkId) {
         state.value = state.value.copy(isLoading = true, error = null)
         try {
-            linkRepository.getLinks()
+            linkRepository.getLinksWithTags()
                 .catch { e ->
                     state.value = state.value.copy(
                         isLoading = false,
@@ -36,8 +36,8 @@ fun LinkDetailUseCase(
                 }
                 .collect { result ->
                     result.fold(
-                        onSuccess = { links ->
-                            val link = links.find { it.id == linkId }?.toDomain()
+                        onSuccess = { entities ->
+                            val link = entities.find { it.id == linkId }?.toDomain()
                             state.value = state.value.copy(
                                 isLoading = false,
                                 link = link,
@@ -67,7 +67,7 @@ fun LinkDetailUseCase(
                 is LinkDetailEvent.LoadLink -> {
                     state.value = state.value.copy(isLoading = true, error = null)
                     try {
-                        linkRepository.getLinks()
+                        linkRepository.getLinksWithTags()
                             .catch { e ->
                                 state.value = state.value.copy(
                                     isLoading = false,
@@ -76,8 +76,8 @@ fun LinkDetailUseCase(
                             }
                             .collect { result ->
                                 result.fold(
-                                    onSuccess = { links ->
-                                        val link = links.find { it.id == linkId }?.toDomain()
+                                    onSuccess = { entities ->
+                                        val link = entities.find { it.id == linkId }?.toDomain()
                                         state.value = state.value.copy(
                                             isLoading = false,
                                             link = link,
