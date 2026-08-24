@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsCompose)
-    // alias(libs.plugins.kotlinSerialization) // Temporarily disabled for WASM prototype
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.compose.compiler)
 }
 
@@ -45,6 +45,7 @@ kotlin {
 
                 // Koin
                 implementation(libs.koin.core)
+                implementation(libs.koin.compose)
 
                 // Ktor
                 implementation(libs.ktor.client.core)
@@ -65,8 +66,8 @@ kotlin {
                 implementation(libs.lifecycle.viewmodel.navigation3)
 //                implementation(libs.adaptive.navigation3)
 
-                // Database module (includes Room runtime transitively) - only for JVM/Android targets
-                // implementation(project(":database"))
+                // Database module (includes Room runtime transitively) - available for all platforms
+                implementation(project(":database"))
             }
         }
 
@@ -80,6 +81,8 @@ kotlin {
             dependencies {
                 // Database module for Android
                 implementation(project(":database"))
+                // Ktor HTTP client engine for Android
+                implementation(libs.ktor.client.okhttp)
             }
         }
 
@@ -88,6 +91,8 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 // Database module for JVM/Desktop
                 implementation(project(":database"))
+                // Ktor HTTP client engine for JVM
+                implementation(libs.ktor.client.java)
             }
         }
 
