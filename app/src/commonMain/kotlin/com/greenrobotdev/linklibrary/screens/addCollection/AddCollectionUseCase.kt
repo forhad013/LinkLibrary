@@ -4,17 +4,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.greenrobotdev.linklibrary.database.repository.CollectionRepository
+import com.greenrobotdev.linklibrary.model.toEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import org.koin.compose.koinInject
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 /**
  * Use case for Add Collection screen
  * Handles collection creation form logic
- * Note: Currently using mock save, can be extended to use CollectionRepository when available
  */
+@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun AddCollectionUseCase(
     initialState: AddCollectionState,
-    events: Flow<AddCollectionEvent>
+    events: Flow<AddCollectionEvent>,
+    collectionRepository: CollectionRepository = koinInject()
 ): AddCollectionState {
     var state = remember { mutableStateOf(initialState) }
 
@@ -40,21 +47,31 @@ fun AddCollectionUseCase(
                     if (state.value.isFormValid) {
                         state.value = state.value.copy(isLoading = true, error = null)
                         try {
-                            // TODO: Replace with repository call when CollectionRepository is available
-                            // val collection = Collection(
-                            //     id = UUID.randomUUID().toString(),
-                            //     name = state.value.name,
-                            //     description = state.value.description
-                            // )
-                            // collectionRepository.addCollection(collection)
+                            // Create the collection entity
+                            val collection = com.greenrobotdev.linklibrary.screens.collections.Collection(
+                                id = Uuid.random().toString(),
+                                name = state.value.name,
+                                description = state.value.description,
+                                count = 0,
+                            )
 
-                            // Mock delay to simulate saving
-                            kotlinx.coroutines.delay(500)
+                            // Save to database using the repository
+                            val result = collectionRepository.addCollection(collection.toEntity()).first()
 
-                            // Set success flag after successful submission
-                            state.value = state.value.copy(
-                                isLoading = false,
-                                success = true
+                            result.fold(
+                                onSuccess = {
+                                    // Set success flag after successful submission
+                                    state.value = state.value.copy(
+                                        isLoading = false,
+                                        success = true
+                                    )
+                                },
+                                onFailure = { error ->
+                                    state.value = state.value.copy(
+                                        isLoading = false,
+                                        error = error.message ?: "Failed to create collection"
+                                    )
+                                }
                             )
                         } catch (e: Exception) {
                             state.value = state.value.copy(
@@ -79,5 +96,5 @@ fun AddCollectionUseCase(
  * Validates if the form is complete
  */
 private fun isFormValid(name: String, description: String): Boolean {
-    return name.isNotBlank() && description.isNotBlank()
+    return name.isNotBlank() // Description is now optional
 }

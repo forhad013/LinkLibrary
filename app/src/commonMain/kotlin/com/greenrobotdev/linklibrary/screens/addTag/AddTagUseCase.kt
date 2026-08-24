@@ -4,17 +4,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.greenrobotdev.linklibrary.database.repository.TagRepository
+import com.greenrobotdev.linklibrary.model.toEntity
+import com.greenrobotdev.linklibrary.screens.tags.Tag
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 /**
  * Use case for Add Tag screen
  * Handles tag creation form logic
- * Note: Currently using mock save, can be extended to use TagRepository when available
  */
+@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun AddTagUseCase(
     initialState: AddTagState,
-    events: Flow<AddTagEvent>
+    events: Flow<AddTagEvent>,
+    tagRepository: TagRepository
 ): AddTagState {
     var state = remember { mutableStateOf(initialState) }
 
@@ -40,21 +47,31 @@ fun AddTagUseCase(
                     if (state.value.isFormValid) {
                         state.value = state.value.copy(isLoading = true, error = null)
                         try {
-                            // TODO: Replace with repository call when TagRepository is available
-                            // val tag = Tag(
-                            //     id = UUID.randomUUID().toString(),
-                            //     name = state.value.name,
-                            //     description = state.value.description
-                            // )
-                            // tagRepository.addTag(tag)
+                            // Create the tag entity
+                            val tag = Tag(
+                                id = Uuid.random().toString(),
+                                name = state.value.name,
+                                description = state.value.description,
+                                count = 0,
+                            )
 
-                            // Mock delay to simulate saving
-                            kotlinx.coroutines.delay(500)
+                            // Save to database using the repository
+                            val result = tagRepository.addTag(tag.toEntity()).first()
 
-                            // Set success flag after successful submission
-                            state.value = state.value.copy(
-                                isLoading = false,
-                                success = true
+                            result.fold(
+                                onSuccess = {
+                                    // Set success flag after successful submission
+                                    state.value = state.value.copy(
+                                        isLoading = false,
+                                        success = true
+                                    )
+                                },
+                                onFailure = { error ->
+                                    state.value = state.value.copy(
+                                        isLoading = false,
+                                        error = error.message ?: "Failed to create tag"
+                                    )
+                                }
                             )
                         } catch (e: Exception) {
                             state.value = state.value.copy(
@@ -79,5 +96,5 @@ fun AddTagUseCase(
  * Validates if the form is complete
  */
 private fun isFormValid(name: String, description: String): Boolean {
-    return name.isNotBlank() && description.isNotBlank()
+    return name.isNotBlank() // Description is now optional
 }
