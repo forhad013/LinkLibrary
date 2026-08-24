@@ -27,7 +27,7 @@ fun LinkDetailUseCase(
     LaunchedEffect(linkId) {
         state.value = state.value.copy(isLoading = true, error = null)
         try {
-            linkRepository.getLinksWithTags()
+            linkRepository.getLinksWithTagsAndCollections()
                 .catch { e ->
                     state.value = state.value.copy(
                         isLoading = false,
@@ -67,7 +67,7 @@ fun LinkDetailUseCase(
                 is LinkDetailEvent.LoadLink -> {
                     state.value = state.value.copy(isLoading = true, error = null)
                     try {
-                        linkRepository.getLinksWithTags()
+                        linkRepository.getLinksWithTagsAndCollections()
                             .catch { e ->
                                 state.value = state.value.copy(
                                     isLoading = false,
