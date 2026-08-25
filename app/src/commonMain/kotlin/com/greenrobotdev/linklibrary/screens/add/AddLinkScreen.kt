@@ -2,24 +2,24 @@ package com.greenrobotdev.linklibrary.screens.add
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Title
@@ -27,7 +27,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -42,20 +43,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
@@ -94,30 +96,14 @@ fun AddLinkScreen(
         }
     }
 
-    // Custom colors matching HTML design exactly
-    val primary = Color(0xFF0058BD) // rgb(0, 88, 189)
-    val primaryBlue = Color(0xFF4285F4) // rgb(66, 133, 244) - used for Save button
-    val background = Color(0xFFFAF9FD) // rgb(250, 249, 253)
-    val surface = Color(0xFFFAF9FD) // rgb(250, 249, 253)
-    val onBackground = Color(0xFF1A1B1E) // rgb(26, 27, 30)
-    val onSurface = Color(0xFF1A1B1E) // rgb(26, 27, 30)
-    val onSurfaceVariant = Color(0xFF424753) // rgb(66, 71, 83)
-    val surfaceContainerLowest = Color(0xFFFFFFFF) // rgb(255, 255, 255)
-    val surfaceContainerLow = Color(0xFFF4F3F7) // rgb(244, 243, 247)
-    val surfaceContainer = Color(0xFFEFEDF1) // rgb(239, 237, 241)
-    val surfaceContainerHighest = Color(0xFFE3E2E6) // rgb(227, 226, 230)
-    val outlineVariant = Color(0xFFC2C6D5) // rgb(194, 198, 213)
-    val secondaryContainer = Color(0xFF83B1FF) // rgb(131, 177, 255)
-    val onSecondaryContainer = Color(0xFF004285) // rgb(0, 66, 133)
-    val tertiary = Color(0xFF006B2B) // rgb(0, 107, 43)
-    val tertiaryFixedDim = Color(0xFF6DDD81) // rgb(109, 221, 129)
-    val onPrimary = Color(0xFFFFFFFF) // rgb(255, 255, 255)
+    // Material 3 color scheme - using primary color scheme for save button
+    val saveButtonColor = MaterialTheme.colorScheme.primary
 
     Scaffold(
         topBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = surface,
+                color = MaterialTheme.colorScheme.surface,
                 tonalElevation = 0.dp
             ) {
                 Row(
@@ -139,14 +125,14 @@ fun AddLinkScreen(
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Close",
-                                tint = onSurfaceVariant
+                                tint =  MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Text(
                             text = "Add New Link",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = primary
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -154,36 +140,37 @@ fun AddLinkScreen(
                         onClick = { viewModel.take(AddLinkEvent.Submit) },
                         enabled = state.isFormValid && !state.isLoading,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = primaryBlue
+                            containerColor = saveButtonColor
                         ),
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.padding(end = 8.dp),
+                        shape = MaterialTheme.shapes.extraLarge
                     ) {
                         Text("Save", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
-        }
+
     },
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp, 8.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp) // 16dp major spacing system
         ) {
             // URL Input Section
-            Column {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "URL",
                     style = MaterialTheme.typography.labelLarge,
-                    color = onSurface,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier = Modifier.fillMaxWidth()
+                        .height(54.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     OutlinedTextField(
                         value = state.url,
@@ -193,21 +180,22 @@ fun AddLinkScreen(
                             Icon(
                                 Icons.Default.Link,
                                 contentDescription = null,
-                                tint = onSurfaceVariant
+                                tint =  MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         },
                         modifier = Modifier.weight(1f),
                         singleLine = true,
                         isError = state.error != null,
                         enabled = !state.isLoading,
-                        shape = RoundedCornerShape(12.dp),
+                        shape = MaterialTheme.shapes.small,
                         colors = TextFieldDefaults.colors(
-                            focusedIndicatorColor = primary,
-                            unfocusedIndicatorColor = outlineVariant
+                            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                            unfocusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant
                         )
                     )
 
                     AutoFetchButton(
+                        modifier = Modifier.fillMaxHeight(),
                         isFetching = state.isFetching,
                         onClick = { viewModel.take(AddLinkEvent.FetchMetadata) },
                         enabled = state.url.isNotBlank() && !state.isLoading
@@ -215,23 +203,22 @@ fun AddLinkScreen(
                 }
                 Text(
                     text = "Paste a URL to automatically fetch title and description.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = onSurfaceVariant,
-                    modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                    style = MaterialTheme.typography.bodySmall,
+                    color =  MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 0.dp)
                 )
             }
 
             Divider()
 
             // Metadata Section
-            Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 // Title Field
                 Column {
                     Text(
                         text = "Title",
                         style = MaterialTheme.typography.labelLarge,
-                        color = onSurface,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     OutlinedTextField(
                         value = state.title,
@@ -241,16 +228,16 @@ fun AddLinkScreen(
                             Icon(
                                 Icons.Default.Title,
                                 contentDescription = null,
-                                tint = onSurfaceVariant
+                                tint =  MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         enabled = !state.isLoading,
-                        shape = RoundedCornerShape(12.dp),
+                        shape = MaterialTheme.shapes.small,
                         colors = TextFieldDefaults.colors(
-                            focusedIndicatorColor = primary,
-                            unfocusedIndicatorColor = outlineVariant
+                            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                            unfocusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant
                         )
                     )
                 }
@@ -259,31 +246,30 @@ fun AddLinkScreen(
             // Organization Section (Card)
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
+                shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(
-                    containerColor = surfaceContainerLowest
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
                 ),
-                border = BorderStroke(1.dp, surfaceContainerHighest),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceContainerHighest),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp) // MD3 uses tonal elevation
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp) // 16dp spacing system
                 ) {
                     Text(
                         text = "Organization",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Medium,
-                        color = onSurface
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     // Collection Dropdown
-                    Column {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
                             text = "Collection",
                             style = MaterialTheme.typography.labelLarge,
-                            color = onSurfaceVariant,
-                            modifier = Modifier.padding(bottom = 8.dp)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         // Collection selection dropdown
@@ -293,18 +279,23 @@ fun AddLinkScreen(
                             onCollectionToggle = { collectionId ->
                                 viewModel.take(AddLinkEvent.ToggleCollection(collectionId))
                             },
+                            onClearAllCollections = {
+                                // Clear all selected collections by toggling each one
+                                state.selectedCollections.forEach { collectionId ->
+                                    viewModel.take(AddLinkEvent.ToggleCollection(collectionId))
+                                }
+                            },
                             onAddCollection = onAddCollection,
                             isLoading = state.isLoadingTagsAndCollections
                         )
                     }
 
                     // Tags Section
-                    Column {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
                             text = "Tags",
                             style = MaterialTheme.typography.labelLarge,
-                            color = onSurfaceVariant,
-                            modifier = Modifier.padding(bottom = 12.dp)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         // Tag chips
@@ -329,9 +320,9 @@ fun AddLinkScreen(
                                             )
                                         },
                                         colors = InputChipDefaults.inputChipColors(
-                                            containerColor = tertiaryFixedDim.copy(alpha = 0.1f),
-                                            labelColor = tertiary,
-                                            leadingIconColor = tertiary
+                                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                            labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                            leadingIconColor = MaterialTheme.colorScheme.onSecondaryContainer
                                         ),
                                         border = null
                                     )
@@ -347,9 +338,10 @@ fun AddLinkScreen(
                                         selected = false,
                                         onClick = { viewModel.take(AddLinkEvent.ToggleTag(tag.id)) },
                                         label = { Text(tag.name) },
-                                        border = BorderStroke(1.dp, outlineVariant),
+                                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                                         colors = FilterChipDefaults.filterChipColors(
-                                            containerColor = surface
+                                            containerColor = MaterialTheme.colorScheme.surface,
+                                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     )
                                 }
@@ -359,12 +351,12 @@ fun AddLinkScreen(
                                 onClick = onAddTag,
                                 modifier = Modifier
                                     .size(32.dp)
-                                    .padding(start = 8.dp)
+                                    .padding(start = 0.dp) // Remove extra padding for consistency
                             ) {
                                 Icon(
                                     Icons.Default.Add,
                                     contentDescription = "Add tag",
-                                    tint = primary,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -374,12 +366,11 @@ fun AddLinkScreen(
             }
 
             // Personal Notes Section
-            Column {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "Personal Notes",
                     style = MaterialTheme.typography.labelLarge,
-                    color = onSurface,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 OutlinedTextField(
                     value = state.notes ?: "",
@@ -389,10 +380,10 @@ fun AddLinkScreen(
                         .fillMaxWidth()
                         .height(120.dp),
                     enabled = !state.isLoading,
-                    shape = RoundedCornerShape(12.dp),
+                    shape = MaterialTheme.shapes.large, // Use Material 3 shape tokens
                     colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = primary,
-                        unfocusedIndicatorColor = outlineVariant
+                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant
                     )
                 )
             }
@@ -400,16 +391,16 @@ fun AddLinkScreen(
             // Add to Tasks Section (Card)
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
+                shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(
-                    containerColor = surfaceContainerLowest
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
                 ),
-                border = BorderStroke(1.dp, surfaceContainerHighest),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceContainerHighest),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp) // MD3 uses tonal elevation
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp) // 16dp spacing system
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -420,7 +411,7 @@ fun AddLinkScreen(
                             text = "Add to Tasks",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Medium,
-                            color = onSurface
+                            color = MaterialTheme.colorScheme.onSurface
                         )
 
                         Row(
@@ -430,7 +421,7 @@ fun AddLinkScreen(
                             Text(
                                 text = "Mark as Task",
                                 style = MaterialTheme.typography.labelLarge,
-                                color = onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Switch(
                                 checked = isTaskEnabled,
@@ -440,14 +431,13 @@ fun AddLinkScreen(
                     }
 
                     if (isTaskEnabled) {
-                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             // Priority Selection
-                            Column {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Text(
                                     text = "Priority",
                                     style = MaterialTheme.typography.labelLarge,
-                                    color = onSurfaceVariant,
-                                    modifier = Modifier.padding(bottom = 8.dp)
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -458,35 +448,34 @@ fun AddLinkScreen(
                                         OutlinedButton(
                                             onClick = { viewModel.take(AddLinkEvent.SetTaskPriority(priority)) },
                                             modifier = Modifier.weight(1f),
-                                            shape = RoundedCornerShape(8.dp),
+                                            shape = MaterialTheme.shapes.small,
                                             colors = if (isSelected) {
                                                 ButtonDefaults.buttonColors(
-                                                    containerColor = secondaryContainer,
-                                                    contentColor = onSecondaryContainer
+                                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                                                 )
                                             } else {
                                                 ButtonDefaults.outlinedButtonColors(
-                                                    contentColor = onSurfaceVariant
+                                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
                                             },
                                             border = if (isSelected) null else BorderStroke(
                                                 1.dp,
-                                                outlineVariant
+                                                MaterialTheme.colorScheme.outlineVariant
                                             )
                                         ) {
-                                            Text(priority)
+                                            Text(priority, style = MaterialTheme.typography.labelLarge)
                                         }
                                     }
                                 }
                             }
 
                             // Due Time
-                            Column {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Text(
                                     text = "Due Time",
                                     style = MaterialTheme.typography.labelLarge,
-                                    color = onSurfaceVariant,
-                                    modifier = Modifier.padding(bottom = 8.dp)
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 OutlinedTextField(
                                     value = dueTime,
@@ -495,16 +484,16 @@ fun AddLinkScreen(
                                         Icon(
                                             Icons.Default.AccessTime,
                                             contentDescription = null,
-                                            tint = primary
+                                            tint = MaterialTheme.colorScheme.primary
                                         )
                                     },
                                     modifier = Modifier.fillMaxWidth(),
                                     singleLine = true,
-                                    shape = RoundedCornerShape(12.dp),
+                                    shape = MaterialTheme.shapes.small,
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                                     colors = TextFieldDefaults.colors(
-                                        focusedIndicatorColor = primary,
-                                        unfocusedIndicatorColor = outlineVariant
+                                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant
                                     )
                                 )
                             }
@@ -543,7 +532,7 @@ private fun Divider() {
         modifier = Modifier
             .fillMaxWidth()
             .height(1.dp)
-            .background(surfaceContainerHighest)
+            .background( MaterialTheme.colorScheme.surfaceContainerHighest)
     )
 }
 
@@ -552,47 +541,255 @@ private fun CollectionSelector(
     collections: List<com.greenrobotdev.linklibrary.screens.collections.Collection>,
     selectedCollections: Set<String>,
     onCollectionToggle: (String) -> Unit,
+    onClearAllCollections: () -> Unit = {},
     onAddCollection: () -> Unit,
     isLoading: Boolean
 ) {
-    // Simplified collection selector - can be enhanced with dropdown
+    var expanded by remember { mutableStateOf(false) }
+
+    println("whkq63 availableCollections ${collections}")
+    println("whkq63 expanded state: $expanded")
+    println("whkq63 collections size: ${collections.size}")
+
+    // Get all selected collections and display them as comma-separated list
+    val selectedCollectionsList = collections.filter { selectedCollections.contains(it.id) }
+    val displayText = if (selectedCollectionsList.isEmpty()) {
+        "Select collections"
+    } else {
+        selectedCollectionsList.joinToString(", ") { it.name }
+    }
+
     Column {
         if (isLoading) {
-            Text("Loading collections...", color = onSurfaceVariant)
+            Text(
+                "Loading collections...",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         } else {
-            if (collections.isEmpty()) {
-                OutlinedButton(
-                    onClick = onAddCollection,
-                    modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Material 3 Dropdown
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(
+                            interactionSource = androidx.compose.foundation.interaction.MutableInteractionSource(),
+                            indication = null
+                        ) {
+                            println("whkq63 clicked! collections size: ${collections.size}")
+                            if (collections.isNotEmpty()) {
+                                expanded = !expanded
+                                println("whkq63 expanded changed to: $expanded")
+                            }
+                        }
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Text(" Add Collection")
-                }
-            } else {
-                collections.forEach { collection ->
-                    Row(
+                    var textFieldWidth by androidx.compose.runtime.mutableStateOf(0)
+
+                    OutlinedTextField(
+                        value = displayText,
+                        onValueChange = { }, // Read-only
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(surfaceContainerLow)
-                            .padding(16.dp)
-                            .border(1.dp, outlineVariant, RoundedCornerShape(12.dp)),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Checkbox(
-                                checked = selectedCollections.contains(collection.id),
-                                onCheckedChange = { onCollectionToggle(collection.id) }
+                            .onGloballyPositioned { coordinates ->
+                                textFieldWidth = coordinates.size.width
+                            },
+                        enabled = false,
+                        readOnly = true,
+                        singleLine = true,
+                        shape = MaterialTheme.shapes.small,
+                        trailingIcon = {
+                            Icon(
+                                Icons.Default.ArrowDropDown,
+                                contentDescription = "Expand dropdown",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            Text(collection.name)
+                        },
+                        colors = TextFieldDefaults.colors(
+                            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                            unfocusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant
+                        )
+                    )
+
+                    // Dropdown Menu - positioned outside the Box constraints
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = {
+                            expanded = false
+                            println("whkq63 onDismissRequest called")
+                        },
+                        offset = DpOffset(0.dp, 0.dp),
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surface)
+                    ) {
+                        println("whkq63 DropdownMenu rendering with ${collections.size} items")
+
+                        // "Clear all selections" option
+                        if (selectedCollectionsList.isNotEmpty()) {
+                            DropdownMenuItem(
+                                text = {
+                                    Column {
+                                        Text(
+                                            "Clear all selections",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.error
+                                        )
+                                        Text(
+                                            "Remove ${selectedCollectionsList.size} selected collection(s)",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    println("whkq63 Clear all selections clicked")
+                                    onClearAllCollections()
+                                    expanded = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Close,
+                                        contentDescription = "Clear all",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                },
+                                modifier = Modifier.background(
+                                    MaterialTheme.colorScheme.errorContainer.copy(
+                                        alpha = 0.1f
+                                    )
+                                )
+                            )
+
+                            // Add a visual divider
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(MaterialTheme.colorScheme.outlineVariant)
+                            )
+                        }
+
+                        // Collection options
+                        collections.forEach { collection ->
+                            println("whkq63 rendering collection item: ${collection.name}")
+                            val isSelected = selectedCollections.contains(collection.id)
+
+                            DropdownMenuItem(
+                                text = {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Text(
+                                            collection.name,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+                                        )
+                                        if (collection.description?.isNotBlank() == true) {
+                                            Text(
+                                                collection.description,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                maxLines = 1,
+                                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                            )
+                                        }
+                                    }
+                                },
+                                onClick = {
+                                    println("whkq63 Collection clicked: ${collection.name}")
+                                    onCollectionToggle(collection.id)
+                                    // Don't close dropdown to allow multiple selections
+                                },
+                                leadingIcon = {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .clip(MaterialTheme.shapes.extraSmall)
+                                            .background(
+                                                if (isSelected)
+                                                    MaterialTheme.colorScheme.primary
+                                                else
+                                                    MaterialTheme.colorScheme.surfaceContainerHighest
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        if (isSelected) {
+                                            Icon(
+                                                Icons.Default.Close,
+                                                contentDescription = "Selected",
+                                                modifier = Modifier.size(16.dp),
+                                                tint = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        }
+                                    }
+                                },
+                                trailingIcon = if (isSelected) {
+                                    {
+                                        Icon(
+                                            Icons.Default.Close,
+                                            contentDescription = "Selected",
+                                            modifier = Modifier.size(18.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                } else null,
+                                modifier = Modifier.background(
+                                    if (isSelected)
+                                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                                    else
+                                        MaterialTheme.colorScheme.surface
+                                )
+                            )
+                        }
+
+                        // Handle empty collections case
+                        if (collections.isEmpty()) {
+                            println("whkq63 No collections - showing empty message")
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        "No collections available",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                },
+                                onClick = { },
+                                enabled = false
+                            )
                         }
                     }
                 }
+
+                // Add Collection Button (Icon only)
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                        .clickable(enabled = !isLoading) { onAddCollection() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "Add collection",
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+
+            // Helper text when no collections exist
+            if (collections.isEmpty() && !isLoading) {
+                Text(
+                    text = "No collections available. Create one to get started.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
             }
         }
     }

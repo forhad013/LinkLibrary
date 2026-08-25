@@ -62,7 +62,6 @@ fun AddLinkPresenter(
             )
         }
     }
-
     LaunchedEffect(Unit) {
         events.collect { event ->
             when (event) {
@@ -143,7 +142,7 @@ fun AddLinkPresenter(
                             result.fold(
                                 onSuccess = { metadata ->
                                     // Auto-fill title from metadata (description removed)
-                                    val autoTitle = if (metadata.title.isNotBlank()) metadata.title else {
+                                    val autoTitle = metadata.title.ifBlank {
                                         // Fallback: generate title from URL
                                         extractTitleFromUrl(state.url)
                                     }

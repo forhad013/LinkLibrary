@@ -1,14 +1,14 @@
 package com.greenrobotdev.linklibrary.components.form
 
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,35 +22,31 @@ fun AutoFetchButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
-    OutlinedButton(
+    FilledTonalButton(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier, // Remove extra padding for better alignment
         enabled = enabled && !isFetching,
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = MaterialTheme.colorScheme.primary
-        )
+        shape = MaterialTheme.shapes.small
     ) {
-        if (isFetching) {
-            CircularProgressIndicator(
-                modifier = Modifier.width(20.dp),
-                strokeWidth = 2.dp,
-                color = MaterialTheme.colorScheme.primary
-            )
-        } else {
-            Icon(
-                Icons.Default.Schedule,
-                contentDescription = "Auto-fetch metadata",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Auto-fetch",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+        if (isFetching) CircularProgressIndicator(
+            modifier = Modifier.size(20.dp),
+            strokeWidth = 1.dp,
+            color = MaterialTheme.colorScheme.onSecondaryContainer
+        )
+        else Icon(
+            Icons.Default.AutoAwesome,
+            contentDescription = "Auto-fetch metadata",
+            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier.size(18.dp)
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = "Auto-fetch",
+            style = MaterialTheme.typography.labelLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
