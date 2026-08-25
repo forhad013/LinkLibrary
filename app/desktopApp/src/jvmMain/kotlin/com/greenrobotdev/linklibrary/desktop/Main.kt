@@ -6,7 +6,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.greenrobotdev.linklibrary.database.di.databaseModule
 import com.greenrobotdev.linklibrary.screens.root.RootScreen
-import com.greenrobotdev.linklibrary.theme.MyApplicationTheme
+import com.greenrobotdev.linklibrary.design.theme.LinkLibraryTheme
 import org.koin.core.context.startKoin
 import kotlin.system.exitProcess
 
@@ -25,7 +25,7 @@ fun main() {
             state = windowState,
             title = "Link Library"
         ) {
-            MyApplicationTheme(darkTheme = true) {
+            LinkLibraryTheme(darkTheme = true) {
                 RootScreen()
             }
         }

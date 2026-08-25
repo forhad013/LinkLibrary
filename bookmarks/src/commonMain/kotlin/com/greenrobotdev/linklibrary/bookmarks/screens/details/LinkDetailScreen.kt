@@ -62,7 +62,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import com.greenrobotdev.linklibrary.screens.share.ShareDialog
 import kotlin.time.Clock
-import com.greenrobotdev.linklibrary.app.screens.share.ShareDialog
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)

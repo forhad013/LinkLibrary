@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 import com.greenrobotdev.linklibrary.model.SharedContent as CommonSharedContent
 import com.greenrobotdev.linklibrary.screens.root.RootScreen
-import com.greenrobotdev.linklibrary.theme.MyApplicationTheme
+import com.greenrobotdev.linklibrary.design.theme.LinkLibraryTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             CompositionLocalProvider {
-                MyApplicationTheme {
+                LinkLibraryTheme {
                     RootScreen(
                         sharedContent = sharedContent,
                         onSharedContentHandled = { sharedContent = null }
@@ -116,7 +116,7 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun DefaultPreview() {
-    MyApplicationTheme {
+    LinkLibraryTheme {
 
     }
 }
