@@ -37,10 +37,10 @@ AISearchBar(
     searchQuery = state.searchQuery,
     isSearching = state.isSearching,
     onSearchQueryChanged = { query ->
-        viewModel.onEvent(LibraryEvent.SearchQueryChanged(query))
+        viewModel.take(LibraryEvent.SearchQueryChanged(query))
     },
     onAISearch = { query ->
-        viewModel.onEvent(LibraryEvent.PerformAISearch(query))
+        viewModel.take(LibraryEvent.PerformAISearch(query))
     }
 )
 

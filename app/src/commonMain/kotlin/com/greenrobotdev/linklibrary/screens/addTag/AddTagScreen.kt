@@ -47,7 +47,7 @@ fun AddTagScreen(
     val viewModel: AddTagViewModel = viewModel(key = routeKey.toString()) {
         AddTagViewModel()
     }
-    val state by viewModel.states.collectAsState()
+    val state by viewModel.models.collectAsState()
 
     // Navigate back after successful tag creation
     LaunchedEffect(state.success) {
@@ -108,7 +108,7 @@ fun AddTagScreen(
             // Tag Name Field
             OutlinedTextField(
                 value = state.name,
-                onValueChange = { viewModel.onEvent(AddTagEvent.NameChanged(it)) },
+                onValueChange = { viewModel.take(AddTagEvent.NameChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Tag Name") },
                 placeholder = { Text("e.g., AI & Tech, Design Resources") },
@@ -120,7 +120,7 @@ fun AddTagScreen(
             // Description Field
             OutlinedTextField(
                 value = state.description,
-                onValueChange = { viewModel.onEvent(AddTagEvent.DescriptionChanged(it)) },
+                onValueChange = { viewModel.take(AddTagEvent.DescriptionChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Description") },
                 placeholder = { Text("What type of links will this tag contain?") },
@@ -133,7 +133,7 @@ fun AddTagScreen(
 
             // Submit Button
             Button(
-                onClick = { viewModel.onEvent(AddTagEvent.Submit) },
+                onClick = { viewModel.take(AddTagEvent.Submit) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = state.isFormValid && !state.isLoading,
                 shape = RoundedCornerShape(12.dp)
@@ -177,7 +177,7 @@ fun AddTagScreen(
                             modifier = Modifier.weight(1f)
                         )
                         IconButton(
-                            onClick = { viewModel.onEvent(AddTagEvent.ClearError) }
+                            onClick = { viewModel.take(AddTagEvent.ClearError) }
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,

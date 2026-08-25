@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.onStart
  * Handles loading, displaying, and managing a single link
  */
 @Composable
-fun LinkDetailUseCase(
+fun LinkDetailPresenter(
     initialState: LinkDetailState,
     events: Flow<LinkDetailEvent>,
     linkRepository: LinkRepository,

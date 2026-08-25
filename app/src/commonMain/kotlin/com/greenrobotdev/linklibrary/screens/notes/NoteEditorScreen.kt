@@ -53,7 +53,7 @@ fun NoteEditorScreen(
     }
 
     // Use the molecule flow from ViewModel
-    val state by viewModel.states.collectAsState()
+    val state by viewModel.models.collectAsState()
 
     // Rich text editor state
     var titleValue by remember { mutableStateOf(TextFieldValue(text = state.note.title)) }
@@ -79,7 +79,7 @@ fun NoteEditorScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { viewModel.onEvent(NoteEditorEvent.SaveNote) },
+                        onClick = { viewModel.take(NoteEditorEvent.SaveNote) },
                         enabled = !state.isSaving && titleValue.text.isNotBlank()
                     ) {
                         if (state.isSaving) {
@@ -108,7 +108,7 @@ fun NoteEditorScreen(
                 value = titleValue,
                 onValueChange = {
                     titleValue = it
-                    viewModel.onEvent(NoteEditorEvent.TitleChanged(it.text))
+                    viewModel.take(NoteEditorEvent.TitleChanged(it.text))
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -150,7 +150,7 @@ fun NoteEditorScreen(
                         value = contentValue,
                         onValueChange = {
                             contentValue = it
-                            viewModel.onEvent(NoteEditorEvent.ContentChanged(it.text))
+                            viewModel.take(NoteEditorEvent.ContentChanged(it.text))
                         },
                         modifier = Modifier
                             .fillMaxSize()
@@ -186,7 +186,7 @@ fun NoteEditorScreen(
             if (state.note.attachedLinkId != null) {
                 AttachedLinkCard(
                     linkId = state.note.attachedLinkId!!,
-                    onDetach = { viewModel.onEvent(NoteEditorEvent.DetachLink) }
+                    onDetach = { viewModel.take(NoteEditorEvent.DetachLink) }
                 )
             }
         }
@@ -197,7 +197,7 @@ fun NoteEditorScreen(
         LinkAttachmentDialog(
             availableLinks = state.availableLinks,
             onLinkSelected = { linkId ->
-                viewModel.onEvent(NoteEditorEvent.AttachLink(linkId))
+                viewModel.take(NoteEditorEvent.AttachLink(linkId))
                 showLinkDialog = false
             },
             onDismiss = { showLinkDialog = false }

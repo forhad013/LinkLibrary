@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.catch
  * Handles social media sharing and link management
  */
 @Composable
-fun ShareUseCase(
+fun SharePresenter(
     initialState: ShareState,
     events: Flow<ShareEvent>,
     linkRepository: LinkRepository

@@ -1,45 +1,35 @@
 package com.greenrobotdev.linklibrary.screens.share
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import app.cash.molecule.RecompositionMode
-import app.cash.molecule.moleculeFlow
+import androidx.compose.runtime.Composable
 import com.greenrobotdev.linklibrary.database.repository.LinkRepository
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import com.greenrobotdev.linklibrary.utils.MoleculeViewModel
+import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 /**
  * ViewModel for Share Pop-up screen
- * Follows the pattern used in other ViewModels in the project
+ * Follows MoleculeViewModel architecture pattern
  */
 class ShareViewModel(
     private val linkId: String
-) : ViewModel(), KoinComponent {
+) : MoleculeViewModel<ShareEvent, ShareState>(), KoinComponent {
 
-    private val eventsFlow: MutableSharedFlow<ShareEvent> = MutableSharedFlow(10)
     private val linkRepository: LinkRepository by inject()
-    private val initialState: ShareState = ShareState(linkId = linkId)
-
-    val states by lazy {
-        moleculeFlow(RecompositionMode.Immediate) {
-            ShareUseCase(initialState, eventsFlow, linkRepository)
-        }.stateIn(viewModelScope, SharingStarted.Lazily, initialState)
-    }
 
     init {
         // Initialize with load event
-        viewModelScope.launch {
-            eventsFlow.emit(ShareEvent.Initialize)
-        }
+        take(ShareEvent.Initialize)
     }
 
-    fun onEvent(event: ShareEvent) {
-        viewModelScope.launch {
-            eventsFlow.emit(event)
-        }
+    
+    @Composable
+    override fun models(events: Flow<ShareEvent>): ShareState {
+        return SharePresenter(initialState = ShareState(linkId = linkId), events, linkRepository)
+    }
+
+    
+    override fun initialValue(): ShareState {
+        return ShareState(linkId = linkId)
     }
 }

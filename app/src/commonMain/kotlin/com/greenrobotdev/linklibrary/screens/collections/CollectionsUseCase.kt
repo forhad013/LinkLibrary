@@ -17,7 +17,7 @@ import org.koin.compose.koinInject
  * Loads and displays collections using CollectionRepository
  */
 @Composable
-fun CollectionsUseCase(
+fun CollectionsPresenter(
     initialState: CollectionsState,
     events: Flow<CollectionsEvent>,
     collectionRepository: CollectionRepository = koinInject()

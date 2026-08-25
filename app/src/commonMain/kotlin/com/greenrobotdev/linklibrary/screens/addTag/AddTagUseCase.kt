@@ -18,7 +18,7 @@ import kotlin.uuid.Uuid
  */
 @OptIn(ExperimentalUuidApi::class)
 @Composable
-fun AddTagUseCase(
+fun AddTagPresenter(
     initialState: AddTagState,
     events: Flow<AddTagEvent>,
     tagRepository: TagRepository

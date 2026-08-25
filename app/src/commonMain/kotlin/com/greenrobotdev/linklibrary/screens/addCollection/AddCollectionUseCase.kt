@@ -18,7 +18,7 @@ import kotlin.uuid.Uuid
  */
 @OptIn(ExperimentalUuidApi::class)
 @Composable
-fun AddCollectionUseCase(
+fun AddCollectionPresenter(
     initialState: AddCollectionState,
     events: Flow<AddCollectionEvent>,
     collectionRepository: CollectionRepository = koinInject()

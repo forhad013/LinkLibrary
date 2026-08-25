@@ -91,7 +91,7 @@ fun TagsScreen(
     val viewModel: TagsViewModel = viewModel(key = routeKey.toString()) {
         TagsViewModel()
     }
-    val state by viewModel.states.collectAsState()
+    val state by viewModel.models.collectAsState()
 
     var searchQuery by remember { mutableStateOf("") }
     val selectedTags = remember { mutableStateListOf<String>() }
@@ -294,7 +294,7 @@ fun TagsScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     TextButton(
-                        onClick = { viewModel.onEvent(TagsEvent.ClearError) }
+                        onClick = { viewModel.take(TagsEvent.ClearError) }
                     ) {
                         Text("Dismiss")
                     }

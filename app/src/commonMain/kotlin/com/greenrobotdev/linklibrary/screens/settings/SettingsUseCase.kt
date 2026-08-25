@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
  * Note: Currently using static data, can be extended to use UserRepository when available
  */
 @Composable
-fun SettingsUseCase(
+fun SettingsPresenter(
     initialState: SettingsState,
     events: Flow<SettingsEvent>
 ): SettingsState {

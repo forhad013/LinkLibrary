@@ -68,19 +68,13 @@ fun AddLinkPresenter(
                 is AddLinkEvent.TitleChanged -> {
                     state = state.copy(
                         title = event.title,
-                        isFormValid = isFormValid(state.url, event.title, state.description)
+                        isFormValid = isFormValid(state.url, event.title)
                     )
                 }
                 is AddLinkEvent.UrlChanged -> {
                     state = state.copy(
                         url = event.url,
-                        isFormValid = isFormValid(event.url, state.title, state.description)
-                    )
-                }
-                is AddLinkEvent.DescriptionChanged -> {
-                    state = state.copy(
-                        description = event.description,
-                        isFormValid = isFormValid(state.url, state.title, event.description)
+                        isFormValid = isFormValid(event.url, state.title,)
                     )
                 }
                 is AddLinkEvent.ToggleFavorite -> {
@@ -150,7 +144,7 @@ fun AddLinkPresenter(
                                         isFetching = false,
                                         fetchedMetadata = metadata,
                                         title = if (metadata.title.isNotBlank()) metadata.title else autoTitle,
-                                        isFormValid = isFormValid(state.url, autoTitle, "")
+                                        isFormValid = isFormValid(state.url, autoTitle)
                                     )
                                 },
                                 onFailure = { error ->
@@ -160,7 +154,7 @@ fun AddLinkPresenter(
                                         isFetching = false,
                                         fetchError = error.message ?: "Failed to fetch metadata. Using fallback title.",
                                         title = fallbackTitle,
-                                        isFormValid = isFormValid(state.url, fallbackTitle, "")
+                                        isFormValid = isFormValid(state.url, fallbackTitle)
                                     )
                                 }
                             )
@@ -171,7 +165,7 @@ fun AddLinkPresenter(
                                 isFetching = false,
                                 fetchError = e.message ?: "Failed to fetch metadata. Using fallback title.",
                                 title = fallbackTitle,
-                                isFormValid = isFormValid(state.url, fallbackTitle, "")
+                                isFormValid = isFormValid(state.url, fallbackTitle)
                             )
                         }
                     }
@@ -183,9 +177,9 @@ fun AddLinkPresenter(
                     // Handle successful metadata fetch
                     state = state.copy(
                         fetchedMetadata = event.metadata,
-                        title = if (event.metadata.title.isNotBlank()) event.metadata.title else state.title,
-                        description = if (event.metadata.description.isNotBlank()) event.metadata.description else state.description,
-                        isFormValid = isFormValid(state.url, if (event.metadata.title.isNotBlank()) event.metadata.title else state.title, if (event.metadata.description.isNotBlank()) event.metadata.description else state.description)
+                        title = event.metadata.title.ifBlank { state.title },
+                        isFormValid = isFormValid(state.url,
+                            event.metadata.title.ifBlank { state.title })
                     )
                 }
                 is AddLinkEvent.MetadataFetchError -> {
@@ -235,7 +229,7 @@ fun AddLinkPresenter(
     return state
 }
 
-private fun isFormValid(url: String, title: String, description: String): Boolean {
+private fun isFormValid(url: String, title: String): Boolean {
     return url.isNotBlank() && title.isNotBlank()
 }
 

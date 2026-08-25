@@ -73,7 +73,7 @@ fun ShareDialog(
         ShareViewModel(linkId)
     }
 
-    val state by viewModel.states.collectAsState()
+    val state by viewModel.models.collectAsState()
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -146,7 +146,7 @@ fun ShareDialog(
                 // Custom message
                 OutlinedTextField(
                     value = state.customMessage,
-                    onValueChange = { viewModel.onEvent(ShareEvent.UpdateMessage(it)) },
+                    onValueChange = { viewModel.take(ShareEvent.UpdateMessage(it)) },
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("Add a message") },
                     placeholder = { Text("What's on your mind?") },
@@ -187,8 +187,8 @@ fun ShareDialog(
                                     platform = platform,
                                     isSelected = state.selectedPlatform == platform,
                                     onClick = {
-                                        viewModel.onEvent(ShareEvent.SelectPlatform(platform))
-                                        viewModel.onEvent(ShareEvent.Share)
+                                        viewModel.take(ShareEvent.SelectPlatform(platform))
+                                        viewModel.take(ShareEvent.Share)
                                     },
                                     modifier = Modifier.weight(1f)
                                 )
@@ -217,7 +217,7 @@ fun ShareDialog(
 
                     Button(
                         onClick = {
-                            viewModel.onEvent(ShareEvent.Share)
+                            viewModel.take(ShareEvent.Share)
                             onDismiss()
                         },
                         modifier = Modifier.weight(1f),
@@ -256,7 +256,7 @@ fun ShareDialog(
                                 modifier = Modifier.weight(1f)
                             )
                             TextButton(
-                                onClick = { viewModel.onEvent(ShareEvent.ClearError) }
+                                onClick = { viewModel.take(ShareEvent.ClearError) }
                             ) {
                                 Text("Dismiss")
                             }

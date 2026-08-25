@@ -41,7 +41,7 @@ AIDescriptionGenerator(
     title = state.title,
     currentDescription = state.description,
     onGenerateDescription = {
-        viewModel.onEvent(AddLinkEvent.GenerateDescription(state.url, state.title))
+        viewModel.take(AddLinkEvent.GenerateDescription(state.url, state.title))
     },
     isGenerating = state.isGeneratingDescription
 )
@@ -53,17 +53,17 @@ AITagSuggestionSection(
     suggestedTags = state.suggestedTags,
     isGenerating = state.isGeneratingTags,
     onGenerateTags = {
-        viewModel.onEvent(AddLinkEvent.GenerateTags(state.url, state.title))
+        viewModel.take(AddLinkEvent.GenerateTags(state.url, state.title))
     },
     onTagToggle = { tag ->
         if (state.tags.contains(tag)) {
-            viewModel.onEvent(AddLinkEvent.DeselectTag(tag))
+            viewModel.take(AddLinkEvent.DeselectTag(tag))
         } else {
-            viewModel.onEvent(AddLinkEvent.SelectTag(tag))
+            viewModel.take(AddLinkEvent.SelectTag(tag))
         }
     },
     onTagsSelected = { tags ->
-        viewModel.onEvent(AddLinkEvent.TagsChanged(tags))
+        viewModel.take(AddLinkEvent.TagsChanged(tags))
     }
 )
 */
@@ -75,7 +75,7 @@ AITagSuggestionSection(
 // URL Field (existing)
 OutlinedTextField(
     value = state.url,
-    onValueChange = { viewModel.onEvent(AddLinkEvent.UrlChanged(it)) },
+    onValueChange = { viewModel.take(AddLinkEvent.UrlChanged(it)) },
     label = { Text("URL") },
     leadingIcon = { Icon(Icons.Default.Link, contentDescription = null) },
     modifier = Modifier.fillMaxWidth(),
@@ -87,7 +87,7 @@ OutlinedTextField(
 // Title Field (existing)
 OutlinedTextField(
     value = state.title,
-    onValueChange = { viewModel.onEvent(AddLinkEvent.TitleChanged(it)) },
+    onValueChange = { viewModel.take(AddLinkEvent.TitleChanged(it)) },
     label = { Text("Title (optional)") },
     leadingIcon = { Icon(Icons.Default.Title, contentDescription = null) },
     modifier = Modifier.fillMaxWidth(),
@@ -101,7 +101,7 @@ AIDescriptionGenerator(
     title = state.title,
     currentDescription = state.description,
     onGenerateDescription = {
-        viewModel.onEvent(AddLinkEvent.GenerateDescription(state.url, state.title))
+        viewModel.take(AddLinkEvent.GenerateDescription(state.url, state.title))
     },
     isGenerating = state.isGeneratingDescription
 )
@@ -109,7 +109,7 @@ AIDescriptionGenerator(
 // Description Field (existing)
 OutlinedTextField(
     value = state.description,
-    onValueChange = { viewModel.onEvent(AddLinkEvent.DescriptionChanged(it)) },
+    onValueChange = { viewModel.take(AddLinkEvent.DescriptionChanged(it)) },
     label = { Text("Description (optional)") },
     modifier = Modifier.fillMaxWidth()
                     .height(120.dp),
@@ -123,17 +123,17 @@ OutlinedTextField(
                 suggestedTags = state.suggestedTags,
                 isGenerating = state.isGeneratingTags,
                 onGenerateTags = {
-                    viewModel.onEvent(AddLinkEvent.GenerateTags(state.url, state.title))
+                    viewModel.take(AddLinkEvent.GenerateTags(state.url, state.title))
                 },
                 onTagToggle = { tag ->
                     if (state.tags.contains(tag)) {
-                        viewModel.onEvent(AddLinkEvent.DeselectTag(tag))
+                        viewModel.take(AddLinkEvent.DeselectTag(tag))
                     } else {
-                        viewModel.onEvent(AddLinkEvent.SelectTag(tag))
+                        viewModel.take(AddLinkEvent.SelectTag(tag))
                     }
                 },
                 onTagsSelected = { tags ->
-                    viewModel.onEvent(AddLinkEvent.TagsChanged(tags))
+                    viewModel.take(AddLinkEvent.TagsChanged(tags))
                 }
             )
 

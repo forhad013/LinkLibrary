@@ -59,7 +59,7 @@ fun CollectionsScreen(
     val viewModel: CollectionsViewModel = viewModel(key = routeKey.toString()) {
         CollectionsViewModel()
     }
-    val state by viewModel.states.collectAsState()
+    val state by viewModel.models.collectAsState()
 
     Scaffold(
         topBar = {
@@ -144,7 +144,7 @@ fun CollectionsScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     TextButton(
-                        onClick = { viewModel.onEvent(CollectionsEvent.ClearError) }
+                        onClick = { viewModel.take(CollectionsEvent.ClearError) }
                     ) {
                         Text("Dismiss")
                     }

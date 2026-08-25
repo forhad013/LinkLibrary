@@ -55,7 +55,7 @@ fun HomeScreen(
     onAddLink: (String?) -> Unit
 ) {
     val viewModel: HomeViewModel = viewModel<HomeViewModel>(key = routeKey.toString()) { HomeViewModel() }
-    val state by viewModel.states.collectAsState()
+    val state by viewModel.models.collectAsState()
 
     HomeView(
         state = state,

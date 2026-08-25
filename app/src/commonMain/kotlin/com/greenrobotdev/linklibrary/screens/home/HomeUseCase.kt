@@ -13,7 +13,7 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 @Composable
-fun HomeUseCase(
+fun HomePresenter(
     initialState: HomeState,
     events: Flow<HomeEvent>,
     linkRepository: LinkRepository

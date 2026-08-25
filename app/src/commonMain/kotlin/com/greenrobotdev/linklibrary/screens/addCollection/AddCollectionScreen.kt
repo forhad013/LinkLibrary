@@ -47,7 +47,7 @@ fun AddCollectionScreen(
     val viewModel: AddCollectionViewModel = viewModel(key = routeKey.toString()) {
         AddCollectionViewModel()
     }
-    val state by viewModel.states.collectAsState()
+    val state by viewModel.models.collectAsState()
 
     // Navigate back after successful collection creation
     LaunchedEffect(state.success) {
@@ -108,7 +108,7 @@ fun AddCollectionScreen(
             // Collection Name Field
             OutlinedTextField(
                 value = state.name,
-                onValueChange = { viewModel.onEvent(AddCollectionEvent.NameChanged(it)) },
+                onValueChange = { viewModel.take(AddCollectionEvent.NameChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Collection Name") },
                 placeholder = { Text("e.g., AI & Tech, Design Resources") },
@@ -120,7 +120,7 @@ fun AddCollectionScreen(
             // Description Field
             OutlinedTextField(
                 value = state.description,
-                onValueChange = { viewModel.onEvent(AddCollectionEvent.DescriptionChanged(it)) },
+                onValueChange = { viewModel.take(AddCollectionEvent.DescriptionChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Description") },
                 placeholder = { Text("What type of links will this collection contain?") },
@@ -133,7 +133,7 @@ fun AddCollectionScreen(
 
             // Submit Button
             Button(
-                onClick = { viewModel.onEvent(AddCollectionEvent.Submit) },
+                onClick = { viewModel.take(AddCollectionEvent.Submit) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = state.isFormValid && !state.isLoading,
                 shape = RoundedCornerShape(12.dp)
@@ -177,7 +177,7 @@ fun AddCollectionScreen(
                             modifier = Modifier.weight(1f)
                         )
                         IconButton(
-                            onClick = { viewModel.onEvent(AddCollectionEvent.ClearError) }
+                            onClick = { viewModel.take(AddCollectionEvent.ClearError) }
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,

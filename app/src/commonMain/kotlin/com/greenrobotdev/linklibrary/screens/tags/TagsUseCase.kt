@@ -17,7 +17,7 @@ import org.koin.compose.koinInject
  * Loads and displays tags using TagRepository
  */
 @Composable
-fun TagsUseCase(
+fun TagsPresenter(
     initialState: TagsState,
     events: Flow<TagsEvent>,
     tagRepository: TagRepository = koinInject()

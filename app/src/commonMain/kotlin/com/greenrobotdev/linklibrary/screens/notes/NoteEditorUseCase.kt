@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
  * Handles note saving, loading, and management
  */
 @Composable
-fun NoteEditorUseCase(
+fun NoteEditorPresenter(
     initialState: NoteEditorState,
     events: Flow<NoteEditorEvent>,
     linkRepository: LinkRepository

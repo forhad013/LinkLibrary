@@ -1,30 +1,27 @@
 package com.greenrobotdev.linklibrary.screens.home
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import app.cash.molecule.RecompositionMode
-import app.cash.molecule.moleculeFlow
+import androidx.compose.runtime.Composable
 import com.greenrobotdev.linklibrary.database.repository.LinkRepository
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import com.greenrobotdev.linklibrary.utils.MoleculeViewModel
+import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class HomeViewModel : ViewModel(), KoinComponent {
+class HomeViewModel : MoleculeViewModel<HomeEvent, HomeState>(), KoinComponent {
 
-    private val initialState: HomeState = HomeState()
-
-    private val eventsFlow: MutableSharedFlow<HomeEvent> = MutableSharedFlow(5)
     private val linkRepository: LinkRepository by inject()
 
-    val states by lazy {
-        moleculeFlow(RecompositionMode.Immediate) {
-            HomeUseCase(initialState, eventsFlow, linkRepository)
-        }.stateIn(viewModelScope, SharingStarted.Lazily, initialState)
+    
+    @Composable
+    override fun models(events: Flow<HomeEvent>): HomeState {
+        return HomePresenter(initialState = HomeState(), events, linkRepository)
     }
 
-    fun onRefresh() { viewModelScope.launch { eventsFlow.emit(HomeEvent.Refresh) } }
-    fun onToggleFavorite(linkId: String) { viewModelScope.launch { eventsFlow.emit(HomeEvent.ToggleFavorite(linkId)) } }
+    
+    override fun initialValue(): HomeState {
+        return HomeState()
+    }
+
+    fun onRefresh() { take(HomeEvent.Refresh) }
+    fun onToggleFavorite(linkId: String) { take(HomeEvent.ToggleFavorite(linkId)) }
 }

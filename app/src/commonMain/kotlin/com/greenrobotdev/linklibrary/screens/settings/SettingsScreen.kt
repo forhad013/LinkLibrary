@@ -65,7 +65,7 @@ fun SettingsScreen(
     val viewModel: SettingsViewModel = viewModel(key = routeKey.toString()) {
         SettingsViewModel()
     }
-    val state by viewModel.states.collectAsState()
+    val state by viewModel.models.collectAsState()
 
     Scaffold(
         topBar = {
@@ -155,7 +155,7 @@ fun SettingsScreen(
                             icon = getIconForType(setting.iconType),
                             title = setting.title,
                             onClick = {
-                                viewModel.onEvent(SettingsEvent.NavigateToSetting(setting.id))
+                                viewModel.take(SettingsEvent.NavigateToSetting(setting.id))
                                 onNavigateToSetting(setting.id)
                             }
                         )
@@ -193,7 +193,7 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     TextButton(
-                        onClick = { viewModel.onEvent(SettingsEvent.ClearError) }
+                        onClick = { viewModel.take(SettingsEvent.ClearError) }
                     ) {
                         Text("Dismiss")
                     }

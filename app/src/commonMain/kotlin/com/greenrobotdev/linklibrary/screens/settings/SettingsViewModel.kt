@@ -1,34 +1,24 @@
 package com.greenrobotdev.linklibrary.screens.settings
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import app.cash.molecule.RecompositionMode
-import app.cash.molecule.moleculeFlow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import androidx.compose.runtime.Composable
+import com.greenrobotdev.linklibrary.utils.MoleculeViewModel
+import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
 
 /**
  * ViewModel for Settings screen
- * Follows MVVM+UseCase architecture pattern
+ * Follows MoleculeViewModel architecture pattern
  */
-class SettingsViewModel : ViewModel(), KoinComponent {
+class SettingsViewModel : MoleculeViewModel<SettingsEvent, SettingsState>(), KoinComponent {
 
-    private val initialState: SettingsState = SettingsState()
-
-    private val eventsFlow: MutableSharedFlow<SettingsEvent> = MutableSharedFlow(10)
-
-    val states by lazy {
-        moleculeFlow(RecompositionMode.Immediate) {
-            SettingsUseCase(initialState, eventsFlow)
-        }.stateIn(viewModelScope, SharingStarted.Lazily, initialState)
+    
+    @Composable
+    override fun models(events: Flow<SettingsEvent>): SettingsState {
+        return SettingsPresenter(initialState = SettingsState(), events)
     }
 
-    fun onEvent(event: SettingsEvent) {
-        viewModelScope.launch {
-            eventsFlow.emit(event)
-        }
+    
+    override fun initialValue(): SettingsState {
+        return SettingsState()
     }
 }

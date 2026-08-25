@@ -75,7 +75,7 @@ fun LinkDetailScreen(
     val viewModel: LinkDetailViewModel = viewModel(key = routeKey.toString()) {
         LinkDetailViewModel(linkId)
     }
-    val state by viewModel.states.collectAsState()
+    val state by viewModel.models.collectAsState()
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showShareDialog by remember { mutableStateOf(false) }
@@ -681,7 +681,7 @@ fun LinkDetailScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        viewModel.onEvent(LinkDetailEvent.Delete)
+                        viewModel.take(LinkDetailEvent.Delete)
                         showDeleteDialog = false
                     }
                 ) {

@@ -37,6 +37,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -70,7 +71,7 @@ fun LibraryScreen(
     onNavigateToTags: () -> Unit = {}
 ) {
     val viewModel: LibraryViewModel = viewModel<LibraryViewModel>(key = routeKey.toString()) { LibraryViewModel() }
-    val state by viewModel.states.collectAsState()
+    val state by viewModel.models.collectAsState()
 
     var viewMode by remember { mutableStateOf(ViewMode.GRID) }
     var sortBy by remember { mutableStateOf(SortOption.RECENT) }
@@ -146,19 +147,20 @@ fun LibraryScreen(
                 ) {
                     OutlinedTextField(
                         value = state.searchQuery,
-                        onValueChange = { /* viewModel.onEvent(LibraryEvent.SearchChanged(it)) */ },
+                        onValueChange = {
+                            viewModel.take(LibraryEvent.SearchChanged(it))
+                                        },
                         modifier = Modifier.weight(1f),
-//                        placeholder = {
-//
-//                            Text("Search links...")
-//                                      },
-//                        leadingIcon = {
-//                            Icon(Icons.Default.Search, contentDescription = null)
-//                        },
-//                        colors = OutlinedTextFieldDefaults(
-//                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-//                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
-//                        ),
+                        placeholder = {
+                            Text("Search links...")
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Default.Search, contentDescription = null)
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                        ),
                         shape = RoundedCornerShape(8.dp)
                     )
 
