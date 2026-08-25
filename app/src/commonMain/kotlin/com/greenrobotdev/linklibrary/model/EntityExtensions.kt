@@ -3,8 +3,8 @@ package com.greenrobotdev.linklibrary.model
 import com.greenrobotdev.linklibrary.database.room.CollectionEntity
 import com.greenrobotdev.linklibrary.database.room.LinkEntity
 import com.greenrobotdev.linklibrary.database.room.TagEntity
-import com.greenrobotdev.linklibrary.screens.collections.Collection
-import com.greenrobotdev.linklibrary.screens.tags.Tag
+import com.greenrobotdev.linklibrary.model.Collection
+import com.greenrobotdev.linklibrary.model.Tag
 
 /**
  * Extension functions to convert between database entities and UI models

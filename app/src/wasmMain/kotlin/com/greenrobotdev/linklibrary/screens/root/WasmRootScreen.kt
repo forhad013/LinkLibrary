@@ -26,16 +26,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.greenrobotdev.linklibrary.model.SharedContent
-import com.greenrobotdev.linklibrary.screens.add.AddLinkScreen
-import com.greenrobotdev.linklibrary.screens.addCollection.AddCollectionScreen
-import com.greenrobotdev.linklibrary.screens.addTag.AddTagScreen
-import com.greenrobotdev.linklibrary.screens.collections.CollectionsScreen
-import com.greenrobotdev.linklibrary.screens.details.LinkDetailScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.addCollection.AddCollectionScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.collections.CollectionsScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.details.LinkDetailScreen
 import com.greenrobotdev.linklibrary.screens.home.HomeScreen
-import com.greenrobotdev.linklibrary.screens.library.LibraryScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryScreen
 import com.greenrobotdev.linklibrary.screens.notes.NoteEditorScreen
 import com.greenrobotdev.linklibrary.screens.settings.SettingsScreen
-import com.greenrobotdev.linklibrary.screens.tags.TagsScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreen
 
 // Simplified version for WASM prototype - no serialization, no AI assistant
 @Composable

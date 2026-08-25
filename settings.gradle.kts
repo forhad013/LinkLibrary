@@ -23,6 +23,8 @@ include(":app:desktopApp")
 include(":app:iosApp")
 include(":app")
 include(":database")
+include(":core:design")
+include(":bookmarks")
 //include(":konsistTest")
 
 // Convention plugins (composite build)

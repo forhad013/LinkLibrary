@@ -2,7 +2,7 @@ package com.greenrobotdev.linklibrary
 
 import androidx.compose.ui.window.CanvasBasedWindow
 import com.greenrobotdev.linklibrary.screens.root.RootScreen
-import com.greenrobotdev.linklibrary.theme.MyApplicationTheme
+import com.greenrobotdev.linklibrary.design.theme.LinkLibraryTheme
 import org.koin.core.context.startKoin
 import com.greenrobotdev.linklibrary.di.appModule
 
@@ -23,7 +23,7 @@ fun main() {
     }
 
     CanvasBasedWindow("Link Library") {
-        MyApplicationTheme(darkTheme = true) {
+        LinkLibraryTheme(darkTheme = true) {
             RootScreen(
                 sharedContent = null, // Will receive from Chrome extension in the future
                 onSharedContentHandled = {}

@@ -1,9 +1,7 @@
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.compose.compiler)
+    kotlin("multiplatform")
+    id("org.jetbrains.compose")
+    id("com.android.library")
 }
 
 kotlin {
@@ -59,21 +57,16 @@ kotlin {
 
                 // Molecule
                 implementation(libs.molecule.runtime)
-//                implementation(libs.molecule.compose)
 
                 // Navigation 3
                 implementation(libs.navigation3.ui)
                 implementation(libs.lifecycle.viewmodel.navigation3)
-//                implementation(libs.adaptive.navigation3)
 
-                // Database module (includes Room runtime transitively) - available for all platforms
+                // Database module
                 implementation(project(":database"))
 
                 // Design module (Material 3 theme and components)
                 implementation(project(":core:design"))
-
-                // Bookmarks module (all bookmark-related screens)
-                implementation(project(":bookmarks"))
             }
         }
 
@@ -119,11 +112,10 @@ kotlin {
             }
         }
     }
-
 }
 
 android {
-    namespace = "com.greenrobotdev.linklibrary"
+    namespace = "com.greenrobotdev.linklibrary.bookmarks"
     compileSdk = 36
 
     defaultConfig {
@@ -149,10 +141,4 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     compilerOptions {
         freeCompilerArgs.add("-Xinline-optimizations")
     }
-}
-
-// Enable Compose compiler metrics and performance monitoring
-composeCompiler {
-    metricsDestination = layout.buildDirectory.dir("compose-compiler-reports")
-    reportsDestination = layout.buildDirectory.dir("compose-compiler-reports")
 }
