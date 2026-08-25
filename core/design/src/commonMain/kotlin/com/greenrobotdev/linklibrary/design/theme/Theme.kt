@@ -2,15 +2,9 @@ package com.greenrobotdev.linklibrary.design.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.foundation.LocalIndication
-import androidx.compose.material3.rippleIndication
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.material3.LocalTonalElevationEnabled
-import androidx.compose.material3.darkColorScheme
 
 /**
  * Material Design 3 Theme

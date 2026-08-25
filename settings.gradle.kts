@@ -24,6 +24,7 @@ include(":app:iosApp")
 include(":app")
 include(":database")
 include(":core:design")
+include(":core:utils")
 include(":bookmarks")
 //include(":konsistTest")
 

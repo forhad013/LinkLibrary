@@ -1,8 +1,5 @@
 package com.greenrobotdev.linklibrary.design.components.layout
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -13,7 +10,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,41 +47,48 @@ fun AppScaffold(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 },
-                navigationIcon = if (navigationIcon != null && onNavigationClick != null) {
-                    {
-                        IconButton(onClick = onNavigationClick) {
-                            Icon(
-                                imageVector = navigationIcon,
-                                contentDescription = "Navigation",
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
+                navigationIcon = {
+                    if (navigationIcon != null && onNavigationClick != null) {
+                        @Composable {
+                            IconButton(onClick = onNavigationClick!!) {
+                                Icon(
+                                    imageVector = navigationIcon,
+                                    contentDescription = "Navigation",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
                         }
-                    }
-                } else null,
-                actions = actions,
+                    } else null
+                },
+                actions = {
+                    actions()
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
         },
-        floatingActionButton = if (fabIcon != null && onFabClick != null) {
-            {
-                FloatingActionButton(
-                    onClick = onFabClick,
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ) {
-                    Icon(
-                        imageVector = fabIcon,
-                        contentDescription = "Action"
-                    )
+        floatingActionButton = {
+            if (fabIcon != null && onFabClick != null) {
+                @Composable {
+                    FloatingActionButton(
+                        onClick = onFabClick!!,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ) {
+                        Icon(
+                            imageVector = fabIcon,
+                            contentDescription = "Action"
+                        )
+                    }
                 }
-            }
-        } else null,
+            } else null
+        },
         floatingActionButtonPosition = when (fabPosition) {
             FabPosition.Start -> ComposeFabPosition.Start
             FabPosition.End -> ComposeFabPosition.End
             FabPosition.Center -> ComposeFabPosition.Center
+            else -> ComposeFabPosition.Start
         },
         containerColor = containerColor,
         content = content

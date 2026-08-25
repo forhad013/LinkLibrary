@@ -8,7 +8,7 @@ plugins {
 kotlin {
     androidTarget {
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
 
@@ -20,7 +20,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach {
         it.binaries.framework {
-            baseName = "design"
+            baseName = "utils"
             isStatic = true
         }
     }
@@ -33,32 +33,46 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                // Compose
                 implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material3)
-                implementation(compose.materialIconsExtended)
-                implementation(compose.ui)
+
+                // Molecule
+                implementation(libs.molecule.runtime)
+
+                // KotlinX Coroutines
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
 
         val androidMain by getting {
             dependencies {
-                implementation("androidx.appcompat:appcompat:1.6.1")
+                // AndroidX Lifecycle ViewModel for Android
+                implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
             }
         }
 
-        val desktopMain by getting
+        val desktopMain by getting {
+            dependencies {
+                // Lifecycle ViewModel for Desktop
+                implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-desktop:1.0.0")
+            }
+        }
 
         val iosX64Main by getting
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
 
-        val wasmJsMain by getting
+        val wasmJsMain by getting {
+            dependencies {
+                // ViewModel stub/alternative for WASM
+                // Note: Full AndroidX ViewModel not available for WASM yet
+            }
+        }
     }
 }
 
 android {
-    namespace = "com.greenrobotdev.linklibrary.design"
+    namespace = "com.greenrobotdev.linklibrary.utils"
     compileSdk = 34
     defaultConfig {
         minSdk = 24

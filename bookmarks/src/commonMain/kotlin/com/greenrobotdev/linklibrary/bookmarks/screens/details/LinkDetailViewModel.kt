@@ -1,8 +1,8 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.details
 
 import androidx.compose.runtime.Composable
-import com.greenrobotdev.linklibrary.database.repository.LinkRepository
 import com.greenrobotdev.linklibrary.utils.MoleculeViewModel
+import com.greenrobotdev.linklibrary.database.repository.LinkRepository
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

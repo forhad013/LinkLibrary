@@ -72,6 +72,9 @@ kotlin {
                 // Design module (Material 3 theme and components)
                 implementation(project(":core:design"))
 
+                // Utils module (MoleculeViewModel and utilities)
+                implementation(project(":core:utils"))
+
                 // Bookmarks module (all bookmark-related screens)
                 implementation(project(":bookmarks"))
             }
