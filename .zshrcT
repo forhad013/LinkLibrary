@@ -1,0 +1,18 @@
+
+export ANTHROPIC_AUTH_TOKEN=33c38c83e0784e52a54d94ec617141f9.bMb33id8ORLvpJXnm
+export PATH="$HOME/.local/bin:$PATH"
+
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export PATH="$JAVA_HOME/bin:$PATH"
+
+# bun completions
+[ -s "/Users/forhadhossain/.bun/_bun" ] && source "/Users/forhadhossain/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+ # Z.ai direct
+alias claude-zai='ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" ANTHROPIC_AUTH_TOKEN="33c38c83e0784e52a54d94ec617141f9.bMb33id8ORLvpJnm'
+
+alias claude-omni='ANTHROPIC_BASE_URL="http://localhost:20128" ANTHROPIC_AUTH_TOKEN="sk-c27997f110d15f31-11947d-35c762c0"`'

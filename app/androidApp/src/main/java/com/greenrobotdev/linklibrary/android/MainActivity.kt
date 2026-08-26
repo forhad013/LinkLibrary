@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -13,13 +12,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
-import com.greenrobotdev.linklibrary.model.SharedContent as CommonSharedContent
-import com.greenrobotdev.linklibrary.screens.root.RootScreen
+import com.greenrobotdev.linklibrary.bookmarks.model.SharedContent
 import com.greenrobotdev.linklibrary.design.theme.LinkLibraryTheme
+import com.greenrobotdev.linklibrary.screens.root.RootScreen
 
 class MainActivity : ComponentActivity() {
 
-    private var sharedContent by mutableStateOf<CommonSharedContent?>(null)
+    private var sharedContent by mutableStateOf<SharedContent?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +58,7 @@ class MainActivity : ComponentActivity() {
                 // Extract URL from text if present
                 val url = extractUrlFromText(text) ?: uri?.toString()
 
-                sharedContent = CommonSharedContent(
+                sharedContent = SharedContent(
                     url = url,
                     text = text,
                     title = title
@@ -73,7 +72,7 @@ class MainActivity : ComponentActivity() {
                 // For multiple items, just take the first text we can find
                 val url = extractUrlFromText(text)
 
-                sharedContent = CommonSharedContent(
+                sharedContent = SharedContent(
                     url = url,
                     text = text,
                     title = title
