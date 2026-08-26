@@ -2,19 +2,20 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     kotlin("multiplatform")
+    id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
 kotlin {
-    androidTarget {
-        // AGP 9: Android configuration moved to androidTarget
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
+    androidLibrary {
+        // AGP 9: Android library configuration
+        namespace = "com.greenrobotdev.linklibrary.utils"
+        compileSdk = 36
 
-        // Android library configuration (AGP 9 style)
-        // These configurations are now part of androidTarget instead of separate android {} block
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        }
     }
 
     jvm("desktop")
@@ -60,8 +61,7 @@ kotlin {
 
         val desktopMain by getting {
             dependencies {
-                // AndroidX Lifecycle ViewModel for Desktop
-                implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
+                // Desktop uses custom ViewModel implementation instead of AndroidX Lifecycle
                 // Molecule Runtime for Desktop
                 implementation(libs.molecule.runtime)
             }
@@ -87,4 +87,7 @@ kotlin {
         }
     }
 }
+
+// Note: AGP 9 uses androidLibrary {} inside kotlin {} block for shared modules
+// Traditional android {} block only used in separate Android app entry point modules
 

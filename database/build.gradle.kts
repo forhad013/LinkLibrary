@@ -1,19 +1,20 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    id("com.android.kotlin.multiplatform.library")
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.androidx.room)
     alias(libs.plugins.ksp)
 }
 
 kotlin {
-    androidTarget {
-        // AGP 9: Android configuration moved to androidTarget
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
+    androidLibrary {
+        // AGP 9: Android library configuration
+        namespace = "com.greenrobotdev.linklibrary.database"
+        compileSdk = 36
 
-        // Android library configuration (AGP 9 style)
-        // These configurations are now part of androidTarget instead of separate android {} block
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        }
     }
     jvm() // Add JVM target to enable expect/actual
 
@@ -63,6 +64,9 @@ kotlin {
     }
 }
 
+// Note: AGP 9 uses androidLibrary {} inside kotlin {} block for shared modules
+// Traditional android {} block only used in separate Android app entry point modules
+
 // Configure Room schema directory per official docs
 room {
     schemaDirectory("$projectDir/schemas")
@@ -70,7 +74,9 @@ room {
 
 // KSP dependencies for Room compiler
 // Per official docs: https://developer.android.com/kotlin/multiplatform/room
+// KSP needs to run for all targets to generate actual implementations
 dependencies {
+    add("kspCommonMainMetadata", libs.androidx.room.compiler)
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspJvm", libs.androidx.room.compiler)
 }

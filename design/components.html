@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lords of Links UI Components</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary": "#295ea6",
+                      "on-background": "#1a1b1e",
+                      "inverse-primary": "#adc6ff",
+                      "on-secondary-container": "#004286",
+                      "secondary-container": "#83b1ff",
+                      "on-tertiary-container": "#f7fff2",
+                      "outline": "#727785",
+                      "primary-container": "#2771df",
+                      "on-tertiary-fixed": "#002108",
+                      "on-secondary": "#ffffff",
+                      "surface-bright": "#faf9fd",
+                      "surface-container-highest": "#e3e2e6",
+                      "on-tertiary-fixed-variant": "#005320",
+                      "on-surface": "#1a1b1e",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "outline-variant": "#c2c6d5",
+                      "surface-tint": "#005ac1",
+                      "surface-container-low": "#f4f3f7",
+                      "background": "#faf9fd",
+                      "primary-fixed": "#d8e2ff",
+                      "inverse-on-surface": "#f2f0f4",
+                      "secondary-fixed": "#d6e3ff",
+                      "tertiary-container": "#2a8541",
+                      "on-tertiary": "#ffffff",
+                      "primary": "#0058bd",
+                      "secondary-fixed-dim": "#a9c7ff",
+                      "tertiary-fixed": "#9cf7a6",
+                      "surface-dim": "#dbd9dd",
+                      "tertiary-fixed-dim": "#6ddd81",
+                      "tertiary": "#006b2b",
+                      "on-primary-fixed": "#001a41",
+                      "on-error": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface-variant": "#424753",
+                      "surface-container": "#efedf1",
+                      "surface-variant": "#e3e2e6",
+                      "on-secondary-fixed-variant": "#00468c",
+                      "on-secondary-fixed": "#001b3d",
+                      "inverse-surface": "#2f3033",
+                      "primary-fixed-dim": "#adc6ff",
+                      "on-primary-fixed-variant": "#004494",
+                      "on-primary-container": "#fefcff",
+                      "surface": "#faf9fd",
+                      "error": "#ba1a1a",
+                      "surface-container-high": "#e9e7eb",
+                      "on-error-container": "#93000a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "lg": "24px",
+                      "margin-desktop": "32px",
+                      "xs": "4px",
+                      "md": "16px",
+                      "gutter": "24px",
+                      "sm": "8px",
+                      "xl": "32px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "title-lg": [
+                              "Inter"
+                      ],
+                      "title-md": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "label-lg": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.25px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "title-lg": [
+                              "22px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "title-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "letterSpacing": "0.15px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-sm": [
+                              "11px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.5px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-lg": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.1px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-lg": [
+                              "57px",
+                              {
+                                      "lineHeight": "64px",
+                                      "letterSpacing": "-0.25px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "letterSpacing": "0.5px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "0px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+          .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+          }
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+          .animate-spin {
+            animation: spin 1s linear infinite;
+          }
+      </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation (Shell) -->
+<header class="w-full sticky top-0 z-40 bg-surface dark:bg-surface flex items-center justify-between px-margin-mobile md:px-margin-desktop h-16 shadow-sm">
+<button class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors active:opacity-80">
+<span class="material-symbols-outlined text-primary" data-icon="menu">menu</span>
+</button>
+<div class="font-title-lg text-title-lg font-bold text-primary">Link Library</div>
+<button class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors active:opacity-80">
+<span class="material-symbols-outlined text-primary" data-icon="search">search</span>
+</button>
+</header>
+<main class="max-w-[800px] mx-auto px-margin-mobile md:px-margin-desktop py-xl space-y-xl pb-32">
+<!-- Header -->
+<div class="mb-xl">
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-sm">UI Component Specification</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Lords of Links (v1: General) Theme - Material 3 Inspired</p>
+</div>
+<!-- 1. Buttons Section -->
+<section class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg mb-lg border-b border-surface-variant pb-sm">1. Buttons</h2>
+<div class="space-y-lg">
+<!-- Primary Filled -->
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Primary Filled</h3>
+<div class="flex flex-wrap gap-md items-center">
+<button class="bg-primary text-on-primary font-label-lg text-label-lg px-6 py-2.5 rounded-full hover:shadow-md hover:opacity-90 transition-all active:scale-95 flex items-center gap-2">
+                            Primary Action
+                        </button>
+<button class="bg-primary text-on-primary font-label-lg text-label-lg px-6 py-2.5 rounded-full hover:shadow-md hover:opacity-90 transition-all active:scale-95 flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+                            With Icon
+                        </button>
+<button class="bg-surface-variant text-on-surface-variant/50 font-label-lg text-label-lg px-6 py-2.5 rounded-full cursor-not-allowed">
+                            Disabled State
+                        </button>
+</div>
+</div>
+<!-- Secondary Tonal -->
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Secondary Tonal</h3>
+<div class="flex flex-wrap gap-md items-center">
+<button class="bg-secondary-container text-on-secondary-container font-label-lg text-label-lg px-6 py-2.5 rounded-full hover:bg-secondary-fixed-dim transition-colors active:scale-95">
+                            Secondary Action
+                        </button>
+<button class="bg-secondary-container text-on-secondary-container font-label-lg text-label-lg px-6 py-2.5 rounded-full hover:bg-secondary-fixed-dim transition-colors active:scale-95 border border-outline-variant/30">
+                            Outlined Variant
+                        </button>
+</div>
+</div>
+<!-- Text Buttons -->
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Text / Ghost Buttons</h3>
+<div class="flex flex-wrap gap-md items-center">
+<button class="text-primary font-label-lg text-label-lg px-4 py-2.5 rounded-lg hover:bg-surface-container-low transition-colors active:scale-95">
+                            Text Button
+                        </button>
+<button class="text-error font-label-lg text-label-lg px-4 py-2.5 rounded-lg hover:bg-error-container/50 transition-colors active:scale-95">
+                            Destructive Action
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. Circular Buttons & FABs -->
+<section class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg mb-lg border-b border-surface-variant pb-sm">2. Circular Buttons &amp; FABs</h2>
+<div class="flex flex-wrap gap-xl items-end">
+<!-- Standard Icon Buttons -->
+<div class="flex gap-md">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container-low text-primary hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+<!-- Floating Action Buttons -->
+<div class="flex gap-lg items-center">
+<div class="flex flex-col items-center gap-sm">
+<button class="w-14 h-14 rounded-2xl bg-primary-container text-on-primary-container shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center justify-center">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Standard FAB</span>
+</div>
+<div class="flex flex-col items-center gap-sm">
+<button class="h-14 px-6 rounded-2xl bg-secondary-container text-on-secondary-container shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-2">
+<span class="material-symbols-outlined">add</span>
+<span class="font-label-lg text-label-lg">New Link</span>
+</button>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Extended FAB</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. Text Fields & Inputs -->
+<section class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg mb-lg border-b border-surface-variant pb-sm">3. Text Fields &amp; Inputs</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Standard Input -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface">Standard Input</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">link</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-xl pl-12 pr-4 py-3 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="https://example.com" type="text"/>
+</div>
+<span class="font-body-md text-[12px] text-on-surface-variant ml-4">Enter a valid URL</span>
+</div>
+<!-- Error State -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-error">Error State</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-error">error</span>
+<input class="w-full bg-error-container/20 border border-error rounded-xl pl-12 pr-4 py-3 font-body-md text-on-surface focus:outline-none" type="text" value="invalid-url"/>
+</div>
+<span class="font-body-md text-[12px] text-error ml-4">Invalid format</span>
+</div>
+<!-- Textarea -->
+<div class="flex flex-col gap-xs md:col-span-2">
+<label class="font-label-sm text-label-sm text-on-surface">Description (Textarea)</label>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant rounded-xl p-4 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-y" placeholder="Add notes here..." rows="3"></textarea>
+</div>
+</div>
+</section>
+<!-- 4. Material Components (Selection & Cards) -->
+<section class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg mb-lg border-b border-surface-variant pb-sm">4. Selection Controls &amp; Cards</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<!-- Selection Controls -->
+<div class="space-y-lg">
+<div class="flex items-center gap-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant w-24">Switch</h3>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+<span class="ml-3 font-body-md text-on-surface">Active State</span>
+</label>
+</div>
+<div class="flex items-center gap-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant w-24">Checkbox</h3>
+<label class="flex items-center gap-3 cursor-pointer">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md text-on-surface">Selected Item</span>
+</label>
+</div>
+<div class="flex items-center gap-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant w-24">Radio</h3>
+<label class="flex items-center gap-3 cursor-pointer">
+<input checked="" class="w-5 h-5 border-outline-variant text-primary focus:ring-primary" name="radio-group" type="radio"/>
+<span class="font-body-md text-on-surface">Option 1</span>
+</label>
+</div>
+</div>
+<!-- Sample Card -->
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md">Sample Card (Glassmorphism inspired edge)</h3>
+<div class="bg-surface-container-low rounded-xl border border-surface-variant p-md shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group cursor-pointer">
+<!-- Decorative top accent -->
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
+<div class="flex justify-between items-start mb-sm mt-1">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">article</span>
+</div>
+<h4 class="font-title-md text-title-md text-on-surface">Research Docs</h4>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Collection of essential UX research documentation and links.</p>
+<div class="flex gap-2">
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-surface-variant text-on-surface-variant font-label-sm text-label-sm">
+                                UX
+                            </span>
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-surface-variant text-on-surface-variant font-label-sm text-label-sm">
+                                Research
+                            </span>
+</div>
+</div>
+</div>
+</div>
+</section><section class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg mb-lg border-b border-surface-variant pb-sm">5. Dialogs &amp; Bottom Sheets</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<!-- Modal Dialog Example -->
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Modal Dialog</h3>
+<div class="bg-surface-container-high rounded-xl p-lg shadow-md max-w-[320px] border border-outline-variant/30">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-sm">Delete Link?</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">This action cannot be undone. The link will be permanently removed from your library.</p>
+<div class="flex justify-end gap-md">
+<button class="text-primary font-label-lg text-label-lg px-4 py-2 rounded-lg hover:bg-surface-container-low transition-colors">Cancel</button>
+<button class="text-error font-label-lg text-label-lg px-4 py-2 rounded-lg hover:bg-error-container/50 transition-colors">Delete</button>
+</div>
+</div>
+</div>
+<!-- Bottom Sheet Example -->
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Bottom Sheet</h3>
+<div class="bg-surface-container-lowest rounded-t-xl border-x border-t border-outline-variant shadow-lg overflow-hidden">
+<div class="w-8 h-1 bg-outline-variant/50 rounded-full mx-auto my-3"></div>
+<div class="px-md pb-md">
+<h4 class="font-title-md text-title-md text-on-surface mb-md px-md">Link Options</h4>
+<div class="space-y-1">
+<button class="w-full flex items-center gap-md px-md py-3 hover:bg-surface-container-low rounded-lg transition-colors text-on-surface">
+<span class="material-symbols-outlined">edit</span>
+<span class="font-body-lg">Edit Link</span>
+</button>
+<button class="w-full flex items-center gap-md px-md py-3 hover:bg-surface-container-low rounded-lg transition-colors text-on-surface">
+<span class="material-symbols-outlined">share</span>
+<span class="font-body-lg">Share</span>
+</button>
+<button class="w-full flex items-center gap-md px-md py-3 hover:bg-surface-container-low rounded-lg transition-colors text-on-surface">
+<span class="material-symbols-outlined">checklist</span>
+<span class="font-body-lg">Add to Tasks</span>
+</button>
+<button class="w-full flex items-center gap-md px-md py-3 hover:bg-error-container/20 text-error rounded-lg transition-colors">
+<span class="material-symbols-outlined">delete</span>
+<span class="font-body-lg">Delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section><section class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg mb-lg border-b border-surface-variant pb-sm">6. Dropdowns &amp; Menus</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<!-- Standard Dropdown -->
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Standard Dropdown</h3>
+<div class="relative">
+<button class="w-full flex items-center justify-between bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-on-surface font-body-md hover:border-primary transition-colors">
+<span class="">Select Category</span>
+<span class="material-symbols-outlined">expand_more</span>
+</button>
+</div>
+</div>
+<!-- Searchable Dropdown (Expanded) -->
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Searchable Dropdown (Expanded)</h3>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg overflow-hidden">
+<div class="p-2 border-b border-outline-variant/30">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-md pl-9 pr-3 py-2 text-sm focus:ring-0" placeholder="Search tags..." type="text"/>
+</div>
+</div>
+<div class="max-h-40 overflow-y-auto">
+<div class="px-4 py-2 text-body-md text-on-surface hover:bg-surface-container-low cursor-pointer">Development</div>
+<div class="px-4 py-2 text-body-md text-on-primary bg-primary cursor-pointer">Design (Active)</div>
+<div class="px-4 py-2 text-body-md text-on-surface hover:bg-surface-container-low cursor-pointer">Marketing</div>
+<div class="px-4 py-2 text-body-md text-on-surface hover:bg-surface-container-low cursor-pointer">Product</div>
+</div>
+</div>
+</div>
+<!-- Multi-select Dropdown -->
+<div class="space-y-md md:col-span-2">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Multi-select Dropdown</h3>
+<div class="max-w-md bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg">
+<div class="p-2 space-y-1">
+<label class="flex items-center gap-3 px-3 py-2 hover:bg-surface-container-low rounded-lg cursor-pointer">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md text-on-surface">Reading List</span>
+</label>
+<label class="flex items-center gap-3 px-3 py-2 hover:bg-surface-container-low rounded-lg cursor-pointer">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md text-on-surface">Work Projects</span>
+</label>
+<label class="flex items-center gap-3 px-3 py-2 hover:bg-surface-container-low rounded-lg cursor-pointer">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md text-on-surface">Personal</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 7. Progress Indicators -->
+<section class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg mb-lg border-b border-surface-variant pb-sm">7. Progress Indicators</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Linear Progress</h3>
+<div class="space-y-4">
+<div>
+<label class="font-label-sm text-label-sm text-on-surface mb-1 block">Determinate (60%)</label>
+<div class="w-full bg-surface-variant rounded-full h-1.5">
+<div class="bg-primary h-1.5 rounded-full" style="width: 60%"></div>
+</div>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-on-surface mb-1 block">Indeterminate</label>
+<div class="w-full bg-surface-variant rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-1.5 rounded-full w-1/3 animate-[pulse_1.5s_ease-in-out_infinite]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Circular Progress</h3>
+<div class="flex items-center gap-md">
+<svg class="animate-spin h-8 w-8 text-primary" fill="none" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
+</svg>
+<span class="font-body-md text-on-surface">Loading...</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 8. Feedback & Notifications -->
+<section class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg mb-lg border-b border-surface-variant pb-sm">8. Feedback &amp; Notifications</h2>
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Snackbars / Toasts</h3>
+<div class="space-y-4 max-w-md">
+<!-- Success Snackbar -->
+<div class="bg-tertiary-container text-on-tertiary-container rounded-lg px-4 py-3 flex items-center justify-between shadow-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary">check_circle</span>
+<span class="font-body-md">Link saved successfully.</span>
+</div>
+<button class="text-tertiary font-label-lg hover:bg-tertiary-fixed-dim/20 px-2 py-1 rounded transition-colors">UNDO</button>
+</div>
+<!-- Error Snackbar -->
+<div class="bg-error-container text-on-error-container rounded-lg px-4 py-3 flex items-center justify-between shadow-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error">error</span>
+<span class="font-body-md">Failed to delete link.</span>
+</div>
+<button class="text-error font-label-lg hover:bg-error/10 px-2 py-1 rounded transition-colors">RETRY</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 9. Navigation -->
+<section class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg mb-lg border-b border-surface-variant pb-sm">9. Navigation</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Tabs</h3>
+<div class="border-b border-surface-variant">
+<nav aria-label="Tabs" class="-mb-px flex space-x-8">
+<button class="border-primary text-primary whitespace-nowrap py-4 px-1 border-b-2 font-title-md">
+                        All
+                    </button>
+<button class="border-transparent text-on-surface-variant hover:text-on-surface hover:border-surface-variant whitespace-nowrap py-4 px-1 border-b-2 font-title-md">
+                        Favorites
+                    </button>
+<button class="border-transparent text-on-surface-variant hover:text-on-surface hover:border-surface-variant whitespace-nowrap py-4 px-1 border-b-2 font-title-md">
+                        Recent
+                    </button>
+</nav>
+</div>
+</div>
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Segmented Button</h3>
+<div class="inline-flex rounded-lg border border-outline-variant p-1 bg-surface-container-lowest">
+<button class="flex items-center gap-2 px-4 py-2 bg-secondary-container text-on-secondary-container rounded-md font-label-lg transition-colors">
+<span class="material-symbols-outlined text-sm">view_list</span>
+                    List
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low rounded-md font-label-lg transition-colors">
+<span class="material-symbols-outlined text-sm">grid_view</span>
+                    Grid
+                </button>
+</div>
+</div>
+</div>
+</section>
+<!-- 10. Specialized Card Variants -->
+<section class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg mb-lg border-b border-surface-variant pb-sm">10. Specialized Card Variants</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<!-- Task Card -->
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Task Card</h3>
+<div class="bg-surface-container-low rounded-xl border border-surface-variant p-4 shadow-sm flex items-start gap-3">
+<input class="mt-1 w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
+<div class="flex-1">
+<h4 class="font-title-md text-on-surface mb-1">Review Q3 Design Specs</h4>
+<div class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-error-container text-on-error-container uppercase tracking-wider">
+                        Due Soon
+                    </div>
+</div>
+</div>
+</div>
+<!-- Note Card -->
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Note Card</h3>
+<div class="bg-surface-container-low rounded-xl border border-surface-variant p-4 shadow-sm">
+<p class="font-body-md text-on-surface mb-3 line-clamp-2">Meeting notes regarding the new architecture transition plan and timeline constraints discussed on Tuesday.</p>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-on-surface-variant">2 min read</span>
+<span class="font-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                        Oct 24, 2023
+                    </span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 11. Empty States -->
+<section class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg mb-lg border-b border-surface-variant pb-sm">11. Empty States</h2>
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Standard Empty State</h3>
+<div class="bg-surface-container-low rounded-xl border border-dashed border-outline-variant p-8 flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-4 opacity-50">folder_open</span>
+<h4 class="font-title-lg text-on-surface mb-2">No links found</h4>
+<p class="font-body-md text-on-surface-variant mb-6 max-w-sm">It looks like you haven't saved any links to this folder yet.</p>
+<button class="bg-primary text-on-primary font-label-lg px-6 py-2.5 rounded-full hover:opacity-90 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                Start adding now
+            </button>
+</div>
+</div>
+</section>
+<!-- 12. Avatars & Badges -->
+<section class="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg mb-lg border-b border-surface-variant pb-sm">12. Avatars &amp; Badges</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Avatars</h3>
+<div class="flex items-center gap-6">
+<!-- Large -->
+<div class="w-16 h-16 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-title-lg shadow-sm">
+                    JD
+                </div>
+<!-- Medium -->
+<div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-title-md shadow-sm">
+                    JD
+                </div>
+<!-- Small -->
+<div class="w-8 h-8 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center font-label-lg shadow-sm">
+                    JD
+                </div>
+</div>
+</div>
+<div class="space-y-md">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-md uppercase tracking-wider">Rank Badges</h3>
+<div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-high border border-outline-variant rounded-full shadow-sm">
+<span class="material-symbols-outlined text-tertiary text-sm" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<span class="font-label-sm text-on-surface uppercase tracking-wider font-bold">Master Archivist</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Mobile only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-2 pb-safe bg-surface-container dark:bg-surface-container-low shadow-md md:hidden">
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container dark:bg-primary-container dark:text-on-primary-container rounded-full px-5 py-1 active:scale-95 transition-transform duration-100">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">book_4</span>
+<span class="font-label-sm text-label-sm mt-1">Library</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-100">
+<span class="material-symbols-outlined">label</span>
+<span class="font-label-sm text-label-sm mt-1">Tags</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-100">
+<span class="material-symbols-outlined">checklist</span>
+<span class="font-label-sm text-label-sm mt-1">Tasks</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-100">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-sm text-label-sm mt-1">Settings</span>
+</button>
+</nav>
+</body></html>

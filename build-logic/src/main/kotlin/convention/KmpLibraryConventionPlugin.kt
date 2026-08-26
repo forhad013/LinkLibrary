@@ -3,6 +3,7 @@ package convention
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -13,12 +14,16 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPlugin
  * Convention plugin for Kotlin Multiplatform library modules.
  * Applies standard KMP configuration with Android and JVM targets,
  * Compose Multiplatform support, and common compiler options.
+ *
+ * AGP 9 compatible: Uses com.android.kotlin.multiplatform.library plugin
  */
 class KmpLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             // Apply required plugins
             pluginManager.apply(KotlinMultiplatformPlugin::class.java)
+            // AGP 9: Apply the Android KMP library plugin
+            pluginManager.apply("com.android.kotlin.multiplatform.library")
 
             // Configure KMP extension
             extensions.configure<KotlinMultiplatformExtension> {

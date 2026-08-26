@@ -2,28 +2,28 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     kotlin("multiplatform")
+    id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
     alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
-    androidTarget {
-        // AGP 9: Android configuration moved to androidTarget
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-            freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
-            freeCompilerArgs.add("-Xcontext-receivers")
-        }
+    androidLibrary {
+        // AGP 9: Android library configuration
+        namespace = "com.greenrobotdev.linklibrary.bookmarks"
+        compileSdk = 36
 
-        // Android library configuration (AGP 9 style)
-        // buildFeatures.compose = true and composeOptions handled differently in AGP 9
-        // Compose integration now managed through kotlin plugin compose
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+            freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
+            freeCompilerArgs.add("-Xcontext-parameters")
+        }
     }
 
     jvm() {
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
             freeCompilerArgs.add("-Xjsr305=strict")
         }
     }
@@ -110,6 +110,7 @@ kotlin {
     }
 }
 
-// Note: -Xinline-optimizations flag removed as it's not supported in Kotlin 2.1.0
+// Note: AGP 9 uses androidLibrary {} inside kotlin {} block for shared modules
+// Traditional android {} block only used in separate Android app entry point modules
 // Note: buildFeatures.compose and composeOptions handled differently in AGP 9
 // Compose integration now managed through org.jetbrains.kotlin.plugin.compose

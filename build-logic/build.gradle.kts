@@ -10,12 +10,13 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin:2.1.0")
-    implementation("com.android.library:com.android.library.gradle.plugin:8.9.1")
-    implementation("com.android.application:com.android.application.gradle.plugin:8.9.1")
+    implementation("org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin:2.2.10")
+    implementation("com.android.library:com.android.library.gradle.plugin:9.0.0")
+    implementation("com.android.application:com.android.application.gradle.plugin:9.0.0")
+    implementation("com.android.kotlin.multiplatform.library:com.android.kotlin.multiplatform.library.gradle.plugin:9.0.0")
     implementation("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:1.9.3")
-    implementation("org.jetbrains.kotlin.plugin.compose:org.jetbrains.kotlin.plugin.compose.gradle.plugin:2.1.0")
-    implementation("org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin:2.1.0")
-    implementation("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:2.1.0-1.0.29")
+    implementation("org.jetbrains.kotlin.plugin.compose:org.jetbrains.kotlin.plugin.compose.gradle.plugin:2.2.10")
+    implementation("org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin:2.2.10")
+    implementation("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:2.2.10-2.0.2")
     implementation("androidx.room:androidx.room.gradle.plugin:2.8.3")
 }

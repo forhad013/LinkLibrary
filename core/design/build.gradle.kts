@@ -2,19 +2,20 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     kotlin("multiplatform")
+    id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
 kotlin {
-    androidTarget {
-        // AGP 9: Android configuration moved to androidTarget
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
-        }
+    androidLibrary {
+        // AGP 9: Android library configuration
+        namespace = "com.greenrobotdev.linklibrary.design"
+        compileSdk = 36
 
-        // Android library configuration (AGP 9 style)
-        // These configurations are now part of androidTarget instead of separate android {} block
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        }
     }
 
     jvm("desktop")
@@ -61,4 +62,7 @@ kotlin {
         val wasmJsMain by getting
     }
 }
+
+// Note: AGP 9 uses androidLibrary {} inside kotlin {} block for shared modules
+// Traditional android {} block only used in separate Android app entry point modules
 
