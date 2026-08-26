@@ -11,7 +11,7 @@ kotlin {
     androidLibrary {
         // AGP 9: Android library configuration
         namespace = "com.greenrobotdev.linklibrary.utils"
-        compileSdk = 36
+        compileSdk = 37
 
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
@@ -21,7 +21,6 @@ kotlin {
     jvm("desktop")
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach {
@@ -75,7 +74,6 @@ kotlin {
             }
         }
 
-        val iosX64Main by getting { dependsOn(iosMain) }
         val iosArm64Main by getting { dependsOn(iosMain) }
         val iosSimulatorArm64Main by getting { dependsOn(iosMain) }
 

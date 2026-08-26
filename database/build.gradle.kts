@@ -10,7 +10,7 @@ kotlin {
     androidLibrary {
         // AGP 9: Android library configuration
         namespace = "com.greenrobotdev.linklibrary.database"
-        compileSdk = 36
+        compileSdk = 37
 
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)

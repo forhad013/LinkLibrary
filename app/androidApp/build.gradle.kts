@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.greenrobotdev.linklibrary.android"
-    compileSdk = 36
+    compileSdk = 37
     defaultConfig {
         applicationId = "com.greenrobotdev.linklibrary.android"
         minSdk = 28
