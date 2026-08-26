@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.kotlinAndroid)
+    // Note: kotlinAndroid plugin removed - AGP 9 provides built-in Kotlin support
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsCompose)
 }
@@ -37,9 +37,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+
+    // Note: kotlinOptions removed - Kotlin compiler options now configured differently in AGP 9
+    // Use tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> for compiler options if needed
 }
 
 dependencies {
