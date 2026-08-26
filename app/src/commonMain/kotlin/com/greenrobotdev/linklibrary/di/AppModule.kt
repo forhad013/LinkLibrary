@@ -1,6 +1,6 @@
 package com.greenrobotdev.linklibrary.di
 
-import com.greenrobotdev.linklibrary.data.MetadataFetchService
+import com.greenrobotdev.linklibrary.bookmarks.service.MetadataFetchService
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel

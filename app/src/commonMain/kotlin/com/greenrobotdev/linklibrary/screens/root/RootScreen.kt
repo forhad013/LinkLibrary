@@ -28,7 +28,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.greenrobotdev.linklibrary.model.SharedContent
+import com.greenrobotdev.linklibrary.bookmarks.model.SharedContent
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.addCollection.AddCollectionScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen

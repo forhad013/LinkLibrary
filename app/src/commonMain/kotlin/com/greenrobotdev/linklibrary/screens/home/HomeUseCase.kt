@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.greenrobotdev.linklibrary.database.repository.LinkRepository
-import com.greenrobotdev.linklibrary.model.toDomain
+import com.greenrobotdev.linklibrary.bookmarks.model.toDomain
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.ExperimentalTime
 
