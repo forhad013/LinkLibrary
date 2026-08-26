@@ -1,8 +1,11 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.android.library")
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -21,15 +24,9 @@ kotlin {
         }
     }
 
-    js("wasm") {
-        browser {
-            commonWebpackConfig {
-                cssSupport {
-                    enabled.set(true)
-                }
-            }
-            binaries.executable()
-        }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
     }
 
     sourceSets {
@@ -56,15 +53,9 @@ kotlin {
                 // Kotlinx DateTime
                 implementation(libs.kotlinx.datetime)
 
-                // Molecule
-                implementation(libs.molecule.runtime)
-
                 // Navigation 3
                 implementation(libs.navigation3.ui)
                 implementation(libs.lifecycle.viewmodel.navigation3)
-
-                // Database module
-                implementation(project(":database"))
 
                 // Design module (Material 3 theme and components)
                 implementation(project(":core:design"))
@@ -82,37 +73,34 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                // Database module for Android
+                // Database module (only for targets that support it)
                 implementation(project(":database"))
                 // Ktor HTTP client engine for Android
                 implementation(libs.ktor.client.okhttp)
+                // Molecule for Android
+                implementation(libs.molecule.runtime)
             }
         }
 
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                // Database module for JVM/Desktop
+                // Database module (only for targets that support it)
                 implementation(project(":database"))
                 // Ktor HTTP client engine for JVM
                 implementation(libs.ktor.client.java)
+                // Molecule for JVM
+                implementation(libs.molecule.runtime)
             }
         }
 
-        val wasmMain by getting {
+        val wasmJsMain by getting {
             dependencies {
-                implementation(compose.html.core)
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material3)
                 implementation(compose.ui)
                 implementation(compose.materialIconsExtended)
-            }
-        }
-
-        val wasmTest by getting {
-            dependencies {
-                implementation(kotlin("test-js"))
             }
         }
     }
@@ -140,9 +128,4 @@ android {
     }
 }
 
-// Enable incremental compilation optimization
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    compilerOptions {
-        freeCompilerArgs.add("-Xinline-optimizations")
-    }
-}
+// Note: -Xinline-optimizations flag removed as it's not supported in Kotlin 2.1.0
