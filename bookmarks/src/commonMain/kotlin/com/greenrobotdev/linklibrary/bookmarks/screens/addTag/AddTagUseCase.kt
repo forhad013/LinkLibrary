@@ -5,8 +5,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.greenrobotdev.linklibrary.database.repository.TagRepository
-import com.greenrobotdev.linklibrary.model.toEntity
-import com.greenrobotdev.linklibrary.model.Tag
+import com.greenrobotdev.linklibrary.bookmarks.model.toEntity
+import com.greenrobotdev.linklibrary.bookmarks.model.Tag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlin.uuid.ExperimentalUuidApi

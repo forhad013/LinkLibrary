@@ -1,7 +1,7 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add
 
 import androidx.compose.runtime.Composable
-import com.greenrobotdev.linklibrary.data.MetadataFetchService
+import com.greenrobotdev.linklibrary.bookmarks.service.MetadataFetchService
 import com.greenrobotdev.linklibrary.database.repository.CollectionRepository
 import com.greenrobotdev.linklibrary.database.repository.LinkRepository
 import com.greenrobotdev.linklibrary.database.repository.TagRepository

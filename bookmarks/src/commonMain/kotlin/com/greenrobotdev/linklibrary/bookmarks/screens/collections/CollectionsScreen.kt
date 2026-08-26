@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.collections
 
+import com.greenrobotdev.linklibrary.bookmarks.model.Collection
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.greenrobotdev.linklibrary.model.Link
+import com.greenrobotdev.linklibrary.bookmarks.model.Link
 import kotlinx.coroutines.delay
 
 /**

@@ -61,6 +61,9 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
+import com.greenrobotdev.linklibrary.design.components.button.AutoFetchButton
+import com.greenrobotdev.linklibrary.bookmarks.model.Collection
+import com.greenrobotdev.linklibrary.bookmarks.model.Tag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -305,12 +308,12 @@ fun AddLinkScreen(
                         ) {
                             // Selected tags
                             state.selectedTags.forEach { tagId ->
-                                val tag = state.availableTags.find { it.id == tagId }
-                                tag?.let {
+                                val tag = state.availableTags.find { availableTag -> availableTag.id == tagId }
+                                tag?.let { foundTag ->
                                     InputChip(
                                         selected = true,
                                         onClick = { viewModel.take(AddLinkEvent.ToggleTag(tagId)) },
-                                        label = { Text(tag.name) },
+                                        label = { Text(foundTag.name) },
                                         avatar = {
                                             Icon(
                                                 Icons.Default.Close,
@@ -330,7 +333,7 @@ fun AddLinkScreen(
 
                             // Available tags
                             state.availableTags
-                                .filter { !state.selectedTags.contains(it.id) }
+                                .filter { availableTag -> !state.selectedTags.contains(availableTag.id) }
                                 .take(3)
                                 .forEach { tag ->
                                     FilterChip(
@@ -537,7 +540,7 @@ private fun Divider() {
 
 @Composable
 private fun CollectionSelector(
-    collections: List<com.greenrobotdev.linklibrary.screens.collections.Collection>,
+    collections: List<Collection>,
     selectedCollections: Set<String>,
     onCollectionToggle: (String) -> Unit,
     onClearAllCollections: () -> Unit = {},
@@ -551,11 +554,11 @@ private fun CollectionSelector(
     println("whkq63 collections size: ${collections.size}")
 
     // Get all selected collections and display them as comma-separated list
-    val selectedCollectionsList = collections.filter { selectedCollections.contains(it.id) }
+    val selectedCollectionsList = collections.filter { collection -> selectedCollections.contains(collection.id) }
     val displayText = if (selectedCollectionsList.isEmpty()) {
         "Select collections"
     } else {
-        selectedCollectionsList.joinToString(", ") { it.name }
+        selectedCollectionsList.joinToString(", ") { collection -> collection.name }
     }
 
     Column {

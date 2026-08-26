@@ -1,9 +1,9 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add
 
-import com.greenrobotdev.linklibrary.data.LinkMetadata
-import com.greenrobotdev.linklibrary.model.Link
-import com.greenrobotdev.linklibrary.model.Collection
-import com.greenrobotdev.linklibrary.model.Tag
+import com.greenrobotdev.linklibrary.bookmarks.service.LinkMetadata
+import com.greenrobotdev.linklibrary.bookmarks.model.Link
+import com.greenrobotdev.linklibrary.bookmarks.model.Collection
+import com.greenrobotdev.linklibrary.bookmarks.model.Tag
 import kotlinx.serialization.Serializable
 
 @Serializable

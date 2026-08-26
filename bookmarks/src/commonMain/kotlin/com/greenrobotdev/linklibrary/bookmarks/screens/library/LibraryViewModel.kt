@@ -9,8 +9,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.greenrobotdev.linklibrary.utils.MoleculeViewModel
 import com.greenrobotdev.linklibrary.database.repository.LinkRepository
-import com.greenrobotdev.linklibrary.model.Link
-import com.greenrobotdev.linklibrary.model.toDomain
+import com.greenrobotdev.linklibrary.bookmarks.model.Link
+import com.greenrobotdev.linklibrary.bookmarks.model.toDomain
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

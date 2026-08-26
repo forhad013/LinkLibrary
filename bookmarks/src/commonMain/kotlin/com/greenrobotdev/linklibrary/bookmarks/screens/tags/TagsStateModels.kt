@@ -1,6 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.tags
 
-import com.greenrobotdev.linklibrary.model.Tag
+import com.greenrobotdev.linklibrary.bookmarks.model.Tag
 import kotlinx.serialization.Serializable
 
 /**

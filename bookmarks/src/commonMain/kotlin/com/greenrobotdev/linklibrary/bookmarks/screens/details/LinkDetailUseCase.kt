@@ -5,7 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.greenrobotdev.linklibrary.database.repository.LinkRepository
-import com.greenrobotdev.linklibrary.model.toDomain
+import com.greenrobotdev.linklibrary.bookmarks.model.toDomain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart

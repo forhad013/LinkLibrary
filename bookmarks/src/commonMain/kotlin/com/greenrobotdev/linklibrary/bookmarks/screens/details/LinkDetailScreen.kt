@@ -60,7 +60,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
-import com.greenrobotdev.linklibrary.screens.share.ShareDialog
+// TODO: ShareDialog temporarily disabled - needs to be moved to bookmarks module or refactored
+// import com.greenrobotdev.linklibrary.screens.share.ShareDialog
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -78,7 +79,8 @@ fun LinkDetailScreen(
     val state by viewModel.models.collectAsState()
 
     var showDeleteDialog by remember { mutableStateOf(false) }
-    var showShareDialog by remember { mutableStateOf(false) }
+    // TODO: Share functionality temporarily disabled
+    // var showShareDialog by remember { mutableStateOf(false) }
 
     // Navigate back after successful deletion
     LaunchedEffect(state.isDeleted) {
@@ -158,6 +160,8 @@ fun LinkDetailScreen(
                         Text("Edit")
                     }
 
+                    // TODO: Share functionality temporarily disabled
+                    /*
                     OutlinedButton(
                         onClick = { showShareDialog = true }
                     ) {
@@ -169,6 +173,7 @@ fun LinkDetailScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Share")
                     }
+                    */
 
                     Button(
                         onClick = { /* Open link */ },
@@ -696,7 +701,8 @@ fun LinkDetailScreen(
         )
     }
 
-    // Share dialog
+    // Share dialog - TODO: temporarily disabled
+    /*
     if (showShareDialog) {
         ShareDialog(
             routeKey = routeKey,
@@ -704,6 +710,7 @@ fun LinkDetailScreen(
             onDismiss = { showShareDialog = false }
         )
     }
+    */
 }
 
 @OptIn(ExperimentalTime::class)

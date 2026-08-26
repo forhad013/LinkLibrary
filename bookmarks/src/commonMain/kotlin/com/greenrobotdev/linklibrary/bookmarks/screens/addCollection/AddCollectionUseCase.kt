@@ -5,7 +5,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.greenrobotdev.linklibrary.database.repository.CollectionRepository
-import com.greenrobotdev.linklibrary.model.toEntity
+import com.greenrobotdev.linklibrary.bookmarks.model.Collection
+import com.greenrobotdev.linklibrary.bookmarks.model.toEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import org.koin.compose.koinInject
@@ -48,7 +49,7 @@ fun AddCollectionPresenter(
                         state.value = state.value.copy(isLoading = true, error = null)
                         try {
                             // Create the collection entity
-                            val collection = com.greenrobotdev.linklibrary.screens.collections.Collection(
+                            val collection = Collection(
                                 id = Uuid.random().toString(),
                                 name = state.value.name,
                                 description = state.value.description,

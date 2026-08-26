@@ -37,8 +37,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.greenrobotdev.linklibrary.model.Collection
-import com.greenrobotdev.linklibrary.model.Tag
+import com.greenrobotdev.linklibrary.bookmarks.model.Collection
+import com.greenrobotdev.linklibrary.bookmarks.model.Tag
 
 /**
  * Tag selection component with filter chips

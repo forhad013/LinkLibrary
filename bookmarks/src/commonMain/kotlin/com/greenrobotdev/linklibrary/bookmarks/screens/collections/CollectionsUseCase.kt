@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.greenrobotdev.linklibrary.database.repository.CollectionRepository
-import com.greenrobotdev.linklibrary.model.toCollection
+import com.greenrobotdev.linklibrary.bookmarks.model.toCollection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import org.koin.compose.koinInject
