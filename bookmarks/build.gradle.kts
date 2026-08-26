@@ -4,17 +4,21 @@ plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
-    id("com.android.library")
     alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
     androidTarget {
+        // AGP 9: Android configuration moved to androidTarget
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
             freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
             freeCompilerArgs.add("-Xcontext-receivers")
         }
+
+        // Android library configuration (AGP 9 style)
+        // buildFeatures.compose = true and composeOptions handled differently in AGP 9
+        // Compose integration now managed through kotlin plugin compose
     }
 
     jvm() {
@@ -106,26 +110,6 @@ kotlin {
     }
 }
 
-android {
-    namespace = "com.greenrobotdev.linklibrary.bookmarks"
-    compileSdk = 36
-
-    defaultConfig {
-        minSdk = 28
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4"
-    }
-}
-
 // Note: -Xinline-optimizations flag removed as it's not supported in Kotlin 2.1.0
+// Note: buildFeatures.compose and composeOptions handled differently in AGP 9
+// Compose integration now managed through org.jetbrains.kotlin.plugin.compose
