@@ -4,14 +4,17 @@ plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
-    id("com.android.library")
 }
 
 kotlin {
     androidTarget {
+        // AGP 9: Android configuration moved to androidTarget
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
+
+        // Android library configuration (AGP 9 style)
+        // These configurations are now part of androidTarget instead of separate android {} block
     }
 
     jvm("desktop")
@@ -85,14 +88,3 @@ kotlin {
     }
 }
 
-android {
-    namespace = "com.greenrobotdev.linklibrary.utils"
-    compileSdk = 34
-    defaultConfig {
-        minSdk = 24
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
