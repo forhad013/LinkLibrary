@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
@@ -25,7 +27,7 @@ kotlin {
         }
     }
 
-    @OptIn(org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl::class)
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
     }
@@ -36,11 +38,11 @@ kotlin {
                 // Compose
                 implementation(compose.runtime)
 
-                // Molecule
-                implementation(libs.molecule.runtime)
-
                 // KotlinX Coroutines
                 implementation(libs.kotlinx.coroutines.core)
+
+                // Note: Molecule runtime is platform-specific and added to androidMain, desktopMain, iosMain
+                // It is not available for WASM
             }
         }
 
@@ -48,24 +50,36 @@ kotlin {
             dependencies {
                 // AndroidX Lifecycle ViewModel for Android
                 implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
+                // Molecule Runtime for Android
+                implementation(libs.molecule.runtime)
             }
         }
 
         val desktopMain by getting {
             dependencies {
-                // Lifecycle ViewModel for Desktop
-                implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-desktop:1.0.0")
+                // AndroidX Lifecycle ViewModel for Desktop
+                implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
+                // Molecule Runtime for Desktop
+                implementation(libs.molecule.runtime)
             }
         }
 
-        val iosX64Main by getting
-        val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
+        val iosMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                // Molecule Runtime for iOS
+                implementation(libs.molecule.runtime)
+            }
+        }
+
+        val iosX64Main by getting { dependsOn(iosMain) }
+        val iosArm64Main by getting { dependsOn(iosMain) }
+        val iosSimulatorArm64Main by getting { dependsOn(iosMain) }
 
         val wasmJsMain by getting {
             dependencies {
-                // ViewModel stub/alternative for WASM
-                // Note: Full AndroidX ViewModel not available for WASM yet
+                // Note: Molecule runtime not available for WASM
+                // WASM targets cannot use MoleculeViewModel
             }
         }
     }
@@ -78,7 +92,7 @@ android {
         minSdk = 24
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
