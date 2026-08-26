@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.androidx.room)
     alias(libs.plugins.ksp)
@@ -8,9 +7,13 @@ plugins {
 
 kotlin {
     androidTarget {
+        // AGP 9: Android configuration moved to androidTarget
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
+
+        // Android library configuration (AGP 9 style)
+        // These configurations are now part of androidTarget instead of separate android {} block
     }
     jvm() // Add JVM target to enable expect/actual
 
@@ -80,16 +83,3 @@ ksp {
     arg("room.useKspKotlinCodegen", "true")
 }
 
-android {
-    namespace = "com.greenrobotdev.linklibrary.database"
-    compileSdk = 36
-
-    defaultConfig {
-        minSdk = 28
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
