@@ -44,6 +44,8 @@ android {
 
 dependencies {
     implementation(project(":app"))
+    implementation(project(":bookmarks"))
+    implementation(project(":core:design"))
     implementation(project(":database"))
     implementation(libs.koin.android)
     implementation(libs.koin.core)
