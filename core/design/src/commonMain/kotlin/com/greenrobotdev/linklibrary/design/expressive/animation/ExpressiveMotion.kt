@@ -1,10 +1,10 @@
 package com.greenrobotdev.linklibrary.design.expressive.animation
 
-import androidx.compose.animation.AnimationSpec
 import androidx.compose.animation.core.AnimationVector
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FloatAnimationSpec
 import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -85,25 +85,25 @@ object DurationTokens {
  */
 object SpringPhysics {
     /** Default spring for component interactions - balanced and natural */
-    fun defaultSpring() = spring(
+    fun defaultSpring(): SpringSpec<Float> = spring(
         dampingRatio = 0.8f,  // Slightly underdamped for natural feel
         stiffness = 400f      // Medium stiffness for responsive but smooth motion
     )
 
     /** Bouncy spring for playful interactions (FAB, success states) */
-    fun bouncySpring() = spring(
+    fun bouncySpring(): SpringSpec<Float> = spring(
         dampingRatio = 0.6f,  // More underdamped for bounce
         stiffness = 350f      // Lower stiffness for more bounce
     )
 
     /** Stiff spring for precise, snappy interactions (switches, sliders) */
-    fun stiffSpring() = spring(
+    fun stiffSpring(): SpringSpec<Float> = spring(
         dampingRatio = 0.9f,  // Near critical damping
         stiffness = 600f      // Higher stiffness for quick response
     )
 
     /** Gentle spring for subtle animations (fade, elevation changes) */
-    fun gentleSpring() = spring(
+    fun gentleSpring(): SpringSpec<Float> = spring(
         dampingRatio = 0.85f,
         stiffness = 300f      // Lower stiffness for gentle motion
     )
@@ -115,31 +115,31 @@ object SpringPhysics {
  */
 object AnimationSpecs {
     /** Emphasized enter animation */
-    fun emphasizedEnter(): FloatAnimationSpec = tween(
+    fun emphasizedEnter(): FloatAnimationSpec = TweenSpec(
         durationMillis = DurationTokens.EmphasizedDecelerate,
         easing = EasingCurves.EmphasizedDecelerate
     )
 
     /** Emphasized exit animation */
-    fun emphasizedExit(): FloatAnimationSpec = tween(
+    fun emphasizedExit(): FloatAnimationSpec = TweenSpec(
         durationMillis = DurationTokens.EmphasizedAccelerate,
         easing = EasingCurves.EmphasizedAccelerate
     )
 
     /** Standard utility animation */
-    fun standard(): FloatAnimationSpec = tween(
+    fun standard(): FloatAnimationSpec = TweenSpec(
         durationMillis = DurationTokens.Standard,
         easing = EasingCurves.Standard
     )
 
     /** Short micro-interaction animation */
-    fun short(): FloatAnimationSpec = tween(
+    fun short(): FloatAnimationSpec = TweenSpec(
         durationMillis = DurationTokens.Short,
         easing = EasingCurves.Standard
     )
 
     /** Medium component interaction animation */
-    fun medium(): FloatAnimationSpec = tween(
+    fun medium(): FloatAnimationSpec = TweenSpec(
         durationMillis = DurationTokens.Medium,
         easing = EasingCurves.Emphasized
     )
@@ -158,7 +158,10 @@ fun rememberAccessibleAnimationSpec(
     return remember(accessibilityManager) {
         // Use instant or very fast animation when motion reduction is enabled
         if (accessibilityManager != null) {
-            tween(durationMillis = 50, easing = EasingCurves.StandardDecelerate)
+            TweenSpec(
+                durationMillis = 50,
+                easing = EasingCurves.StandardDecelerate
+            )
         } else {
             defaultSpec
         }
