@@ -77,7 +77,7 @@ fun Modifier.expressiveClickable(
 @Composable
 fun Modifier.bouncyRipple(
     interactionSource: MutableInteractionSource,
-    radius: androidx.compose.ui.unit.Dp = androidx.compose.ui.unit.dp(40)
+    radius: androidx.compose.ui.unit.Dp = 40.dp
 ): Modifier {
     return indication(
         interactionSource = interactionSource,
@@ -98,7 +98,7 @@ fun Modifier.bouncyRipple(
 @Composable
 fun Modifier.subtleRipple(
     interactionSource: MutableInteractionSource,
-    radius: androidx.compose.ui.unit.Dp = androidx.compose.ui.unit.dp(24)
+    radius: androidx.compose.ui.unit.Dp = 24.dp
 ): Modifier {
     return indication(
         interactionSource = interactionSource,

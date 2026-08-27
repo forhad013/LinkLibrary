@@ -46,7 +46,7 @@ fun AppIcon(
     Icon(
         imageVector = imageVector,
         contentDescription = contentDescription,
-        modifier = modifier.size(size.dp),
+        modifier = modifier.then(androidx.compose.ui.draw.size(size.dp)),
         tint = tint
     )
 }

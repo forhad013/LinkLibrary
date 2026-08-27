@@ -77,7 +77,7 @@ fun calculateTargetElevation(
 @Composable
 fun animateElevation(
     targetElevation: Dp,
-    animationSpec: AnimationSpec<Dp> = SpringPhysics.defaultSpring()
+    animationSpec: AnimationSpec<Dp> = tween(durationMillis = 300)
 ): Dp {
     val elevation by animateDpAsState(
         targetValue = targetElevation,
@@ -118,7 +118,7 @@ fun animateElevationTween(
 fun animateElevationColor(
     surfaceColor: Color,
     elevation: Dp,
-    animationSpec: AnimationSpec<Color> = SpringPhysics.defaultSpring()
+    animationSpec: AnimationSpec<Color> = tween(durationMillis = 300)
 ): Color {
     // Calculate tonal offset based on elevation
     val tonalOffset = when (elevation) {

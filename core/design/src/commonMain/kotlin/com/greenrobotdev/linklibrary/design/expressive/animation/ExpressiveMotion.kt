@@ -1,17 +1,8 @@
 package com.greenrobotdev.linklibrary.design.expressive.animation
 
-import androidx.compose.animation.AnimationSpec
-import androidx.compose.animation.core.AnimationVector
 import androidx.compose.animation.core.CubicBezierEasing
-import androidx.compose.animation.core.FloatAnimationSpec
 import androidx.compose.animation.core.SpringSpec
-import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalAccessibilityManager
-import kotlin.math.max
 
 /**
  * Material Design 3 Expressive Motion System
@@ -110,80 +101,4 @@ object SpringPhysics {
     )
 }
 
-/**
- * Animation specs following Material 3 guidelines
- * Combines easing curves with durations for transition animations
- */
-object AnimationSpecs {
-    /** Emphasized enter animation */
-    fun emphasizedEnter(): FloatAnimationSpec = TweenSpec(
-        durationMillis = DurationTokens.EmphasizedDecelerate,
-        easing = EasingCurves.EmphasizedDecelerate
-    )
-
-    /** Emphasized exit animation */
-    fun emphasizedExit(): FloatAnimationSpec = TweenSpec(
-        durationMillis = DurationTokens.EmphasizedAccelerate,
-        easing = EasingCurves.EmphasizedAccelerate
-    )
-
-    /** Standard utility animation */
-    fun standard(): FloatAnimationSpec = TweenSpec(
-        durationMillis = DurationTokens.Standard,
-        easing = EasingCurves.Standard
-    )
-
-    /** Short micro-interaction animation */
-    fun short(): FloatAnimationSpec = TweenSpec(
-        durationMillis = DurationTokens.Short,
-        easing = EasingCurves.Standard
-    )
-
-    /** Medium component interaction animation */
-    fun medium(): FloatAnimationSpec = TweenSpec(
-        durationMillis = DurationTokens.Medium,
-        easing = EasingCurves.Emphasized
-    )
-}
-
-/**
- * Remember animation spec with accessibility support
- * Reduces motion duration when user prefers reduced animation
- */
-@Composable
-fun rememberAccessibleAnimationSpec(
-    defaultSpec: FloatAnimationSpec
-): FloatAnimationSpec {
-    val accessibilityManager = LocalAccessibilityManager.current
-
-    return remember(accessibilityManager) {
-        // Use instant or very fast animation when motion reduction is enabled
-        if (accessibilityManager != null) {
-            TweenSpec(
-                durationMillis = 50,
-                easing = EasingCurves.StandardDecelerate
-            )
-        } else {
-            defaultSpec
-        }
-    }
-}
-
-/**
- * Material 3 Expressive motion configuration
- * Provides convenient access to spring physics and animation specs
- */
-object ExpressiveMotion {
-    // Spring specs for component state changes
-    fun defaultSpring() = SpringPhysics.defaultSpring()
-    fun bouncySpring() = SpringPhysics.bouncySpring()
-    fun stiffSpring() = SpringPhysics.stiffSpring()
-    fun gentleSpring() = SpringPhysics.gentleSpring()
-
-    // Pre-configured animation specs
-    fun enter() = AnimationSpecs.emphasizedEnter()
-    fun exit() = AnimationSpecs.emphasizedExit()
-    fun standard() = AnimationSpecs.standard()
-    fun short() = AnimationSpecs.short()
-    fun medium() = AnimationSpecs.medium()
-}
+/** Stiff spring for precise, snappy interactions (switches, sliders) */

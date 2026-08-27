@@ -130,7 +130,7 @@ fun PrimaryFilledCard(
     // Expressive: Primary color transitions
     val animatedBackgroundColor by animateColorAsState(
         targetValue = backgroundColor,
-        animationSpec = SpringPhysics.bouncySpring(),
+        animationSpec = tween(durationMillis = 300),
         label = "primary_filled_card_background"
     )
 
