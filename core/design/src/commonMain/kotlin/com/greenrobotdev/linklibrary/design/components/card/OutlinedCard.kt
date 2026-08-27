@@ -1,21 +1,32 @@
 package com.greenrobotdev.linklibrary.design.components.card
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.greenrobotdev.linklibrary.design.expressive.animation.SpringPhysics
 
 /**
- * Outlined card component with Material 3 styling
+ * Outlined card component with Material 3 Expressive features
  *
- * Card with outlined border appearance. Low-emphasis container for
- * content with minimal visual weight.
+ * Card with outlined border and enhanced animations:
+ * - Press scale effect (0.98x when pressed)
+ * - Border color transitions
+ * - Background color fill on hover/press
+ * - Smooth visual feedback
  *
  * @param modifier Modifier to be applied to the card
  * @param shape Shape to be applied to the card. Defaults to theme's medium shape
@@ -37,14 +48,43 @@ fun OutlinedCard(
     onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Expressive: Press scale effect
+    val scale by animateFloatAsState(
+        targetValue = if (onClick != null && isPressed) 0.98f else 1f,
+        animationSpec = SpringPhysics.gentleSpring(),
+        label = "outlined_card_scale"
+    )
+
+    // Expressive: Border color transitions
+    val animatedBorderColor by animateColorAsState(
+        targetValue = borderColor,
+        animationSpec = SpringPhysics.gentleSpring(),
+        label = "outlined_card_border"
+    )
+
+    // Expressive: Background fill on interaction
+    val animatedBackgroundColor by animateColorAsState(
+        targetValue = if (onClick != null && isPressed) {
+            MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.5f)
+        } else {
+            backgroundColor
+        },
+        animationSpec = SpringPhysics.gentleSpring(),
+        label = "outlined_card_background"
+    )
+
     if (onClick != null) {
         Card(
             onClick = onClick,
-            modifier = modifier,
+            modifier = modifier.scale(scale),
             shape = shape,
-            border = BorderStroke(borderWidth, borderColor),
+            border = BorderStroke(borderWidth, animatedBorderColor),
+            interactionSource = interactionSource,
             colors = CardDefaults.cardColors(
-                containerColor = backgroundColor,
+                containerColor = animatedBackgroundColor,
                 contentColor = contentColor,
                 disabledContainerColor = backgroundColor,
                 disabledContentColor = contentColor.copy(alpha = 0.38f)
@@ -57,9 +97,9 @@ fun OutlinedCard(
         Card(
             modifier = modifier,
             shape = shape,
-            border = BorderStroke(borderWidth, borderColor),
+            border = BorderStroke(borderWidth, animatedBorderColor),
             colors = CardDefaults.cardColors(
-                containerColor = backgroundColor,
+                containerColor = animatedBackgroundColor,
                 contentColor = contentColor,
                 disabledContainerColor = backgroundColor,
                 disabledContentColor = contentColor.copy(alpha = 0.38f)
@@ -72,7 +112,12 @@ fun OutlinedCard(
 }
 
 /**
- * Simple outlined card - basic variant without click handling
+ * Simple outlined card - basic variant with expressive features
+ *
+ * Non-interactive outlined card with smooth animations:
+ * - Border color transitions
+ * - Smooth background color changes
+ * - Visual polish
  *
  * @param modifier Modifier to be applied to the card
  * @param shape Shape to be applied to the card. Defaults to theme's medium shape
@@ -92,12 +137,26 @@ fun SimpleOutlinedCard(
     borderWidth: Dp = 1.dp,
     content: @Composable () -> Unit
 ) {
+    // Expressive: Smooth border color animation
+    val animatedBorderColor by animateColorAsState(
+        targetValue = borderColor,
+        animationSpec = SpringPhysics.gentleSpring(),
+        label = "simple_outlined_card_border"
+    )
+
+    // Expressive: Smooth background color animation
+    val animatedBackgroundColor by animateColorAsState(
+        targetValue = backgroundColor,
+        animationSpec = SpringPhysics.gentleSpring(),
+        label = "simple_outlined_card_background"
+    )
+
     Card(
         modifier = modifier,
         shape = shape,
-        border = BorderStroke(borderWidth, borderColor),
+        border = BorderStroke(borderWidth, animatedBorderColor),
         colors = CardDefaults.cardColors(
-            containerColor = backgroundColor,
+            containerColor = animatedBackgroundColor,
             contentColor = contentColor,
             disabledContainerColor = backgroundColor,
             disabledContentColor = contentColor.copy(alpha = 0.38f)

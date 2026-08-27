@@ -1,19 +1,30 @@
 package com.greenrobotdev.linklibrary.design.components.card
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
+import com.greenrobotdev.linklibrary.design.expressive.animation.SpringPhysics
 
 /**
- * Filled card component with Material 3 styling
+ * Filled card component with Material 3 Expressive features
  *
- * Card with filled background appearance. High-emphasis container for
- * important content with strong visual presence.
+ * Card with filled background and enhanced animations:
+ * - Press scale effect (0.98x when pressed)
+ * - Subtle background color transitions
+ * - Smooth visual feedback
+ * - Enhanced ripple effects
  *
  * @param modifier Modifier to be applied to the card
  * @param shape Shape to be applied to the card. Defaults to theme's medium shape
@@ -31,13 +42,31 @@ fun FilledCard(
     onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Expressive: Press scale effect
+    val scale by animateFloatAsState(
+        targetValue = if (onClick != null && isPressed) 0.98f else 1f,
+        animationSpec = SpringPhysics.gentleSpring(),
+        label = "filled_card_scale"
+    )
+
+    // Expressive: Background color transition
+    val animatedBackgroundColor by animateColorAsState(
+        targetValue = backgroundColor,
+        animationSpec = SpringPhysics.gentleSpring(),
+        label = "filled_card_background"
+    )
+
     if (onClick != null) {
         Card(
             onClick = onClick,
-            modifier = modifier,
+            modifier = modifier.scale(scale),
             shape = shape,
+            interactionSource = interactionSource,
             colors = CardDefaults.cardColors(
-                containerColor = backgroundColor,
+                containerColor = animatedBackgroundColor,
                 contentColor = contentColor,
                 disabledContainerColor = backgroundColor,
                 disabledContentColor = contentColor
@@ -51,7 +80,7 @@ fun FilledCard(
             modifier = modifier,
             shape = shape,
             colors = CardDefaults.cardColors(
-                containerColor = backgroundColor,
+                containerColor = animatedBackgroundColor,
                 contentColor = contentColor,
                 disabledContainerColor = backgroundColor,
                 disabledContentColor = contentColor
@@ -64,10 +93,13 @@ fun FilledCard(
 }
 
 /**
- * Filled card with primary color background
+ * Filled card with primary color background and expressive features
  *
- * High-emphasis card with theme primary color for special prominence.
- * Use sparingly for highly important content.
+ * High-emphasis card with primary color and enhanced animations:
+ * - Press scale effect with bouncy spring
+ * - Primary color transitions
+ * - Strong visual feedback
+ * - Enhanced interactive states
  *
  * @param modifier Modifier to be applied to the card
  * @param shape Shape to be applied to the card. Defaults to theme's medium shape
@@ -85,13 +117,31 @@ fun PrimaryFilledCard(
     onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Expressive: Press scale effect with bouncy spring for high-emphasis
+    val scale by animateFloatAsState(
+        targetValue = if (onClick != null && isPressed) 0.97f else 1f,
+        animationSpec = SpringPhysics.bouncySpring(),
+        label = "primary_filled_card_scale"
+    )
+
+    // Expressive: Primary color transitions
+    val animatedBackgroundColor by animateColorAsState(
+        targetValue = backgroundColor,
+        animationSpec = SpringPhysics.bouncySpring(),
+        label = "primary_filled_card_background"
+    )
+
     if (onClick != null) {
         Card(
             onClick = onClick,
-            modifier = modifier,
+            modifier = modifier.scale(scale),
             shape = shape,
+            interactionSource = interactionSource,
             colors = CardDefaults.cardColors(
-                containerColor = backgroundColor,
+                containerColor = animatedBackgroundColor,
                 contentColor = contentColor,
                 disabledContainerColor = backgroundColor.copy(alpha = 0.38f),
                 disabledContentColor = contentColor.copy(alpha = 0.38f)
@@ -105,7 +155,7 @@ fun PrimaryFilledCard(
             modifier = modifier,
             shape = shape,
             colors = CardDefaults.cardColors(
-                containerColor = backgroundColor,
+                containerColor = animatedBackgroundColor,
                 contentColor = contentColor,
                 disabledContainerColor = backgroundColor.copy(alpha = 0.38f),
                 disabledContentColor = contentColor.copy(alpha = 0.38f)
