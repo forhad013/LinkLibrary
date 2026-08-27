@@ -1,32 +1,71 @@
 package com.greenrobotdev.linklibrary.design.theme
 
+import androidx.compose.material3.Experimentalexpressive.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Experimentalexpressive.MotionScheme
+import androidx.compose.material3.Experimentalexpressive.MaterialExpressiveTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 /**
  * Material 3 Expressive Theme Configuration for KMP
  *
- * This theme uses standard MaterialTheme with enhanced custom animations:
- * - Custom spring-based motion physics
+ * This theme enables Material 3 Expressive features using the official KMP Expressive APIs:
+ * - Spring-based motion physics via motionScheme
  * - Enhanced ripple effects
  * - Dynamic color schemes
- * - Expressive component behaviors via custom implementations
+ * - Expressive component behaviors
+ *
+ * Based on Compose Multiplatform 1.9.0-alpha04 with Expressive support
  */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MaterialExpressiveAppTheme(
     modifier: Modifier = Modifier,
+    darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    MaterialTheme(
+    val colorScheme = if (darkTheme) {
+        darkColorScheme()
+    } else {
+        lightColorScheme()
+    }
+
+    MaterialExpressiveTheme(
         modifier = modifier,
+        colorScheme = colorScheme,
+        motionScheme = MotionScheme.default, // Use default expressive motion
         content = content
     )
 }
 
 /**
- * Surface with Material 3 Expressive features enabled
+ * Standard MaterialTheme wrapper for compatibility
+ */
+@Composable
+fun MaterialAppTheme(
+    modifier: Modifier = Modifier,
+    darkTheme: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    val colorScheme = if (darkTheme) {
+        darkColorScheme()
+    } else {
+        lightColorScheme()
+    }
+
+    MaterialTheme(
+        modifier = modifier,
+        colorScheme = colorScheme,
+        content = content
+    )
+}
+
+/**
+ * Surface with Material 3 standard features
  */
 @Composable
 fun ExpressiveSurface(
