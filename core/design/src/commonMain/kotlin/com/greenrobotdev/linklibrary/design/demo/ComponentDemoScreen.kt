@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.design.demo
 
+import androidx.compose.material3.Experimentalexpressive.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
+import com.greenrobotdev.linklibrary.design.theme.MaterialExpressiveAppTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -68,22 +70,24 @@ import com.greenrobotdev.linklibrary.design.foundation.text.AppText
  * Demo screen showcasing all implemented components from Phases 1-3
  * Use this to test and verify component behavior and appearance
  */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ComponentDemoScreen(onBack: () -> Unit = {}) {
-    var textFieldValue by remember { mutableStateOf("") }
-    var searchQuery by remember { mutableStateOf("") }
-    var textAreaValue by remember { mutableStateOf("") }
-    var checkedState by remember { mutableStateOf(false) }
-    var switchState by remember { mutableStateOf(true) }
-    var sliderValue by remember { mutableStateOf(0.5f) }
-    var selectedRadioOption by remember { mutableStateOf("Option 1") }
+    MaterialExpressiveAppTheme {
+        var textFieldValue by remember { mutableStateOf("") }
+        var searchQuery by remember { mutableStateOf("") }
+        var textAreaValue by remember { mutableStateOf("") }
+        var checkedState by remember { mutableStateOf(false) }
+        var switchState by remember { mutableStateOf(true) }
+        var sliderValue by remember { mutableStateOf(0.5f) }
+        var selectedRadioOption by remember { mutableStateOf("Option 1") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+        ) {
         AppText(
             text = "Component Library Demo",
             style = androidx.compose.material3.MaterialTheme.typography.headlineLarge
@@ -408,6 +412,7 @@ fun ComponentDemoScreen(onBack: () -> Unit = {}) {
             color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
             modifier = Modifier.fillMaxWidth()
         )
+        }
     }
 }
 

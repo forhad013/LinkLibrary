@@ -8,6 +8,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Experimentalexpressive.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +39,7 @@ import com.greenrobotdev.linklibrary.design.expressive.animation.SpringPhysics
  * @param onClick Optional click handler for interactive cards
  * @param content Content to be displayed inside the card
  */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun OutlinedCard(
     modifier: Modifier = Modifier,

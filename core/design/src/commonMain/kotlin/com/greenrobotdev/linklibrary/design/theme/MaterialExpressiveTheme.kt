@@ -1,12 +1,13 @@
 package com.greenrobotdev.linklibrary.design.theme
 
-import androidx.compose.material3.Experimentalexpressive.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Experimentalexpressive.MaterialExpressiveTheme
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 /**
  * Material 3 Expressive Theme Configuration for KMP
@@ -80,7 +81,7 @@ fun ExpressiveSurface(
  *
  * Based on Compose Multiplatform 1.9.0-alpha04 with Expressive support
  */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MaterialExpressiveAppTheme(
     modifier: Modifier = Modifier,
@@ -94,9 +95,8 @@ fun MaterialExpressiveAppTheme(
     }
 
     MaterialExpressiveTheme(
-        modifier = modifier,
         colorScheme = colorScheme,
-        motionScheme = MotionScheme.default, // Use default expressive motion
+        motionScheme = MaterialTheme.motionScheme, // Use default expressive motion
         content = content
     )
 }
@@ -117,7 +117,6 @@ fun MaterialAppTheme(
     }
 
     MaterialTheme(
-        modifier = modifier,
         colorScheme = colorScheme,
         content = content
     )
