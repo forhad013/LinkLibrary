@@ -27,6 +27,7 @@ private val config = SavedStateConfiguration {
             subclass(RootScreens.AddCollection::class, serializer<RootScreens.AddCollection>())
             subclass(RootScreens.Tags::class, serializer<RootScreens.Tags>())
             subclass(RootScreens.AddTag::class, serializer<RootScreens.AddTag>())
+            subclass(RootScreens.ComponentDemo::class, serializer<RootScreens.ComponentDemo>())
         }
     }
 }

@@ -60,7 +60,8 @@ private fun getIconForType(iconType: String): androidx.compose.ui.graphics.vecto
 fun SettingsScreen(
     routeKey: NavKey,
     onNavigateToSetting: (String) -> Unit = {},
-    onNavigateToAI: () -> Unit = {}
+    onNavigateToAI: () -> Unit = {},
+    onNavigateToComponentDemo: () -> Unit = {}
 ) {
     val viewModel: SettingsViewModel = viewModel(key = routeKey.toString()) {
         SettingsViewModel()
@@ -173,6 +174,13 @@ fun SettingsScreen(
                         icon = Icons.Default.AutoAwesome,
                         title = "AI Assistant Demo",
                         onClick = { onNavigateToAI() }
+                    )
+
+                    // Add Component Demo option
+                    SettingsItem(
+                        icon = Icons.Default.TextFields,
+                        title = "Component Demo",
+                        onClick = { onNavigateToComponentDemo() }
                     )
                 }
             }

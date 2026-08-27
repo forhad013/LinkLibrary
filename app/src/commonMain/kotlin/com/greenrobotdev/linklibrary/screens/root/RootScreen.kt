@@ -39,6 +39,7 @@ import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryScreen
 import com.greenrobotdev.linklibrary.screens.notes.NoteEditorScreen
 import com.greenrobotdev.linklibrary.screens.settings.SettingsScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreen
+import com.greenrobotdev.linklibrary.design.demo.ComponentDemoScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.serializer
@@ -54,6 +55,7 @@ private val config = SavedStateConfiguration {
             subclass(RootScreens.AddLink::class, serializer<RootScreens.AddLink>())
             subclass(RootScreens.AddCollection::class, serializer<RootScreens.AddCollection>())
             subclass(RootScreens.AIAssistantDemo::class, serializer<RootScreens.AIAssistantDemo>())
+            subclass(RootScreens.ComponentDemo::class, serializer<RootScreens.ComponentDemo>())
             subclass(RootScreens.Collections::class, serializer<RootScreens.Collections>())
             subclass(RootScreens.NoteEditor::class, serializer<RootScreens.NoteEditor>())
             subclass(RootScreens.Tags::class, serializer<RootScreens.Tags>())
@@ -103,7 +105,8 @@ fun RootScreen(
                        currentRoute !is RootScreens.AddCollection &&
                        currentRoute !is RootScreens.NoteEditor &&
                        currentRoute !is RootScreens.Tags &&
-                       currentRoute !is RootScreens.AddTag
+                       currentRoute !is RootScreens.AddTag &&
+                       currentRoute !is RootScreens.ComponentDemo
 
     Scaffold(
         modifier = Modifier
@@ -168,7 +171,8 @@ fun RootScreen(
                             // Settings Tab
                             is RootScreens.SettingsTab -> SettingsScreen(
                                 routeKey = route,
-                                onNavigateToAI = { navigator.navigate(RootScreens.AIAssistantDemo) }
+                                onNavigateToAI = { navigator.navigate(RootScreens.AIAssistantDemo) },
+                                onNavigateToComponentDemo = { navigator.navigate(RootScreens.ComponentDemo) }
                             )
 
                             // Detail Screens (shared across all tabs)
@@ -215,6 +219,11 @@ fun RootScreen(
 
                             is RootScreens.AddTag -> AddTagScreen(
                                 routeKey = route,
+                                onBack = { navigator.goBack() }
+                            )
+
+                            // Demo Screens
+                            is RootScreens.ComponentDemo -> ComponentDemoScreen(
                                 onBack = { navigator.goBack() }
                             )
 

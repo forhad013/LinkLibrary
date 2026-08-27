@@ -30,6 +30,9 @@ sealed class RootScreens : NavKey {
     data object AIAssistantDemo : RootScreens()
 
     @Serializable
+    data object ComponentDemo : RootScreens()
+
+    @Serializable
     data object Collections : RootScreens()
 
     // Note Editor

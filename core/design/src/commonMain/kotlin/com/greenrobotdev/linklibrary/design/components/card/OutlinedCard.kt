@@ -71,10 +71,7 @@ fun OutlinedCard(
 }
 
 /**
- * Outlined card with elevated hover state
- *
- * Outlined card that gains subtle elevation on hover for desktop platforms.
- * Provides tactile feedback for pointer interactions.
+ * Simple outlined card - basic variant without click handling
  *
  * @param modifier Modifier to be applied to the card
  * @param shape Shape to be applied to the card. Defaults to theme's medium shape
@@ -82,50 +79,20 @@ fun OutlinedCard(
  * @param contentColor Content color. Defaults to theme's onSurface color
  * @param borderColor Border color. Defaults to theme's outline variant color
  * @param borderWidth Border width. Defaults to 1dp
- * @param onClick Optional click handler for interactive cards
  * @param content Content to be displayed inside the card
  */
 @Composable
-fun OutlinedCardHover(
+fun SimpleOutlinedCard(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.medium,
     backgroundColor: Color = Color.Transparent,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     borderColor: Color = MaterialTheme.colorScheme.outlineVariant,
     borderWidth: Dp = 1.dp,
-    onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
-    var isHovered by remember { mutableStateOf(false) }
-
     Card(
-        onClick = onClick ?: {},
-        modifier = modifier
-            .then(
-                if (onClick != null) {
-                    Modifier.pointerInteropFilter(
-                        PointerInputPass.Initial,
-                        PointerInputPass.Initial
-                    ) { ptr ->
-                        ptr.handlePointerEvent(
-                            PointerEvent(
-                                list = listOf(
-                                    PointerItem(
-                                        pointerId = ptr.id,
-                                        position = ptr.position,
-                                        pressed = true,
-                                        pressedChanged = true
-                                    )
-                                )
-                            )
-                        )
-                        isHovered = true
-                        ptr.consume()
-                    }
-                } else {
-                    Modifier
-                }
-            ),
+        modifier = modifier,
         shape = shape,
         border = BorderStroke(borderWidth, borderColor),
         colors = CardDefaults.cardColors(
@@ -134,13 +101,7 @@ fun OutlinedCardHover(
             disabledContainerColor = backgroundColor,
             disabledContentColor = contentColor.copy(alpha = 0.38f)
         ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isHovered && onClick != null) {
-                androidx.compose.ui.unit.Dp(2.dp)
-            } else {
-                androidx.compose.ui.unit.Dp(0.dp)
-            }
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = androidx.compose.ui.unit.Dp(0.dp))
     ) {
         content()
     }
