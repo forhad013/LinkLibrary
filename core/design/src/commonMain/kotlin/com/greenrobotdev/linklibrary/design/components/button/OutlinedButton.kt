@@ -2,6 +2,7 @@ package com.greenrobotdev.linklibrary.design.components.button
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.padding
@@ -58,7 +59,7 @@ fun OutlinedButton(
         } else {
             MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
         },
-        animationSpec = SpringPhysics.gentleSpring(),
+        animationSpec = tween(durationMillis = 300),
         label = "outlined_button_border"
     )
 
@@ -123,7 +124,7 @@ fun DestructiveOutlinedButton(
         } else {
             MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
         },
-        animationSpec = SpringPhysics.gentleSpring(),
+        animationSpec = tween(durationMillis = 300),
         label = "destructive_button_color"
     )
 

@@ -2,6 +2,7 @@ package com.greenrobotdev.linklibrary.design.components.card
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.material3.Card
@@ -55,7 +56,7 @@ fun FilledCard(
     // Expressive: Background color transition
     val animatedBackgroundColor by animateColorAsState(
         targetValue = backgroundColor,
-        animationSpec = SpringPhysics.gentleSpring(),
+        animationSpec = tween(durationMillis = 300),
         label = "filled_card_background"
     )
 

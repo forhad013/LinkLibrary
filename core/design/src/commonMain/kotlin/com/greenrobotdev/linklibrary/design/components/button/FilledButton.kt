@@ -3,10 +3,9 @@ package com.greenrobotdev.linklibrary.design.components.button
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -17,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -61,7 +59,7 @@ fun FilledButton(
     // Expressive: Dynamic elevation animation
     val elevation by animateDpAsState(
         targetValue = if (isPressed) 8.dp else 0.dp,
-        animationSpec = SpringPhysics.gentleSpring(),
+        animationSpec = tween(durationMillis = 300),
         label = "button_elevation"
     )
 
@@ -72,7 +70,7 @@ fun FilledButton(
         } else {
             MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
         },
-        animationSpec = SpringPhysics.gentleSpring(),
+        animationSpec = tween(durationMillis = 300),
         label = "button_container_color"
     )
 
@@ -151,7 +149,7 @@ fun FilledButton(
             isPressed -> 8.dp  // Higher elevation when pressed
             else -> 0.dp  // Normal elevation
         },
-        animationSpec = SpringPhysics.gentleSpring(),
+        animationSpec = tween(durationMillis = 300),
         label = "button_elevation_loading"
     )
 

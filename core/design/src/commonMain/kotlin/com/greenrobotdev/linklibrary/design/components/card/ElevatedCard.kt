@@ -2,6 +2,7 @@ package com.greenrobotdev.linklibrary.design.components.card
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -64,7 +65,7 @@ fun ElevatedCard(
             onClick != null -> elevation + 2.dp  // Slight elevation when interactive
             else -> elevation
         },
-        animationSpec = SpringPhysics.gentleSpring(),
+        animationSpec = tween(durationMillis = 300),
         label = "elevated_card_elevation"
     )
 
@@ -152,7 +153,7 @@ fun ElevatedBorderedCard(
             onClick != null -> elevation + 2.dp
             else -> elevation
         },
-        animationSpec = SpringPhysics.gentleSpring(),
+        animationSpec = tween(durationMillis = 300),
         label = "bordered_card_elevation"
     )
 

@@ -2,6 +2,7 @@ package com.greenrobotdev.linklibrary.design.components.card
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -61,7 +62,7 @@ fun OutlinedCard(
     // Expressive: Border color transitions
     val animatedBorderColor by animateColorAsState(
         targetValue = borderColor,
-        animationSpec = SpringPhysics.gentleSpring(),
+        animationSpec = tween(durationMillis = 300),
         label = "outlined_card_border"
     )
 
@@ -72,7 +73,7 @@ fun OutlinedCard(
         } else {
             backgroundColor
         },
-        animationSpec = SpringPhysics.gentleSpring(),
+        animationSpec = tween(durationMillis = 300),
         label = "outlined_card_background"
     )
 
@@ -140,14 +141,14 @@ fun SimpleOutlinedCard(
     // Expressive: Smooth border color animation
     val animatedBorderColor by animateColorAsState(
         targetValue = borderColor,
-        animationSpec = SpringPhysics.gentleSpring(),
+        animationSpec = tween(durationMillis = 300),
         label = "simple_outlined_card_border"
     )
 
     // Expressive: Smooth background color animation
     val animatedBackgroundColor by animateColorAsState(
         targetValue = backgroundColor,
-        animationSpec = SpringPhysics.gentleSpring(),
+        animationSpec = tween(durationMillis = 300),
         label = "simple_outlined_card_background"
     )
 

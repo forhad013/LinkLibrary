@@ -6,12 +6,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.design.tokens.SpacingTokens
+import androidx.compose.ui.draw.size as drawSize
 
 /**
  * Icon size tokens following Material 3 guidelines
@@ -46,7 +46,7 @@ fun AppIcon(
     Icon(
         imageVector = imageVector,
         contentDescription = contentDescription,
-        modifier = modifier.then(androidx.compose.ui.draw.size(size.dp)),
+        modifier = modifier.then(drawSize(size.dp)),
         tint = tint
     )
 }
