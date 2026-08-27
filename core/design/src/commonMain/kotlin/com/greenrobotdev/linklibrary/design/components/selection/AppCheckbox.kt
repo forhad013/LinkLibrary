@@ -43,11 +43,10 @@ fun AppCheckbox(
                 colors = androidx.compose.material3.CheckboxDefaults.colors(
                     checkedColor = MaterialTheme.colorScheme.primary,
                     uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    checkedBorderColor = MaterialTheme.colorScheme.primary,
-                    uncheckedBorderColor = MaterialTheme.colorScheme.outline,
+                    checkmarkColor = MaterialTheme.colorScheme.onPrimary,
                     disabledCheckedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                     disabledUncheckedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                    disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                    disabledIndeterminateColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                 )
             )
             if (label.isNotEmpty()) {
@@ -72,11 +71,10 @@ fun AppCheckbox(
             colors = androidx.compose.material3.CheckboxDefaults.colors(
                 checkedColor = MaterialTheme.colorScheme.primary,
                 uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                checkedBorderColor = MaterialTheme.colorScheme.primary,
-                uncheckedBorderColor = MaterialTheme.colorScheme.outline,
+                checkmarkColor = MaterialTheme.colorScheme.onPrimary,
                 disabledCheckedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                 disabledUncheckedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                disabledIndeterminateColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
             )
         )
     }

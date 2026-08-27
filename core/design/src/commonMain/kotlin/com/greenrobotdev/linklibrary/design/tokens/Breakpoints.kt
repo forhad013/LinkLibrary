@@ -1,10 +1,12 @@
 package com.greenrobotdev.linklibrary.design.tokens
 
-import androidx.compose.foundation.layout.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+
+// Window size class enum for responsive breakpoints
+enum class WindowSizeClass { Compact, Medium, Expanded }
 
 /**
  * Material Design 3 Breakpoint Tokens
@@ -25,16 +27,16 @@ object BreakpointsTokens {
 
 /**
  * Remember the window width size class based on current configuration
- * @return WindowWidthSizeClass (Compact, Medium, or Expanded)
+ * @return WindowSizeClass (Compact, Medium, or Expanded)
  */
 @Composable
-fun rememberWindowWidthSizeClass(): WindowWidthSizeClass {
+fun rememberWindowSizeClass(): WindowSizeClass {
     val configuration = LocalConfiguration.current
     return remember(configuration.screenWidthDp) {
         when {
-            configuration.screenWidthDp < BreakpointsTokens.Medium.value -> WindowWidthSizeClass.Compact
-            configuration.screenWidthDp < BreakpointsTokens.Expanded.value -> WindowWidthSizeClass.Medium
-            else -> WindowWidthSizeClass.Expanded
+            configuration.screenWidthDp < BreakpointsTokens.Medium.value -> WindowSizeClass.Compact
+            configuration.screenWidthDp < BreakpointsTokens.Expanded.value -> WindowSizeClass.Medium
+            else -> WindowSizeClass.Expanded
         }
     }
 }
@@ -44,7 +46,7 @@ fun rememberWindowWidthSizeClass(): WindowWidthSizeClass {
  */
 @Composable
 fun isCompactWindow(): Boolean {
-    return rememberWindowWidthSizeClass() == WindowWidthSizeClass.Compact
+    return rememberWindowSizeClass() == WindowSizeClass.Compact
 }
 
 /**
@@ -52,7 +54,7 @@ fun isCompactWindow(): Boolean {
  */
 @Composable
 fun isMediumWindow(): Boolean {
-    return rememberWindowWidthSizeClass() == WindowWidthSizeClass.Medium
+    return rememberWindowSizeClass() == WindowSizeClass.Medium
 }
 
 /**
@@ -60,5 +62,5 @@ fun isMediumWindow(): Boolean {
  */
 @Composable
 fun isExpandedWindow(): Boolean {
-    return rememberWindowWidthSizeClass() == WindowWidthSizeClass.Expanded
+    return rememberWindowSizeClass() == WindowSizeClass.Expanded
 }

@@ -67,7 +67,7 @@ fun SearchField(
         },
         singleLine = singleLine,
         colors = colors,
-        shape = MaterialTheme.shapes.full
+        shape = MaterialTheme.shapes.small
     )
 }
 
@@ -124,6 +124,6 @@ fun SearchField(
         },
         singleLine = singleLine,
         colors = colors,
-        shape = MaterialTheme.shapes.full
+        shape = MaterialTheme.shapes.small
     )
 }

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +17,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.design.tokens.SpacingTokens
+import com.greenrobotdev.linklibrary.design.components.button.TextButton
 
 /**
  * Empty state component with Material 3 styling
@@ -46,7 +46,7 @@ fun EmptyState(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(SpacingTokens.XLarge),
+            .padding(SpacingTokens.ExtraLarge),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -78,7 +78,7 @@ fun EmptyState(
         }
 
         if (actionLabel != null && onActionClick != null) {
-            Spacer(Modifier.height(SpacingTokens.XLarge))
+            Spacer(Modifier.height(SpacingTokens.ExtraLarge))
             TextButton(
                 text = actionLabel,
                 onClick = onActionClick
@@ -164,7 +164,7 @@ fun EmptyStateWithIllustration(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(SpacingTokens.XLarge),
+            .padding(SpacingTokens.ExtraLarge),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -195,7 +195,7 @@ fun EmptyStateWithIllustration(
         }
 
         if (actionLabel != null && onActionClick != null) {
-            Spacer(Modifier.height(SpacingTokens.XLarge))
+            Spacer(Modifier.height(SpacingTokens.ExtraLarge))
             TextButton(
                 text = actionLabel,
                 onClick = onActionClick

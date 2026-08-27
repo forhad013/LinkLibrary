@@ -107,7 +107,7 @@ fun AppSwitchWithIcon(
         verticalAlignment = Alignment.CenterVertically
     ) {
         androidx.compose.material3.Icon(
-            imageVector = if (checked) checkedIcon ?: uncheckedIcon else uncheckedIcon,
+            imageVector = if (checked && checkedIcon != null) checkedIcon else uncheckedIcon,
             contentDescription = null,
             tint = if (enabled) {
                 if (checked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant

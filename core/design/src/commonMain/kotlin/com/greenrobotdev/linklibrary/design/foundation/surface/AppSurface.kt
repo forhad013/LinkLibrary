@@ -63,20 +63,18 @@ fun AppCardSurface(
 ) {
     if (onClick != null) {
         androidx.compose.material3.Card(
-            modifier = modifier,
-            shape = shape,
-            color = color,
-            contentColor = contentColor,
             onClick = onClick,
-            content = content
-        )
+            modifier = modifier,
+            shape = shape
+        ) {
+            content()
+        }
     } else {
         androidx.compose.material3.Card(
             modifier = modifier,
-            shape = shape,
-            color = color,
-            contentColor = contentColor,
-            content = content
-        )
+            shape = shape
+        ) {
+            content()
+        }
     }
 }
