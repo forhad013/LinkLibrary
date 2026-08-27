@@ -10,8 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.greenrobotdev.linklibrary.design.tokens.SpacingTokens
-import androidx.compose.ui.draw.size as drawSize
+import androidx.compose.ui.draw.size
 
 /**
  * Icon size tokens following Material 3 guidelines
@@ -46,7 +45,7 @@ fun AppIcon(
     Icon(
         imageVector = imageVector,
         contentDescription = contentDescription,
-        modifier = modifier.then(drawSize(size.dp)),
+        modifier = modifier.then(androidx.compose.ui.draw.size(size.dp)),
         tint = tint
     )
 }
