@@ -97,7 +97,7 @@ fun AppSwitchWithIcon(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     checkedIcon: androidx.compose.ui.graphics.vector.ImageVector? = null,
-    uncheckedIcon: androidx.compose.ui.graphics.vector.ImageVector? = null,
+    uncheckedIcon: androidx.compose.ui.graphics.vector.ImageVector,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     label: String? = null
