@@ -1,18 +1,15 @@
 package com.greenrobotdev.linklibrary.design.demo
 
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
@@ -21,14 +18,12 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Icon
-import com.greenrobotdev.linklibrary.design.theme.MaterialExpressiveAppTheme
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.design.components.button.FilledButton
@@ -38,20 +33,14 @@ import com.greenrobotdev.linklibrary.design.components.button.TextButton
 import com.greenrobotdev.linklibrary.design.components.card.ElevatedCard
 import com.greenrobotdev.linklibrary.design.components.card.FilledCard
 import com.greenrobotdev.linklibrary.design.components.card.OutlinedCard
-import com.greenrobotdev.linklibrary.design.components.emptystate.EmptyState
 import com.greenrobotdev.linklibrary.design.components.emptystate.CompactEmptyState
+import com.greenrobotdev.linklibrary.design.components.emptystate.EmptyState
 import com.greenrobotdev.linklibrary.design.components.progress.CircularProgress
 import com.greenrobotdev.linklibrary.design.components.progress.DeterminateCircularProgress
 import com.greenrobotdev.linklibrary.design.components.progress.DeterminateLinearProgress
 import com.greenrobotdev.linklibrary.design.components.progress.LinearProgress
 import com.greenrobotdev.linklibrary.design.components.progress.LinearProgressWithPercentage
-import com.greenrobotdev.linklibrary.design.components.progress.CurlyCircularProgress
-import com.greenrobotdev.linklibrary.design.components.progress.RoundedSquareProgress
-import com.greenrobotdev.linklibrary.design.components.progress.SquircleProgress
-import com.greenrobotdev.linklibrary.design.components.progress.DiamondProgress
-import com.greenrobotdev.linklibrary.design.components.progress.StarProgress
 import com.greenrobotdev.linklibrary.design.components.selection.AppCheckbox
-import com.greenrobotdev.linklibrary.design.components.selection.AppRadio
 import com.greenrobotdev.linklibrary.design.components.selection.AppRadioGroup
 import com.greenrobotdev.linklibrary.design.components.selection.AppSlider
 import com.greenrobotdev.linklibrary.design.components.selection.AppSwitch
@@ -70,6 +59,7 @@ import com.greenrobotdev.linklibrary.design.foundation.layout.SmallVerticalSpace
 import com.greenrobotdev.linklibrary.design.foundation.layout.TinyVerticalSpacer
 import com.greenrobotdev.linklibrary.design.foundation.surface.AppCardSurface
 import com.greenrobotdev.linklibrary.design.foundation.text.AppText
+import com.greenrobotdev.linklibrary.design.theme.MaterialExpressiveAppTheme
 
 /**
  * Demo screen showcasing all implemented components from Phases 1-3
@@ -349,7 +339,7 @@ fun ComponentDemoScreen(onBack: () -> Unit = {}) {
         SectionTitle("Expressive Progress - Curly & Shaped")
 
         AppText(text = "Curly Progress")
-        CurlyCircularProgress()
+//        CurlyCircularProgress()
 
         SmallVerticalSpacer()
 
@@ -358,15 +348,15 @@ fun ComponentDemoScreen(onBack: () -> Unit = {}) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            RoundedSquareProgress()
-            SquircleProgress()
-            DiamondProgress()
+//            RoundedSquareProgress()
+//            SquircleProgress()
+//            DiamondProgress()
         }
 
         SmallVerticalSpacer()
 
         AppText(text = "Star Progress")
-        StarProgress()
+//        StarProgress()
 
         MediumVerticalSpacer()
 

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tags Overview - Lords of Links</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#FEFBFF",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#cbbeff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#f0edee",
+                        "on-primary-fixed-variant": "#4b21bd",
+                        "primary-container": "#EADDFF",
+                        "surface-container-highest": "#e5e2e3",
+                        "primary-fixed": "#e7deff",
+                        "on-background": "#1b1b1c",
+                        "surface-variant": "#e5e2e3",
+                        "on-primary-fixed": "#1e0061",
+                        "surface-tint": "#6341d5",
+                        "outline-variant": "#cac4d7",
+                        "surface-dim": "#dcd9da",
+                        "tertiary-fixed": "#e8e0e6",
+                        "background": "#fcf8f9",
+                        "inverse-on-surface": "#f3f0f1",
+                        "inverse-surface": "#303031",
+                        "tertiary-container": "#625e63",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#dfd8de",
+                        "primary": "#4c22bd",
+                        "secondary-fixed": "#e7deff",
+                        "on-secondary-fixed-variant": "#4b2ea6",
+                        "surface-container-high": "#eae7e8",
+                        "tertiary": "#4a464b",
+                        "surface-container-low": "#f6f3f4",
+                        "inverse-primary": "#cbbeff",
+                        "on-surface-variant": "#484554",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#340d90",
+                        "on-primary-container": "#ded4ff",
+                        "surface-bright": "#fcf8f9",
+                        "secondary-fixed-dim": "#ccbeff",
+                        "error": "#BA1A1A",
+                        "tertiary-fixed-dim": "#cbc4ca",
+                        "outline": "#797586",
+                        "on-tertiary-fixed-variant": "#49454a",
+                        "secondary": "#6349bf",
+                        "on-error": "#ffffff",
+                        "on-surface": "#1b1b1c",
+                        "on-secondary-fixed": "#1e0060",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#1d1b1f",
+                        "secondary-container": "#9f86ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "margin-desktop": "24px",
+                        "container-padding": "24px",
+                        "gutter": "16px",
+                        "section-gap": "48px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Be Vietnam Pro"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-lg": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "title-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0.5px", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.25px", "fontWeight": "400" }],
+                        "display-lg": ["57px", { "lineHeight": "64px", "letterSpacing": "-0.25px", "fontWeight": "700" }],
+                        "title-lg": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-md": ["28px", { "lineHeight": "36px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .filled-icon { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:hidden pb-24">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 bg-background dark:bg-background z-40">
+<div class="flex justify-between items-center px-margin-mobile h-16 w-full">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Lords of Links</h1>
+<div class="flex gap-4 items-center">
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow px-margin-mobile py-6 flex flex-col gap-6">
+<!-- Header Section -->
+<div class="flex flex-col gap-2">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Tags Overview</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Organize and find your collections effortlessly.</p>
+</div>
+<!-- Manage Tags Action -->
+<div class="flex justify-end">
+<button class="bg-secondary-container text-on-secondary-container font-label-lg text-label-lg px-4 py-2 rounded-full flex items-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                Manage Tags
+            </button>
+</div>
+<!-- Tags Cloud / Bento -->
+<div class="flex flex-wrap gap-3">
+<!-- Tag Chip 1 (High Count / Featured) -->
+<button class="bg-primary-container text-on-primary-container rounded-xl px-4 py-3 flex items-center gap-2 active:scale-95 transition-transform flex-grow">
+<span class="material-symbols-outlined filled-icon">local_offer</span>
+<span class="font-label-lg text-label-lg font-bold">Inspiration</span>
+<span class="ml-auto bg-surface/50 text-on-surface font-label-md text-label-md px-2 py-1 rounded-full">142</span>
+</button>
+<!-- Tag Chip 2 -->
+<button class="bg-surface-container-high text-on-surface rounded-xl px-4 py-3 flex items-center gap-2 active:scale-95 transition-transform flex-grow">
+<span class="material-symbols-outlined">design_services</span>
+<span class="font-label-lg text-label-lg">UI Patterns</span>
+<span class="ml-auto bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md px-2 py-1 rounded-full">85</span>
+</button>
+<!-- Tag Chip 3 -->
+<button class="bg-surface-container-high text-on-surface rounded-xl px-4 py-3 flex items-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">code</span>
+<span class="font-label-lg text-label-lg">CSS</span>
+<span class="ml-auto bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md px-2 py-1 rounded-full">47</span>
+</button>
+<!-- Tag Chip 4 -->
+<button class="bg-surface-container-high text-on-surface rounded-xl px-4 py-3 flex items-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">article</span>
+<span class="font-label-lg text-label-lg">Articles</span>
+<span class="ml-auto bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md px-2 py-1 rounded-full">32</span>
+</button>
+<!-- Tag Chip 5 -->
+<button class="bg-surface-container-high text-on-surface rounded-xl px-4 py-3 flex items-center gap-2 active:scale-95 transition-transform flex-grow">
+<span class="material-symbols-outlined">build</span>
+<span class="font-label-lg text-label-lg">Tools &amp; Utilities</span>
+<span class="ml-auto bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md px-2 py-1 rounded-full">21</span>
+</button>
+<!-- Tag Chip 6 -->
+<button class="border-2 border-outline-variant text-on-surface rounded-xl px-4 py-3 flex items-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-outline">movie</span>
+<span class="font-label-lg text-label-lg">Videos</span>
+<span class="ml-auto bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md px-2 py-1 rounded-full">12</span>
+</button>
+<!-- Tag Chip 7 -->
+<button class="border-2 border-outline-variant text-on-surface rounded-xl px-4 py-3 flex items-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-outline">palette</span>
+<span class="font-label-lg text-label-lg">Color</span>
+<span class="ml-auto bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md px-2 py-1 rounded-full">8</span>
+</button>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 right-4 bg-primary text-on-primary w-14 h-14 rounded-xl shadow-lg flex items-center justify-center active:scale-90 transition-transform z-50">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface dark:bg-surface shadow-[0_-4px_16px_rgba(76,34,189,0.12)] rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:bg-surface-variant/50 transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined text-2xl mb-1" data-icon="book_4">book_4</span>
+<span class="font-label-md text-label-md">Library</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:bg-surface-variant/50 transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined text-2xl mb-1" data-icon="assignment">assignment</span>
+<span class="font-label-md text-label-md">Tasks</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:bg-surface-variant/50 transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined text-2xl mb-1" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Notes</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-container text-on-primary-container dark:text-on-primary-container rounded-2xl px-5 py-1 hover:bg-surface-variant/50 transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined text-2xl mb-1" data-icon="folder_shared" data-weight="fill" style="font-variation-settings: 'FILL' 1;">folder_shared</span>
+<span class="font-label-md text-label-md font-bold">Collections</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lords of Links</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#FEFBFF",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#cbbeff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#f0edee",
+                        "on-primary-fixed-variant": "#4b21bd",
+                        "primary-container": "#EADDFF",
+                        "surface-container-highest": "#e5e2e3",
+                        "primary-fixed": "#e7deff",
+                        "on-background": "#1b1b1c",
+                        "surface-variant": "#e5e2e3",
+                        "on-primary-fixed": "#1e0061",
+                        "surface-tint": "#6341d5",
+                        "outline-variant": "#cac4d7",
+                        "surface-dim": "#dcd9da",
+                        "tertiary-fixed": "#e8e0e6",
+                        "background": "#fcf8f9",
+                        "inverse-on-surface": "#f3f0f1",
+                        "inverse-surface": "#303031",
+                        "tertiary-container": "#625e63",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#dfd8de",
+                        "primary": "#4c22bd",
+                        "secondary-fixed": "#e7deff",
+                        "on-secondary-fixed-variant": "#4b2ea6",
+                        "surface-container-high": "#eae7e8",
+                        "tertiary": "#4a464b",
+                        "surface-container-low": "#f6f3f4",
+                        "inverse-primary": "#cbbeff",
+                        "on-surface-variant": "#484554",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#340d90",
+                        "on-primary-container": "#ded4ff",
+                        "surface-bright": "#fcf8f9",
+                        "secondary-fixed-dim": "#ccbeff",
+                        "error": "#BA1A1A",
+                        "tertiary-fixed-dim": "#cbc4ca",
+                        "outline": "#797586",
+                        "on-tertiary-fixed-variant": "#49454a",
+                        "secondary": "#6349bf",
+                        "on-error": "#ffffff",
+                        "on-surface": "#1b1b1c",
+                        "on-secondary-fixed": "#1e0060",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#1d1b1f",
+                        "secondary-container": "#9f86ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "margin-desktop": "24px",
+                        "container-padding": "24px",
+                        "gutter": "16px",
+                        "section-gap": "48px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Be Vietnam Pro"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-lg": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "title-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0.5px", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.25px", "fontWeight": "400" }],
+                        "display-lg": ["57px", { "lineHeight": "64px", "letterSpacing": "-0.25px", "fontWeight": "700" }],
+                        "title-lg": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-md": ["28px", { "lineHeight": "36px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        /* Hide scrollbar for horizontal scrolling containers */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="pb-24">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 bg-background dark:bg-background flat no shadows z-50">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 w-full">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim tracking-tight">
+                Lords of Links
+            </h1>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</div>
+</header>
+<main class="px-margin-mobile md:px-margin-desktop space-y-section-gap mt-6">
+<!-- Daily Quest Section -->
+<section class="space-y-4">
+<h2 class="font-title-lg text-title-lg text-on-surface">Daily Quest</h2>
+<div class="bg-surface rounded-[24px] p-container-padding shadow-sm border border-surface-container-highest relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary-container/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="relative z-10 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="bg-primary text-on-primary font-label-md text-label-md px-3 py-1 rounded-full w-fit">
+                            Active Task
+                        </div>
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Organize "Project Alpha" Research</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Review and tag 15 unclassified links in the inbox.</p>
+<div class="w-full bg-surface-container-highest h-2 rounded-full mt-2">
+<div class="bg-primary h-2 rounded-full" style="width: 60%;"></div>
+</div>
+<div class="flex justify-between items-center font-label-sm text-on-surface-variant">
+<span>60% Complete</span>
+<span>9/15 links</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Access / Recent Links -->
+<section class="space-y-4">
+<div class="flex justify-between items-end">
+<h2 class="font-title-lg text-title-lg text-on-surface">Quick Access</h2>
+<button class="font-label-md text-label-md text-primary hover:text-surface-tint transition-colors">View All</button>
+</div>
+<div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4 -mx-margin-mobile px-margin-mobile snap-x snap-mandatory">
+<!-- Quick Access Card 1 -->
+<div class="min-w-[240px] bg-tertiary-container rounded-[20px] p-4 flex flex-col gap-3 snap-start relative overflow-hidden shadow-sm hover:shadow-md transition-shadow active:scale-[0.98]">
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-surface/10 rounded-full blur-xl"></div>
+<div class="w-10 h-10 rounded-xl bg-surface/20 flex items-center justify-center mb-2 backdrop-blur-sm">
+<span class="material-symbols-outlined text-on-tertiary">article</span>
+</div>
+<h4 class="font-body-lg text-body-lg font-semibold text-on-tertiary line-clamp-2">Understanding Material Design 3 Expressive</h4>
+<p class="font-label-md text-label-md text-on-tertiary-container opacity-80 truncate">design.google.com</p>
+</div>
+<!-- Quick Access Card 2 -->
+<div class="min-w-[240px] bg-surface rounded-[20px] p-4 flex flex-col gap-3 snap-start border border-surface-container shadow-sm hover:shadow-md transition-shadow active:scale-[0.98]">
+<div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-on-primary-container">code</span>
+</div>
+<h4 class="font-body-lg text-body-lg font-semibold text-on-surface line-clamp-2">Tailwind CSS v4 Configuration Guide</h4>
+<p class="font-label-md text-label-md text-on-surface-variant truncate">tailwindcss.com</p>
+</div>
+<!-- Quick Access Card 3 -->
+<div class="min-w-[240px] bg-surface rounded-[20px] p-4 flex flex-col gap-3 snap-start border border-surface-container shadow-sm hover:shadow-md transition-shadow active:scale-[0.98]">
+<div class="w-10 h-10 rounded-xl bg-secondary-container flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-on-secondary-container">palette</span>
+</div>
+<h4 class="font-body-lg text-body-lg font-semibold text-on-surface line-clamp-2">Color Theory for UI Designers</h4>
+<p class="font-label-md text-label-md text-on-surface-variant truncate">uxplanet.org</p>
+</div>
+</div>
+</section>
+<!-- Primary Collections -->
+<section class="space-y-4">
+<h2 class="font-title-lg text-title-lg text-on-surface">Primary Collections</h2>
+<div class="grid grid-cols-2 gap-4">
+<!-- Collection Item -->
+<button class="bg-surface rounded-2xl p-4 flex flex-col items-center gap-3 border border-surface-container-highest shadow-sm hover:bg-surface-container-lowest transition-colors active:scale-95 text-center group">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-primary-container">work</span>
+</div>
+<div>
+<div class="font-label-lg text-label-lg font-semibold text-on-surface">Work Projects</div>
+<div class="font-label-md text-label-md text-on-surface-variant mt-1">42 Links</div>
+</div>
+</button>
+<!-- Collection Item -->
+<button class="bg-surface rounded-2xl p-4 flex flex-col items-center gap-3 border border-surface-container-highest shadow-sm hover:bg-surface-container-lowest transition-colors active:scale-95 text-center group">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-secondary-container">lightbulb</span>
+</div>
+<div>
+<div class="font-label-lg text-label-lg font-semibold text-on-surface">Inspiration</div>
+<div class="font-label-md text-label-md text-on-surface-variant mt-1">128 Links</div>
+</div>
+</button>
+<!-- Collection Item -->
+<button class="bg-surface rounded-2xl p-4 flex flex-col items-center gap-3 border border-surface-container-highest shadow-sm hover:bg-surface-container-lowest transition-colors active:scale-95 text-center group">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed-dim flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-tertiary-container">menu_book</span>
+</div>
+<div>
+<div class="font-label-lg text-label-lg font-semibold text-on-surface">Reading List</div>
+<div class="font-label-md text-label-md text-on-surface-variant mt-1">15 Links</div>
+</div>
+</button>
+<!-- Collection Item -->
+<button class="bg-surface rounded-2xl p-4 flex flex-col items-center gap-3 border border-surface-container-highest shadow-sm hover:bg-surface-container-lowest transition-colors active:scale-95 text-center group">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center group-hover:scale-110 transition-transform border border-dashed border-outline">
+<span class="material-symbols-outlined text-on-surface-variant">add</span>
+</div>
+<div class="font-label-lg text-label-lg font-semibold text-on-surface-variant mt-auto">New</div>
+</button>
+</div>
+</section>
+</main>
+<!-- FAB -->
+<button class="fixed bottom-24 right-4 md:right-8 w-16 h-16 bg-primary text-on-primary rounded-2xl shadow-lg flex items-center justify-center active:scale-90 transition-transform duration-200 z-40 group hover:shadow-xl hover:-translate-y-1">
+<span class="material-symbols-outlined text-[32px] group-hover:rotate-90 transition-transform duration-300">add_link</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface dark:bg-surface shadow-[0_-4px_16px_rgba(76,34,189,0.12)] rounded-t-xl">
+<button class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-container text-on-primary-container dark:text-on-primary-container rounded-2xl px-5 py-1 active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="book_4" style="font-variation-settings: 'FILL' 1;">book_4</span>
+<span class="font-label-md text-label-md mt-1">Library</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:bg-surface-variant/50 transition-all active:scale-90 duration-200 rounded-2xl">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-label-md text-label-md mt-1">Tasks</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:bg-surface-variant/50 transition-all active:scale-90 duration-200 rounded-2xl">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md mt-1">Notes</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-5 py-1 hover:bg-surface-variant/50 transition-all active:scale-90 duration-200 rounded-2xl">
+<span class="material-symbols-outlined" data-icon="folder_shared">folder_shared</span>
+<span class="font-label-md text-label-md mt-1">Collections</span>
+</button>
+</nav>
+</body></html>
