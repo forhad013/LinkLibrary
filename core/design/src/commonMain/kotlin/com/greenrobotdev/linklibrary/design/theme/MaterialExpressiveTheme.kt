@@ -1,6 +1,6 @@
 package com.greenrobotdev.linklibrary.design.theme
 
-import androidx.compose.material3.Experimentalexpressive.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.expressive.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
