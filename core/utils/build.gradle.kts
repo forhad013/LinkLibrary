@@ -1,21 +1,13 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-    kotlin("multiplatform")
-    id("com.android.kotlin.multiplatform.library")
-    id("org.jetbrains.compose")
-    id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.convention.kmp.library)
 }
 
 kotlin {
-    androidLibrary {
-        // AGP 9: Android library configuration
+    android {
         namespace = "com.greenrobotdev.linklibrary.utils"
         compileSdk = 37
-
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
-        }
     }
 
     jvm("desktop")
@@ -86,6 +78,6 @@ kotlin {
     }
 }
 
-// Note: AGP 9 uses androidLibrary {} inside kotlin {} block for shared modules
+// Note: AGP 9 uses android {} inside kotlin {} block for shared modules
 // Traditional android {} block only used in separate Android app entry point modules
 

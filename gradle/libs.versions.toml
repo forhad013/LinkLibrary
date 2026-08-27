@@ -83,3 +83,7 @@ androidx-room = { id = "androidx.room", version.ref = "room" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 molecule = { id = "app.cash.molecule", version.ref = "molecule" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
+
+# Convention plugins from build-logic module
+convention-kmp-library = { id = "convention.kmp-library", version = "unspecified" }
+convention-android-room = { id = "convention.android-room", version = "unspecified" }

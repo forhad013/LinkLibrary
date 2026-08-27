@@ -1,32 +1,17 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-    kotlin("multiplatform")
-    id("com.android.kotlin.multiplatform.library")
-    id("org.jetbrains.compose")
-    id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.convention.kmp.library)
     alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
-    androidLibrary {
-        // AGP 9: Android library configuration
+    android {
         namespace = "com.greenrobotdev.linklibrary.bookmarks"
         compileSdk = 37
-
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
-            freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
-            freeCompilerArgs.add("-Xcontext-parameters")
-        }
     }
 
-    jvm() {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
-            freeCompilerArgs.add("-Xjsr305=strict")
-        }
-    }
+    jvm()
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -110,7 +95,4 @@ kotlin {
     }
 }
 
-// Note: AGP 9 uses androidLibrary {} inside kotlin {} block for shared modules
-// Traditional android {} block only used in separate Android app entry point modules
-// Note: buildFeatures.compose and composeOptions handled differently in AGP 9
-// Compose integration now managed through org.jetbrains.kotlin.plugin.compose
+// AGP 9 configuration handled by kmp-library-convention plugin
