@@ -63,35 +63,41 @@ fun rememberInteractionState(
 
     // Process interaction events
     LaunchedEffect(interactions) {
-        snapshotFlow { interactions }.collect { flow ->
-            flow.collect { interaction ->
-                when (interaction) {
-                    is PressInteraction.Press -> {
-                        activeInteractions[interaction] = true
-                    }
-                    is PressInteraction.Release,
-                    is PressInteraction.Cancel -> {
-                        activeInteractions.remove(interaction.press)
-                    }
-                    is HoverInteraction.Enter -> {
-                        activeInteractions[interaction] = true
-                    }
-                    is HoverInteraction.Exit -> {
-                        activeInteractions.remove(interaction.enter)
-                    }
-                    is FocusInteraction.Focus -> {
-                        activeInteractions[interaction] = true
-                    }
-                    is FocusInteraction.Unfocus -> {
-                        activeInteractions.remove(interaction.focus)
-                    }
-                    is DragInteraction.Start -> {
-                        activeInteractions[interaction] = true
-                    }
-                    is DragInteraction.Cancel,
-                    is DragInteraction.Stop -> {
-                        activeInteractions.remove(interaction.start)
-                    }
+        interactions.collect { interaction ->
+            when (interaction) {
+                is PressInteraction.Press -> {
+                    activeInteractions[interaction] = true
+                }
+                is PressInteraction.Release,
+                is PressInteraction.Cancel -> {
+                    // Find and remove the press interaction
+                    activeInteractions.keys.filterIsInstance<PressInteraction.Press>()
+                        .firstOrNull()?.let { activeInteractions.remove(it) }
+                }
+                is HoverInteraction.Enter -> {
+                    activeInteractions[interaction] = true
+                }
+                is HoverInteraction.Exit -> {
+                    // Find and remove the hover interaction
+                    activeInteractions.keys.filterIsInstance<HoverInteraction.Enter>()
+                        .firstOrNull()?.let { activeInteractions.remove(it) }
+                }
+                is FocusInteraction.Focus -> {
+                    activeInteractions[interaction] = true
+                }
+                is FocusInteraction.Unfocus -> {
+                    // Find and remove the focus interaction
+                    activeInteractions.keys.filterIsInstance<FocusInteraction.Focus>()
+                        .firstOrNull()?.let { activeInteractions.remove(it) }
+                }
+                is DragInteraction.Start -> {
+                    activeInteractions[interaction] = true
+                }
+                is DragInteraction.Cancel,
+                is DragInteraction.Stop -> {
+                    // Find and remove the drag interaction
+                    activeInteractions.keys.filterIsInstance<DragInteraction.Start>()
+                        .firstOrNull()?.let { activeInteractions.remove(it) }
                 }
             }
         }

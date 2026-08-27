@@ -12,9 +12,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 
 /**
  * Material Design 3 Expressive Shimmer Effect
@@ -41,15 +40,15 @@ object ShimmerDefaults {
         return Brush.linearGradient(
             colors = if (isDark) {
                 listOf(
-                    android.util.Color.parseColor("#24FFFFFF"),
-                    android.util.Color.parseColor("#44FFFFFF"),
-                    android.util.Color.parseColor("#24FFFFFF")
+                    Color.White.copy(alpha = 0.14f),
+                    Color.White.copy(alpha = 0.27f),
+                    Color.White.copy(alpha = 0.14f)
                 )
             } else {
                 listOf(
-                    android.util.Color.parseColor("#1A000000"),
-                    android.util.Color.parseColor("#33000000"),
-                    android.util.Color.parseColor("#1A000000")
+                    Color.Black.copy(alpha = 0.1f),
+                    Color.Black.copy(alpha = 0.2f),
+                    Color.Black.copy(alpha = 0.1f)
                 )
             },
             start = Offset.Zero,
@@ -93,15 +92,15 @@ fun rememberShimmerBrush(
     return Brush.linearGradient(
         colors = if (isDark) {
             listOf(
-                android.util.Color.parseColor("#24FFFFFF"),
-                android.util.Color.parseColor("#44FFFFFF"),
-                android.util.Color.parseColor("#24FFFFFF")
+                Color.White.copy(alpha = 0.14f),
+                Color.White.copy(alpha = 0.27f),
+                Color.White.copy(alpha = 0.14f)
             )
         } else {
             listOf(
-                android.util.Color.parseColor("#1A000000"),
-                android.util.Color.parseColor("#33000000"),
-                android.util.Color.parseColor("#1A000000")
+                Color.Black.copy(alpha = 0.1f),
+                Color.Black.copy(alpha = 0.2f),
+                Color.Black.copy(alpha = 0.1f)
             )
         },
         start = startOffset,
@@ -115,14 +114,14 @@ fun rememberShimmerBrush(
  * @param isDark Whether the theme is dark mode
  * @param shimmerWidth Width of the shimmer effect
  */
+@Composable
 fun Modifier.shimmer(
     isDark: Boolean = false,
     shimmerWidth: Float = 500f
-): Modifier = composed {
-    val darkMode = isDark || !MaterialTheme.colorScheme.isLight
-    val shimmerBrush = rememberShimmerBrush(shimmerWidth, darkMode)
+): Modifier {
+    val shimmerBrush = rememberShimmerBrush(shimmerWidth, isDark)
 
-    then(
+    return this.then(
         background(shimmerBrush)
     )
 }
@@ -134,11 +133,12 @@ fun Modifier.shimmer(
  * @param highlightColor Highlight color for the shimmer
  * @param shimmerWidth Width of the shimmer effect
  */
+@Composable
 fun Modifier.customShimmer(
-    baseColor: androidx.compose.ui.graphics.Color,
-    highlightColor: androidx.compose.ui.graphics.Color,
+    baseColor: Color,
+    highlightColor: Color,
     shimmerWidth: Float = 500f
-): Modifier = composed {
+): Modifier {
     val infiniteTransition = rememberInfiniteTransition(label = "shimmer")
 
     val offsetX by infiniteTransition.animateFloat(
@@ -164,7 +164,7 @@ fun Modifier.customShimmer(
         end = Offset(x = offsetX + shimmerWidth, y = 0f)
     )
 
-    then(
+    return this.then(
         background(shimmerBrush)
     )
 }

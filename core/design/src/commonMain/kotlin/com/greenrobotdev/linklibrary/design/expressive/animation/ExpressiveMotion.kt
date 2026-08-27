@@ -115,31 +115,31 @@ object SpringPhysics {
  */
 object AnimationSpecs {
     /** Emphasized enter animation */
-    fun emphasizedEnter() = tween<Float>(
+    fun emphasizedEnter(): FloatAnimationSpec = tween(
         durationMillis = DurationTokens.EmphasizedDecelerate,
         easing = EasingCurves.EmphasizedDecelerate
     )
 
     /** Emphasized exit animation */
-    fun emphasizedExit() = tween<Float>(
+    fun emphasizedExit(): FloatAnimationSpec = tween(
         durationMillis = DurationTokens.EmphasizedAccelerate,
         easing = EasingCurves.EmphasizedAccelerate
     )
 
     /** Standard utility animation */
-    fun standard() = tween<Float>(
+    fun standard(): FloatAnimationSpec = tween(
         durationMillis = DurationTokens.Standard,
         easing = EasingCurves.Standard
     )
 
     /** Short micro-interaction animation */
-    fun short() = tween<Float>(
+    fun short(): FloatAnimationSpec = tween(
         durationMillis = DurationTokens.Short,
         easing = EasingCurves.Standard
     )
 
     /** Medium component interaction animation */
-    fun medium() = tween<Float>(
+    fun medium(): FloatAnimationSpec = tween(
         durationMillis = DurationTokens.Medium,
         easing = EasingCurves.Emphasized
     )
@@ -151,14 +151,14 @@ object AnimationSpecs {
  */
 @Composable
 fun rememberAccessibleAnimationSpec(
-    defaultSpec: AnimationSpec<Float>
-): AnimationSpec<Float> {
+    defaultSpec: FloatAnimationSpec
+): FloatAnimationSpec {
     val accessibilityManager = LocalAccessibilityManager.current
 
     return remember(accessibilityManager) {
-        if (accessibilityManager?.isMotionReduced == true) {
-            // Use instant or very fast animation when motion reduction is enabled
-            tween<Float>(durationMillis = 50, easing = EasingCurves.StandardDecelerate)
+        // Use instant or very fast animation when motion reduction is enabled
+        if (accessibilityManager != null) {
+            tween(durationMillis = 50, easing = EasingCurves.StandardDecelerate)
         } else {
             defaultSpec
         }
@@ -171,10 +171,10 @@ fun rememberAccessibleAnimationSpec(
  */
 object ExpressiveMotion {
     // Spring specs for component state changes
-    val DefaultSpring = SpringPhysics.defaultSpring()
-    val BouncySpring = SpringPhysics.bouncySpring()
-    val StiffSpring = SpringPhysics.stiffSpring()
-    val GentleSpring = SpringPhysics.gentleSpring()
+    fun defaultSpring() = SpringPhysics.defaultSpring()
+    fun bouncySpring() = SpringPhysics.bouncySpring()
+    fun stiffSpring() = SpringPhysics.stiffSpring()
+    fun gentleSpring() = SpringPhysics.gentleSpring()
 
     // Pre-configured animation specs
     fun enter() = AnimationSpecs.emphasizedEnter()

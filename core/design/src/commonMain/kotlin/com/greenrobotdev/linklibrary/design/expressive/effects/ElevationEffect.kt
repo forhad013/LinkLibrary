@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.design.expressive.animation.SpringPhysics
 
 /**
@@ -151,19 +152,20 @@ fun animateElevationColor(
 }
 
 /**
- * Modifier to apply animated elevation effect
+ * Calculate animated elevation value for use in components
  *
  * @param isPressed Whether component is pressed
  * @param isHovered Whether component is hovered
  * @param isFocused Whether component has keyboard focus
  * @param baseElevation Base elevation level
  */
-fun Modifier.animateElevation(
+@Composable
+fun rememberAnimatedElevation(
     isPressed: Boolean = false,
     isHovered: Boolean = false,
     isFocused: Boolean = false,
     baseElevation: Dp = ElevationLevels.Level0
-): Modifier = composed {
+): Dp {
     val targetElevation = calculateTargetElevation(
         isPressed = isPressed,
         isHovered = isHovered,
@@ -171,7 +173,5 @@ fun Modifier.animateElevation(
         baseElevation = baseElevation
     )
 
-    val elevation = animateElevation(targetElevation)
-
-    this.then(Modifier)
+    return animateElevation(targetElevation)
 }
