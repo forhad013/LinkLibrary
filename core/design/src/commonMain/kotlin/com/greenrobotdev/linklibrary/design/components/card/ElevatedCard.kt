@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.design.components.card
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -7,6 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 /**
  * Elevated card component with Material 3 styling
@@ -28,7 +31,7 @@ fun ElevatedCard(
     shape: Shape = MaterialTheme.shapes.medium,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
-    elevation: androidx.compose.ui.unit.Dp = androidx.compose.ui.unit.Dp(1.dp),
+    elevation: Dp = 1.dp,
     onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
@@ -83,7 +86,7 @@ fun ElevatedBorderedCard(
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     borderBorderColor: Color = MaterialTheme.colorScheme.outlineVariant,
-    elevation: androidx.compose.ui.unit.Dp = androidx.compose.ui.unit.Dp(1.dp),
+    elevation: Dp = 1.dp,
     onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {

@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.dp
 
 /**
  * Filled card component with Material 3 styling
@@ -41,7 +42,7 @@ fun FilledCard(
                 disabledContainerColor = backgroundColor,
                 disabledContentColor = contentColor
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = androidx.compose.ui.unit.Dp(0.dp))
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             content()
         }
@@ -55,7 +56,7 @@ fun FilledCard(
                 disabledContainerColor = backgroundColor,
                 disabledContentColor = contentColor
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = androidx.compose.ui.unit.Dp(0.dp))
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             content()
         }
@@ -95,7 +96,7 @@ fun PrimaryFilledCard(
                 disabledContainerColor = backgroundColor.copy(alpha = 0.38f),
                 disabledContentColor = contentColor.copy(alpha = 0.38f)
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = androidx.compose.ui.unit.Dp(0.dp))
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             content()
         }
@@ -109,7 +110,7 @@ fun PrimaryFilledCard(
                 disabledContainerColor = backgroundColor.copy(alpha = 0.38f),
                 disabledContentColor = contentColor.copy(alpha = 0.38f)
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = androidx.compose.ui.unit.Dp(0.dp))
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             content()
         }

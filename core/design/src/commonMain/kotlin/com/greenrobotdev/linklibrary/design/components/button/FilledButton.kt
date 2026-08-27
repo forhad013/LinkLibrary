@@ -1,7 +1,6 @@
 package com.greenrobotdev.linklibrary.design.components.button
 
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacing
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -12,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 
 /**
  * Filled button component with Material 3 styling

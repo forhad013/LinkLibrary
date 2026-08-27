@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.dp
 
 /**
  * Material Design 3 Breakpoint Tokens

@@ -1,11 +1,13 @@
 package com.greenrobotdev.linklibrary.design.foundation.layout
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.design.tokens.SpacingTokens
 
 /**
@@ -28,12 +30,20 @@ fun AppDivider(
     startIndent: Dp = SpacingTokens.None,
     endIndent: Dp = SpacingTokens.None
 ) {
+    val finalModifier = when {
+        startIndent != SpacingTokens.None && endIndent != SpacingTokens.None ->
+            modifier.padding(start = startIndent, end = endIndent)
+        startIndent != SpacingTokens.None ->
+            modifier.padding(start = startIndent)
+        endIndent != SpacingTokens.None ->
+            modifier.padding(end = endIndent)
+        else -> modifier
+    }
+
     Divider(
-        modifier = modifier,
+        modifier = finalModifier,
         color = color,
-        thickness = thickness,
-        startIndent = startIndent,
-        endIndent = endIndent
+        thickness = thickness
     )
 }
 

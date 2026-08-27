@@ -1,11 +1,9 @@
 package com.greenrobotdev.linklibrary.design.components.selection
 
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacing
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 /**
  * Slider component with Material 3 styling
@@ -53,7 +52,7 @@ fun AppSlider(
                 enabled = enabled,
                 valueRange = valueRange,
                 steps = steps,
-                colors = SliderColors(
+                colors = androidx.compose.material3.SliderDefaults.colors(
                     thumbColor = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                     activeTrackColor = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
                     activeTickColor = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
@@ -87,7 +86,7 @@ fun AppSlider(
             enabled = enabled,
             valueRange = valueRange,
             steps = steps,
-            colors = SliderColors(
+            colors = androidx.compose.material3.SliderDefaults.colors(
                 thumbColor = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                 activeTrackColor = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
                 activeTickColor = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
@@ -142,7 +141,7 @@ fun AppRangeSlider(
             enabled = enabled,
             valueRange = valueRange,
             steps = steps,
-            colors = SliderColors(
+            colors = androidx.compose.material3.SliderDefaults.colors(
                 thumbColor = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                 activeTrackColor = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
                 activeTickColor = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),

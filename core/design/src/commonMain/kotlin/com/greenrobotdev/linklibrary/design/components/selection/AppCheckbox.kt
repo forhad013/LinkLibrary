@@ -1,16 +1,15 @@
 package com.greenrobotdev.linklibrary.design.components.selection
 
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacing
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
 /**
  * Checkbox component with Material 3 styling
@@ -41,14 +40,14 @@ fun AppCheckbox(
                 checked = checked,
                 onCheckedChange = onCheckedChange,
                 enabled = enabled,
-                colors = CheckboxColors(
+                colors = androidx.compose.material3.CheckboxDefaults.colors(
                     checkedColor = MaterialTheme.colorScheme.primary,
                     uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    checkedBorderColorColor = MaterialTheme.colorScheme.primary,
-                    uncheckedBorderColorColor = MaterialTheme.colorScheme.outline,
+                    checkedBorderColor = MaterialTheme.colorScheme.primary,
+                    uncheckedBorderColor = MaterialTheme.colorScheme.outline,
                     disabledCheckedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                     disabledUncheckedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                    disabledBorderColorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                    disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                 )
             )
             if (label.isNotEmpty()) {
@@ -70,14 +69,14 @@ fun AppCheckbox(
             onCheckedChange = onCheckedChange,
             modifier = modifier,
             enabled = enabled,
-            colors = CheckboxColors(
+            colors = androidx.compose.material3.CheckboxDefaults.colors(
                 checkedColor = MaterialTheme.colorScheme.primary,
                 uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                checkedBorderColorColor = MaterialTheme.colorScheme.primary,
-                uncheckedBorderColorColor = MaterialTheme.colorScheme.outline,
+                checkedBorderColor = MaterialTheme.colorScheme.primary,
+                uncheckedBorderColor = MaterialTheme.colorScheme.outline,
                 disabledCheckedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                 disabledUncheckedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                disabledBorderColorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
             )
         )
     }

@@ -8,6 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.design.tokens.SpacingTokens
 
 /**
@@ -51,7 +53,7 @@ fun AppIcon(
 /**
  * Sealed class for icon size variants
  */
-sealed class IconSize(val dp: androidx.compose.ui.unit.Dp) {
+sealed class IconSize(val dp: Dp) {
     object Small : IconSize(IconSizes.Small)
     object Medium : IconSize(IconSizes.Medium)
     object Large : IconSize(IconSizes.Large)

@@ -62,7 +62,7 @@ fun TextArea(
     MaterialOutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier.heightIn(min = minLines * 24.dp, max = maxLines * 24.dp),
+        modifier = modifier.heightIn(min = (minLines * 24).dp, max = (maxLines * 24).dp),
         enabled = enabled,
         readOnly = readOnly,
         label = if (label != null) {
