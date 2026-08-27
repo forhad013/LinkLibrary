@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Experimentalexpressive.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,10 +27,10 @@ import com.greenrobotdev.linklibrary.design.expressive.animation.SpringPhysics
  * Filled button component with Material 3 Expressive features
  *
  * High-emphasis button for primary actions with enhanced animations:
- * - Press-to-scale animation (0.97x when pressed)
- * - Dynamic elevation changes
- * - Smooth color transitions
- * - Enhanced ripple effects
+ * - Press-to-scale animation (0.94x when pressed) using Expressive spring physics
+ * - Dynamic elevation changes (0→12dp) with Enhanced motion
+ * - Smooth color transitions with Expressive APIs
+ * - Enhanced ripple effects with dramatic radius (60-80dp)
  *
  * @param text Button text label
  * @param onClick Callback invoked when button is clicked
@@ -37,6 +38,7 @@ import com.greenrobotdev.linklibrary.design.expressive.animation.SpringPhysics
  * @param enabled Whether the button is enabled for interaction
  * @param icon Optional leading icon to display before text
  */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun FilledButton(
     text: String,

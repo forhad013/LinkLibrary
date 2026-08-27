@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.draw.size
 
 /**
  * Icon size tokens following Material 3 guidelines
@@ -45,7 +44,7 @@ fun AppIcon(
     Icon(
         imageVector = imageVector,
         contentDescription = contentDescription,
-        modifier = modifier.then(androidx.compose.ui.draw.size(size.dp)),
+//        modifier = modifier.then(androidx.compose.ui.draw.size(size.dp)),
         tint = tint
     )
 }
