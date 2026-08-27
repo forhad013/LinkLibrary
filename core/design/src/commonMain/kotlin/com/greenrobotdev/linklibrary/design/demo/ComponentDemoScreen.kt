@@ -1,6 +1,6 @@
 package com.greenrobotdev.linklibrary.design.demo
 
-import androidx.compose.material3.Experimentalexpressive.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,6 +45,11 @@ import com.greenrobotdev.linklibrary.design.components.progress.DeterminateCircu
 import com.greenrobotdev.linklibrary.design.components.progress.DeterminateLinearProgress
 import com.greenrobotdev.linklibrary.design.components.progress.LinearProgress
 import com.greenrobotdev.linklibrary.design.components.progress.LinearProgressWithPercentage
+import com.greenrobotdev.linklibrary.design.components.progress.CurlyCircularProgress
+import com.greenrobotdev.linklibrary.design.components.progress.RoundedSquareProgress
+import com.greenrobotdev.linklibrary.design.components.progress.SquircleProgress
+import com.greenrobotdev.linklibrary.design.components.progress.DiamondProgress
+import com.greenrobotdev.linklibrary.design.components.progress.StarProgress
 import com.greenrobotdev.linklibrary.design.components.selection.AppCheckbox
 import com.greenrobotdev.linklibrary.design.components.selection.AppRadio
 import com.greenrobotdev.linklibrary.design.components.selection.AppRadioGroup
@@ -313,20 +318,55 @@ fun ComponentDemoScreen(onBack: () -> Unit = {}) {
         // Progress Indicators Demo
         SectionTitle("Progress Indicators")
 
-        AppText(text = "Indeterminate Progress")
-        LinearProgress()
-        TinyVerticalSpacer()
-        CircularProgress()
+        AppText(text = "Standard Progress")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            LinearProgress()
+            CircularProgress()
+        }
+
         SmallVerticalSpacer()
 
         AppText(text = "Determinate Progress (75%)")
-        DeterminateLinearProgress(progress = 0.75f)
-        TinyVerticalSpacer()
-        DeterminateCircularProgress(progress = 0.75f)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            DeterminateLinearProgress(progress = 0.75f)
+            DeterminateCircularProgress(progress = 0.75f)
+        }
+
         SmallVerticalSpacer()
 
         AppText(text = "Progress with Percentage")
         LinearProgressWithPercentage(progress = 0.42f, showPercentage = true)
+
+        MediumVerticalSpacer()
+
+        // Expressive Progress Indicators Demo
+        SectionTitle("Expressive Progress - Curly & Shaped")
+
+        AppText(text = "Curly Progress")
+        CurlyCircularProgress()
+
+        SmallVerticalSpacer()
+
+        AppText(text = "Shaped Progress Indicators")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            RoundedSquareProgress()
+            SquircleProgress()
+            DiamondProgress()
+        }
+
+        SmallVerticalSpacer()
+
+        AppText(text = "Star Progress")
+        StarProgress()
 
         MediumVerticalSpacer()
 
@@ -404,7 +444,7 @@ fun ComponentDemoScreen(onBack: () -> Unit = {}) {
         LargeVerticalSpacer()
 
         // Component Count
-        val componentCount = 26
+        val componentCount = 31
         AppText(
             text = "$componentCount production-ready components implemented",
             style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
