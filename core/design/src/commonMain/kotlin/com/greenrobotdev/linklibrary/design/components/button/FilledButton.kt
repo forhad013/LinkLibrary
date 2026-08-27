@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.expressive.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,7 +37,6 @@ import com.greenrobotdev.linklibrary.design.expressive.animation.SpringPhysics
  * @param enabled Whether the button is enabled for interaction
  * @param icon Optional leading icon to display before text
  */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun FilledButton(
     text: String,

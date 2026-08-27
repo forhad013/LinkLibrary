@@ -1,28 +1,25 @@
 package com.greenrobotdev.linklibrary.design.theme
 
-import androidx.compose.material3.expressive.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 /**
- * Material 3 Expressive Theme Configuration
+ * Material 3 Expressive Theme Configuration for KMP
  *
- * This theme enables Material 3 Expressive features including:
- * - Spring-based motion physics
+ * This theme uses standard MaterialTheme with enhanced custom animations:
+ * - Custom spring-based motion physics
  * - Enhanced ripple effects
- * - Shape morphing animations
  * - Dynamic color schemes
- * - Expressive component behaviors
+ * - Expressive component behaviors via custom implementations
  */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MaterialExpressiveAppTheme(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    MaterialExpressiveTheme(
+    MaterialTheme(
         modifier = modifier,
         content = content
     )
@@ -31,7 +28,6 @@ fun MaterialExpressiveAppTheme(
 /**
  * Surface with Material 3 Expressive features enabled
  */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ExpressiveSurface(
     modifier: Modifier = Modifier,
