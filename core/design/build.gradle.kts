@@ -1,23 +1,18 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("com.android.library")
+    alias(libs.plugins.convention.kmp.library)
 }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
-        }
+    android {
+        namespace = "com.greenrobotdev.linklibrary.design"
+        compileSdk = 37
     }
 
     jvm("desktop")
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach {
@@ -35,11 +30,12 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                // Compose
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material3)
-                implementation(compose.materialIconsExtended)
                 implementation(compose.ui)
+                implementation(compose.materialIconsExtended)
             }
         }
 
@@ -48,25 +44,6 @@ kotlin {
                 implementation("androidx.appcompat:appcompat:1.6.1")
             }
         }
-
-        val desktopMain by getting
-
-        val iosX64Main by getting
-        val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
-
-        val wasmJsMain by getting
     }
 }
 
-android {
-    namespace = "com.greenrobotdev.linklibrary.design"
-    compileSdk = 34
-    defaultConfig {
-        minSdk = 24
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-}

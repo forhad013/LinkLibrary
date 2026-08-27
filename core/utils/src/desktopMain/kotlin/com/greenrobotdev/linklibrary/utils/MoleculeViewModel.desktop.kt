@@ -1,11 +1,12 @@
 package com.greenrobotdev.linklibrary.utils
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import app.cash.molecule.RecompositionMode
 import app.cash.molecule.moleculeFlow
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancelScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,15 +14,20 @@ import kotlinx.coroutines.flow.stateIn
 
 /**
  * Desktop-specific actual implementation of MoleculeViewModel.
- * Integrates with AndroidX ViewModel for proper lifecycle management on desktop.
+ * Uses custom lifecycle management instead of AndroidX ViewModel for desktop compatibility.
  */
-actual abstract class MoleculeViewModel<Event, Model> : ViewModel() {
+actual abstract class MoleculeViewModel<Event, Model> {
+
+    /**
+     * Job for managing coroutine lifecycle on desktop.
+     */
+    private val viewModelJob = SupervisorJob()
 
     /**
      * Scope for Molecule composition and state management.
-     * Uses the ViewModel's scope for proper lifecycle management.
+     * Custom scope for desktop targets with proper lifecycle management.
      */
-    actual protected val moleculeScope: CoroutineScope = viewModelScope
+    actual protected val moleculeScope: CoroutineScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     /**
      * Event flow that buffers user events for processing by the presenter.
@@ -92,10 +98,9 @@ actual abstract class MoleculeViewModel<Event, Model> : ViewModel() {
 
     /**
      * Cleanup method to be called when the ViewModel is no longer needed.
-     * Desktop implementation inherits this from AndroidX ViewModel.
+     * Desktop implementation uses custom coroutine job cancellation.
      */
-    actual override fun onCleared() {
-        // AndroidX ViewModel handles cleanup automatically
-        super.onCleared()
+    actual open fun onCleared() {
+        viewModelJob.cancel()
     }
 }

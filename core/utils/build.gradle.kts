@@ -1,23 +1,18 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("com.android.library")
+    alias(libs.plugins.convention.kmp.library)
 }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
+    android {
+        namespace = "com.greenrobotdev.linklibrary.utils"
+        compileSdk = 37
     }
 
     jvm("desktop")
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach {
@@ -57,8 +52,7 @@ kotlin {
 
         val desktopMain by getting {
             dependencies {
-                // AndroidX Lifecycle ViewModel for Desktop
-                implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
+                // Desktop uses custom ViewModel implementation instead of AndroidX Lifecycle
                 // Molecule Runtime for Desktop
                 implementation(libs.molecule.runtime)
             }
@@ -72,7 +66,6 @@ kotlin {
             }
         }
 
-        val iosX64Main by getting { dependsOn(iosMain) }
         val iosArm64Main by getting { dependsOn(iosMain) }
         val iosSimulatorArm64Main by getting { dependsOn(iosMain) }
 
@@ -85,14 +78,6 @@ kotlin {
     }
 }
 
-android {
-    namespace = "com.greenrobotdev.linklibrary.utils"
-    compileSdk = 34
-    defaultConfig {
-        minSdk = 24
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
+// Note: AGP 9 uses android {} inside kotlin {} block for shared modules
+// Traditional android {} block only used in separate Android app entry point modules
+

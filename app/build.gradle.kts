@@ -1,28 +1,17 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.convention.kmp.library)
     alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-            freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
-            freeCompilerArgs.add("-Xcontext-receivers")
-        }
+    android {
+        namespace = "com.greenrobotdev.linklibrary.app"
+        compileSdk = 37
     }
 
-    jvm() {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-            freeCompilerArgs.add("-Xjsr305=strict")
-        }
-    }
+    jvm()
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -119,39 +108,12 @@ kotlin {
 
         val wasmJsTest by getting {
             dependencies {
-                implementation(kotlin("test-js"))
+                // WASM testing uses different approach in Kotlin 2.3+
+                // kotlin-test-js is no longer needed, dependencies inherited from commonTest
             }
         }
     }
-
 }
 
-android {
-    namespace = "com.greenrobotdev.linklibrary"
-    compileSdk = 36
+// AGP 9 configuration handled by kmp-library-convention plugin
 
-    defaultConfig {
-        minSdk = 28
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4"
-    }
-}
-
-// Note: -Xinline-optimizations flag removed as it's not supported in Kotlin 2.1.0
-
-// Enable Compose compiler metrics and performance monitoring
-composeCompiler {
-    metricsDestination = layout.buildDirectory.dir("compose-compiler-reports")
-    reportsDestination = layout.buildDirectory.dir("compose-compiler-reports")
-}

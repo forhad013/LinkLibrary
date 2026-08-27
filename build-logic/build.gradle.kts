@@ -4,18 +4,28 @@ plugins {
 
 repositories {
     gradlePluginPortal()
-    google()
+    google()          // Required for Android/AGP artifacts
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin:2.1.0")
-    implementation("com.android.library:com.android.library.gradle.plugin:8.9.1")
-    implementation("com.android.application:com.android.application.gradle.plugin:8.9.1")
-    implementation("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:1.9.3")
-    implementation("org.jetbrains.kotlin.plugin.compose:org.jetbrains.kotlin.plugin.compose.gradle.plugin:2.1.0")
-    implementation("org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin:2.1.0")
-    implementation("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:2.1.0-1.0.29")
-    implementation("androidx.room:androidx.room.gradle.plugin:2.8.3")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.4.10")
+    implementation("org.jetbrains.compose:compose-gradle-plugin:1.7.1")
+    implementation("com.android.tools.build:gradle:9.1.0")
+    implementation("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:2.3.11")
+    implementation("androidx.room:androidx.room.gradle.plugin:2.8.4")
+}
+
+// Register convention plugins for Gradle to discover
+gradlePlugin {
+    plugins {
+        register("kmpLibrary") {
+            id = "convention.kmp-library"
+            implementationClass = "convention.KmpLibraryConventionPlugin"
+        }
+        register("androidRoom") {
+            id = "convention.android-room"
+            implementationClass = "convention.AndroidRoomConventionPlugin"
+        }
+    }
 }

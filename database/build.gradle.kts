@@ -1,18 +1,13 @@
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.androidx.room)
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.convention.android.room)
 }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
+    android {
+        namespace = "com.greenrobotdev.linklibrary.database"
+        compileSdk = 37
     }
-    jvm() // Add JVM target to enable expect/actual
+    jvm()
 
     sourceSets {
         val commonMain by getting {
@@ -60,36 +55,23 @@ kotlin {
     }
 }
 
-// Configure Room schema directory per official docs
-room {
+// Configure Room schema directory
+configure<androidx.room.gradle.RoomExtension> {
     schemaDirectory("$projectDir/schemas")
 }
 
-// KSP dependencies for Room compiler
-// Per official docs: https://developer.android.com/kotlin/multiplatform/room
-dependencies {
-    add("kspAndroid", libs.androidx.room.compiler)
-    add("kspJvm", libs.androidx.room.compiler)
-}
-
-// KSP configuration for Room incremental processing
-ksp {
+// Configure KSP compiler args for Room
+configure<com.google.devtools.ksp.gradle.KspExtension> {
     arg("room.schemaLocation", "$projectDir/schemas")
     arg("room.incremental", "true")
     arg("room.expandProjection", "true")
     arg("room.useKspKotlinCodegen", "true")
 }
 
-android {
-    namespace = "com.greenrobotdev.linklibrary.database"
-    compileSdk = 36
-
-    defaultConfig {
-        minSdk = 28
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
+// Configure KSP dependencies for Room compiler
+dependencies {
+    add("kspCommonMainMetadata", libs.androidx.room.compiler)
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspJvm", libs.androidx.room.compiler)
 }
+

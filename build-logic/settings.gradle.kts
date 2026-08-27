@@ -1,10 +1,18 @@
-rootProject.name = "build-logic"
-
 dependencyResolutionManagement {
     repositories {
         gradlePluginPortal()
-        google()
+        google()          // Required for Android/AGP artifacts
         mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
+
+    // Enable version catalog access for convention plugins
+    versionCatalogs {
+        create("libs") {
+            from(files("../gradle/libs.versions.toml"))
+        }
+    }
+}
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
