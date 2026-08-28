@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 
 <html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Bookmark Details - Lords of Links</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Bookmark Details - Lords of Links</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -104,7 +104,7 @@
             }
         }
     </script>
-<style>
+    <style>
         body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
         /* Smooth transitions for interactive elements */
         .interactive-btn { transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), background-color 0.2s ease, box-shadow 0.2s ease; }
@@ -116,129 +116,134 @@
         ::-webkit-scrollbar-thumb { background: theme('colors.outline-variant'); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: theme('colors.outline'); }
     </style>
+    <style>
+        body {
+          min-height: max(884px, 100dvh);
+        }
+    </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col md:flex-row">
 <!-- TopAppBar (Visible on Mobile & Desktop, acts as header on desktop without side nav for this detailed view) -->
 <header class="w-full sticky top-0 z-40 bg-background dark:bg-background h-16 flex justify-between items-center px-margin-desktop md:px-margin-desktop">
-<div class="flex items-center gap-4">
-<button class="md:hidden text-on-surface hover:bg-surface-container-high p-2 rounded-full transition-colors active:scale-95 duration-200">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
-</button>
-<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim hidden md:block">
-                Lords of Links
-            </div>
-<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim md:hidden">
-                Details
-            </div>
-</div>
-<div class="flex items-center gap-2">
-<button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-200 p-2 rounded-full">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
-</button>
-<button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-200 p-2 rounded-full">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
-</button>
-</div>
+    <div class="flex items-center gap-4">
+        <button class="md:hidden text-on-surface hover:bg-surface-container-high p-2 rounded-full transition-colors active:scale-95 duration-200">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+        </button>
+        <div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim hidden md:block">
+            Lords of Links
+        </div>
+        <div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim md:hidden">
+            Details
+        </div>
+    </div>
+    <div class="flex items-center gap-2">
+        <button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-200 p-2 rounded-full">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+        </button>
+        <button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-200 p-2 rounded-full">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+        </button>
+    </div>
 </header>
 <!-- Main Content Canvas -->
 <main class="flex-1 w-full max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-gutter md:py-margin-desktop pb-32 md:pb-margin-desktop">
-<!-- Back Navigation (Desktop) -->
-<div class="hidden md:flex items-center gap-2 mb-gutter text-on-surface-variant cursor-pointer hover:text-primary transition-colors group w-fit">
-<span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
-<span class="font-label-lg text-label-lg">Back to Library</span>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter md:gap-margin-desktop">
-<!-- Left Column: Hero Image & Meta -->
-<div class="lg:col-span-8 flex flex-col gap-gutter">
-<!-- Hero Image Container with Glassmorphism Overlay -->
-<div class="relative w-full h-[300px] md:h-[450px] rounded-3xl overflow-hidden shadow-lg shadow-primary/10 group">
-<img alt="Hero Image" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A high-quality, inspiring abstract visual representing digital connectivity and creativity. A vibrant network of glowing nodes and flowing lines against a clean, warm off-white background. Accents of deep violet and bright lavender weave through the composition. The lighting is soft and studio-like, casting gentle shadows that give the abstract shapes a tactile, 3D quality, evoking a sense of modern professional utility combined with expressive, energetic design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu1aumvSih9R5qXKUunkxUjybt7qxnUcDVQ9-c4yfWIe9Cj-wI_U3rkXPz5rBhI5wlZWDPv0G32Un0d1mA7PDt8N-6VDc51QNdmdMq2FQJ31qsW49ARzEumt9Qe6-iisQDNSU8-WbrSZSM8jcznPAuk73M-oalRuMdd4Z4Lv0wzBlQR6y2-hB1qlWCRrhZ-CfBBaP8gizpjEXGhguonHZQUQ7405JfqNjyFmMyW_jJELrHHoalxJPGxg"/>
-<!-- Gradient overlay for text readability -->
-<div class="absolute inset-0 bg-gradient-to-t from-surface/90 via-surface/40 to-transparent"></div>
-<!-- Floating Meta Tags -->
-<div class="absolute top-gutter left-gutter flex flex-wrap gap-2">
-<span class="bg-primary-container text-on-primary-container font-label-md text-label-md px-3 py-1 rounded-full shadow-sm backdrop-blur-md bg-opacity-90">Design System</span>
-<span class="bg-surface/80 text-on-surface font-label-md text-label-md px-3 py-1 rounded-full shadow-sm backdrop-blur-md">UI/UX</span>
-</div>
-<!-- Bottom Content Overlay -->
-<div class="absolute bottom-0 left-0 w-full p-container-padding">
-<div class="flex items-center gap-2 mb-2 text-primary font-label-md text-label-md">
-<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">link</span>
-<span class="truncate max-w-[200px] md:max-w-md">uxdesign.cc/the-future-of-material-you</span>
-</div>
-<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2 leading-tight">
-                            The Evolution of Material You: Expressive Professionalism
-                        </h1>
-</div>
-</div>
-<!-- Meta Description Card -->
-<div class="bg-surface rounded-3xl p-container-padding shadow-md shadow-primary/5">
-<h2 class="font-title-lg text-title-lg text-on-surface mb-4 flex items-center gap-2">
-<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0;">subject</span>
-                        Summary
-                    </h2>
-<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
-                        An in-depth exploration of how Google's Material 3 design system is adapting to professional environments without losing its expressive, personal touch. The article covers fluid typography scales, dynamic color extraction algorithms applied to enterprise dashboards, and the strategic use of ambient shadows to denote structural hierarchy. Essential reading for designers bridging the gap between utilitarian enterprise software and engaging consumer apps.
-                    </p>
-<div class="mt-6 flex flex-wrap gap-4 text-on-surface-variant font-label-md text-label-md">
-<div class="flex items-center gap-1 bg-surface-container-low px-3 py-1.5 rounded-lg">
-<span class="material-symbols-outlined text-[16px]">calendar_today</span>
-                            Added Oct 24, 2023
-                        </div>
-<div class="flex items-center gap-1 bg-surface-container-low px-3 py-1.5 rounded-lg">
-<span class="material-symbols-outlined text-[16px]">schedule</span>
-                            8 min read
-                        </div>
-</div>
-</div>
-</div>
-<!-- Right Column: Actions & Notes (Bento Style) -->
-<div class="lg:col-span-4 flex flex-col gap-gutter">
-<!-- Action Buttons Card -->
-<div class="bg-surface rounded-3xl p-container-padding shadow-md shadow-primary/5 flex flex-col gap-4">
-<button class="interactive-btn w-full bg-primary text-on-primary font-label-lg text-label-lg py-4 px-6 rounded-2xl flex items-center justify-center gap-2 hover:bg-secondary transition-colors shadow-sm">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">open_in_new</span>
-                        Open Link
+    <!-- Back Navigation (Desktop) -->
+    <div class="hidden md:flex items-center gap-2 mb-gutter text-on-surface-variant cursor-pointer hover:text-primary transition-colors group w-fit">
+        <span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+        <span class="font-label-lg text-label-lg">Back to Library</span>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter md:gap-margin-desktop">
+        <!-- Left Column: Hero Image & Meta -->
+        <div class="lg:col-span-8 flex flex-col gap-gutter">
+            <!-- Hero Image Container with Glassmorphism Overlay -->
+            <div class="relative w-full h-[300px] md:h-[450px] rounded-3xl overflow-hidden shadow-lg shadow-primary/10 group">
+                <img alt="Hero Image" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A high-quality, inspiring abstract visual representing digital connectivity and creativity. A vibrant network of glowing nodes and flowing lines against a clean, warm off-white background. Accents of deep violet and bright lavender weave through the composition. The lighting is soft and studio-like, casting gentle shadows that give the abstract shapes a tactile, 3D quality, evoking a sense of modern professional utility combined with expressive, energetic design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu1aumvSih9R5qXKUunkxUjybt7qxnUcDVQ9-c4yfWIe9Cj-wI_U3rkXPz5rBhI5wlZWDPv0G32Un0d1mA7PDt8N-6VDc51QNdmdMq2FQJ31qsW49ARzEumt9Qe6-iisQDNSU8-WbrSZSM8jcznPAuk73M-oalRuMdd4Z4Lv0wzBlQR6y2-hB1qlWCRrhZ-CfBBaP8gizpjEXGhguonHZQUQ7405JfqNjyFmMyW_jJELrHHoalxJPGxg"/>
+                <!-- Gradient overlay for text readability -->
+                <div class="absolute inset-0 bg-gradient-to-t from-surface/90 via-surface/40 to-transparent"></div>
+                <!-- Floating Meta Tags -->
+                <div class="absolute top-gutter left-gutter flex flex-wrap gap-2">
+                    <span class="bg-primary-container text-on-primary-container font-label-md text-label-md px-3 py-1 rounded-full shadow-sm backdrop-blur-md bg-opacity-90">Design System</span>
+                    <span class="bg-surface/80 text-on-surface font-label-md text-label-md px-3 py-1 rounded-full shadow-sm backdrop-blur-md">UI/UX</span>
+                </div>
+                <!-- Bottom Content Overlay -->
+                <div class="absolute bottom-0 left-0 w-full p-container-padding">
+                    <div class="flex items-center gap-2 mb-2 text-primary font-label-md text-label-md">
+                        <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">link</span>
+                        <span class="truncate max-w-[200px] md:max-w-md">uxdesign.cc/the-future-of-material-you</span>
+                    </div>
+                    <h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2 leading-tight">
+                        The Evolution of Material You: Expressive Professionalism
+                    </h1>
+                </div>
+            </div>
+            <!-- Meta Description Card -->
+            <div class="bg-surface rounded-3xl p-container-padding shadow-md shadow-primary/5">
+                <h2 class="font-title-lg text-title-lg text-on-surface mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0;">subject</span>
+                    Summary
+                </h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                    An in-depth exploration of how Google's Material 3 design system is adapting to professional environments without losing its expressive, personal touch. The article covers fluid typography scales, dynamic color extraction algorithms applied to enterprise dashboards, and the strategic use of ambient shadows to denote structural hierarchy. Essential reading for designers bridging the gap between utilitarian enterprise software and engaging consumer apps.
+                </p>
+                <div class="mt-6 flex flex-wrap gap-4 text-on-surface-variant font-label-md text-label-md">
+                    <div class="flex items-center gap-1 bg-surface-container-low px-3 py-1.5 rounded-lg">
+                        <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                        Added Oct 24, 2023
+                    </div>
+                    <div class="flex items-center gap-1 bg-surface-container-low px-3 py-1.5 rounded-lg">
+                        <span class="material-symbols-outlined text-[16px]">schedule</span>
+                        8 min read
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Right Column: Actions & Notes (Bento Style) -->
+        <div class="lg:col-span-4 flex flex-col gap-gutter">
+            <!-- Action Buttons Card -->
+            <div class="bg-surface rounded-3xl p-container-padding shadow-md shadow-primary/5 flex flex-col gap-4">
+                <button class="interactive-btn w-full bg-primary text-on-primary font-label-lg text-label-lg py-4 px-6 rounded-2xl flex items-center justify-center gap-2 hover:bg-secondary transition-colors shadow-sm">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">open_in_new</span>
+                    Open Link
+                </button>
+                <div class="grid grid-cols-2 gap-3">
+                    <button class="interactive-btn bg-secondary-container text-on-secondary-container font-label-lg text-label-lg py-3 px-4 rounded-xl flex flex-col items-center justify-center gap-1 hover:bg-[#b09bff] transition-colors text-center shadow-sm h-full">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">add_task</span>
+                        Add to Task
                     </button>
-<div class="grid grid-cols-2 gap-3">
-<button class="interactive-btn bg-secondary-container text-on-secondary-container font-label-lg text-label-lg py-3 px-4 rounded-xl flex flex-col items-center justify-center gap-1 hover:bg-[#b09bff] transition-colors text-center shadow-sm h-full">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">add_task</span>
-                            Add to Task
-                        </button>
-<button class="interactive-btn bg-surface-container-high text-on-surface font-label-lg text-label-lg py-3 px-4 rounded-xl flex flex-col items-center justify-center gap-1 hover:bg-surface-variant transition-colors text-center shadow-sm h-full border border-outline-variant/30">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">move_item</span>
-                            Move to Collection
-                        </button>
-</div>
-<div class="flex justify-between items-center mt-2 pt-4 border-t border-surface-variant">
-<button aria-label="Share" class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low flex items-center justify-center">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">share</span>
-</button>
-<button aria-label="Copy Link" class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low flex items-center justify-center">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">content_copy</span>
-</button>
-<button aria-label="Delete" class="text-error hover:bg-error-container/50 transition-colors p-2 rounded-full flex items-center justify-center">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">delete</span>
-</button>
-</div>
-</div>
-<!-- Personal Notes Area -->
-<div class="bg-surface rounded-3xl p-container-padding shadow-md shadow-primary/5 flex-1 flex flex-col min-h-[300px]">
-<div class="flex justify-between items-center mb-4">
-<h3 class="font-title-lg text-title-lg text-on-surface flex items-center gap-2">
-<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">edit_note</span>
-                            Personal Notes
-                        </h3>
-<span class="text-on-surface-variant font-label-md text-label-md bg-surface-container px-2 py-1 rounded-md">Saved</span>
-</div>
-<textarea class="w-full flex-1 bg-surface-container-low border-2 border-transparent focus:border-secondary focus:ring-0 rounded-2xl p-4 font-body-md text-body-md text-on-surface placeholder:text-outline resize-none transition-colors" placeholder="Jot down key takeaways, action items, or why you saved this..." spellcheck="false">Review the section on ambient shadow implementation for the upcoming Q3 dashboard redesign. The concept of tinting shadows with the primary color (violet) instead of pure black seems like it could fix the 'muddy' look we've been getting on the data cards.</textarea>
-<div class="mt-4 flex justify-end">
-<button class="interactive-btn text-primary font-label-lg text-label-lg py-2 px-4 rounded-full hover:bg-primary-container/50 transition-colors">
-                            Format Note
-                        </button>
-</div>
-</div>
-</div>
-</div>
+                    <button class="interactive-btn bg-surface-container-high text-on-surface font-label-lg text-label-lg py-3 px-4 rounded-xl flex flex-col items-center justify-center gap-1 hover:bg-surface-variant transition-colors text-center shadow-sm h-full border border-outline-variant/30">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">move_item</span>
+                        Move to Collection
+                    </button>
+                </div>
+                <div class="flex justify-between items-center mt-2 pt-4 border-t border-surface-variant">
+                    <button aria-label="Share" class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low flex items-center justify-center">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">share</span>
+                    </button>
+                    <button aria-label="Copy Link" class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low flex items-center justify-center">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">content_copy</span>
+                    </button>
+                    <button aria-label="Delete" class="text-error hover:bg-error-container/50 transition-colors p-2 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">delete</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Personal Notes Area -->
+            <div class="bg-surface rounded-3xl p-container-padding shadow-md shadow-primary/5 flex-1 flex flex-col min-h-[300px]">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-title-lg text-title-lg text-on-surface flex items-center gap-2">
+                        <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+                        Personal Notes
+                    </h3>
+                    <span class="text-on-surface-variant font-label-md text-label-md bg-surface-container px-2 py-1 rounded-md">Saved</span>
+                </div>
+                <textarea class="w-full flex-1 bg-surface-container-low border-2 border-transparent focus:border-secondary focus:ring-0 rounded-2xl p-4 font-body-md text-body-md text-on-surface placeholder:text-outline resize-none transition-colors" placeholder="Jot down key takeaways, action items, or why you saved this..." spellcheck="false">Review the section on ambient shadow implementation for the upcoming Q3 dashboard redesign. The concept of tinting shadows with the primary color (violet) instead of pure black seems like it could fix the 'muddy' look we've been getting on the data cards.</textarea>
+                <div class="mt-4 flex justify-end">
+                    <button class="interactive-btn text-primary font-label-lg text-label-lg py-2 px-4 rounded-full hover:bg-primary-container/50 transition-colors">
+                        Format Note
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 </body></html>
