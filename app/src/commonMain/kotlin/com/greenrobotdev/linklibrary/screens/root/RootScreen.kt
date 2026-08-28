@@ -29,7 +29,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.greenrobotdev.linklibrary.bookmarks.model.SharedContent
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkScreenEnhanced
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.addCollection.AddCollectionScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.collections.CollectionsScreen
@@ -185,7 +185,7 @@ fun RootScreen(
                                 }
                             )
 
-                            is RootScreens.AddLink -> AddLinkScreenEnhanced(
+                            is RootScreens.AddLink -> AddLinkScreen(
                                 routeKey = route,
                                 initialUrl = route.initialUrl,
                                 onBack = { navigator.goBack() },

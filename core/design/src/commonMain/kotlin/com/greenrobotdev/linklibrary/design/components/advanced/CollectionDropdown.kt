@@ -17,9 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
@@ -46,7 +46,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -82,9 +81,10 @@ fun CollectionDropdown(
     modifier: Modifier = Modifier,
     placeholder: String = "Select collection",
     showLinkCounts: Boolean = true,
-    allowNone: Boolean = true,
     enabled: Boolean = true
 ) {
+    println("whkq63 availableCollections $collections")
+
     var expanded by remember { mutableStateOf(false) }
     var showCreateDialog by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
@@ -123,15 +123,11 @@ fun CollectionDropdown(
         modifier = modifier
     ) {
         OutlinedTextField(
-            value = selectedCollection?.name ?: if (allowNone) "No collection" else "",
+            value = selectedCollection?.name ?:   "Select a collection ",
             onValueChange = {},
             readOnly = true,
             modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor()
-                .graphicsLayer {
-                    shadowElevation = fieldElevation.toPx()
-                },
+                .fillMaxWidth(),
             placeholder = { Text(placeholder) },
             trailingIcon = {
                 Icon(
@@ -166,7 +162,9 @@ fun CollectionDropdown(
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.height(400.dp)
+            modifier = Modifier
+                .height(400.dp)
+                .width(300.dp) // Add explicit width to prevent intrinsic measurements
         ) {
             // Search field in dropdown
             Row(
@@ -200,14 +198,15 @@ fun CollectionDropdown(
                 (it.description?.contains(searchText, ignoreCase = true) ?: false)
             }
 
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
+            println("whkq63 filteredCollections: $filteredCollections, size: ${filteredCollections.size}")
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                // "No collection" option
-                if (allowNone) {
-                    item {
-                        DropdownMenuItem(
+                    DropdownMenuItem(
                             text = {
                                 Row(
                                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -242,10 +241,11 @@ fun CollectionDropdown(
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-                }
+
 
                 // Collection items
-                items(filteredCollections) { collection ->
+                filteredCollections.forEach { collection ->
+                    println("whkq63 rendering collection item: ${collection.name}")
                     DropdownMenuItem(
                         text = {
                             Row(
@@ -320,8 +320,7 @@ fun CollectionDropdown(
 
                 // Create new collection option
                 if (searchText.isNotEmpty()) {
-                    item {
-                        DropdownMenuItem(
+                    DropdownMenuItem(
                             text = {
                                 Row(
                                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -353,24 +352,22 @@ fun CollectionDropdown(
                             },
                             modifier = Modifier.fillMaxWidth()
                         )
-                    }
                 }
             }
         }
-    }
 
-    // Create collection dialog
-    if (showCreateDialog) {
-        CreateCollectionDialog(
-            initialName = searchText,
-            onDismiss = { showCreateDialog = false },
-            onCreate = { name, description ->
-                onCollectionCreate(name, description.orEmpty())
-                showCreateDialog = false
-            }
-        )
+        // Create collection dialog
+        if (showCreateDialog) {
+            CreateCollectionDialog(
+                initialName = searchText,
+                onDismiss = { showCreateDialog = false },
+                onCreate = { name, description ->
+                    onCollectionCreate(name, description.orEmpty())
+                    showCreateDialog = false
+                }
+            )
+        }
     }
-}
 
 @Composable
 private fun CreateCollectionDialog(

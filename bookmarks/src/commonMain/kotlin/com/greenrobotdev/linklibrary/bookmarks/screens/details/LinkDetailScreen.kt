@@ -184,7 +184,7 @@ fun LinkDetailScreen(
             }
 
             state.link != null -> {
-                // Content state - matching HTML grid layout (8:4 column split on desktop)
+                // Content state - Expressive Material 3 single-column layout
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -193,63 +193,41 @@ fun LinkDetailScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    // Responsive grid: single column on mobile, 8:4 split on desktop
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(24.dp)
-                    ) {
-                        // Left Column: Hero + Summary (spans 8/12 on desktop)
-                        Column(
-                            modifier = Modifier
-                                .weight(8f)
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(24.dp)
-                        ) {
-                            // Hero Card
-                            HeroCard(
-                                imageUrl = state.link?.url,
-                                title = state.link?.title ?: "",
-                                url = state.link?.url?.toString() ?: "",
-                                tags = state.link?.tags ?: emptyList(),
-                                description = state.link?.description ?: ""
-                            )
+                    // Hero Card with expressive gradient and molecular imagery
+                    HeroCard(
+                        imageUrl = state.link?.url,
+                        title = state.link?.title ?: "",
+                        url = state.link?.url?.toString() ?: "",
+                        tags = state.link?.tags ?: emptyList(),
+                        description = state.link?.description ?: ""
+                    )
 
-                            // Summary Card
-                            SummaryCard(
-                                description = state.link?.description ?: "",
-                                createdAt = state.link?.createdAt,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
+                    // Action Buttons Card (moved after hero for better UX)
+                    ActionButtonsCard(
+                        onOpenLink = { /* Open link */ },
+                        onEdit = { /* Navigate to edit */ },
+                        onShare = { /* Share link */ },
+                        onCopyLink = { /* Copy link */ },
+                        onDelete = { showDeleteDialog = true },
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                        // Right Column: Actions + Notes (spans 4/12 on desktop)
-                        Column(
-                            modifier = Modifier
-                                .weight(4f)
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(24.dp)
-                        ) {
-                            // Action Buttons Card
-                            ActionButtonsCard(
-                                onOpenLink = { /* Open link */ },
-                                onEdit = { /* Navigate to edit */ },
-                                onShare = { /* Share link */ },
-                                onCopyLink = { /* Copy link */ },
-                                onDelete = { showDeleteDialog = true },
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                    // Summary Card
+                    SummaryCard(
+                        description = state.link?.description ?: "",
+                        createdAt = state.link?.createdAt,
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                            // Personal Notes Card
-                            PersonalNotesCard(
-                                notes = personalNotes,
-                                isEditing = isEditingNotes,
-                                onEditClick = { isEditingNotes = true },
-                                onNotesChange = { personalNotes = it },
-                                onSave = { isEditingNotes = false },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
+                    // Personal Notes Card
+                    PersonalNotesCard(
+                        notes = personalNotes,
+                        isEditing = isEditingNotes,
+                        onEditClick = { isEditingNotes = true },
+                        onNotesChange = { personalNotes = it },
+                        onSave = { isEditingNotes = false },
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
                     Spacer(modifier = Modifier.height(32.dp)) // Bottom padding
                 }
@@ -304,13 +282,13 @@ fun LinkDetailScreen(
 }
 
 /**
- * Hero Card Component
+ * Hero Card Component - Material 3 Design
  *
- * Hero card matching the link_details.html specification with:
- * - Large image (300px mobile, 450px desktop)
- * - Proper gradient overlay (surface/90 via surface/40 to transparent)
- * - Floating meta tags at top-left
+ * Hero card matching the Material 3 design specification with:
+ * - Light lavender/gray gradient background with abstract molecular 3D imagery
+ * - Pill-shaped tags with proper Material 3 styling
  * - Bottom overlay with URL indicator and title
+ * - 24dp rounded corners matching Material 3 design system
  */
 @Composable
 private fun HeroCard(
@@ -320,7 +298,7 @@ private fun HeroCard(
     tags: List<String>,
     description: String
 ) {
-    // Animation for hover effect
+    // Animation for hover effect using spring physics
     var isHovered by remember { mutableStateOf(false) }
     val cardScale by animateFloatAsState(
         targetValue = if (isHovered) 1.02f else 1f,
@@ -338,50 +316,129 @@ private fun HeroCard(
                 scaleX = cardScale
                 scaleY = cardScale
             },
-        shape = RoundedCornerShape(24.dp), // Matching HTML rounded-3xl
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp,
-            hoveredElevation = 4.dp
+        shape = RoundedCornerShape(24.dp), // Material 3 extra-large rounded corners
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
         ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 1.dp,
+            hoveredElevation = 2.dp
+        )
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp) // Fixed height matching HTML
+                .height(300.dp) // Fixed height for mobile
         ) {
-            // Hero Image or Gradient Placeholder
+            // Hero Image or Expressive Material 3 Gradient Background with molecular imagery
             if (imageUrl != null) {
                 PlatformAsyncImage(
                     model = imageUrl,
                     contentDescription = title,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+//                    contentScale = ContentScale.Crop
                 )
             } else {
-                // Gradient placeholder matching HTML aesthetic
+                // Expressive organic gradient background with molecular network imagery
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
-                            Brush.horizontalGradient(
+                            Brush.verticalGradient(
                                 colors = listOf(
-                                    MaterialTheme.colorScheme.primaryContainer,
-                                    MaterialTheme.colorScheme.secondaryContainer
-                                )
+                                    // Soft lilac top
+                                    Color(0xFFE8E0F0).copy(alpha = 0.8f),
+                                    // Light purple mid-top
+                                    Color(0xFFD4C4E8).copy(alpha = 0.7f),
+                                    // Medium purple mid-bottom
+                                    Color(0xFFC4A8E0).copy(alpha = 0.6f),
+                                    // Soft lavender bottom
+                                    Color(0xFFE0D0F0).copy(alpha = 0.5f)
+                                ),
+                                startY = 0f,
+                                endY = Float.POSITIVE_INFINITY
                             )
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Article,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.3f),
-                        modifier = Modifier.size(64.dp)
-                    )
+                    // Expressive molecular/sphere 3D visual
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        // Large central molecular sphere
+                        Box(
+                            modifier = Modifier
+                                .size(140.dp)
+                                .graphicsLayer {
+                                    scaleX = 1f
+                                    scaleY = 1f
+                                    alpha = 0.6f
+                                }
+                                .background(
+                                    Brush.radialGradient(
+                                        colors = listOf(
+                                            Color(0xFF9B7EBD).copy(alpha = 0.4f),
+                                            Color(0xFF7B5FA0).copy(alpha = 0.2f),
+                                            Color.Transparent
+                                        ),
+                                        radius = 200f
+                                    ),
+                                    shape = CircleShape
+                                )
+                        )
+
+                        // Smaller surrounding molecular spheres
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .padding(start = 40.dp, top = 20.dp)
+                                .size(60.dp)
+                                .graphicsLayer { alpha = 0.4f }
+                                .background(
+                                    Brush.radialGradient(
+                                        colors = listOf(
+                                            Color(0xFFB8A0D0).copy(alpha = 0.5f),
+                                            Color.Transparent
+                                        ),
+                                        radius = 100f
+                                    ),
+                                    shape = CircleShape
+                                )
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .padding(end = 50.dp, bottom = 30.dp)
+                                .size(80.dp)
+                                .graphicsLayer { alpha = 0.35f }
+                                .background(
+                                    Brush.radialGradient(
+                                        colors = listOf(
+                                            Color(0xFFC8B0E0).copy(alpha = 0.6f),
+                                            Color.Transparent
+                                        ),
+                                        radius = 120f
+                                    ),
+                                    shape = CircleShape
+                                )
+                        )
+
+                        // Molecular connecting nodes
+                        Icon(
+                            imageVector = Icons.Default.Code,
+                            contentDescription = null,
+                            tint = Color(0xFF7B5FA0).copy(alpha = 0.15f),
+                            modifier = Modifier
+                                .size(100.dp)
+                                .graphicsLayer { alpha = 0.3f }
+                        )
+                    }
                 }
             }
 
-            // Gradient overlay matching HTML: from-surface/90 via-surface/40 to-transparent
+            // Material 3 gradient overlay for text readability
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -389,14 +446,14 @@ private fun HeroCard(
                         Brush.verticalGradient(
                             colors = listOf(
                                 Color.Transparent,
-                                MaterialTheme.colorScheme.surface.copy(alpha = 0.4f),
-                                MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
+                                MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.3f),
+                                MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.7f)
                             )
                         )
                     )
             )
 
-            // Floating Meta Tags (matching HTML top-left positioning)
+            // Floating Pill-shaped Tags (Expressive Material 3 design)
             if (tags.isNotEmpty()) {
                 Row(
                     modifier = Modifier
@@ -404,39 +461,41 @@ private fun HeroCard(
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Primary tag with filled background
+                    // Primary tag with expressive filled tonal background
                     Surface(
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        shadowElevation = 2.dp
+                        shape = RoundedCornerShape(20.dp), // More pronounced pill shape
+                        color = Color(0xFF9B7EBD).copy(alpha = 0.85f), // Expressive purple
+                        tonalElevation = 3.dp
                     ) {
                         Text(
                             text = tags.firstOrNull() ?: "Design System",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            fontWeight = FontWeight.Medium,
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp)
                         )
                     }
 
-                    // Secondary tags with surface background
+                    // Secondary tags with expressive styling
                     tags.drop(1).take(2).forEach { tag ->
                         Surface(
-                            shape = CircleShape,
-                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
-                            shadowElevation = 2.dp
+                            shape = RoundedCornerShape(20.dp), // More pronounced pill shape
+                            color = Color(0xFFE8E0F0).copy(alpha = 0.75f), // Soft lilac
+                            tonalElevation = 2.dp
                         ) {
                             Text(
                                 text = tag,
                                 style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF5B3F80), // Deep purple text
+                                modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp)
                             )
                         }
                     }
                 }
             }
 
-            // Bottom Content Overlay (matching HTML bottom overlay)
+            // Bottom Content Overlay (Material 3 typography and spacing)
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -456,7 +515,7 @@ private fun HeroCard(
                     )
                     Text(
                         text = url,
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -464,10 +523,10 @@ private fun HeroCard(
                     )
                 }
 
-                // Title
+                // Title with Material 3 typography
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.headlineLarge, // Larger to match HTML
+                    style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     lineHeight = MaterialTheme.typography.headlineLarge.lineHeight,
@@ -480,10 +539,13 @@ private fun HeroCard(
 }
 
 /**
- * Summary Card Component
+ * Summary Card Component - Expressive Material 3 Design
  *
  * Card displaying link summary/description with metadata badges
- * matching the link_details.html specification
+ * matching the expressive Material 3 design specification with:
+ * - Section header: purple document icon + "Summary" (bold)
+ * - Body paragraph with proper expressive Material 3 typography
+ * - Meta row with pill-shaped badges (date + read time)
  */
 @Composable
 private fun SummaryCard(
@@ -493,18 +555,17 @@ private fun SummaryCard(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(24.dp), // Matching HTML rounded-3xl
+        shape = RoundedCornerShape(24.dp), // Material 3 extra-large rounded corners
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Header with icon
+            // Header with icon - Expressive Material 3 design
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -512,17 +573,18 @@ private fun SummaryCard(
                 Icon(
                     imageVector = Icons.Default.Article,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = Color(0xFF7B5FA0), // Deep expressive purple
                     modifier = Modifier.size(24.dp)
                 )
                 Text(
                     text = "Summary",
                     style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
-            // Description text
+            // Description text with expressive Material 3 typography
             Text(
                 text = description.takeIf { it.isNotBlank() }
                     ?: "No description available for this link.",
@@ -531,56 +593,60 @@ private fun SummaryCard(
                 lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
             )
 
-            // Metadata badges (matching HTML)
+            // Metadata badges - Expressive Material 3 pill-shaped design
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Date added badge
+                // Date added badge - Expressive pill design with soft lilac
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerLow
+                    shape = RoundedCornerShape(14.dp), // More pronounced pill shape
+                    color = Color(0xFFE8E0F0).copy(alpha = 0.6f), // Soft lilac
+                    tonalElevation = 2.dp
                 ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Label,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = Color(0xFF7B5FA0).copy(alpha = 0.8f), // Deep purple
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
                             text = "Added ${formatTimestamp(createdAt)}",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF5B3F80) // Deep purple text
                         )
                     }
                 }
 
-                // Read time badge (placeholder)
+                // Read time badge - Expressive pill design with soft lilac
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerLow
+                    shape = RoundedCornerShape(14.dp), // More pronounced pill shape
+                    color = Color(0xFFE8E0F0).copy(alpha = 0.6f), // Soft lilac
+                    tonalElevation = 2.dp
                 ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.VideoLibrary,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = Color(0xFF7B5FA0).copy(alpha = 0.8f), // Deep purple
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
                             text = "5 min read",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF5B3F80) // Deep purple text
                         )
                     }
                 }
@@ -590,10 +656,14 @@ private fun SummaryCard(
 }
 
 /**
- * Action Buttons Card Component
+ * Action Buttons Card Component - Expressive Material 3 Design
  *
  * Card containing primary and secondary action buttons
- * matching the link_details.html specification
+ * matching the expressive Material 3 design specification with:
+ * - Full-width primary "Open Link" button with deep expressive purple color
+ * - "Add to Task" button with filled tonal style (light lilac)
+ * - "Move to Collection" button with outlined style
+ * - Icon-only actions (Share, Copy, Delete) separated by dividers
  */
 @Composable
 private fun ActionButtonsCard(
@@ -606,24 +676,23 @@ private fun ActionButtonsCard(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(24.dp), // Matching HTML rounded-3xl
+        shape = RoundedCornerShape(24.dp), // Material 3 extra-large rounded corners
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Primary Action Button (Open Link)
+            // Primary Action Button (Open Link) - Expressive filled button with deep purple
             Button(
                 onClick = onOpenLink,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(16.dp), // Material 3 rounded corners
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = Color(0xFF7B5FA0) // Deep expressive purple
                 ),
                 elevation = ButtonDefaults.buttonElevation(
                     defaultElevation = 2.dp,
@@ -633,38 +702,39 @@ private fun ActionButtonsCard(
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    modifier = Modifier.padding(vertical = 8.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.OpenInNew,
                         contentDescription = null,
                         modifier = Modifier.size(20.dp),
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        tint = Color.White
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         "Open Link",
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = Color.White
                     )
                 }
             }
 
-            // Secondary Actions (2-column grid)
+            // Secondary Actions (2-column grid) - Expressive Material 3 design
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Add to Task button
-                OutlinedButton(
+                // Add to Task button - Expressive filled tonal button with lilac
+                Button(
                     onClick = { /* TODO: Add to task */ },
                     modifier = Modifier
                         .weight(1f)
                         .height(64.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFD4C4E8).copy(alpha = 0.8f) // Light expressive lilac
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp)
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -673,17 +743,19 @@ private fun ActionButtonsCard(
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = null,
+                            tint = Color(0xFF5B3F80), // Deep purple
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             "Add to Task",
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFF5B3F80) // Deep purple
                         )
                     }
                 }
 
-                // Move to Collection button
+                // Move to Collection button - Expressive outlined button
                 OutlinedButton(
                     onClick = { /* TODO: Move to collection */ },
                     modifier = Modifier
@@ -691,9 +763,9 @@ private fun ActionButtonsCard(
                         .height(64.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onSurface
+                        contentColor = Color(0xFF7B5FA0) // Deep purple
                     ),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+                    border = BorderStroke(1.dp, Color(0xFFD4C4E8).copy(alpha = 0.6f))
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -702,60 +774,62 @@ private fun ActionButtonsCard(
                         Icon(
                             imageVector = Icons.Default.Label,
                             contentDescription = null,
+                            tint = Color(0xFF7B5FA0), // Deep purple
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             "Move to Collection",
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFF7B5FA0) // Deep purple
                         )
                     }
                 }
             }
 
-            // Tertiary Actions (icon row with divider)
+            // Tertiary Actions (icon row with divider) - Expressive Material 3 design
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
                     onClick = onShare,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(48.dp) // Material 3 touch target
                 ) {
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = "Share",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = Color(0xFF7B5FA0).copy(alpha = 0.7f) // Muted purple
                     )
                 }
 
                 VerticalDivider(
                     modifier = Modifier.height(24.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    color = Color(0xFFE8E0F0).copy(alpha = 0.6f) // Soft lilac divider
                 )
 
                 IconButton(
                     onClick = onCopyLink,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(48.dp) // Material 3 touch target
                 ) {
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = "Copy link",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = Color(0xFF7B5FA0).copy(alpha = 0.7f) // Muted purple
                     )
                 }
 
                 VerticalDivider(
                     modifier = Modifier.height(24.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    color = Color(0xFFE8E0F0).copy(alpha = 0.6f) // Soft lilac divider
                 )
 
                 IconButton(
                     onClick = onDelete,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(48.dp) // Material 3 touch target
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
@@ -769,10 +843,13 @@ private fun ActionButtonsCard(
 }
 
 /**
- * Personal Notes Card Component
+ * Personal Notes Card Component - Expressive Material 3 Design
  *
- * Large editable notes area with format button
- * matching the link_details.html specification
+ * Large editable notes area matching the expressive Material 3 design specification with:
+ * - Header with purple notes icon + "Personal Notes" (bold) + "Saved" pill badge
+ * - Note body inside an inset light-gray rounded box
+ * - "Format Note" link, purple, right-aligned at bottom
+ * - Edit button with icon
  */
 @Composable
 private fun PersonalNotesCard(
@@ -784,13 +861,12 @@ private fun PersonalNotesCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(), // HTML min-height handled by content
-        shape = RoundedCornerShape(24.dp), // Matching HTML rounded-3xl
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp), // Material 3 extra-large rounded corners
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier
@@ -798,7 +874,7 @@ private fun PersonalNotesCard(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Header with edit status and format button
+            // Header with Expressive Material 3 design
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -811,35 +887,38 @@ private fun PersonalNotesCard(
                     Icon(
                         imageVector = Icons.Default.EditNote,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary,
+                        tint = Color(0xFF9B7EBD), // Expressive purple
                         modifier = Modifier.size(24.dp)
                     )
                     Text(
                         text = "Personal Notes",
                         style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
-                // Status indicator
+                // "Saved" status pill badge - Expressive Material 3 design
                 if (!isEditing) {
                     Surface(
-                        shape = RoundedCornerShape(4.dp),
-                        color = MaterialTheme.colorScheme.surfaceContainer
+                        shape = RoundedCornerShape(14.dp), // More pronounced pill shape
+                        color = Color(0xFFE8E0F0).copy(alpha = 0.7f), // Soft lilac
+                        tonalElevation = 2.dp
                     ) {
                         Text(
                             text = "Saved",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF5B3F80), // Deep purple text
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp)
                         )
                     }
                 }
             }
 
-            // Notes content
+            // Notes content with expressive Material 3 inset styling
             if (isEditing) {
-                // Edit mode - TextField
+                // Edit mode - TextField with expressive Material 3 styling
                 androidx.compose.material3.TextField(
                     value = notes,
                     onValueChange = onNotesChange,
@@ -847,78 +926,97 @@ private fun PersonalNotesCard(
                         .fillMaxWidth()
                         .weight(1f),
                     placeholder = {
-                        Text("Jot down key takeaways, action items, or why you saved this...")
+                        Text(
+                            "Jot down key takeaways, action items, or why you saved this...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        )
                     },
                     colors = androidx.compose.material3.TextFieldDefaults.colors(
-                        focusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                        focusedIndicatorColor = Color(0xFF9B7EBD), // Expressive purple
                         unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                        focusedContainerColor = Color(0xFFF5F0FF).copy(alpha = 0.5f), // Very light lilac
+                        unfocusedContainerColor = Color(0xFFF5F0FF).copy(alpha = 0.5f)
                     ),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(16.dp), // Material 3 rounded corners
                     maxLines = 10,
                     textStyle = MaterialTheme.typography.bodyMedium
                 )
 
-                // Action row
+                // Action row with expressive Material 3 styling
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(
                         onClick = onSave,
-                        shape = CircleShape,
                         colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.primary
+                            contentColor = Color(0xFF7B5FA0) // Deep expressive purple
                         )
                     ) {
-                        Text("Save Notes", style = MaterialTheme.typography.labelLarge)
+                        Text(
+                            "Save Notes",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = Color(0xFF7B5FA0) // Deep expressive purple
+                        )
                     }
                 }
             } else {
-                // View mode - Text area
-                Box(
+                // View mode - Read-only text area with expressive Material 3 inset styling
+                Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f)
+                        .weight(1f),
+                    shape = RoundedCornerShape(16.dp), // Material 3 rounded corners
+                    color = Color(0xFFF5F0FF).copy(alpha = 0.4f), // Very light lilac
+                    tonalElevation = 2.dp
                 ) {
-                    androidx.compose.material3.TextField(
-                        value = notes.takeIf { it.isNotBlank() } ?: "No notes added yet. Click Edit to add your thoughts...",
-                        onValueChange = { },
-                        modifier = Modifier.fillMaxSize(),
-                        colors = androidx.compose.material3.TextFieldDefaults.colors(
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
-                        ),
-                        shape = RoundedCornerShape(16.dp),
-                        maxLines = 10,
-                        textStyle = MaterialTheme.typography.bodyMedium,
-                        readOnly = true
-                    )
+                    Box(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = notes.takeIf { it.isNotBlank() }
+                                ?: "No notes added yet. Click Edit to add your thoughts...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = if (notes.isNotBlank()) {
+                                MaterialTheme.colorScheme.onSurface
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            },
+                            fontStyle = if (notes.isNotBlank()) {
+                                androidx.compose.ui.text.font.FontStyle.Normal
+                            } else {
+                                androidx.compose.ui.text.font.FontStyle.Italic
+                            }
+                        )
+                    }
                 }
 
-                // Format button (always visible)
+                // Format and Edit buttons row - Expressive Material 3 design
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // "Format Note" text button - Expressive Material 3 design
                     TextButton(
                         onClick = { /* TODO: Format notes */ },
-                        shape = CircleShape,
                         colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.primary
+                            contentColor = Color(0xFF7B5FA0) // Deep expressive purple
                         )
                     ) {
-                        Text("Format Note", style = MaterialTheme.typography.labelLarge)
+                        Text(
+                            "Format Note",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = Color(0xFF7B5FA0) // Deep expressive purple
+                        )
                     }
 
-                    Spacer(modifier = Modifier.width(8.dp))
-
+                    // Edit button with icon - Expressive Material 3 design
                     TextButton(
                         onClick = onEditClick,
-                        shape = CircleShape,
                         colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.primary
+                            contentColor = Color(0xFF7B5FA0) // Deep expressive purple
                         )
                     ) {
                         Row(
@@ -928,9 +1026,14 @@ private fun PersonalNotesCard(
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = null,
+                                tint = Color(0xFF7B5FA0), // Deep expressive purple
                                 modifier = Modifier.size(18.dp)
                             )
-                            Text("Edit", style = MaterialTheme.typography.labelLarge)
+                            Text(
+                                "Edit",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = Color(0xFF7B5FA0) // Deep expressive purple
+                            )
                         }
                     }
                 }

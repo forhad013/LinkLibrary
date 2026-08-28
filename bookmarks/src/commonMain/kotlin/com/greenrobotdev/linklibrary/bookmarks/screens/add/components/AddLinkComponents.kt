@@ -2,15 +2,46 @@ package com.greenrobotdev.linklibrary.bookmarks.screens.add.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Title
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.bookmarks.model.Collection
@@ -254,12 +285,14 @@ fun OrganizationSection(
     availableTags: List<Tag>,
     selectedTags: List<String>,
     onCollectionToggle: (String) -> Unit,
+    onClearAllCollections: () -> Unit,
     onTagToggle: (String) -> Unit,
     onAddTag: () -> Unit,
     onAddCollection: () -> Unit,
     isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -278,17 +311,11 @@ fun OrganizationSection(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            // Collection Dropdown
-            CollectionInputRow(
-                collections = availableCollections,
-                selectedCollectionId = selectedCollections.firstOrNull(),
-                onCollectionSelected = { collectionId ->
-                    selectedCollections.forEach { existingId ->
-                        onCollectionToggle(existingId)
-                    }
-                    collectionId?.let { onCollectionToggle(it) }
-                },
-                onCollectionCreate = { _, _ -> onAddCollection() },
+            CollectionSelector(
+                collections = availableCollections.toSet(),
+                selectedCollections = selectedCollections.toSet(),
+                onCollectionToggle = onCollectionToggle,
+                onClearAllCollections = onClearAllCollections,
                 onAddCollection = onAddCollection,
                 isLoading = isLoading
             )
@@ -325,47 +352,73 @@ private fun CollectionInputRow(
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            CollectionDropdown(
-                collections = collections.map {
-                    CollectionItem(
-                        id = it.id,
-                        name = it.name,
-                        description = it.description,
-                        icon = Icons.Default.Folder,
-                        linkCount = 0,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                },
-                selectedCollectionId = selectedCollectionId,
-                onCollectionSelected = onCollectionSelected,
-                onCollectionCreate = onCollectionCreate,
-                modifier = Modifier.weight(1f),
-                placeholder = "Select collections",
-                showLinkCounts = true,
-                allowNone = true,
-                enabled = !isLoading
-            )
 
-            // Add Collection Button
-            IconButton(
-                onClick = onAddCollection,
-                enabled = !isLoading,
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-                        RoundedCornerShape(12.dp)
+        when {
+            // Empty state - no collections available
+            collections.isEmpty() -> {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(
+                        onClick = onAddCollection,
+                        modifier = Modifier.weight(1f),
+                        enabled = !isLoading
+                    ) {
+                        Text(
+                            "Create your first collection",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+
+            // Show collection dropdown
+            else -> {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    CollectionDropdown(
+                        collections = collections.map {
+                            CollectionItem(
+                                id = it.id,
+                                name = it.name,
+                                description = it.description,
+                                icon = Icons.Default.Folder,
+                                linkCount = 0,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        },
+                        selectedCollectionId = selectedCollectionId,
+                        onCollectionSelected = onCollectionSelected,
+                        onCollectionCreate = onCollectionCreate,
+                        modifier = Modifier.weight(1f),
+                        placeholder = "Select collections",
+                        showLinkCounts = true,
+                        enabled = !isLoading
                     )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add collection",
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
+
+                    // Add Collection Button
+                    IconButton(
+                        onClick = onAddCollection,
+                        enabled = !isLoading,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+                                RoundedCornerShape(12.dp)
+                            )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add collection",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
             }
         }
     }
@@ -391,48 +444,94 @@ private fun TagsSection(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        // Selected tags as chips
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val selectedTagsList = availableTags.filter { it.id in selectedTags }
-            selectedTagsList.forEach { tag ->
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surface,
-                    border = BorderStroke(
-                        1.dp,
-                        MaterialTheme.colorScheme.outlineVariant
-                    ),
-                    onClick = { onTagToggle(tag.id) }
+        when {
+            // Empty state - no tags available
+            availableTags.isEmpty() -> {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = tag.name,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
+                    TextButton(
+                        onClick = onAddTag,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            "Create your first tag",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
 
-            // Add Tag Button
-            IconButton(
-                onClick = onAddTag,
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(
-                        MaterialTheme.colorScheme.primaryContainer,
-                        RoundedCornerShape(16.dp)
-                    )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add tag",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(16.dp)
-                )
+            // Show selected tags as chips
+            else -> {
+
+                when {
+                    // No tags selected but available
+                    availableTags.isEmpty() -> {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "You haven't created any tags",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            // Add Tag Button
+                            IconButton(
+                                onClick = onAddTag,
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .background(
+                                        MaterialTheme.colorScheme.primaryContainer,
+                                        RoundedCornerShape(16.dp)
+                                    )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Add tag",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    // Show selected tags chips
+                    else -> {
+                        FlowRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            availableTags.forEach { tag ->
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = MaterialTheme.colorScheme.surface,
+                                    border = BorderStroke(
+                                        1.dp,
+                                        MaterialTheme.colorScheme.outlineVariant
+                                    ),
+                                    onClick = { onTagToggle(tag.id) }
+                                ) {
+                                    Text(
+                                        text = tag.name,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                    )
+                                }
+                            }
+
+
+                        }
+                    }
+                }
             }
         }
     }
