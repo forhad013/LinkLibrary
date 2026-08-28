@@ -12,7 +12,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkEvent
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkViewModel
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkScreenState
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkState
 import com.greenrobotdev.linklibrary.design.components.form.FixedFormActionsBar
 
 /**
@@ -33,7 +33,7 @@ fun AddLinkView(
     onAddTag: () -> Unit,
     onAddCollection: () -> Unit,
     content: @Composable (
-        state: AddLinkScreenState,
+        state: AddLinkState,
         onEvent: (AddLinkEvent) -> Unit,
         isTaskEnabled: Boolean,
         onTaskEnabledChange: (Boolean) -> Unit,
