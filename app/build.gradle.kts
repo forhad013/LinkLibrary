@@ -46,6 +46,8 @@ kotlin {
                 implementation(libs.navigation3.ui)
                 implementation(libs.lifecycle.viewmodel.navigation3)
 
+                // Coil for image loading (Android only - added in androidMain)
+
                 // Design module (Material 3 theme and components)
                 implementation(project(":core:design"))
 
@@ -71,6 +73,8 @@ kotlin {
                 implementation(libs.ktor.client.okhttp)
                 // Molecule for Android
                 implementation(libs.molecule.runtime)
+                // Coil for image loading (Android only)
+                implementation(libs.coil.compose)
             }
         }
 

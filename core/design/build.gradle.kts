@@ -42,6 +42,8 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation("androidx.appcompat:appcompat:1.6.1")
+                // Coil for image loading (Android only)
+                implementation(libs.coil.compose)
             }
         }
     }
