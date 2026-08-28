@@ -29,17 +29,17 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.greenrobotdev.linklibrary.bookmarks.model.SharedContent
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkScreenEnhanced
 import com.greenrobotdev.linklibrary.bookmarks.screens.addCollection.AddCollectionScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.collections.CollectionsScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.details.LinkDetailScreen
-import com.greenrobotdev.linklibrary.screens.home.HomeScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreenEnhanced
+import com.greenrobotdev.linklibrary.design.demo.ComponentDemoScreen
+import com.greenrobotdev.linklibrary.screens.home.HomeScreen
 import com.greenrobotdev.linklibrary.screens.notes.NoteEditorScreen
 import com.greenrobotdev.linklibrary.screens.settings.SettingsScreen
-import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreen
-import com.greenrobotdev.linklibrary.design.demo.ComponentDemoScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.serializer
@@ -185,7 +185,7 @@ fun RootScreen(
                                 }
                             )
 
-                            is RootScreens.AddLink -> AddLinkScreen(
+                            is RootScreens.AddLink -> AddLinkScreenEnhanced(
                                 routeKey = route,
                                 initialUrl = route.initialUrl,
                                 onBack = { navigator.goBack() },
@@ -211,7 +211,7 @@ fun RootScreen(
                             )
 
                             // Tags Screens
-                            is RootScreens.Tags -> TagsScreen(
+                            is RootScreens.Tags -> TagsScreenEnhanced(
                                 routeKey = route,
                                 onBack = { navigator.goBack() },
                                 onCreateTag = { navigator.navigate(RootScreens.AddTag) }
