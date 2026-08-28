@@ -3,38 +3,40 @@ package com.greenrobotdev.linklibrary.design.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * Material Design 3 Color Scheme
- * Based on HTML design template with exact RGB values
+ * Material Design 3 Expressive Color Scheme
+ * Based on lords_of_links_add_link HTML design template with exact RGB values
+ * Primary: Purple theme (#4c22bd)
  */
 
-// Primary Colors
-internal val Primary = Color(0xFF0058BD)           // rgb(0, 88, 189) - Primary
-internal val PrimaryBlue = Color(0xFF4285F4)       // rgb(66, 133, 244) - Save Button
-internal val PrimaryFixed = Color(0xFFD8E2FF)      // rgb(216, 226, 255)
-internal val PrimaryFixedDim = Color(0xFFADC6FF)   // rgb(173, 198, 255)
+// Primary Colors - Purple theme
+internal val Primary = Color(0xFF4C22BD)           // rgb(76, 34, 189) - Primary purple
+internal val PrimaryFixed = Color(0xFFE7DEFF)      // rgb(231, 222, 255)
+internal val PrimaryFixedDim = Color(0xFFCBBEFF)   // rgb(203, 190, 255)
 internal val OnPrimary = Color(0xFFFFFFFF)         // rgb(255, 255, 255)
-internal val OnPrimaryFixed = Color(0xFF001A41)    // rgb(0, 26, 65)
-internal val OnPrimaryFixedVariant = Color(0xFF004494) // rgb(0, 68, 148)
+internal val OnPrimaryFixed = Color(0xFF1E0061)    // rgb(30, 0, 97)
+internal val OnPrimaryFixedVariant = Color(0xFF4B21BD) // rgb(75, 33, 189)
+internal val PrimaryContainer = Color(0xFFEADDFF)  // rgb(234, 221, 255)
+internal val OnPrimaryContainer = Color(0xFFDED4FF) // rgb(222, 212, 255)
 
-// Secondary Colors
-internal val Secondary = Color(0xFF295EA6)         // rgb(41, 94, 166)
-internal val SecondaryContainer = Color(0xFF83B1FF) // rgb(131, 177, 255)
-internal val SecondaryFixed = Color(0xFFD6E3FF)   // rgb(214, 227, 255)
-internal val SecondaryFixedDim = Color(0xFFA9C7FF) // rgb(169, 199, 255)
+// Secondary Colors - Light purple theme
+internal val Secondary = Color(0xFF6349BF)         // rgb(99, 73, 191) - Light purple
+internal val SecondaryContainer = Color(0xFF9F86FF) // rgb(159, 134, 255)
+internal val SecondaryFixed = Color(0xFFE7DEFF)   // rgb(231, 222, 255)
+internal val SecondaryFixedDim = Color(0xFFCCBEFF) // rgb(204, 190, 255)
 internal val OnSecondary = Color(0xFFFFFFFF)      // rgb(255, 255, 255)
-internal val OnSecondaryContainer = Color(0xFF004285) // rgb(0, 66, 133)
-internal val OnSecondaryFixed = Color(0xFF001B3D) // rgb(0, 27, 61)
-internal val OnSecondaryFixedVariant = Color(0xFF00468C) // rgb(0, 70, 140)
+internal val OnSecondaryContainer = Color(0xFF340D90) // rgb(52, 13, 144)
+internal val OnSecondaryFixed = Color(0xFF1E0060) // rgb(30, 0, 96)
+internal val OnSecondaryFixedVariant = Color(0xFF4B2EA6) // rgb(75, 46, 166)
 
-// Tertiary Colors
-internal val Tertiary = Color(0xFF006B2B)          // rgb(0, 107, 43) - Green
-internal val TertiaryContainer = Color(0xFF008738) // rgb(0, 135, 56)
-internal val TertiaryFixed = Color(0xFF89FA9B)    // rgb(137, 250, 155)
-internal val TertiaryFixedDim = Color(0xFF6DDD81)  // rgb(109, 221, 129)
+// Tertiary Colors - Neutral gray theme
+internal val Tertiary = Color(0xFF4A464B)         // rgb(74, 70, 75) - Neutral
+internal val TertiaryContainer = Color(0xFF625E63) // rgb(98, 94, 99)
+internal val TertiaryFixed = Color(0xFFE8E0E6)    // rgb(232, 224, 230)
+internal val TertiaryFixedDim = Color(0xFFCBC4CA)  // rgb(203, 196, 202)
 internal val OnTertiary = Color(0xFFFFFFFF)       // rgb(255, 255, 255)
-internal val OnTertiaryContainer = Color(0xFFF7FFF2) // rgb(247, 255, 242)
-internal val OnTertiaryFixed = Color(0xFF002108)   // rgb(0, 33, 8)
-internal val OnTertiaryFixedVariant = Color(0xFF005320) // rgb(0, 83, 32)
+internal val OnTertiaryContainer = Color(0xFFDFD8DE) // rgb(223, 216, 222)
+internal val OnTertiaryFixed = Color(0xFF1D1B1F)   // rgb(29, 27, 31)
+internal val OnTertiaryFixedVariant = Color(0xFF49454A) // rgb(73, 69, 74)
 
 // Error Colors
 internal val Error = Color(0xFFBA1A1A)            // rgb(186, 26, 26)
@@ -42,36 +44,32 @@ internal val ErrorContainer = Color(0xFFFFDAD6)   // rgb(255, 218, 214)
 internal val OnError = Color(0xFFFFFFFF)           // rgb(255, 255, 255)
 internal val OnErrorContainer = Color(0xFF93000A)  // rgb(147, 0, 10)
 
-// Background and Surface Colors
-internal val Background = Color(0xFFFAF9FD)        // rgb(250, 249, 253) - Main background
-internal val OnBackground = Color(0xFF1A1B1E)     // rgb(26, 27, 30) - Text primary
-internal val Surface = Color(0xFFFAF9FD)           // rgb(250, 249, 253) - Same as background
-internal val OnSurface = Color(0xFF1A1B1E)         // rgb(26, 27, 30)
-internal val OnSurfaceVariant = Color(0xFF424753)   // rgb(66, 71, 83) - Text secondary
-internal val SurfaceVariant = Color(0xFFE3E2E6)    // rgb(227, 226, 230)
+// Background and Surface Colors - Light theme
+internal val Background = Color(0xFFFCF8F9)        // rgb(252, 248, 249) - Main background
+internal val OnBackground = Color(0xFF1B1B1C)     // rgb(27, 27, 28) - Text primary
+internal val Surface = Color(0xFFFEFBFF)           // rgb(254, 251, 255) - Cards
+internal val OnSurface = Color(0xFF1B1B1C)         // rgb(27, 27, 28)
+internal val OnSurfaceVariant = Color(0xFF484554)   // rgb(72, 69, 84) - Text secondary
+internal val SurfaceVariant = Color(0xFFE5E2E3)    // rgb(229, 226, 227)
 internal val SurfaceContainerLowest = Color(0xFFFFFFFF) // rgb(255, 255, 255) - White
-internal val SurfaceContainerLow = Color(0xFFF4F3F7) // rgb(244, 243, 247)
-internal val SurfaceContainer = Color(0xFFEFEDF1)  // rgb(239, 237, 241)
-internal val SurfaceContainerHigh = Color(0xFFE9E7EB) // rgb(233, 231, 235)
-internal val SurfaceContainerHighest = Color(0xFFE3E2E6) // rgb(227, 226, 230) - Border color
-internal val SurfaceDim = Color(0xFFDBD9DD)         // rgb(219, 217, 221)
-internal val SurfaceBright = Color(0xFFFAF9FD)     // rgb(250, 249, 253)
+internal val SurfaceContainerLow = Color(0xFFF6F3F4) // rgb(246, 243, 244)
+internal val SurfaceContainer = Color(0xFFF0EDEE)  // rgb(240, 237, 238)
+internal val SurfaceContainerHigh = Color(0xFFEAE7E8) // rgb(234, 231, 232)
+internal val SurfaceContainerHighest = Color(0xFFE5E2E3) // rgb(229, 226, 223)
+internal val SurfaceDim = Color(0xFFDCD9DA)         // rgb(220, 217, 218)
+internal val SurfaceBright = Color(0xFFFCF8F9)     // rgb(252, 248, 249)
 
 // Outline and Border Colors
-internal val Outline = Color(0xFF727785)           // rgb(114, 119, 133)
-internal val OutlineVariant = Color(0xFFC2C6D5)    // rgb(194, 198, 213) - Border outline
+internal val Outline = Color(0xFF797586)           // rgb(121, 117, 134)
+internal val OutlineVariant = Color(0xFFCAC4D7)    // rgb(202, 196, 215) - Border outline
+internal val SurfaceTint = Color(0xFF6341D5)       // rgb(99, 65, 213) - Surface tint
 
 // Inverse Colors
-internal val InverseSurface = Color(0xFF2F3033)    // rgb(47, 48, 51)
-internal val InverseOnSurface = Color(0xFFF1F0F4)  // rgb(241, 240, 244)
-internal val InversePrimary = Color(0xFFADC6FF)    // rgb(173, 198, 255)
+internal val InverseSurface = Color(0xFF303031)    // rgb(48, 48, 49)
+internal val InverseOnSurface = Color(0xFFF3F0F1)  // rgb(243, 240, 241)
+internal val InversePrimary = Color(0xFFCBBEFF)    // rgb(203, 190, 255)
 
-// Additional Container Colors
-internal val SurfaceTint = Color(0xFF005AC1)       // rgb(0, 90, 193)
-internal val PrimaryContainer = Color(0xFF2771DF)   // rgb(39, 113, 223)
-internal val OnPrimaryContainer = Color(0xFFFEFCFF) // rgb(254, 252, 255)
-
-// Dark Mode Specific Colors
-internal val DarkBackground = Color(0xFF1A1A1A)
-internal val DarkSurface = Color(0xFF242424)
-internal val DarkSurfaceVariant = Color(0xFF2D2D2D)
+// Dark Mode Specific Colors (computed based on light theme)
+internal val DarkBackground = Color(0xFF1B1B1C)
+internal val DarkSurface = Color(0xFF303031)
+internal val DarkSurfaceVariant = Color(0xFF484554)
