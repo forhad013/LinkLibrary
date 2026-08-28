@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.bookmarks.model.Tag
-import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreenState
+import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsState
 
 /**
  * TagsTopBar - Top app bar for Tags screen
@@ -167,7 +167,7 @@ fun TagsManageButton(
  */
 @Composable
 fun TagsContent(
-    state: TagsScreenState,
+    state: TagsState,
     onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {

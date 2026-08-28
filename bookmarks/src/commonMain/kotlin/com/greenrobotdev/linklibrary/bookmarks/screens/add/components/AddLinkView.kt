@@ -1,65 +1,50 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add.components
 
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation3.runtime.NavKey
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkEvent
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkViewModel
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkState
 import com.greenrobotdev.linklibrary.design.components.form.FixedFormActionsBar
 
 /**
- * AddLinkView - Main view component with screen-level logic and state management
+ * AddLinkView - Presentational component that receives state and event callbacks
  *
  * This component handles:
- * - View model initialization and state management
- * - LaunchedEffect blocks for navigation and auto-fetch
- * - Animation states
- * - Task state management
- * - Content layout orchestration
+ * - UI state management (animations, local form state)
+ * - Layout orchestration
+ * - Event handling via callbacks
+ *
+ * Business logic (ViewModel, navigation effects) is owned by the parent screen
  */
 @Composable
 fun AddLinkView(
-    routeKey: NavKey,
-    initialUrl: String?,
-    onBack: () -> Unit,
+    state: AddLinkState,
+    onEvent: (AddLinkEvent) -> Unit,
     onAddTag: () -> Unit,
     onAddCollection: () -> Unit,
-    content: @Composable (
-        state: AddLinkState,
-        onEvent: (AddLinkEvent) -> Unit,
-        isTaskEnabled: Boolean,
-        onTaskEnabledChange: (Boolean) -> Unit,
-        selectedPriority: String,
-        onPriorityChange: (String) -> Unit,
-        dueTime: String,
-        onDueTimeChange: (String) -> Unit,
-        modifier: Modifier
-    ) -> Unit
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val viewModel: AddLinkViewModel = viewModel<AddLinkViewModel>(key = routeKey.toString()) { AddLinkViewModel(initialUrl) }
-    val state by viewModel.models.collectAsState()
-
-    // Navigate back after successful link addition
-    LaunchedEffect(state.success) {
-        if (state.success) {
-            onBack()
-        }
-    }
-
-    // Auto-fetch metadata when URL is entered and valid
-    LaunchedEffect(state.url) {
-        if (state.url.isNotBlank() && state.url.startsWith("http") && !state.isFetching && state.title.isBlank()) {
-            viewModel.take(AddLinkEvent.FetchMetadata)
-        }
-    }
+    // Local UI state for task section
+    var isTaskEnabled by remember { mutableStateOf(false) }
+    var selectedPriority by remember { mutableStateOf("Medium") }
+    var dueTime by remember { mutableStateOf("09:00") }
 
     // Animated container for the form
     val contentAlpha by animateFloatAsState(
@@ -68,23 +53,27 @@ fun AddLinkView(
         label = "content_alpha"
     )
 
-    // Tasks state
-    var isTaskEnabled by remember { mutableStateOf(false) }
-    var selectedPriority by remember { mutableStateOf("Medium") }
-    var dueTime by remember { mutableStateOf("09:00") }
-
-    // Content callback with all necessary state and callbacks
-    content(
-        state,
-        { viewModel.take(it) },
-        isTaskEnabled,
-        { isTaskEnabled = it },
-        selectedPriority,
-        { selectedPriority = it },
-        dueTime,
-        { dueTime = it },
-        Modifier
-    )
+    AddLinkFormScaffold(
+        onSaveClick = { onEvent(AddLinkEvent.Submit) },
+        onBackClick = onBack,
+        isFormValid = state.isFormValid,
+        isLoading = state.isLoading,
+        modifier = modifier
+    ) { padding ->
+        AddLinkFormContent(
+            state = state,
+            onEvent = onEvent,
+            isTaskEnabled = isTaskEnabled,
+            onTaskEnabledChange = { isTaskEnabled = it },
+            selectedPriority = selectedPriority,
+            onPriorityChange = { selectedPriority = it },
+            dueTime = dueTime,
+            onDueTimeChange = { dueTime = it },
+            modifier = Modifier.padding(padding),
+            onAddTag = onAddTag,
+            onAddCollection = onAddCollection
+        )
+    }
 }
 
 /**
@@ -94,7 +83,7 @@ fun AddLinkView(
  */
 @Composable
 fun AddLinkFormContent(
-    state: AddLinkScreenState,
+    state: AddLinkState,
     onEvent: (AddLinkEvent) -> Unit,
     isTaskEnabled: Boolean,
     onTaskEnabledChange: (Boolean) -> Unit,
@@ -135,9 +124,9 @@ fun AddLinkFormContent(
         // Organization Section
         OrganizationSection(
             availableCollections = state.availableCollections,
-            selectedCollections = state.selectedCollections,
+            selectedCollections = state.selectedCollections.toList(),
             availableTags = state.availableTags,
-            selectedTags = state.selectedTags,
+            selectedTags = state.selectedTags.toList(),
             onCollectionToggle = { onEvent(AddLinkEvent.ToggleCollection(it)) },
             onTagToggle = { onEvent(AddLinkEvent.ToggleTag(it)) },
             onAddTag = onAddTag,

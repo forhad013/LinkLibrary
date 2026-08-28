@@ -78,7 +78,7 @@ fun CollectionDropdown(
     collections: List<CollectionItem>,
     selectedCollectionId: String?,
     onCollectionSelected: (String?) -> Unit,
-    onCollectionCreate: (String, String?) -> Unit,
+    onCollectionCreate: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     placeholder: String = "Select collection",
     showLinkCounts: Boolean = true,
@@ -365,7 +365,7 @@ fun CollectionDropdown(
             initialName = searchText,
             onDismiss = { showCreateDialog = false },
             onCreate = { name, description ->
-                onCollectionCreate(name, description)
+                onCollectionCreate(name, description.orEmpty())
                 showCreateDialog = false
             }
         )

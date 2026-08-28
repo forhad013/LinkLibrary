@@ -2,6 +2,8 @@ package com.greenrobotdev.linklibrary.bookmarks.screens.tags
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import com.greenrobotdev.linklibrary.bookmarks.screens.tags.components.*
 

@@ -77,7 +77,7 @@ actual abstract class MoleculeViewModel<Event, Model> {
      * @return The current model/state
      */
     @Composable
-    protected abstract fun models(events: Flow<Event>): Model
+    actual protected abstract fun models(events: Flow<Event>): Model
 
     /**
      * Provides the initial value for the models StateFlow.
@@ -87,7 +87,7 @@ actual abstract class MoleculeViewModel<Event, Model> {
      *
      * @return The initial model value
      */
-    protected open fun initialValue(): Model {
+    actual protected open fun initialValue(): Model {
         // Default implementation - subclasses should override this
         // to provide the actual initial state
         error("initialValue() must be overridden in subclasses")

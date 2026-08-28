@@ -8,10 +8,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsViewModel
-import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreenState
+import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsState
 
 /**
  * TagsView - Main view component with screen-level logic and state management
@@ -27,7 +28,7 @@ fun TagsView(
     onCreateTag: () -> Unit,
     onManageTags: () -> Unit,
     content: @Composable (
-        state: TagsScreenState,
+        state: TagsState,
         onCreateTag: () -> Unit,
         onManageTags: () -> Unit,
         modifier: Modifier

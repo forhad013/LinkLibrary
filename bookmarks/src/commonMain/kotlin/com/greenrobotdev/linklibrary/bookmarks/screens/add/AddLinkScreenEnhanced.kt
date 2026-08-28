@@ -1,66 +1,73 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add
 
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.*
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.AddLinkView
 
 /**
  * Enhanced Add Link Screen - Material 3 Expressive Design
  *
- * Comprehensive link creation screen with:
- * - Real-time URL validation
- * - Auto-fetch metadata with loading states
- * - Advanced tag management
- * - Collection selection with inline creation
- * - Personal notes with character count
- * - Form validation and error handling
- * - Expressive animations and micro-interactions
+ * Screen-led architecture approach:
+ * - Screen owns ViewModel and business logic
+ * - Screen handles navigation and side effects
+ * - View components are presentational and receive state/callbacks
  *
- * This screen has been refactored into logical components for better maintainability:
- * - AddLinkView: Handles screen-level logic and state management
- * - AddLinkFormScaffold: Provides the standard Material 3 layout
- * - AddLinkFormContent: Orchestrates all form sections
- * - Individual components for each section (UrlInputSection, OrganizationSection, etc.)
+ * Business Logic Responsibilities:
+ * - ViewModel creation and lifecycle management
+ * - Navigation effects (success -> back navigation)
+ * - Auto-fetch logic based on URL changes
+ * - Event flow to ViewModel
+ *
+ * UI Composition:
+ * - AddLinkView: Presentational component with state and callbacks
+ * - Individual sections: Reusable UI components
  */
 @Composable
 fun AddLinkScreenEnhanced(
     routeKey: NavKey,
     initialUrl: String?,
     onBack: () -> Unit,
-    onAddTag: () -> Unit = {},
-    onAddCollection: () -> Unit = {}
+    onAddTag: () -> Unit,
+    onAddCollection: () -> Unit
 ) {
-    AddLinkView(
-        routeKey = routeKey,
-        initialUrl = initialUrl,
-        onBack = onBack,
-        onAddTag = onAddTag,
-        onAddCollection = onAddCollection
-    ) { state, onEvent, isTaskEnabled, onTaskEnabledChange, selectedPriority, onPriorityChange, dueTime, onDueTimeChange, modifier ->
+    // Screen owns the ViewModel and state
+    val viewModel: AddLinkViewModel = viewModel<AddLinkViewModel>(key = routeKey.toString()) { AddLinkViewModel(initialUrl) }
+    val state by viewModel.models.collectAsState()
 
-        AddLinkFormScaffold(
-            onSaveClick = { onEvent(AddLinkEvent.Submit) },
-            onBackClick = onBack,
-            isFormValid = state.isFormValid,
-            isLoading = state.isLoading,
-            modifier = modifier
-        ) { padding ->
-            AddLinkFormContent(
-                state = state,
-                onEvent = onEvent,
-                isTaskEnabled = isTaskEnabled,
-                onTaskEnabledChange = onTaskEnabledChange,
-                selectedPriority = selectedPriority,
-                onPriorityChange = onPriorityChange,
-                dueTime = dueTime,
-                onDueTimeChange = onDueTimeChange,
-                modifier = Modifier.padding(padding),
-                onAddTag = onAddTag,
-                onAddCollection = onAddCollection
-            )
+    // Screen handles navigation effects
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            onBack()
         }
     }
+
+    // Screen handles business logic (auto-fetch)
+    LaunchedEffect(state.url) {
+        if (shouldAutoFetch(state)) {
+            viewModel.take(AddLinkEvent.FetchMetadata)
+        }
+    }
+
+    // Screen passes state and event callbacks to presentational view
+    AddLinkView(
+        state = state,
+        onEvent = { viewModel.take(it) },
+        onAddTag = onAddTag,
+        onAddCollection = onAddCollection,
+        onBack = onBack
+    )
+}
+
+/**
+ * Determines if auto-fetch should be triggered based on current state
+ */
+private fun shouldAutoFetch(state: AddLinkState): Boolean {
+    return state.url.isNotBlank() &&
+           state.url.startsWith("http") &&
+           !state.isFetching &&
+           state.title.isBlank()
 }
