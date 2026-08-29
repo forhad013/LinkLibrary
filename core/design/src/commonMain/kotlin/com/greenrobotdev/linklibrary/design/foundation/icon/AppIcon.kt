@@ -38,14 +38,14 @@ fun AppIcon(
     imageVector: ImageVector,
     contentDescription: String? = null,
     modifier: Modifier = Modifier,
-    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     size: IconSize = IconSize.Medium
 ) {
     Icon(
         imageVector = imageVector,
         contentDescription = contentDescription,
 //        modifier = modifier.then(androidx.compose.ui.draw.size(size.dp)),
-        tint = tint
+        tint = color
     )
 }
 
@@ -68,14 +68,14 @@ sealed class IconSize(val dp: Dp) {
 fun ErrorIcon(
     contentDescription: String? = "Error",
     modifier: Modifier = Modifier,
-    tint: Color = MaterialTheme.colorScheme.error,
+    color: Color = MaterialTheme.colorScheme.error,
     size: IconSize = IconSize.Medium
 ) {
     AppIcon(
         imageVector = Icons.Filled.Error,
         contentDescription = contentDescription,
         modifier = modifier,
-        tint = tint,
+        color = color,
         size = size
     )
 }
