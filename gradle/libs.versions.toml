@@ -27,6 +27,7 @@ ksp = "2.3.11"
 sqlcipher = "4.6.1"
 coroutines = "1.11.0"
 coil = "2.7.0"
+multiplatform-settings = "1.1.1"
 
 
 [libraries]
@@ -53,6 +54,11 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktorClientCore" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
+
+# Multiplatform Settings for cross-platform preferences
+multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
+multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
+multiplatform-settings-argonaut = { module = "com.russhwolf:multiplatform-settings-argonaut", version.ref = "multiplatform-settings" }
 
 # Coil for Image Loading (Compose support)
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }

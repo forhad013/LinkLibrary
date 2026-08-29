@@ -23,6 +23,21 @@ data class UserProfile(
 )
 
 /**
+ * Theme mode options for the application
+ */
+@Serializable
+sealed class ThemeMode {
+    @Serializable
+    data object System : ThemeMode()
+
+    @Serializable
+    data object Light : ThemeMode()
+
+    @Serializable
+    data object Dark : ThemeMode()
+}
+
+/**
  * State for Settings screen
  */
 @Serializable
@@ -30,7 +45,8 @@ data class SettingsState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val userProfile: UserProfile? = null,
-    val settingItems: List<SettingItem> = emptyList()
+    val settingItems: List<SettingItem> = emptyList(),
+    val themeMode: ThemeMode = ThemeMode.System
 )
 
 /**
@@ -40,4 +56,5 @@ sealed interface SettingsEvent {
     object LoadSettings : SettingsEvent
     data class NavigateToSetting(val settingId: String) : SettingsEvent
     object ClearError : SettingsEvent
+    data class SetThemeMode(val themeMode: ThemeMode) : SettingsEvent
 }
