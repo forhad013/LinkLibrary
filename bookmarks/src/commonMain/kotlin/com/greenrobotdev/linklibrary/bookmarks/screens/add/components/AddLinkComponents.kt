@@ -47,6 +47,9 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -75,14 +78,7 @@ fun AddLinkTopBar(
     modifier: Modifier = Modifier
 ) {
     // Animate button state for better visual feedback
-    val buttonScale by animateFloatAsState(
-        targetValue = if (isFormValid && !isLoading) 1f else 0.95f,
-        animationSpec = tween(
-            durationMillis = 200,
-            easing = FastOutSlowInEasing
-        ),
-        label = "save_button_scale"
-    )
+    val buttonScale = if (isFormValid && !isLoading) 1f else 0.95f
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -180,16 +176,6 @@ fun UrlInputSection(
     modifier: Modifier = Modifier
 ) {
     // Animate container based on fetch state
-    val containerColor by animateFloatAsState(
-        targetValue = when {
-            isFetching -> 0.08f
-            fetchError != null -> 0.05f
-            titleFetched && urlNotEmpty -> 0.12f
-            else -> 0f
-        },
-        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
-        label = "container_color_alpha"
-    )
 
     val accentColor = when {
         fetchError != null -> MaterialTheme.colorScheme.error
@@ -440,11 +426,6 @@ fun TitleInputSection(
     modifier: Modifier = Modifier
 ) {
     // Animate border based on focus and content state
-    val hasContent by animateFloatAsState(
-        targetValue = if (title.isNotBlank()) 1f else 0.6f,
-        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
-        label = "title_has_content"
-    )
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -552,11 +533,6 @@ fun OrganizationSection(
 ) {
     // Animate elevation based on selection state
     val hasSelection = selectedCollections.isNotEmpty() || selectedTags.isNotEmpty()
-    val elevation by animateFloatAsState(
-        targetValue = if (hasSelection) 1f else 0.5f,
-        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
-        label = "organization_elevation"
-    )
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -853,11 +829,7 @@ fun PersonalNotesSection(
     maxLength: Int = 500
 ) {
     // Animate character progress
-    val characterProgress by animateFloatAsState(
-        targetValue = notes.length.toFloat() / maxLength,
-        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
-        label = "character_progress"
-    )
+    val characterProgress = notes.length.toFloat() / maxLength
 
     // Color based on how close to limit
     val progressColor = when {
@@ -1009,11 +981,7 @@ fun TaskSection(
     modifier: Modifier = Modifier
 ) {
     // Animate card appearance when enabled
-    val cardScale by animateFloatAsState(
-        targetValue = if (isEnabled) 1f else 0.98f,
-        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
-        label = "task_card_scale"
-    )
+    val cardScale = if (isEnabled) 1f else 0.98f
 
     Card(
         modifier = modifier
@@ -1111,12 +1079,6 @@ fun TaskSection(
 
             // Animated content reveal
             if (isEnabled) {
-                androidx.compose.animation.core.animateFloatAsState(
-                    targetValue = 1f,
-                    animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
-                    label = "task_content_reveal"
-                )
-
                 TaskOptionsContent(
                     selectedPriority = selectedPriority,
                     onPriorityChange = onPriorityChange,
@@ -1245,11 +1207,7 @@ private fun PrioritySelector(
 
             priorities.forEach { (priority, containerColor) ->
                 val isSelected = selectedPriority == priority
-                val buttonScale by animateFloatAsState(
-                    targetValue = if (isSelected) 1.05f else 1f,
-                    animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
-                    label = "priority_${priority}_scale"
-                )
+                val buttonScale = if (isSelected) 1.05f else 1f
 
                 Surface(
                     onClick = { onPriorityChange(priority) },
@@ -1318,11 +1276,6 @@ private fun DueTimeInput(
     isLoading: Boolean
 ) {
     // Animate border based on content
-    val hasContent by animateFloatAsState(
-        targetValue = if (dueTime.isNotBlank()) 1f else 0.6f,
-        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
-        label = "due_time_has_content"
-    )
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -1450,14 +1403,7 @@ fun ErrorMessageCard(
     modifier: Modifier = Modifier
 ) {
     // Animate card appearance
-    val cardScale by animateFloatAsState(
-        targetValue = 1f,
-        animationSpec = tween(
-            durationMillis = 300,
-            easing = FastOutSlowInEasing
-        ),
-        label = "error_card_scale"
-    )
+    val cardScale = 1f
 
     Card(
         modifier = modifier
