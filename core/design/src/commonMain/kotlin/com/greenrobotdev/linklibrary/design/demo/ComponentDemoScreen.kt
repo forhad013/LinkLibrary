@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,9 +27,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.greenrobotdev.linklibrary.design.components.button.FilledButton
+import com.greenrobotdev.linklibrary.design.components.button.ComponentColors
 import com.greenrobotdev.linklibrary.design.components.button.IconButton
 import com.greenrobotdev.linklibrary.design.components.button.OutlinedButton
+import com.greenrobotdev.linklibrary.design.components.button.StandardButton
 import com.greenrobotdev.linklibrary.design.components.button.TextButton
 import com.greenrobotdev.linklibrary.design.components.card.ElevatedCard
 import com.greenrobotdev.linklibrary.design.components.card.FilledCard
@@ -125,7 +127,7 @@ fun ComponentDemoScreen(onBack: () -> Unit = {}) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            FilledButton(
+            StandardButton(
                 text = "Primary",
                 onClick = { },
                 icon = Icons.Default.Add
@@ -161,7 +163,7 @@ fun ComponentDemoScreen(onBack: () -> Unit = {}) {
                 icon = Icons.Default.Delete,
                 contentDescription = "Delete",
                 onClick = { },
-                tint = androidx.compose.material3.MaterialTheme.colorScheme.error
+                colors = ComponentColors(content = MaterialTheme.colorScheme.error)
             )
         }
 
