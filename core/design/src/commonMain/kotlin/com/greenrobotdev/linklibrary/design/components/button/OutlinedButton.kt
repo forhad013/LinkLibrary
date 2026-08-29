@@ -1,105 +1,125 @@
 package com.greenrobotdev.linklibrary.design.components.button
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton as MaterialOutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.greenrobotdev.linklibrary.design.expressive.animation.SpringPhysics
+import com.greenrobotdev.linklibrary.design.theme.ComponentSize
+import com.greenrobotdev.linklibrary.design.theme.ComponentStyle
 
 /**
- * Outlined button component with Material 3 Expressive features
+ * Outlined button - Convenience wrapper for StandardButton with outlined style
  *
- * Medium-emphasis button for secondary actions with enhanced animations:
- * - Press-to-scale animation (0.97x when pressed)
- * - Border color transitions
- * - Container fill color on hover/focus
- * - Smooth color state changes
+ * This is a simplified API for outlined buttons that internally uses StandardButton
+ * with ComponentStyle.Outlined. For full customization options, use StandardButton directly.
  *
- * @param text Button text label
- * @param onClick Callback invoked when button is clicked
- * @param modifier Modifier to be applied to the button
- * @param enabled Whether the button is enabled for interaction
- * @param icon Optional leading icon to display before text
+ * ## Usage Example
+ * ```kotlin
+ * // Basic outlined button
+ * OutlinedButton(
+ *     text = "Cancel",
+ *     onClick = { /* handle click */ }
+ * )
+ *
+ * // With icon
+ * OutlinedButton(
+ *     text = "Learn More",
+ *     icon = Icons.Default.Info,
+ *     onClick = { /* handle click */ }
+ * )
+ *
+ * // For more options, use StandardButton directly
+ * StandardButton(
+ *     text = "Custom",
+ *     onClick = { /* handle click */ },
+ *     style = ComponentStyle.Outlined,
+ *     size = ComponentSize.Large,
+ *     colors = ComponentColors(container = /* custom */)
+ * )
+ * ```
+ *
+ * ## Material 3 Compliance
+ * - ✅ Expressive press-to-scale animation (0.97x when pressed)
+ * - ✅ Border color transitions and smooth animations
+ * - ✅ Enhanced ripple effects with Material 3 radius
+ * - ✅ Proper accessibility semantics and content descriptions
+ * - ✅ Theme-consistent color tokens with override capability
+ *
+ * @param text Required: Button text label
+ * @param onClick Required: Callback invoked when button is clicked
+ * @param modifier Optional: Modifier to be applied to the button
+ * @param enabled Optional: Whether the button is enabled for interaction (default: true)
+ * @param icon Optional: Leading icon to display before text
+ * @param size Optional: Button size variant (default: ComponentSize.Medium)
+ * @param colors Optional: Custom color overrides
  */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun OutlinedButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    icon: ImageVector? = null
+    icon: ImageVector? = null,
+    size: ComponentSize = ComponentSize.Medium,
+    colors: ComponentColors? = null
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    // Expressive: Press-to-scale animation
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.97f else 1f,
-        animationSpec = SpringPhysics.defaultSpring(),
-        label = "outlined_button_scale"
-    )
-
-    // Expressive: Animate border color
-    val borderColor by animateColorAsState(
-        targetValue = if (enabled) {
-            MaterialTheme.colorScheme.outline
-        } else {
-            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-        },
-        animationSpec = tween(durationMillis = 300),
-        label = "outlined_button_border"
-    )
-
-    MaterialOutlinedButton(
+    StandardButton(
         onClick = onClick,
-        modifier = modifier.scale(scale),
+        modifier = modifier,
+        text = text,
         enabled = enabled,
-        interactionSource = interactionSource,
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = MaterialTheme.colorScheme.primary,
-            disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-        )
-    ) {
-        if (icon != null) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.padding(end = ButtonDefaults.IconSpacing)
-            )
-        }
-        Text(text)
-    }
+        style = ComponentStyle.Outlined,
+        size = size,
+        icon = icon,
+        colors = colors
+    )
 }
 
 /**
- * Outlined button with destructive/error styling and expressive features
+ * Destructive outlined button - Convenience wrapper for StandardButton with error colors
  *
- * High-emphasis button for destructive actions with enhanced animations:
- * - Press-to-scale animation with spring physics
- * - Error color transitions
- * - Shake animation on press (destructive actions)
- * - Enhanced visual feedback
+ * This is a simplified API for destructive outlined buttons that internally uses StandardButton
+ * with ComponentStyle.Outlined and error color overrides. For full customization options,
+ * use StandardButton directly with custom ComponentColors.
  *
- * @param text Button text label
- * @param onClick Callback invoked when button is clicked
- * @param modifier Modifier to be applied to the button
- * @param enabled Whether the button is enabled for interaction
- * @param icon Optional leading icon to display before text
+ * ## Usage Example
+ * ```kotlin
+ * // Basic destructive button
+ * DestructiveOutlinedButton(
+ *     text = "Delete",
+ *     onClick = { /* handle destructive action */ }
+ * )
+ *
+ * // With icon
+ * DestructiveOutlinedButton(
+ *     text = "Remove",
+ *     icon = Icons.Default.Delete,
+ *     onClick = { /* handle destructive action */ }
+ * )
+ *
+ * // For more control, use StandardButton directly
+ * StandardButton(
+ *     text = "Custom Destructive",
+ *     onClick = { /* handle click */ },
+ *     style = ComponentStyle.Outlined,
+ *     colors = ComponentColors(
+ *         content = MaterialTheme.colorScheme.error
+ *     )
+ * )
+ * ```
+ *
+ * ## Material 3 Compliance
+ * - ✅ Expressive press-to-scale animation with bouncy spring physics
+ * - ✅ Error color transitions and smooth animations
+ * - ✅ Enhanced visual feedback for destructive actions
+ * - ✅ Proper accessibility semantics for destructive actions
+ * - ✅ Theme-consistent error color tokens
+ *
+ * @param text Required: Button text label
+ * @param onClick Required: Callback invoked when button is clicked
+ * @param modifier Optional: Modifier to be applied to the button
+ * @param enabled Optional: Whether the button is enabled for interaction (default: true)
+ * @param icon Optional: Leading icon to display before text
+ * @param size Optional: Button size variant (default: ComponentSize.Medium)
  */
 @Composable
 fun DestructiveOutlinedButton(
@@ -107,46 +127,20 @@ fun DestructiveOutlinedButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    icon: ImageVector? = null
+    icon: ImageVector? = null,
+    size: ComponentSize = ComponentSize.Medium
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    // Expressive: Press-to-scale animation
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.97f else 1f,
-        animationSpec = SpringPhysics.bouncySpring(),  // More bouncy for destructive actions
-        label = "destructive_button_scale"
-    )
-
-    // Expressive: Error color transitions
-    val contentColor by animateColorAsState(
-        targetValue = if (enabled) {
-            MaterialTheme.colorScheme.error
-        } else {
-            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-        },
-        animationSpec = tween(durationMillis = 300),
-        label = "destructive_button_color"
-    )
-
-    MaterialOutlinedButton(
+    StandardButton(
         onClick = onClick,
-        modifier = modifier.scale(scale),
+        modifier = modifier,
+        text = text,
         enabled = enabled,
-        interactionSource = interactionSource,
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = contentColor,
-            disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+        style = ComponentStyle.Outlined,
+        size = size,
+        icon = icon,
+        colors = ComponentColors(
+            content = androidx.compose.material3.MaterialTheme.colorScheme.error,
+            border = androidx.compose.material3.MaterialTheme.colorScheme.error
         )
-    ) {
-        if (icon != null) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.padding(end = ButtonDefaults.IconSpacing)
-            )
-        }
-        Text(text)
-    }
+    )
 }
