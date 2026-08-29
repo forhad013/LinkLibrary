@@ -118,13 +118,14 @@ fun AddLinkTopBar(
 }
 
 /**
- * UrlInputSection - URL input with auto-fetch functionality
+ * UrlInputSection - URL input with integrated auto-fetch functionality
  *
  * Features:
- * - URL text input with validation
- * - Auto-fetch button with loading states
+ * - URL text input with integrated auto-fetch button
+ * - Auto-fetch button with loading states integrated into text field
  * - Fetch state indicators
  * - Helper text for user guidance
+ * - Modern Material 3 design with cohesive UI
  */
 @Composable
 fun UrlInputSection(
@@ -142,83 +143,128 @@ fun UrlInputSection(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // URL input row with auto-fetch button
-        Row(
+        // Integrated URL input field with auto-fetch action
+        OutlinedTextField(
+            value = url,
+            onValueChange = onUrlChange,
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.Top
-        ) {
-            // URL Input
-            OutlinedTextField(
-                value = url,
-                onValueChange = onUrlChange,
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("https://example.com") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Link,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.outline
-                    )
-                },
-                enabled = !isLoading,
-                singleLine = true,
-                shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+            placeholder = { Text("https://example.com") },
+            leadingIcon = {
+                Icon(
+                    Icons.Default.Link,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.outline
                 )
-            )
+            },
+            trailingIcon = {
+                // Integrated auto-fetch button
+                val fetchState = when {
+                    isFetching -> FetchState.Loading
+                    fetchError != null -> FetchState.Error
+                    titleFetched && urlNotEmpty -> FetchState.Success
+                    else -> FetchState.Idle
+                }
 
-            // Auto-Fetch Button
-            val fetchState = when {
-                isFetching -> FetchState.Loading
-                fetchError != null -> FetchState.Error
-                titleFetched && urlNotEmpty -> FetchState.Success
-                else -> FetchState.Idle
-            }
-
-            Button(
-                onClick = onFetchClick,
-                enabled = url.isNotBlank() && !isLoading,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
-                ),
-                modifier = Modifier
-                    .height(48.dp)
-                    .widthIn(min = 120.dp),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    when (fetchState) {
-                        FetchState.Loading -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                strokeWidth = 2.dp,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                        else -> {
-                            Icon(
-                                imageVector = Icons.Default.AutoAwesome,
-                                contentDescription = "Auto-fetch",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(20.dp)
-                            )
+                // Only show trailing icon when there's text to fetch
+                if (url.isNotBlank()) {
+                    IconButton(
+                        onClick = onFetchClick,
+                        enabled = !isLoading && !isFetching,
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        when (fetchState) {
+                            FetchState.Loading -> {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            FetchState.Success -> {
+                                Icon(
+                                    imageVector = Icons.Default.Schedule,
+                                    contentDescription = "Fetched successfully",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            FetchState.Error -> {
+                                Icon(
+                                    imageVector = Icons.Default.Error,
+                                    contentDescription = "Fetch failed",
+                                    tint = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            else -> {
+                                Icon(
+                                    imageVector = Icons.Default.AutoAwesome,
+                                    contentDescription = "Auto-fetch metadata",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         }
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        "Auto-fetch",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurface
+                } else {
+                    // Show hint icon when empty
+                    Icon(
+                        Icons.Default.AutoAwesome,
+                        contentDescription = "Auto-fetch will appear here",
+                        tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                        modifier = Modifier.size(20.dp)
                     )
                 }
+            },
+            enabled = !isLoading,
+            singleLine = true,
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface
+            ),
+            supportingText = {
+                when {
+                    isFetching -> {
+                        Text(
+                            "Fetching metadata...",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    fetchError != null -> {
+                        Text(
+                            fetchError,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                    titleFetched && urlNotEmpty -> {
+                        Text(
+                            "Metadata fetched successfully",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    url.isNotBlank() -> {
+                        Text(
+                            "Tap the auto-fetch button to get link metadata",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    else -> {
+                        Text(
+                            "Enter a URL to auto-fetch link information",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
-        }
+        )
     }
 }
 
