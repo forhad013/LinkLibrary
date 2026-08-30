@@ -27,12 +27,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.bookmarks.model.Collection
+import com.greenrobotdev.linklibrary.design.components.button.IconButton
+import com.greenrobotdev.linklibrary.design.components.icon.AppIcon
+import com.greenrobotdev.linklibrary.design.components.icon.IconBackgroundVariant
+import com.greenrobotdev.linklibrary.design.theme.ComponentSize
+import com.greenrobotdev.linklibrary.design.theme.ComponentStyle
 
 @Composable
 internal fun CollectionSelector(
@@ -74,10 +78,8 @@ internal fun CollectionSelector(
                             interactionSource = androidx.compose.foundation.interaction.MutableInteractionSource(),
                             indication = null
                         ) {
-                            println("whkq63 clicked! collections size: ${collections.size}")
-                            if (collections.isNotEmpty()) {
+                              if (collections.isNotEmpty()) {
                                 expanded = !expanded
-                                println("whkq63 expanded changed to: $expanded")
                             }
                         }
                 ) {
@@ -113,15 +115,12 @@ internal fun CollectionSelector(
                         expanded = expanded,
                         onDismissRequest = {
                             expanded = false
-                            println("whkq63 onDismissRequest called")
                         },
                         offset = DpOffset(0.dp, 0.dp),
                         modifier = Modifier
                             .background(MaterialTheme.colorScheme.surface)
                     ) {
-                        println("whkq63 DropdownMenu rendering with ${collections.size} items")
-
-                        // "Clear all selections" option
+                         // "Clear all selections" option
                         if (selectedCollectionsList.isNotEmpty()) {
                             DropdownMenuItem(
                                 text = {
@@ -139,7 +138,6 @@ internal fun CollectionSelector(
                                     }
                                 },
                                 onClick = {
-                                    println("whkq63 Clear all selections clicked")
                                     onClearAllCollections()
                                     expanded = false
                                 },
@@ -169,8 +167,7 @@ internal fun CollectionSelector(
 
                         // Collection options
                         collections.forEach { collection ->
-                            println("whkq63 rendering collection item: ${collection.name}")
-                            val isSelected = selectedCollections.contains(collection.id)
+                             val isSelected = selectedCollections.contains(collection.id)
 
                             DropdownMenuItem(
                                 text = {
@@ -199,26 +196,20 @@ internal fun CollectionSelector(
                                     // Don't close dropdown to allow multiple selections
                                 },
                                 leadingIcon = {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                            .clip(MaterialTheme.shapes.extraSmall)
-                                            .background(
-                                                if (isSelected)
-                                                    MaterialTheme.colorScheme.primary
-                                                else
-                                                    MaterialTheme.colorScheme.surfaceContainerHighest
-                                            ),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        if (isSelected) {
-                                            Icon(
-                                                Icons.Default.Close,
-                                                contentDescription = "Selected",
-                                                modifier = Modifier.size(16.dp),
-                                                tint = MaterialTheme.colorScheme.onPrimary
-                                            )
-                                        }
+                                    if (isSelected) {
+                                        AppIcon(
+                                            icon = Icons.Default.Close,
+                                            backgroundColor = MaterialTheme.colorScheme.primary,
+                                            iconTint = MaterialTheme.colorScheme.onPrimary,
+                                            variant = IconBackgroundVariant.Compact
+                                        )
+                                    } else {
+                                        AppIcon(
+                                            icon = Icons.Default.Close,
+                                            backgroundColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                            iconTint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            variant = IconBackgroundVariant.Compact
+                                        )
                                     }
                                 },
                                 trailingIcon = if (isSelected) {
@@ -242,8 +233,7 @@ internal fun CollectionSelector(
 
                         // Handle empty collections case
                         if (collections.isEmpty()) {
-                            println("whkq63 No collections - showing empty message")
-                            DropdownMenuItem(
+                             DropdownMenuItem(
                                 text = {
                                     Text(
                                         "No collections available",
@@ -259,21 +249,18 @@ internal fun CollectionSelector(
                 }
 
                 // Add Collection Button (Icon only)
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .background(MaterialTheme.colorScheme.secondaryContainer)
-                        .clickable(enabled = !isLoading) { onAddCollection() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Add collection",
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+                IconButton(
+                    onClick = onAddCollection,
+                    icon = Icons.Default.Add,
+                    contentDescription = "Add collection",
+                    style = ComponentStyle.Elevated,
+                    size = ComponentSize.Medium,
+                    colors = com.greenrobotdev.linklibrary.design.components.button.ComponentColors(
+                        container = MaterialTheme.colorScheme.secondaryContainer,
+                        content = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    enabled = !isLoading
+                )
             }
 
             // Helper text when no collections exist

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -63,16 +62,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greenrobotdev.linklibrary.design.components.utils.PlatformAsyncImage
+import com.greenrobotdev.linklibrary.design.components.icon.AppIcon
 import androidx.navigation3.runtime.NavKey
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -570,12 +568,11 @@ private fun SummaryCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Article,
-                    contentDescription = null,
-                    tint = Color(0xFF7B5FA0), // Deep expressive purple
-                    modifier = Modifier.size(24.dp)
+                AppIcon(
+                    icon = Icons.Default.Article,
+                    backgroundColor = Color(0xFF7B5FA0)
                 )
+
                 Text(
                     text = "Summary",
                     style = MaterialTheme.typography.titleLarge,
@@ -884,12 +881,11 @@ private fun PersonalNotesCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.EditNote,
-                        contentDescription = null,
-                        tint = Color(0xFF9B7EBD), // Expressive purple
-                        modifier = Modifier.size(24.dp)
+                    AppIcon(
+                        icon = Icons.Default.EditNote,
+                        backgroundColor = Color(0xFF9B7EBD)
                     )
+
                     Text(
                         text = "Personal Notes",
                         style = MaterialTheme.typography.titleLarge,

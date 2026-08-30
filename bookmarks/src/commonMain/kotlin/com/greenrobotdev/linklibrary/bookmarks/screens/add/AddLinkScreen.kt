@@ -27,8 +27,7 @@ import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.ErrorMessa
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.OrganizationSection
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.PersonalNotesSection
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.TaskSection
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.TitleInputSection
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.UrlInputSection
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.UrlTitleCard
 import com.greenrobotdev.linklibrary.design.components.form.FixedFormActionsBar
 
 /**
@@ -157,10 +156,12 @@ fun AddLinkFormContent(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        // URL Section with Inline Auto-Fetch
-        UrlInputSection(
+        // Combined URL and Title Card with enhanced contrast
+        UrlTitleCard(
             url = state.url,
             onUrlChange = { onEvent(AddLinkEvent.UrlChanged(it)) },
+            title = state.title,
+            onTitleChange = { onEvent(AddLinkEvent.TitleChanged(it)) },
             onFetchClick = { onEvent(AddLinkEvent.FetchMetadata) },
             isFetching = state.isFetching,
             fetchError = state.fetchError,
@@ -169,14 +170,6 @@ fun AddLinkFormContent(
             isLoading = state.isLoading
         )
 
-        // Title Field
-        TitleInputSection(
-            title = state.title,
-            onTitleChange = { onEvent(AddLinkEvent.TitleChanged(it)) },
-            isLoading = state.isLoading
-        )
-
-        println("whkq63 ${state.availableTags}")
         // Organization Section
         OrganizationSection(
             availableCollections = state.availableCollections,

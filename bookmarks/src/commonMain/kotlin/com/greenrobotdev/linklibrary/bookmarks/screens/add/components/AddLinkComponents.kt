@@ -1,26 +1,15 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.ui.draw.scale
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -29,27 +18,13 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Title
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -59,16 +34,32 @@ import com.greenrobotdev.linklibrary.bookmarks.model.Tag
 import com.greenrobotdev.linklibrary.design.components.advanced.CollectionDropdown
 import com.greenrobotdev.linklibrary.design.components.advanced.CollectionItem
 import com.greenrobotdev.linklibrary.design.components.advanced.FetchState
+import com.greenrobotdev.linklibrary.design.components.appbar.AppTopBar
+import com.greenrobotdev.linklibrary.design.components.button.IconButton
+import com.greenrobotdev.linklibrary.design.components.cards.FormCard
+import com.greenrobotdev.linklibrary.design.components.cards.InputCard
+import com.greenrobotdev.linklibrary.design.components.cards.ToggleCard
+import com.greenrobotdev.linklibrary.design.components.progress.AppCircularProgressSmall
+import com.greenrobotdev.linklibrary.design.components.selection.AddPill
+import com.greenrobotdev.linklibrary.design.components.selection.SelectionPill
+import com.greenrobotdev.linklibrary.design.components.textfield.AppTextFieldEnhanced
+import com.greenrobotdev.linklibrary.design.components.textfield.AppTextFieldWithCharacterLimit
+import com.greenrobotdev.linklibrary.design.theme.ComponentSize
+import com.greenrobotdev.linklibrary.design.theme.ComponentStyle
+import com.greenrobotdev.linklibrary.design.components.feedback.ErrorMessageCard as DesignErrorMessageCard
+import com.greenrobotdev.linklibrary.design.components.selection.PrioritySelector as DesignPrioritySelector
 
 /**
- * AddLinkTopBar - Top app bar for Add Link screen
+ * AddLinkTopBar - Standardized top app bar for Add Link screen
+ *
+ * Now uses AppTopBar from design module for consistent styling across all screens.
  *
  * Features:
- * - Close button for navigation
- * - Screen title with Material 3 expressive styling
- * - Save button with form validation and enhanced visual feedback
+ * - Consistent Material 3 Expressive styling
+ * - Standard navigation and action buttons
+ * - Proper dark theme support
+ * - Unified appearance with other form screens
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddLinkTopBar(
     onBackClick: () -> Unit,
@@ -77,96 +68,33 @@ fun AddLinkTopBar(
     isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
-    // Animate button state for better visual feedback
-    val buttonScale = if (isFormValid && !isLoading) 1f else 0.95f
-
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 2.dp,
-        shadowElevation = 4.dp
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Enhanced close button with better visual feedback
-            Surface(
-                onClick = onBackClick,
-                modifier = Modifier.size(40.dp),
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.5f),
-                tonalElevation = 1.dp
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Close",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            // Enhanced title with better typography
-            Text(
-                text = "Add New Link",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            // Enhanced save button with Material 3 expressive styling
-            Surface(
-                onClick = onSaveClick,
-                enabled = isFormValid && !isLoading,
-                modifier = Modifier
-                    .scale(buttonScale)
-                    .padding(end = 8.dp)
-                    .height(40.dp),
-                shape = RoundedCornerShape(20.dp),
-                color = when {
-                    isFormValid && !isLoading -> MaterialTheme.colorScheme.primary
-                    else -> MaterialTheme.colorScheme.surfaceContainerHighest
-                },
-                tonalElevation = if (isFormValid && !isLoading) 2.dp else 0.dp
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                ) {
-                    Text(
-                        "Save",
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Medium,
-                        color = when {
-                            isFormValid && !isLoading -> MaterialTheme.colorScheme.onPrimary
-                            else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                        }
-                    )
-                }
-            }
-        }
-    }
+    AppTopBar(
+        title = "Add New Link",
+        onNavigationClick = onBackClick,
+        onActionClick = onSaveClick,
+        modifier = modifier,
+        actionText = "Save",
+        isActionEnabled = isFormValid,
+        isLoading = isLoading,
+        navigationIcon = Icons.Default.Close
+    )
 }
 
 /**
- * UrlInputSection - URL input with integrated auto-fetch functionality
+ * UrlTitleCard - Combined URL and Title input card using design module template
  *
  * Features:
- * - URL text input with integrated auto-fetch button
- * - Auto-fetch button with loading states integrated into text field
- * - Enhanced Material 3 expressive styling for both light and dark themes
- * - Animated state transitions
- * - Fetch state indicators with improved visual feedback
+ * - Single card containing both URL and Title inputs
+ * - Uses ContentCard template for consistent Material 3 Expressive styling
+ * - Enhanced contrast with atmospheric layering
+ * - Integrated auto-fetch button with loading states
  */
 @Composable
-fun UrlInputSection(
+fun UrlTitleCard(
     url: String,
     onUrlChange: (String) -> Unit,
+    title: String,
+    onTitleChange: (String) -> Unit,
     onFetchClick: () -> Unit,
     isFetching: Boolean,
     fetchError: String?,
@@ -175,8 +103,65 @@ fun UrlInputSection(
     isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
-    // Animate container based on fetch state
+    InputCard(
+        modifier = modifier
+    ) {
+        // URL Input Section
+        UrlInputSection(
+            url = url,
+            onUrlChange = onUrlChange,
+            onFetchClick = onFetchClick,
+            isFetching = isFetching,
+            fetchError = fetchError,
+            titleFetched = titleFetched,
+            urlNotEmpty = urlNotEmpty,
+            isLoading = isLoading
+        )
 
+        // Title Input Section
+        TitleInputSection(
+            title = title,
+            onTitleChange = onTitleChange,
+            isLoading = isLoading
+        )
+    }
+}
+
+/**
+ * UrlInputSection - URL input with integrated auto-fetch functionality
+ *
+ * DESIGN DECISION: This component preserves custom implementation due to complexity
+ *
+ * Why this component was NOT migrated to standardized components:
+ * - Integrated auto-fetch button with multiple states (Loading, Success, Error, Idle)
+ * - Complex state management (fetchError, titleFetched, urlNotEmpty, isFetching, isLoading)
+ * - Dynamic accent colors based on multiple state conditions
+ * - Unique UI pattern: leading icon + text field + integrated button in single Surface
+ * - Conditional helper text with progress indicators
+ *
+ * Standardization achieved:
+ * - Progress indicators migrated to AppCircularProgressSmall ✅
+ * - Consistent Material 3 Expressive styling maintained ✅
+ *
+ * Future consideration: Could be candidate for AppTextFieldWithButton component
+ *
+ * Features:
+ * - Clean URL input without image preview
+ * - Integrated auto-fetch button with loading states
+ * - Dynamic border colors based on fetch state
+ * - Helper text with progress/error indicators
+ */
+@Composable
+private fun UrlInputSection(
+    url: String,
+    onUrlChange: (String) -> Unit,
+    onFetchClick: () -> Unit,
+    isFetching: Boolean,
+    fetchError: String?,
+    titleFetched: Boolean,
+    urlNotEmpty: Boolean,
+    isLoading: Boolean
+) {
     val accentColor = when {
         fetchError != null -> MaterialTheme.colorScheme.error
         titleFetched && urlNotEmpty -> MaterialTheme.colorScheme.primary
@@ -185,56 +170,49 @@ fun UrlInputSection(
     }
 
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // URL label with enhanced styling
+        // URL label matching Vibrant Citadel Dark design
         Text(
             text = "URL",
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(start = 4.dp)
         )
 
-        // Enhanced URL input field with Material 3 expressive styling
+        // Enhanced URL input field with Vibrant Citadel Dark styling
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            color = when {
-                isFetching -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                fetchError != null -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f)
-                titleFetched && urlNotEmpty -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
-                else -> MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.5f)
-            },
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
             border = BorderStroke(
-                width = when {
-                    isFetching -> 2.dp
-                    fetchError != null -> 2.dp
-                    titleFetched && urlNotEmpty -> 2.dp
-                    url.isNotBlank() -> 1.dp
-                    else -> 1.dp
-                },
-                color = accentColor
+                width = 1.dp,
+                color = when {
+                    fetchError != null -> MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
+                    titleFetched && urlNotEmpty -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                    else -> MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                }
             ),
-            tonalElevation = when {
-                isFetching -> 2.dp
-                titleFetched && urlNotEmpty -> 1.dp
-                else -> 0.dp
-            }
+            tonalElevation = 2.dp
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Leading icon with animated tint
+                // Leading icon
                 Icon(
                     Icons.Default.Link,
                     contentDescription = null,
-                    tint = accentColor,
+                    tint = when {
+                        fetchError != null -> MaterialTheme.colorScheme.error
+                        titleFetched && urlNotEmpty -> MaterialTheme.colorScheme.primary
+                        else -> MaterialTheme.colorScheme.onSurfaceVariant
+                    },
                     modifier = Modifier.size(20.dp)
                 )
 
@@ -244,7 +222,7 @@ fun UrlInputSection(
                         value = url,
                         onValueChange = onUrlChange,
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("https://example.com") },
+                        placeholder = { Text("https://example.com/article") },
                         enabled = !isLoading,
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -252,12 +230,16 @@ fun UrlInputSection(
                             unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
                             focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
                             unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
-                            cursorColor = accentColor
+                            cursorColor = MaterialTheme.colorScheme.secondary,
+                            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                         )
                     )
                 }
 
-                // Integrated auto-fetch button with enhanced styling
+                // Integrated auto-fetch button
                 val fetchState = when {
                     isFetching -> FetchState.Loading
                     fetchError != null -> FetchState.Error
@@ -269,24 +251,20 @@ fun UrlInputSection(
                     Surface(
                         onClick = onFetchClick,
                         enabled = !isLoading && !isFetching && fetchState != FetchState.Success,
-                        modifier = Modifier.size(40.dp),
-                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.size(36.dp),
+                        shape = RoundedCornerShape(18.dp),
                         color = when (fetchState) {
                             FetchState.Success -> MaterialTheme.colorScheme.primaryContainer
                             FetchState.Error -> MaterialTheme.colorScheme.errorContainer
                             FetchState.Loading -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                            else -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f)
+                            else -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f)
                         },
-                        tonalElevation = 1.dp
+                        tonalElevation = 2.dp
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             when (fetchState) {
                                 FetchState.Loading -> {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(20.dp),
-                                        strokeWidth = 2.dp,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
+                                    AppCircularProgressSmall(modifier = Modifier.size(18.dp))
                                 }
                                 FetchState.Success -> {
                                     Icon(
@@ -315,42 +293,29 @@ fun UrlInputSection(
                             }
                         }
                     }
-                } else {
-                    // Show hint icon when empty
-                    Icon(
-                        Icons.Default.AutoAwesome,
-                        contentDescription = "Auto-fetch will appear here",
-                        tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
-                        modifier = Modifier.size(20.dp)
-                    )
                 }
             }
         }
 
-        // Enhanced helper text with better visual feedback
+        // Helper text matching Vibrant Citadel Dark design
         when {
             isFetching -> {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(start = 4.dp)
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(14.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    AppCircularProgressSmall(modifier = Modifier.size(12.dp))
                     Text(
                         "Fetching metadata...",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
             fetchError != null -> {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(start = 4.dp)
                 ) {
@@ -362,15 +327,14 @@ fun UrlInputSection(
                     )
                     Text(
                         fetchError,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                        fontWeight = FontWeight.Medium
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
                     )
                 }
             }
             titleFetched && urlNotEmpty -> {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(start = 4.dp)
                 ) {
@@ -382,140 +346,49 @@ fun UrlInputSection(
                     )
                     Text(
                         "Metadata fetched successfully",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
-            }
-            url.isNotBlank() -> {
-                Text(
-                    "Tap the auto-fetch button to get link metadata",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-            else -> {
-                Text(
-                    "Enter a URL to auto-fetch link information",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    modifier = Modifier.padding(start = 4.dp)
-                )
             }
         }
     }
 }
 
 /**
- * TitleInputSection - Title input field with Material 3 expressive styling
+ * TitleInputSection - Title input using enhanced standardized component
  *
  * Features:
- * - Enhanced labeled title input
- * - Animated leading icon with color changes
- * - Material 3 expressive container design
- * - Focus state animations
- * - Improved dark theme support
+ * - Clean title input using AppTextFieldEnhanced
+ * - Material 3 Expressive styling
+ * - Consistent appearance across form screens
  */
 @Composable
-fun TitleInputSection(
+private fun TitleInputSection(
     title: String,
     onTitleChange: (String) -> Unit,
-    isLoading: Boolean,
-    modifier: Modifier = Modifier
+    isLoading: Boolean
 ) {
-    // Animate border based on focus and content state
-
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        // Enhanced label with better typography
-        Text(
-            text = "Title",
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(start = 4.dp)
-        )
-
-        // Enhanced title input field with Material 3 expressive styling
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.5f),
-            border = BorderStroke(
-                width = if (title.isNotBlank()) 2.dp else 1.dp,
-                color = if (title.isNotBlank()) {
-                    MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f)
-                } else {
-                    MaterialTheme.colorScheme.outlineVariant
-                }
-            ),
-            tonalElevation = if (title.isNotBlank()) 1.dp else 0.dp
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Animated leading icon
-                Icon(
-                    Icons.Default.Title,
-                    contentDescription = null,
-                    tint = if (title.isNotBlank()) {
-                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f)
-                    } else {
-                        MaterialTheme.colorScheme.outline
-                    },
-                    modifier = Modifier.size(20.dp)
-                )
-
-                // Text input
-                Box(modifier = Modifier.weight(1f)) {
-                    androidx.compose.material3.OutlinedTextField(
-                        value = title,
-                        onValueChange = onTitleChange,
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Enter link title") },
-                        enabled = !isLoading,
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                            unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                            focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
-                            unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
-                            cursorColor = MaterialTheme.colorScheme.secondary
-                        )
-                    )
-                }
-            }
-        }
-
-        // Optional character count hint
-        if (title.isNotBlank()) {
-            Text(
-                text = "${title.length} characters",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                modifier = Modifier.padding(start = 4.dp)
-            )
-        }
-    }
+    AppTextFieldEnhanced(
+        value = title,
+        onValueChange = onTitleChange,
+        modifier = Modifier.fillMaxWidth(),
+        label = "Title",
+        placeholder = "Link Title",
+        singleLine = true,
+        enabled = !isLoading
+    )
 }
 
 /**
- * OrganizationSection - Collection and tags selection with Material 3 expressive styling
+ * OrganizationSection - Collection and tags selection using FormCard from design module
  *
  * Features:
- * - Enhanced Material 3 expressive container design
- * - Collection dropdown with inline creation
- * - Tags chips display with improved selection feedback
- * - Animated state transitions
- * - Improved dark theme support
+ * - Material 3 Expressive styling with FormCard wrapper
+ * - 24px padding matching "spirited padding" design
+ * - Pill-shaped tags with proper selection states
+ * - Tonal stacking instead of harsh borders
+ * - Enhanced contrast and atmospheric layering
  */
 @Composable
 fun OrganizationSection(
@@ -531,76 +404,27 @@ fun OrganizationSection(
     isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
-    // Animate elevation based on selection state
-    val hasSelection = selectedCollections.isNotEmpty() || selectedTags.isNotEmpty()
-
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.4f)
-        ),
-        border = BorderStroke(
-            width = if (hasSelection) 2.dp else 1.dp,
-            color = if (hasSelection) {
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-            } else {
-                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-            }
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (hasSelection) 2.dp else 1.dp
-        )
+    FormCard(
+        modifier = modifier,
+        headerIcon = Icons.Default.Folder,
+        headerTitle = "Organization",
     ) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            // Enhanced section header with icon
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Surface(
-                    modifier = Modifier.size(32.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            Icons.Default.Folder,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                }
+        CollectionSelector(
+            collections = availableCollections.toSet(),
+            selectedCollections = selectedCollections.toSet(),
+            onCollectionToggle = onCollectionToggle,
+            onClearAllCollections = onClearAllCollections,
+            onAddCollection = onAddCollection,
+            isLoading = isLoading
+        )
 
-                Text(
-                    text = "Organization",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            CollectionSelector(
-                collections = availableCollections.toSet(),
-                selectedCollections = selectedCollections.toSet(),
-                onCollectionToggle = onCollectionToggle,
-                onClearAllCollections = onClearAllCollections,
-                onAddCollection = onAddCollection,
-                isLoading = isLoading
-            )
-
-            // Tags Section
-            TagsSection(
-                availableTags = availableTags,
-                selectedTags = selectedTags,
-                onTagToggle = onTagToggle,
-                onAddTag = onAddTag
-            )
-        }
+        // Tags Section
+        TagsSection(
+            availableTags = availableTags,
+            selectedTags = selectedTags,
+            onTagToggle = onTagToggle,
+            onAddTag = onAddTag
+        )
     }
 }
 
@@ -674,23 +498,19 @@ private fun CollectionInputRow(
                         enabled = !isLoading
                     )
 
-                    // Add Collection Button
+                    // Add Collection Button - using standardized IconButton
                     IconButton(
                         onClick = onAddCollection,
-                        enabled = !isLoading,
-                        modifier = Modifier
-                            .size(48.dp)
-                            .background(
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-                                RoundedCornerShape(12.dp)
-                            )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add collection",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
+                        icon = Icons.Default.Add,
+                        contentDescription = "Add collection",
+                        style = ComponentStyle.Filled,
+                        size = ComponentSize.Medium,
+                        colors = com.greenrobotdev.linklibrary.design.components.button.ComponentColors(
+                            container = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+                            content = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        enabled = !isLoading
+                    )
                 }
             }
         }
@@ -698,7 +518,13 @@ private fun CollectionInputRow(
 }
 
 /**
- * TagsSection - Tags display with chips and add button
+ * TagsSection - Tags display using standardized SelectionPill components
+ *
+ * Features:
+ * - Material 3 Expressive styling using SelectionPill from design module
+ * - Consistent pill appearance and behavior
+ * - Proper selection states with visual feedback
+ * - Add new tag functionality with AddPill component
  */
 @Composable
 private fun TagsSection(
@@ -713,7 +539,7 @@ private fun TagsSection(
     ) {
         Text(
             text = "Tags",
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
@@ -738,72 +564,28 @@ private fun TagsSection(
                 }
             }
 
-            // Show selected tags as chips
+            // Show tags as standardized pill-shaped buttons
             else -> {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    availableTags.forEach { tag ->
+                        val isSelected = selectedTags.contains(tag.id)
 
-                when {
-                    // No tags selected but available
-                    availableTags.isEmpty() -> {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                "You haven't created any tags",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.weight(1f)
-                            )
-
-                            // Add Tag Button
-                            IconButton(
-                                onClick = onAddTag,
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .background(
-                                        MaterialTheme.colorScheme.primaryContainer,
-                                        RoundedCornerShape(16.dp)
-                                    )
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Add tag",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
-                        }
+                        SelectionPill(
+                            selected = isSelected,
+                            onClick = { onTagToggle(tag.id) },
+                            text = tag.name,
+                            selectedIcon = Icons.Default.Schedule
+                        )
                     }
 
-                    // Show selected tags chips
-                    else -> {
-                        FlowRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            availableTags.forEach { tag ->
-                                Surface(
-                                    shape = RoundedCornerShape(12.dp),
-                                    color = MaterialTheme.colorScheme.surface,
-                                    border = BorderStroke(
-                                        1.dp,
-                                        MaterialTheme.colorScheme.outlineVariant
-                                    ),
-                                    onClick = { onTagToggle(tag.id) }
-                                ) {
-                                    Text(
-                                        text = tag.name,
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                                    )
-                                }
-                            }
-
-
-                        }
-                    }
+                    // Add New Tag button
+                    AddPill(
+                        onClick = onAddTag,
+                        text = "New Tag"
+                    )
                 }
             }
         }
@@ -811,14 +593,13 @@ private fun TagsSection(
 }
 
 /**
- * PersonalNotesSection - Personal notes input with Material 3 expressive styling
+ * PersonalNotesSection - Personal notes using enhanced standardized component
  *
  * Features:
- * - Enhanced multi-line text input with Material 3 expressive design
- * - Character counting with visual feedback
- * - 500 character limit with progress indication
- * - Animated state transitions
- * - Improved dark theme support
+ * - Material 3 Expressive styling using AppTextFieldWithCharacterLimit
+ * - Automatic character counting and limit enforcement
+ * - Dynamic warning indicators based on character usage
+ * - Consistent appearance across form screens
  */
 @Composable
 fun PersonalNotesSection(
@@ -828,146 +609,35 @@ fun PersonalNotesSection(
     modifier: Modifier = Modifier,
     maxLength: Int = 500
 ) {
-    // Animate character progress
-    val characterProgress = notes.length.toFloat() / maxLength
-
-    // Color based on how close to limit
-    val progressColor = when {
-        notes.length >= maxLength * 0.9 -> MaterialTheme.colorScheme.error
-        notes.length >= maxLength * 0.7 -> MaterialTheme.colorScheme.tertiary
-        else -> MaterialTheme.colorScheme.primary
-    }
-
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+    FormCard(
+        modifier = modifier,
+        headerIcon = Icons.Default.AutoAwesome,
+        headerTitle = "Personal Notes",
     ) {
-        // Enhanced label with character count
-        Row(
+        AppTextFieldWithCharacterLimit(
+            value = notes,
+            onValueChange = onNotesChange,
+            maxLength = maxLength,
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Personal Notes",
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            // Animated character counter
-            if (notes.isNotBlank()) {
-                Text(
-                    text = "${notes.length}/$maxLength",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Medium,
-                    color = progressColor.copy(alpha = 0.8f)
-                )
-            }
-        }
-
-        // Enhanced notes container with Material 3 expressive styling
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.4f),
-            border = BorderStroke(
-                width = when {
-                    notes.length >= maxLength -> 2.dp
-                    notes.isNotBlank() -> 1.dp
-                    else -> 1.dp
-                },
-                color = when {
-                    notes.length >= maxLength -> MaterialTheme.colorScheme.error
-                    notes.isNotBlank() -> MaterialTheme.colorScheme.outlineVariant
-                    else -> MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                }
-            ),
-            tonalElevation = if (notes.isNotBlank()) 1.dp else 0.dp
-        ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    androidx.compose.material3.OutlinedTextField(
-                        value = notes,
-                        onValueChange = {
-                            if (it.length <= maxLength) {
-                                onNotesChange(it)
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(120.dp),
-                        placeholder = { Text("Add any personal notes, reminders, or context here...") },
-                        enabled = !isLoading,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                            unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                            focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
-                            unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
-                            cursorColor = MaterialTheme.colorScheme.secondary
-                        )
-                    )
-                }
-
-                // Character progress bar
-                if (notes.isNotBlank()) {
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(4.dp),
-                        color = MaterialTheme.colorScheme.surfaceContainerHighest
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(characterProgress)
-                                .fillMaxHeight()
-                                .background(progressColor.copy(alpha = 0.6f))
-                        )
-                    }
-                }
-            }
-        }
-
-        // Helper text with character limit warning
-        if (notes.length >= maxLength * 0.8) {
-            val warningText = when {
-                notes.length >= maxLength -> "Character limit reached"
-                notes.length >= maxLength * 0.9 -> "Almost at character limit"
-                else -> "Getting close to character limit"
-            }
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(start = 4.dp)
-            ) {
-                Icon(
-                    if (notes.length >= maxLength) Icons.Default.Error else Icons.Default.Schedule,
-                    contentDescription = null,
-                    tint = progressColor,
-                    modifier = Modifier.size(14.dp)
-                )
-                Text(
-                    warningText,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = progressColor,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
+            placeholder = "Why are you saving this link? Add personal thoughts or highlights here...",
+            singleLine = false,
+            minLines = 3,
+            maxLines = 5,
+            enabled = !isLoading
+        )
     }
 }
 
 /**
- * TaskSection - Add to tasks functionality with Material 3 expressive styling
+ * TaskSection - Add to tasks functionality using ToggleCard from design module
  *
  * Features:
- * - Enhanced task enable/disable toggle with Material 3 expressive design
+ * - Material 3 Expressive styling with ToggleCard wrapper
  * - Priority selection (Low/Medium/High) with improved visual feedback
  * - Due time input with animated states
  * - Conditional visibility based on enabled state
  * - Animated state transitions
- * - Improved dark theme support
+ * - Improved dark theme support with enhanced contrast
  */
 @Composable
 fun TaskSection(
@@ -980,294 +650,50 @@ fun TaskSection(
     isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
-    // Animate card appearance when enabled
-    val cardScale = if (isEnabled) 1f else 0.98f
-
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .scale(cardScale),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isEnabled) {
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-            } else {
-                MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.4f)
-            }
-        ),
-        border = BorderStroke(
-            width = if (isEnabled) 2.dp else 1.dp,
-            color = if (isEnabled) {
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-            } else {
-                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-            }
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isEnabled) 3.dp else 1.dp
-        )
+    ToggleCard(
+        modifier = modifier,
+        isEnabled = isEnabled,
+        onEnabledChange = onEnabledChange,
+        title = "Add to Tasks",
+        description = "Set priority and due date",
+        enabledIcon = Icons.Default.AutoAwesome,
+        disabledIcon = Icons.Default.Schedule,
+        activeColor = MaterialTheme.colorScheme.primary
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Enhanced task toggle header with icon
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // Icon that changes based on enabled state
-                    Surface(
-                        modifier = Modifier.size(32.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        color = if (isEnabled) {
-                            MaterialTheme.colorScheme.primaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.surfaceContainerHighest
-                        }
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                if (isEnabled) Icons.Default.AutoAwesome else Icons.Default.Schedule,
-                                contentDescription = null,
-                                tint = if (isEnabled) {
-                                    MaterialTheme.colorScheme.onPrimaryContainer
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    }
-
-                    Column {
-                        Text(
-                            text = "Add to Tasks",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-
-                        if (isEnabled) {
-                            Text(
-                                text = "Set priority and due date",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
-
-                // Enhanced switch with Material 3 styling
-                Switch(
-                    checked = isEnabled,
-                    onCheckedChange = onEnabledChange,
-                    colors = SwitchDefaults.colors(
-                        checkedTrackColor = MaterialTheme.colorScheme.primary,
-                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                        uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    modifier = Modifier.width(52.dp)
-                )
-            }
-
-            // Animated content reveal
-            if (isEnabled) {
-                TaskOptionsContent(
-                    selectedPriority = selectedPriority,
-                    onPriorityChange = onPriorityChange,
-                    dueTime = dueTime,
-                    onDueTimeChange = onDueTimeChange,
-                    isLoading = isLoading
-                )
-            }
-        }
-    }
-}
-
-/**
- * TaskToggleHeader - Toggle switch for task functionality
- */
-@Composable
-private fun TaskToggleHeader(
-    isEnabled: Boolean,
-    onEnabledChange: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Add to Tasks",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Mark as Task",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Switch(
-                checked = isEnabled,
-                onCheckedChange = onEnabledChange,
-                colors = SwitchDefaults.colors(
-                    checkedTrackColor = MaterialTheme.colorScheme.primary,
-                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary
+            // Priority Selection using design module component
+            DesignPrioritySelector(
+                options = listOf("Low", "Medium", "High"),
+                selectedOption = selectedPriority,
+                onOptionSelected = onPriorityChange,
+                optionColors = listOf(
+                    MaterialTheme.colorScheme.secondaryContainer,
+                    MaterialTheme.colorScheme.tertiaryContainer,
+                    MaterialTheme.colorScheme.primaryContainer
                 ),
-                modifier = Modifier.width(52.dp)
+                enabled = !isLoading
+            )
+
+            // Due Time
+            DueTimeInput(
+                dueTime = dueTime,
+                onDueTimeChange = onDueTimeChange,
+                isLoading = isLoading
             )
         }
     }
 }
 
 /**
- * TaskOptionsContent - Priority and due time inputs
- */
-@Composable
-private fun TaskOptionsContent(
-    selectedPriority: String,
-    onPriorityChange: (String) -> Unit,
-    dueTime: String,
-    onDueTimeChange: (String) -> Unit,
-    isLoading: Boolean
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Priority Selection
-        PrioritySelector(
-            selectedPriority = selectedPriority,
-            onPriorityChange = onPriorityChange
-        )
-
-        // Due Time
-        DueTimeInput(
-            dueTime = dueTime,
-            onDueTimeChange = onDueTimeChange,
-            isLoading = isLoading
-        )
-    }
-}
-
-/**
- * PrioritySelector - Enhanced priority selection with Material 3 expressive styling
- */
-@Composable
-private fun PrioritySelector(
-    selectedPriority: String,
-    onPriorityChange: (String) -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        // Enhanced label with better styling
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                Icons.Default.Schedule,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(16.dp)
-            )
-            Text(
-                text = "Priority Level",
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-
-        // Enhanced priority buttons with Material 3 expressive design
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            val priorities = listOf(
-                "Low" to MaterialTheme.colorScheme.secondaryContainer,
-                "Medium" to MaterialTheme.colorScheme.tertiaryContainer,
-                "High" to MaterialTheme.colorScheme.primaryContainer
-            )
-
-            priorities.forEach { (priority, containerColor) ->
-                val isSelected = selectedPriority == priority
-                val buttonScale = if (isSelected) 1.05f else 1f
-
-                Surface(
-                    onClick = { onPriorityChange(priority) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(52.dp)
-                        .scale(buttonScale),
-                    shape = RoundedCornerShape(16.dp),
-                    color = if (isSelected) {
-                        containerColor
-                    } else {
-                        MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.5f)
-                    },
-                    border = BorderStroke(
-                        width = if (isSelected) 2.dp else 1.dp,
-                        color = if (isSelected) {
-                            containerColor
-                        } else {
-                            MaterialTheme.colorScheme.outlineVariant
-                        }
-                    ),
-                    tonalElevation = if (isSelected) 2.dp else 0.dp
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (isSelected) {
-                                Icon(
-                                    Icons.Default.AutoAwesome,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
-
-                            Text(
-                                priority,
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                                color = if (isSelected) {
-                                    MaterialTheme.colorScheme.onPrimaryContainer
-                                } else {
-                                    MaterialTheme.colorScheme.onSurface
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * DueTimeInput - Enhanced due time input with Material 3 expressive styling
+ * DueTimeInput - Enhanced due time input using standardized components
+ *
+ * Features:
+ * - Material 3 Expressive styling using AppTextFieldEnhanced
+ * - Integrated leading icon functionality
+ * - Standardized clear button using IconButton from design module
+ * - Helper text for suggestions
  */
 @Composable
 private fun DueTimeInput(
@@ -1275,102 +701,42 @@ private fun DueTimeInput(
     onDueTimeChange: (String) -> Unit,
     isLoading: Boolean
 ) {
-    // Animate border based on content
-
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Enhanced label with icon
+        // Enhanced due time input with leading icon
         Row(
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(
-                Icons.Default.Schedule,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(16.dp)
-            )
-            Text(
-                text = "Due Time",
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-
-        // Enhanced due time input with Material 3 expressive styling
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.5f),
-            border = BorderStroke(
-                width = if (dueTime.isNotBlank()) 2.dp else 1.dp,
-                color = if (dueTime.isNotBlank()) {
-                    MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                } else {
-                    MaterialTheme.colorScheme.outlineVariant
-                }
-            ),
-            tonalElevation = if (dueTime.isNotBlank()) 1.dp else 0.dp
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Animated leading icon
-                Icon(
-                    Icons.Default.Schedule,
-                    contentDescription = null,
-                    tint = if (dueTime.isNotBlank()) {
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                    } else {
-                        MaterialTheme.colorScheme.outline
-                    },
-                    modifier = Modifier.size(20.dp)
+            Box(modifier = Modifier.weight(1f)) {
+                AppTextFieldEnhanced(
+                    value = dueTime,
+                    onValueChange = onDueTimeChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = "Due Time",
+                    placeholder = "e.g., Tomorrow, Friday 3PM",
+                    leadingIcon = Icons.Default.Schedule,
+                    singleLine = true,
+                    enabled = !isLoading
                 )
+            }
 
-                // Text input
-                Box(modifier = Modifier.weight(1f)) {
-                    androidx.compose.material3.OutlinedTextField(
-                        value = dueTime,
-                        onValueChange = onDueTimeChange,
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("e.g., Tomorrow, Friday 3PM") },
-                        enabled = !isLoading,
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                            unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                            focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
-                            unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
-                            cursorColor = MaterialTheme.colorScheme.primary
-                        )
+            // Clear button when has content - using standardized IconButton
+            if (dueTime.isNotBlank() && !isLoading) {
+                IconButton(
+                    onClick = { onDueTimeChange("") },
+                    icon = Icons.Default.Close,
+                    contentDescription = "Clear due time",
+                    style = ComponentStyle.Filled,
+                    size = ComponentSize.Small,
+                    colors = com.greenrobotdev.linklibrary.design.components.button.ComponentColors(
+                        container = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                        content = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.7f)
                     )
-                }
-
-                // Clear button when has content
-                if (dueTime.isNotBlank() && !isLoading) {
-                    Surface(
-                        onClick = { onDueTimeChange("") },
-                        modifier = Modifier.size(32.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Clear due time",
-                                tint = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.7f),
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
-                    }
-                }
+                )
             }
         }
 
@@ -1387,14 +753,7 @@ private fun DueTimeInput(
 }
 
 /**
- * ErrorMessageCard - Enhanced error message display with Material 3 expressive styling
- *
- * Features:
- * - Enhanced error icon and message with Material 3 expressive design
- * - Animated appearance
- * - Improved visual feedback
- * - Optional dismiss functionality
- * - Better dark theme support
+ * ErrorMessageCard - Wrapper using design module component
  */
 @Composable
 fun ErrorMessageCard(
@@ -1402,75 +761,9 @@ fun ErrorMessageCard(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Animate card appearance
-    val cardScale = 1f
-
-    Card(
+    DesignErrorMessageCard(
+        error = error,
+        onDismiss = onDismiss,
         modifier = modifier
-            .fillMaxWidth()
-            .scale(cardScale),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.9f)
-        ),
-        border = BorderStroke(
-            width = 2.dp,
-            color = MaterialTheme.colorScheme.error.copy(alpha = 0.3f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Enhanced error icon with animated pulse effect
-            Surface(
-                modifier = Modifier.size(40.dp),
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.error.copy(alpha = 0.2f)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        Icons.Default.Error,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onErrorContainer,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-            }
-
-            // Error message with enhanced typography
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Error",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onErrorContainer
-                )
-                Text(
-                    text = error,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.9f)
-                )
-            }
-
-            // Dismiss button
-            Surface(
-                onClick = onDismiss,
-                modifier = Modifier.size(32.dp),
-                shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colorScheme.error.copy(alpha = 0.3f)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = "Dismiss error",
-                        tint = MaterialTheme.colorScheme.onErrorContainer,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-        }
-    }
+    )
 }

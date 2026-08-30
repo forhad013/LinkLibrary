@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -132,15 +131,13 @@ fun FormActionButtons(
                             contentDescription = null,
                             modifier = Modifier
                                 .width(20.dp)
-                                .height(20.dp),
-                            tint = MaterialTheme.colorScheme.onPrimary
+                                .height(20.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                     }
                     Text(
                         text = primaryText,
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        style = MaterialTheme.typography.labelLarge
                     )
                 }
             }
@@ -151,7 +148,9 @@ fun FormActionButtons(
 /**
  * Fixed bottom action bar for forms with surface background
  *
- * Sticks to bottom of screen with proper elevation and Material 3 Expressive styling
+ * Sticks to bottom of screen with proper elevation and Material 3 Expressive styling.
+ * Uses surfaceContainerHigh for tonal stacking to create visual separation from content
+ * in both light and dark themes.
  */
 @Composable
 fun FixedFormActionsBar(
@@ -167,7 +166,7 @@ fun FixedFormActionsBar(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.background,
+        color = MaterialTheme.colorScheme.surface,
         tonalElevation = 3.dp,
         shadowElevation = 8.dp
     ) {
@@ -304,15 +303,13 @@ fun CenteredActionButton(
                     Icon(
                         imageVector = it,
                         contentDescription = null,
-                        modifier = Modifier.width(24.dp).height(24.dp),
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        modifier = Modifier.width(24.dp).height(24.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
                 Text(
                     text = text,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
         }

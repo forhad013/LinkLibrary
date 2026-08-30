@@ -14,20 +14,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import com.greenrobotdev.linklibrary.design.components.button.AppButton
+import com.greenrobotdev.linklibrary.design.components.card.AppErrorCard
+import com.greenrobotdev.linklibrary.design.components.card.AppIntroductionCard
+import com.greenrobotdev.linklibrary.design.components.textfield.AppTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -82,48 +80,32 @@ fun AddCollectionScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Introduction Card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Create New Collection",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Organize your links into collections to easily find them later",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-                    )
-                }
-            }
+            AppIntroductionCard(
+                title = "Create New Collection",
+                description = "Organize your links into collections to easily find them later",
+                modifier = Modifier.fillMaxWidth()
+            )
 
             // Collection Name Field
-            OutlinedTextField(
+            AppTextField(
                 value = state.name,
                 onValueChange = { viewModel.take(AddCollectionEvent.NameChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Collection Name") },
-                placeholder = { Text("e.g., AI & Tech, Design Resources") },
+                label = "Collection Name",
+                placeholder = "e.g., AI & Tech, Design Resources",
                 singleLine = true,
                 isError = state.error != null,
                 enabled = !state.isLoading
             )
 
             // Description Field
-            OutlinedTextField(
+            AppTextField(
                 value = state.description,
                 onValueChange = { viewModel.take(AddCollectionEvent.DescriptionChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Description") },
-                placeholder = { Text("What type of links will this collection contain?") },
+                label = "Description",
+                placeholder = "What type of links will this collection contain?",
+                singleLine = false,
                 minLines = 3,
                 maxLines = 5,
                 enabled = !state.isLoading
@@ -132,61 +114,21 @@ fun AddCollectionScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             // Submit Button
-            Button(
+            AppButton(
+                text = "Create Collection",
                 onClick = { viewModel.take(AddCollectionEvent.Submit) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = state.isFormValid && !state.isLoading,
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                if (state.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Text("Creating...")
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Text("Create Collection")
-                }
-            }
+                enabled = state.isFormValid,
+                isLoading = state.isLoading
+            )
 
             // Error message
             state.error?.let { error ->
-                Card(
+                AppErrorCard(
+                    error = error,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = error,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onErrorContainer,
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(
-                            onClick = { viewModel.take(AddCollectionEvent.ClearError) }
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Dismiss",
-                                tint = MaterialTheme.colorScheme.onErrorContainer
-                            )
-                        }
-                    }
-                }
+                    onDismiss = { viewModel.take(AddCollectionEvent.ClearError) }
+                )
             }
         }
     }

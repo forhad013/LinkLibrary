@@ -281,9 +281,9 @@ private fun AvailableTagChip(
 
     val backgroundColor by animateColorAsState(
         targetValue = when {
-            isPressed -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.8f)
-            isHovered -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f)
-            else -> MaterialTheme.colorScheme.surfaceVariant
+            isPressed -> MaterialTheme.colorScheme.secondaryContainer
+            isHovered -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f)
+            else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
         },
         animationSpec = tween(durationMillis = 200),
         label = "chip_background"
