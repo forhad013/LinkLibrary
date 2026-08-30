@@ -44,9 +44,8 @@ kotlin {
                 implementation("androidx.appcompat:appcompat:1.6.1")
                 // Coil for image loading (Android only)
                 implementation(libs.coil.compose)
-                // Compose UI Tooling for Preview support (needed for @Preview functions)
+                // Compose UI Tooling Preview for @Preview functions
                 implementation("androidx.compose.ui:ui-tooling-preview:1.7.6")
-                implementation("androidx.compose.ui:ui-tooling:1.7.6")
             }
         }
     }
