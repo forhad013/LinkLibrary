@@ -17,6 +17,8 @@ val LightColorScheme = lightColorScheme(
     onPrimary = Color(0xFFFFFFFF),
     primaryContainer = Color(0xFFDDE3FF),
     onPrimaryContainer = Color(0xFF1E36A8),
+    secondary = Color(0xFF5B3BB5),
+    onSecondary = Color(0xFFFFFFFF),
     secondaryContainer = Color(0xFFE9DDFF),
     onSecondaryContainer = Color(0xFF432A8F),
     tertiary = Color(0xFFFF8A3D),
@@ -42,7 +44,7 @@ val LightColorScheme = lightColorScheme(
     scrim = Color.Black
 )
 
-// shortcut: wireframes are light-only; dark keeps the same hues darkened, revisit when a dark design exists
+// Dark variant — kept from before; wireframes' dark design is pending
 val DarkColorScheme = darkColorScheme(
     primary = Color(0xFFB7C4FF),
     onPrimary = Color(0xFF12236B),
