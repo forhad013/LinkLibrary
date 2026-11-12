@@ -4,27 +4,24 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 /**
- * New Root Screens - Only 4 top-level tabs
- * Each tab manages its own independent navigation tree
+ * Root Screens - 4 top-level tabs (GRE-49)
  */
 @Serializable
 sealed class RootScreens : NavKey {
 
-    // Home Tab - Dashboard and recent activity
+    // Feed Tab - saved links feed (empty state until GRE-15)
     @Serializable
-    data object HomeTab : RootScreens()
-    // Library Tab - Bookmarks management
+    data object FeedTab : RootScreens()
 
+    // Search Tab - placeholder until GRE-19
+    @Serializable
+    data object SearchTab : RootScreens()
 
+    // Library Tab - categories and tags (until GRE-46)
     @Serializable
     data object LibraryTab : RootScreens()
 
-    // Organize Tab - Collections and tags management
-    @Serializable
-    data object OrganizeTab : RootScreens()
-
-
-    // Settings Tab - App configuration
+    // Settings Tab
     @Serializable
     data object SettingsTab : RootScreens()
 }

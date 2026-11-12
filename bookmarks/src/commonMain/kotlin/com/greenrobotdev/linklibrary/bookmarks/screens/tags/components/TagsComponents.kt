@@ -104,7 +104,7 @@ fun TagsHeader(
             color = MaterialTheme.colorScheme.onSurface
         )
         Text(
-            text = "Organize and find your collections effortlessly.",
+            text = "Organize and find your categoryNames effortlessly.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

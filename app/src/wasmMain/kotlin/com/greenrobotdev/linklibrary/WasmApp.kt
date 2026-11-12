@@ -23,7 +23,7 @@ fun main() {
     }
 
     CanvasBasedWindow("Link Library") {
-        LinkLibraryTheme(darkTheme = true) {
+        LinkLibraryTheme {
             RootScreen(
                 sharedContent = null, // Will receive from Chrome extension in the future
                 onSharedContentHandled = {}

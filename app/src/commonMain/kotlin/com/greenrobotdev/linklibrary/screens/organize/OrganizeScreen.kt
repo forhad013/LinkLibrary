@@ -25,20 +25,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
-import com.greenrobotdev.linklibrary.bookmarks.screens.collections.CollectionsScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.categories.CategoriesScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreenEnhanced
 import com.greenrobotdev.linklibrary.design.components.cards.ContentCard
 
 /**
  * Organize Screen - Base screen for the Organize tab
- * Shows overview of collections and tags with quick access to management screens
+ * Shows overview of categoryNames and tags with quick access to management screens
  */
 @Composable
 fun OrganizeScreen(
     routeKey: NavKey,
-    onNavigateToCollections: () -> Unit,
+    onNavigateToCategories: () -> Unit,
     onNavigateToTags: () -> Unit,
-    onCreateCollection: () -> Unit,
+    onCreateCategory: () -> Unit,
     onCreateTag: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -57,10 +57,10 @@ fun OrganizeScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Collections Card
+        // Categories Card
         ContentCard(
             headerIcon = Icons.Default.Collections,
-            headerTitle = "Collections",
+            headerTitle = "Categories",
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
@@ -68,7 +68,7 @@ fun OrganizeScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "Manage your link collections",
+                    text = "Manage your link categoryNames",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -77,9 +77,9 @@ fun OrganizeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // View Collections Button
+                    // View Categories Button
                     Card(
-                        onClick = onNavigateToCollections,
+                        onClick = onNavigateToCategories,
                         modifier = Modifier.weight(1f),
                         shape = MaterialTheme.shapes.medium,
                         colors = CardDefaults.cardColors(
@@ -93,7 +93,7 @@ fun OrganizeScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Collections,
-                                contentDescription = "View Collections",
+                                contentDescription = "View Categories",
                                 tint = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                             Text(
@@ -105,9 +105,9 @@ fun OrganizeScreen(
                         }
                     }
 
-                    // Create Collection Button
+                    // Create Category Button
                     Card(
-                        onClick = onCreateCollection,
+                        onClick = onCreateCategory,
                         modifier = Modifier.weight(1f),
                         shape = MaterialTheme.shapes.medium,
                         colors = CardDefaults.cardColors(
@@ -121,7 +121,7 @@ fun OrganizeScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
-                                contentDescription = "Create Collection",
+                                contentDescription = "Create Category",
                                 tint = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                             Text(

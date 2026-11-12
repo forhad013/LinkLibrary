@@ -46,14 +46,15 @@ fun LibraryPresenter(
 
     // Load links reactively
     LaunchedEffect(Unit) {
-        linkRepository.getLinksWithTagsAndCollections().collect { result ->
+        linkRepository.getLinksWithTags().collect { result ->
             result.onSuccess { entities ->
                 links.clear()
                 links.addAll(entities.map { it.toDomain() })
                 state = state.copy(
                     searchQuery = state.searchQuery,
                     links = links.toList(),
-                    filteredLinks = filterLinks(state.searchQuery, links.toList())
+                    filteredLinks = filterLinks(state.searchQuery, links.toList()),
+                    isLoading = false
                 )
             }
         }

@@ -29,10 +29,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.greenrobotdev.linklibrary.bookmarks.model.Collection
+import com.greenrobotdev.linklibrary.bookmarks.model.Category
 import com.greenrobotdev.linklibrary.bookmarks.model.Tag
-import com.greenrobotdev.linklibrary.design.components.advanced.CollectionDropdown
-import com.greenrobotdev.linklibrary.design.components.advanced.CollectionItem
+import com.greenrobotdev.linklibrary.design.components.advanced.CategoryDropdown
+import com.greenrobotdev.linklibrary.design.components.advanced.CategoryItem
 import com.greenrobotdev.linklibrary.design.components.advanced.FetchState
 import com.greenrobotdev.linklibrary.design.components.appbar.AppTopBar
 import com.greenrobotdev.linklibrary.design.components.button.IconButton
@@ -381,7 +381,7 @@ private fun TitleInputSection(
 }
 
 /**
- * OrganizationSection - Collection and tags selection using FormCard from design module
+ * OrganizationSection - Category and tags selection using FormCard from design module
  *
  * Features:
  * - Material 3 Expressive styling with FormCard wrapper
@@ -392,15 +392,15 @@ private fun TitleInputSection(
  */
 @Composable
 fun OrganizationSection(
-    availableCollections: List<Collection>,
-    selectedCollections: List<String>,
+    availableCategories: List<Category>,
+    selectedCategoryIds: List<String>,
     availableTags: List<Tag>,
     selectedTags: List<String>,
-    onCollectionToggle: (String) -> Unit,
-    onClearAllCollections: () -> Unit,
+    onCategoryToggle: (String) -> Unit,
+    onClearAllCategories: () -> Unit,
     onTagToggle: (String) -> Unit,
     onAddTag: () -> Unit,
-    onAddCollection: () -> Unit,
+    onAddCategory: () -> Unit,
     isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -409,12 +409,12 @@ fun OrganizationSection(
         headerIcon = Icons.Default.Folder,
         headerTitle = "Organization",
     ) {
-        CollectionSelector(
-            collections = availableCollections.toSet(),
-            selectedCollections = selectedCollections.toSet(),
-            onCollectionToggle = onCollectionToggle,
-            onClearAllCollections = onClearAllCollections,
-            onAddCollection = onAddCollection,
+        CategorySelector(
+            categoryNames = availableCategories.toSet(),
+            selectedCategoryIds = selectedCategoryIds.toSet(),
+            onCategoryToggle = onCategoryToggle,
+            onClearAllCategories = onClearAllCategories,
+            onAddCategory = onAddCategory,
             isLoading = isLoading
         )
 
@@ -429,15 +429,15 @@ fun OrganizationSection(
 }
 
 /**
- * CollectionInputRow - Collection input with dropdown and add button
+ * CategoryInputRow - Category input with dropdown and add button
  */
 @Composable
-private fun CollectionInputRow(
-    collections: List<Collection>,
-    selectedCollectionId: String?,
-    onCollectionSelected: (String?) -> Unit,
-    onCollectionCreate: (String, String) -> Unit,
-    onAddCollection: () -> Unit,
+private fun CategoryInputRow(
+    categoryNames: List<Category>,
+    selectedCategoryId: String?,
+    onCategorySelected: (String?) -> Unit,
+    onCategoryCreate: (String, String) -> Unit,
+    onAddCategory: () -> Unit,
     isLoading: Boolean
 ) {
     Column(
@@ -445,26 +445,26 @@ private fun CollectionInputRow(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Collection",
+            text = "Category",
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         when {
-            // Empty state - no collections available
-            collections.isEmpty() -> {
+            // Empty state - no categoryNames available
+            categoryNames.isEmpty() -> {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextButton(
-                        onClick = onAddCollection,
+                        onClick = onAddCategory,
                         modifier = Modifier.weight(1f),
                         enabled = !isLoading
                     ) {
                         Text(
-                            "Create your first collection",
+                            "Create your first category",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -472,37 +472,36 @@ private fun CollectionInputRow(
                 }
             }
 
-            // Show collection dropdown
+            // Show category dropdown
             else -> {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    CollectionDropdown(
-                        collections = collections.map {
-                            CollectionItem(
+                    CategoryDropdown(
+                        categories = categoryNames.map {
+                            CategoryItem(
                                 id = it.id,
                                 name = it.name,
-                                description = it.description,
                                 icon = Icons.Default.Folder,
                                 linkCount = 0,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         },
-                        selectedCollectionId = selectedCollectionId,
-                        onCollectionSelected = onCollectionSelected,
-                        onCollectionCreate = onCollectionCreate,
+                        selectedCategoryId = selectedCategoryId,
+                        onCategorySelected = onCategorySelected,
+                        onCategoryCreate = onCategoryCreate,
                         modifier = Modifier.weight(1f),
-                        placeholder = "Select collections",
+                        placeholder = "Select category",
                         showLinkCounts = true,
                         enabled = !isLoading
                     )
 
-                    // Add Collection Button - using standardized IconButton
+                    // Add Category Button - using standardized IconButton
                     IconButton(
-                        onClick = onAddCollection,
+                        onClick = onAddCategory,
                         icon = Icons.Default.Add,
-                        contentDescription = "Add collection",
+                        contentDescription = "Add category",
                         style = ComponentStyle.Filled,
                         size = ComponentSize.Medium,
                         colors = com.greenrobotdev.linklibrary.design.components.button.ComponentColors(
