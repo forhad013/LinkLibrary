@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.database.repository
 
+import com.greenrobotdev.linklibrary.database.room.CategoryDao
 import com.greenrobotdev.linklibrary.database.room.CategoryEntity
 import com.greenrobotdev.linklibrary.database.room.CategoryWithCount
 import kotlinx.coroutines.flow.Flow
@@ -14,4 +15,5 @@ interface CategoryRepository {
     suspend fun getCategoryForLink(linkId: String): Flow<Result<CategoryEntity?>>
     suspend fun assignLinkToCategory(linkId: String, categoryId: String): Flow<Result<Unit>>
     suspend fun getCategoriesWithCounts(): Flow<Result<List<CategoryWithCount>>>
+    suspend fun getSmartListCounts(): Flow<Result<CategoryDao.SmartListCounts>>
 }

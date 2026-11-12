@@ -128,7 +128,18 @@ interface CategoryDao {
     fun countFavorites(): Flow<Int>
 
     @Query("SELECT COUNT(*) FROM links WHERE isArchived = 1")
-    fun countArchived(): Flow<Int>
+    fun countArchivedFlow(): Flow<Int>
+
+    data class SmartListCounts(val unopened: Int, val favorites: Int, val archived: Int, val uncategorized: Int)
+
+    @Query("""
+        SELECT
+            (SELECT COUNT(*) FROM links WHERE isOpened = 0 AND isArchived = 0) as unopened,
+            (SELECT COUNT(*) FROM links WHERE isFavorite = 1 AND isArchived = 0) as favorites,
+            (SELECT COUNT(*) FROM links WHERE isArchived = 1) as archived,
+            (SELECT COUNT(*) FROM links l WHERE NOT EXISTS (SELECT 1 FROM link_categories lc WHERE lc.linkId = l.id)) as uncategorized
+    """)
+    fun getSmartListCounts(): Flow<SmartListCounts>
 
     @Query("""
         SELECT COUNT(*) FROM links l

@@ -20,4 +20,7 @@ sealed class OrganizeNavRoutes : NavKey {
 
     // Bulk operations
     data object BulkOrganize : OrganizeNavRoutes()
+
+    // Manage categories and tags (rename/move/delete)
+    data object Manage : OrganizeNavRoutes()
 }

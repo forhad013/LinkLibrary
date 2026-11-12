@@ -9,8 +9,9 @@ import androidx.navigation3.ui.NavDisplay
 import com.greenrobotdev.linklibrary.bookmarks.screens.addCategory.AddCategoryScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.categories.CategoriesScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryTabScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.manage.ManageScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreenEnhanced
-import com.greenrobotdev.linklibrary.screens.organize.OrganizeScreen
 import com.greenrobotdev.linklibrary.screens.root.TabNavigator
 import com.greenrobotdev.linklibrary.screens.root.rememberTabNavigationState
 import com.greenrobotdev.linklibrary.screens.root.toEntries
@@ -30,21 +31,20 @@ fun OrganizeTabNavigation() {
         entries = tabNavState.toEntries { route ->
             NavEntry(route) {
                 when (route) {
-                    // Base Organize Screen - Shows categoryNames and tags overview
-                    is OrganizeNavRoutes.OrganizeBase -> OrganizeScreen(
-                        routeKey = route,
-                        onNavigateToCategories = {
-                            tabNavigator.navigate(OrganizeNavRoutes.CategoryDetail("all"))
-                        },
-                        onNavigateToTags = {
-                            tabNavigator.navigate(OrganizeNavRoutes.TagDetail("all"))
-                        },
+                    // Library tab base (design: library_categories_amp_tags)
+                    is OrganizeNavRoutes.OrganizeBase -> LibraryTabScreen(
+                        onManage = { tabNavigator.navigate(OrganizeNavRoutes.Manage) },
                         onCreateCategory = {
                             tabNavigator.navigate(OrganizeNavRoutes.CategoryEdit(null))
                         },
-                        onCreateTag = {
-                            tabNavigator.navigate(OrganizeNavRoutes.TagEdit(null))
+                        onCategoryClick = { categoryId ->
+                            tabNavigator.navigate(OrganizeNavRoutes.CategoryDetail(categoryId))
                         }
+                    )
+
+                    // Manage categories and tags
+                    is OrganizeNavRoutes.Manage -> ManageScreen(
+                        onBack = { tabNavigator.goBack() }
                     )
 
                     // Category Detail Screen

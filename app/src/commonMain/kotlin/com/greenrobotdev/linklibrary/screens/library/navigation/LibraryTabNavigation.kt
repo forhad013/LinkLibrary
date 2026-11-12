@@ -1,17 +1,16 @@
 package com.greenrobotdev.linklibrary.screens.library.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.filled.RssFeed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkScreen
-import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.addCategory.AddCategoryScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.categories.CategoriesScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.details.LinkDetailScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreenEnhanced
 import com.greenrobotdev.linklibrary.screens.notes.NoteEditorScreen
 import com.greenrobotdev.linklibrary.screens.root.TabNavigator

@@ -86,4 +86,9 @@ class RoomCategoryRepository(
         categoryDao.getAllCategoriesWithCounts()
             .map { Result.success(it) }
             .catch { emit(Result.failure(it)) }
+
+    override suspend fun getSmartListCounts(): Flow<Result<CategoryDao.SmartListCounts>> =
+        categoryDao.getSmartListCounts()
+            .map { Result.success(it) }
+            .catch { emit(Result.failure(it)) }
 }
