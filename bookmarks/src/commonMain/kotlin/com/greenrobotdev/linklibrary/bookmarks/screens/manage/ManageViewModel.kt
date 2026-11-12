@@ -21,19 +21,25 @@ import org.koin.core.component.inject
 data class ManageState(
     val categories: List<Category> = emptyList(),
     val tags: List<Tag> = emptyList(),
+    val categoriesVisible: Boolean = true,
     val selectedCategoryId: String? = null,
     val selectedTagId: String? = null,
     // pair of (kind label, name) pending delete confirmation
-    val deleteTarget: Pair<String, String>? = null
+    val deleteTarget: Pair<String, String>? = null,
+    // pair of (id, current name) pending rename dialog
+    val renaming: Pair<String, String>? = null
 )
 
 sealed interface ManageEvent {
+    data class ShowCategories(val visible: Boolean = true) : ManageEvent
+    object ShowTags : ManageEvent
     data class SelectCategory(val id: String?) : ManageEvent
     data class SelectTag(val id: String?) : ManageEvent
+    object StartRename : ManageEvent
+    object CancelRename : ManageEvent
     data class RenameCategory(val id: String, val newName: String) : ManageEvent
-    data class MoveCategory(val id: String, val newParentId: String?) : ManageEvent
-    data class DeleteCategory(val id: String) : ManageEvent
     data class RenameTag(val id: String, val newName: String) : ManageEvent
+    data class DeleteCategory(val id: String) : ManageEvent
     data class DeleteTag(val id: String) : ManageEvent
     object ConfirmDelete : ManageEvent
     object CancelDelete : ManageEvent
@@ -67,18 +73,30 @@ class ManageViewModel : MoleculeViewModel<ManageEvent, ManageState>(), KoinCompo
         LaunchedEffect(Unit) {
             events.collect { event ->
                 when (event) {
+                    is ManageEvent.ShowCategories -> state = state.copy(categoriesVisible = true)
+                    ManageEvent.ShowTags -> state = state.copy(categoriesVisible = false)
                     is ManageEvent.SelectCategory -> state = state.copy(selectedCategoryId = event.id, selectedTagId = null)
                     is ManageEvent.SelectTag -> state = state.copy(selectedTagId = event.id, selectedCategoryId = null)
-                    is ManageEvent.RenameCategory -> categoryRepository.renameCategory(event.id, event.newName).first()
-                    is ManageEvent.MoveCategory -> categoryRepository.moveCategory(event.id, event.newParentId).first()
-                    is ManageEvent.DeleteCategory -> {
-                        pendingDelete = PendingDelete.Category(event.id)
-                        state = state.copy(deleteTarget = "category" to (state.categories.firstOrNull { it.id == event.id }?.name ?: ""))
+                    ManageEvent.StartRename -> {
+                        val cat = state.categories.firstOrNull { it.id == state.selectedCategoryId }
+                        val tag = state.tags.firstOrNull { it.id == state.selectedTagId }
+                        val target = cat?.let { it.id to it.name } ?: tag?.let { it.id to it.name }
+                        state = state.copy(renaming = target)
+                    }
+                    ManageEvent.CancelRename -> state = state.copy(renaming = null)
+                    is ManageEvent.RenameCategory -> {
+                        categoryRepository.renameCategory(event.id, event.newName).first()
+                        state = state.copy(renaming = null)
                     }
                     is ManageEvent.RenameTag -> {
                         tagRepository.getTagById(event.id).first().getOrNull()?.let { tag ->
                             tagRepository.updateTag(tag.copy(name = event.newName)).first()
                         }
+                        state = state.copy(renaming = null)
+                    }
+                    is ManageEvent.DeleteCategory -> {
+                        pendingDelete = PendingDelete.Category(event.id)
+                        state = state.copy(deleteTarget = "category" to (state.categories.firstOrNull { it.id == event.id }?.name ?: ""))
                     }
                     is ManageEvent.DeleteTag -> {
                         pendingDelete = PendingDelete.Tag(event.id)
@@ -91,7 +109,7 @@ class ManageViewModel : MoleculeViewModel<ManageEvent, ManageState>(), KoinCompo
                             null -> Unit
                         }
                         pendingDelete = null
-                        state = state.copy(deleteTarget = null)
+                        state = state.copy(deleteTarget = null, selectedCategoryId = null, selectedTagId = null)
                     }
                     ManageEvent.CancelDelete -> {
                         pendingDelete = null

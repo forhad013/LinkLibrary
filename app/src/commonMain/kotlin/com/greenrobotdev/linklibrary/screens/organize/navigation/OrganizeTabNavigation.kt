@@ -3,18 +3,24 @@ package com.greenrobotdev.linklibrary.screens.organize.navigation
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.greenrobotdev.linklibrary.bookmarks.screens.addCategory.AddCategoryScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.categories.CategoriesScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker.CategoryPickerScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryTabScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.manage.ManageScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreenEnhanced
+import com.greenrobotdev.linklibrary.database.repository.CategoryRepository
 import com.greenrobotdev.linklibrary.screens.root.TabNavigator
 import com.greenrobotdev.linklibrary.screens.root.rememberTabNavigationState
 import com.greenrobotdev.linklibrary.screens.root.toEntries
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import org.koin.mp.KoinPlatform.getKoin
 
 /**
  * Organize Tab Navigation - Manages all screens within the Organize tab
@@ -44,8 +50,27 @@ fun OrganizeTabNavigation() {
 
                     // Manage categories and tags
                     is OrganizeNavRoutes.Manage -> ManageScreen(
-                        onBack = { tabNavigator.goBack() }
+                        onBack = { tabNavigator.goBack() },
+                        onMoveCategory = { categoryId ->
+                            tabNavigator.navigate(OrganizeNavRoutes.MoveCategory(categoryId))
+                        }
                     )
+
+                    // Move a category into a new parent (reuses the category picker)
+                    is OrganizeNavRoutes.MoveCategory -> {
+                        val scope = rememberCoroutineScope()
+                        CategoryPickerScreen(
+                            initialSelection = null,
+                            onDone = { newParentId ->
+                                scope.launch {
+                                    getKoin().get<CategoryRepository>()
+                                        .moveCategory(route.categoryId, newParentId).first()
+                                }
+                                tabNavigator.goBack()
+                            },
+                            onBack = { tabNavigator.goBack() }
+                        )
+                    }
 
                     // Category Detail Screen
                     is OrganizeNavRoutes.CategoryDetail -> CategoriesScreen(

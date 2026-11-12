@@ -1,22 +1,19 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.manage
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.DriveFileMove
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Label
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,66 +33,143 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.greenrobotdev.linklibrary.bookmarks.model.Category
-import com.greenrobotdev.linklibrary.bookmarks.model.Tag
-import com.greenrobotdev.linklibrary.design.components.icon.AppIcon
 
 /**
- * Manage categories and tags (design: manage_categories_amp_tags).
- * Select a row, then Rename / Move / Delete. Delete asks for confirmation;
- * links are never deleted.
+ * Manage categories and tags (design: Manage categories & tags).
+ * Categories/Tags toggle, pill rows; selecting a row shows a bottom action bar
+ * (Rename / Move / Delete). Delete confirms; links are never deleted.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ManageScreen(onBack: () -> Unit) {
+fun ManageScreen(onBack: () -> Unit, onMoveCategory: (String) -> Unit = {}) {
     val viewModel: ManageViewModel = viewModel { ManageViewModel() }
     val state by viewModel.models.collectAsState()
+
+    val showCategories = state.categoriesVisible
+    val selectedName = state.categories.firstOrNull { it.id == state.selectedCategoryId }?.name
+        ?: state.tags.firstOrNull { it.id == state.selectedTagId }?.name
+    val hasSelection = selectedName != null
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Manage") },
+                title = { Text("Manage", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
-        }
+        },
+        bottomBar = {
+            if (hasSelection) {
+                BottomActionBar(
+                    label = selectedName ?: "",
+                    isCategory = state.selectedCategoryId != null,
+                    onRename = { viewModel.take(ManageEvent.StartRename) },
+                    onMove = { state.selectedCategoryId?.let(onMoveCategory) },
+                    onDelete = {
+                        if (state.selectedCategoryId != null) {
+                            viewModel.take(ManageEvent.DeleteCategory(state.selectedCategoryId!!))
+                        } else {
+                            viewModel.take(ManageEvent.DeleteTag(state.selectedTagId!!))
+                        }
+                    }
+                )
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item { Text("Categories", style = MaterialTheme.typography.titleMedium) }
-            items(state.categories) { category ->
-                ManageRow(
-                    label = category.name,
-                    count = category.count,
-                    icon = Icons.Default.Folder,
-                    selected = state.selectedCategoryId == category.id,
-                    onClick = { viewModel.take(ManageEvent.SelectCategory(if (state.selectedCategoryId == category.id) null else category.id)) },
-                    onRename = { viewModel.take(ManageEvent.RenameCategory(category.id, it)) },
-                    onMove = { viewModel.take(ManageEvent.MoveCategory(category.id, it)) },
-                    onDelete = { viewModel.take(ManageEvent.DeleteCategory(category.id)) }
+        Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp)) {
+            // Toggle pills
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                TogglePill(
+                    "Categories",
+                    active = showCategories,
+                    modifier = Modifier.weight(1f),
+                    onClick = { viewModel.take(ManageEvent.ShowCategories()) }
+                )
+                TogglePill(
+                    "Tags",
+                    active = !showCategories,
+                    modifier = Modifier.weight(1f),
+                    onClick = { viewModel.take(ManageEvent.ShowTags) }
                 )
             }
-            item { Text("Tags", style = MaterialTheme.typography.titleMedium) }
-            items(state.tags) { tag ->
-                ManageRow(
-                    label = tag.name,
-                    count = tag.count,
-                    icon = Icons.Default.Label,
-                    selected = state.selectedTagId == tag.id,
-                    onClick = { viewModel.take(ManageEvent.SelectTag(if (state.selectedTagId == tag.id) null else tag.id)) },
-                    onRename = { viewModel.take(ManageEvent.RenameTag(tag.id, it)) },
-                    onMove = null, // tags have no hierarchy
-                    onDelete = { viewModel.take(ManageEvent.DeleteTag(tag.id)) }
-                )
+
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                val rows = if (showCategories) state.categories.map { Triple(it.id, it.name, it.count) }
+                else state.tags.map { Triple(it.id, it.name, it.count) }
+                items(rows) { (id, name, count) ->
+                    val selectedId = if (showCategories) state.selectedCategoryId else state.selectedTagId
+                    ManageRow(
+                        label = name,
+                        count = count,
+                        selected = selectedId == id,
+                        onClick = {
+                            val next = if (selectedId == id) null else id
+                            if (showCategories) viewModel.take(ManageEvent.SelectCategory(next))
+                            else viewModel.take(ManageEvent.SelectTag(next))
+                        }
+                    )
+                }
+                item {
+                    Text(
+                        if (showCategories) "Categories can be nested up to 5 levels. Sorted by name."
+                        else "Tags sorted by name.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
+                    )
+                }
             }
         }
+    }
+
+    // Rename dialog
+    if (state.renaming != null) {
+        val target = state.renaming!!
+        var nameField by remember(target) { mutableStateOf(target.second) }
+        AlertDialog(
+            onDismissRequest = { viewModel.take(ManageEvent.CancelRename) },
+            title = { Text("Rename \"${target.second}\"") },
+            text = {
+                OutlinedTextField(
+                    value = nameField,
+                    onValueChange = { nameField = it },
+                    singleLine = true,
+                    label = { Text("New name") }
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (state.selectedCategoryId != null) {
+                            viewModel.take(ManageEvent.RenameCategory(target.first, nameField.trim()))
+                        } else {
+                            viewModel.take(ManageEvent.RenameTag(target.first, nameField.trim()))
+                        }
+                    },
+                    enabled = nameField.isNotBlank()
+                ) { Text("Save") }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.take(ManageEvent.CancelRename) }) { Text("Cancel") }
+            }
+        )
     }
 
     // Delete confirmation
@@ -114,79 +189,83 @@ fun ManageScreen(onBack: () -> Unit) {
 }
 
 @Composable
-private fun ManageRow(
-    label: String,
-    count: Int,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    selected: Boolean,
-    onClick: () -> Unit,
-    onRename: (String) -> Unit,
-    onMove: ((String?) -> Unit)?,
-    onDelete: () -> Unit,
-) {
-    var renaming by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
-    var moving by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
-    var nameField by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(label) }
+private fun TogglePill(label: String, active: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Box(
+        modifier = modifier
+            .background(
+                if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer,
+                RoundedCornerShape(50)
+            )
+            .clickable(onClick = onClick)
+            .padding(vertical = 10.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            label,
+            style = MaterialTheme.typography.labelLarge,
+            color = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
 
-    Column(
+@Composable
+private fun ManageRow(label: String, count: Int, selected: Boolean, onClick: () -> Unit) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            AppIcon(icon = icon, backgroundColor = MaterialTheme.colorScheme.primary)
-            Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-            Text(
-                "$count",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            .background(
+                if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+                RoundedCornerShape(50)
             )
-        }
+            .clickable(onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            "[$count]",
+            style = MaterialTheme.typography.bodySmall,
+            color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
 
-        if (selected) {
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                IconButton(onClick = { renaming = true }) {
-                    Icon(Icons.Default.Edit, contentDescription = "Rename")
-                }
-                if (onMove != null) {
-                    IconButton(onClick = { moving = true }) {
-                        Icon(Icons.AutoMirrored.Filled.DriveFileMove, contentDescription = "Move")
-                    }
-                }
-                IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete")
-                }
-            }
-            if (renaming) {
-                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = nameField,
-                        onValueChange = { nameField = it },
-                        singleLine = true,
-                        label = { Text("New name") },
-                        modifier = Modifier.weight(1f)
-                    )
-                    TextButton(
-                        onClick = { onRename(nameField.trim()); renaming = false },
-                        enabled = nameField.isNotBlank()
-                    ) { Text("Save") }
-                }
-            }
-            if (moving && onMove != null) {
-                Text(
-                    "Move: pick the new parent in the category picker (next step)",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                // shortcut: inline parent picker not built yet; move-to-root for now
-                TextButton(onClick = { onMove(null); moving = false }) { Text("Move to top level") }
-            }
+@Composable
+private fun BottomActionBar(
+    label: String,
+    isCategory: Boolean,
+    onRename: () -> Unit,
+    onMove: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .background(MaterialTheme.colorScheme.inverseSurface, RoundedCornerShape(28.dp))
+            .padding(horizontal = 16.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            label,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.inverseOnSurface,
+            modifier = Modifier.weight(1f),
+            maxLines = 1
+        )
+        TextButton(onClick = onRename) { Text("Rename", color = MaterialTheme.colorScheme.inverseOnSurface) }
+        if (isCategory) {
+            TextButton(onClick = onMove) { Text("Move", color = MaterialTheme.colorScheme.inverseOnSurface) }
         }
+        TextButton(
+            onClick = onDelete,
+            modifier = Modifier.background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(50))
+        ) { Text("Delete", color = MaterialTheme.colorScheme.onTertiary) }
     }
 }
