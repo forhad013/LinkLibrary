@@ -19,7 +19,7 @@ sealed class RootScreens : NavKey {
     @Serializable
     data object LibraryTab : RootScreens()
 
-    // Organize Tab - Collections and tags management
+    // Organize Tab - Categories and tags management
     @Serializable
     data object OrganizeTab : RootScreens()
 

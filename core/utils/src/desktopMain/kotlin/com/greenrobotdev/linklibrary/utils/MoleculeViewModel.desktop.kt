@@ -5,7 +5,6 @@ import app.cash.molecule.RecompositionMode
 import app.cash.molecule.moleculeFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.CancelScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -91,7 +90,6 @@ actual abstract class MoleculeViewModel<Event, Model> {
      * @return The initial model value
      */
     actual protected open fun initialValue(): Model {
-        // Default implementation - subclasses should override this
         // to provide the actual initial state
         error("initialValue() must be overridden in subclasses")
     }
@@ -100,7 +98,7 @@ actual abstract class MoleculeViewModel<Event, Model> {
      * Cleanup method to be called when the ViewModel is no longer needed.
      * Desktop implementation uses custom coroutine job cancellation.
      */
-    actual open fun onCleared() {
+    actual protected open fun onCleared() {
         viewModelJob.cancel()
     }
 }

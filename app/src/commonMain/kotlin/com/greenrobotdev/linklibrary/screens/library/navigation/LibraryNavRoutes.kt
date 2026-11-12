@@ -15,9 +15,9 @@ sealed class LibraryNavRoutes : NavKey {
     data class AddLink(val initialUrl: String? = null) : LibraryNavRoutes()
     data class NoteEditor(val noteId: String? = null) : LibraryNavRoutes()
 
-    // Collections and tags management
-    data object Collections : LibraryNavRoutes()
+    // Categories and tags management
+    data object Categories : LibraryNavRoutes()
     data object Tags : LibraryNavRoutes()
-    data object AddCollection : LibraryNavRoutes()
+    data object AddCategory : LibraryNavRoutes()
     data object AddTag : LibraryNavRoutes()
 }

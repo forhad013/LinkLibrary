@@ -31,7 +31,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.greenrobotdev.linklibrary.bookmarks.model.Collection
+import com.greenrobotdev.linklibrary.bookmarks.model.Category
 import com.greenrobotdev.linklibrary.design.components.button.IconButton
 import com.greenrobotdev.linklibrary.design.components.icon.AppIcon
 import com.greenrobotdev.linklibrary.design.components.icon.IconBackgroundVariant
@@ -39,28 +39,28 @@ import com.greenrobotdev.linklibrary.design.theme.ComponentSize
 import com.greenrobotdev.linklibrary.design.theme.ComponentStyle
 
 @Composable
-internal fun CollectionSelector(
-    collections: Set<Collection>,
-    selectedCollections: Set<String>,
-    onCollectionToggle: (String) -> Unit,
-    onClearAllCollections: () -> Unit,
-    onAddCollection: () -> Unit,
+internal fun CategorySelector(
+    categoryNames: Set<Category>,
+    selectedCategoryIds: Set<String>,
+    onCategoryToggle: (String) -> Unit,
+    onClearAllCategories: () -> Unit,
+    onAddCategory: () -> Unit,
     isLoading: Boolean
 ) {
     var expanded by remember { mutableStateOf(false) }
     
-    // Get all selected collections and display them as comma-separated list
-    val selectedCollectionsList = collections.filter { collection -> selectedCollections.contains(collection.id) }
-    val displayText = if (selectedCollectionsList.isEmpty()) {
-        "Select collections"
+    // Get all selected categoryNames and display them as comma-separated list
+    val selectedCategoryIdsList = categoryNames.filter { category -> selectedCategoryIds.contains(category.id) }
+    val displayText = if (selectedCategoryIdsList.isEmpty()) {
+        "Select categoryNames"
     } else {
-        selectedCollectionsList.joinToString(", ") { collection -> collection.name }
+        selectedCategoryIdsList.joinToString(", ") { category -> category.name }
     }
 
     Column {
         if (isLoading) {
             Text(
-                "Loading collections...",
+                "Loading categoryNames...",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -78,7 +78,7 @@ internal fun CollectionSelector(
                             interactionSource = androidx.compose.foundation.interaction.MutableInteractionSource(),
                             indication = null
                         ) {
-                              if (collections.isNotEmpty()) {
+                              if (categoryNames.isNotEmpty()) {
                                 expanded = !expanded
                             }
                         }
@@ -121,7 +121,7 @@ internal fun CollectionSelector(
                             .background(MaterialTheme.colorScheme.surface)
                     ) {
                          // "Clear all selections" option
-                        if (selectedCollectionsList.isNotEmpty()) {
+                        if (selectedCategoryIdsList.isNotEmpty()) {
                             DropdownMenuItem(
                                 text = {
                                     Column {
@@ -131,14 +131,14 @@ internal fun CollectionSelector(
                                             color = MaterialTheme.colorScheme.error
                                         )
                                         Text(
-                                            "Remove ${selectedCollectionsList.size} selected collection(s)",
+                                            "Remove ${selectedCategoryIdsList.size} selected category(s)",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                 },
                                 onClick = {
-                                    onClearAllCollections()
+                                    onClearAllCategories()
                                     expanded = false
                                 },
                                 leadingIcon = {
@@ -165,9 +165,9 @@ internal fun CollectionSelector(
                             )
                         }
 
-                        // Collection options
-                        collections.forEach { collection ->
-                             val isSelected = selectedCollections.contains(collection.id)
+                        // Category options
+                        categoryNames.forEach { category ->
+                             val isSelected = selectedCategoryIds.contains(category.id)
 
                             DropdownMenuItem(
                                 text = {
@@ -175,24 +175,15 @@ internal fun CollectionSelector(
                                         verticalArrangement = Arrangement.spacedBy(4.dp)
                                     ) {
                                         Text(
-                                            collection.name,
+                                            category.name,
                                             style = MaterialTheme.typography.bodyMedium,
                                             fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
                                         )
-                                        if (collection.description?.isNotBlank() == true) {
-                                            Text(
-                                                collection.description,
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                maxLines = 1,
-                                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                                            )
-                                        }
                                     }
                                 },
                                 onClick = {
-                                    println("whkq63 Collection clicked: ${collection.name}")
-                                    onCollectionToggle(collection.id)
+                                    println("whkq63 Category clicked: ${category.name}")
+                                    onCategoryToggle(category.id)
                                     // Don't close dropdown to allow multiple selections
                                 },
                                 leadingIcon = {
@@ -231,12 +222,12 @@ internal fun CollectionSelector(
                             )
                         }
 
-                        // Handle empty collections case
-                        if (collections.isEmpty()) {
+                        // Handle empty categoryNames case
+                        if (categoryNames.isEmpty()) {
                              DropdownMenuItem(
                                 text = {
                                     Text(
-                                        "No collections available",
+                                        "No categoryNames available",
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -248,11 +239,11 @@ internal fun CollectionSelector(
                     }
                 }
 
-                // Add Collection Button (Icon only)
+                // Add Category Button (Icon only)
                 IconButton(
-                    onClick = onAddCollection,
+                    onClick = onAddCategory,
                     icon = Icons.Default.Add,
-                    contentDescription = "Add collection",
+                    contentDescription = "Add category",
                     style = ComponentStyle.Elevated,
                     size = ComponentSize.Medium,
                     colors = com.greenrobotdev.linklibrary.design.components.button.ComponentColors(
@@ -263,10 +254,10 @@ internal fun CollectionSelector(
                 )
             }
 
-            // Helper text when no collections exist
-            if (collections.isEmpty() && !isLoading) {
+            // Helper text when no categoryNames exist
+            if (categoryNames.isEmpty() && !isLoading) {
                 Text(
-                    text = "No collections available. Create one to get started.",
+                    text = "No categoryNames available. Create one to get started.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp)

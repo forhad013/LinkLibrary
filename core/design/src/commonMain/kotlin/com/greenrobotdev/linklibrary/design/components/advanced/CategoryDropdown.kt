@@ -51,18 +51,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
 /**
- * CollectionDropdown - Searchable collection selector with inline creation
+ * CategoryDropdown - Searchable category selector with inline creation
  *
- * Material 3 Expressive dropdown component for selecting collections with:
+ * Material 3 Expressive dropdown component for selecting categories with:
  * - Search and filtering functionality
- * - Inline collection creation
+ * - Inline category creation
  * - Selected state indication
  * - Usage statistics
  * - Icon support
  * - Accessible interactions
  */
 
-data class CollectionItem(
+data class CategoryItem(
     val id: String,
     val name: String,
     val description: String? = null,
@@ -73,23 +73,23 @@ data class CollectionItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CollectionDropdown(
-    collections: List<CollectionItem>,
-    selectedCollectionId: String?,
-    onCollectionSelected: (String?) -> Unit,
-    onCollectionCreate: (String, String) -> Unit,
+fun CategoryDropdown(
+    categories: List<CategoryItem>,
+    selectedCategoryId: String?,
+    onCategorySelected: (String?) -> Unit,
+    onCategoryCreate: (String, String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "Select collection",
+    placeholder: String = "Select category",
     showLinkCounts: Boolean = true,
     enabled: Boolean = true
 ) {
-    println("whkq63 availableCollections $collections")
+    println("whkq63 availableCategories $categories")
 
     var expanded by remember { mutableStateOf(false) }
     var showCreateDialog by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
 
-    val selectedCollection = collections.find { it.id == selectedCollectionId }
+    val selectedCategory = categories.find { it.id == selectedCategoryId }
 
     // Arrow rotation animation
     val arrowRotation by animateFloatAsState(
@@ -123,7 +123,7 @@ fun CollectionDropdown(
         modifier = modifier
     ) {
         OutlinedTextField(
-            value = selectedCollection?.name ?:   "Select a collection ",
+            value = selectedCategory?.name ?:   "Select a category ",
             onValueChange = {},
             readOnly = true,
             modifier = Modifier
@@ -132,18 +132,18 @@ fun CollectionDropdown(
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "Select collection",
+                    contentDescription = "Select category",
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.rotate(arrowRotation)
                 )
             },
-            leadingIcon = selectedCollection?.icon?.let {
+            leadingIcon = selectedCategory?.icon?.let {
                 {
                     Icon(
                         imageVector = it,
                         contentDescription = null,
-                        tint = if (selectedCollection.color != androidx.compose.ui.graphics.Color.Unspecified) {
-                            selectedCollection.color
+                        tint = if (selectedCategory.color != androidx.compose.ui.graphics.Color.Unspecified) {
+                            selectedCategory.color
                         } else {
                             MaterialTheme.colorScheme.primary
                         }
@@ -183,7 +183,7 @@ fun CollectionDropdown(
                 OutlinedTextField(
                     value = searchText,
                     onValueChange = { searchText = it },
-                    placeholder = { Text("Search collections...") },
+                    placeholder = { Text("Search categories...") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     shape = RoundedCornerShape(8.dp)
@@ -192,13 +192,13 @@ fun CollectionDropdown(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
-            // Filtered collections
-            val filteredCollections = collections.filter {
+            // Filtered categories
+            val filteredCategories = categories.filter {
                 it.name.contains(searchText, ignoreCase = true) ||
                 (it.description?.contains(searchText, ignoreCase = true) ?: false)
             }
 
-            println("whkq63 filteredCollections: $filteredCollections, size: ${filteredCollections.size}")
+            println("whkq63 filteredCategories: $filteredCategories, size: ${filteredCategories.size}")
 
             Column(
                 modifier = Modifier
@@ -212,7 +212,7 @@ fun CollectionDropdown(
                                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    if (selectedCollectionId == null) {
+                                    if (selectedCategoryId == null) {
                                         Icon(
                                             imageVector = Icons.Default.Check,
                                             contentDescription = null,
@@ -223,7 +223,7 @@ fun CollectionDropdown(
                                         Spacer(modifier = Modifier.width(20.dp))
                                     }
                                     Column {
-                                        Text("No collection")
+                                        Text("No category")
                                         if (showLinkCounts) {
                                             Text(
                                                 "Uncategorized links",
@@ -235,7 +235,7 @@ fun CollectionDropdown(
                                 }
                             },
                             onClick = {
-                                onCollectionSelected(null)
+                                onCategorySelected(null)
                                 expanded = false
                             },
                             modifier = Modifier.fillMaxWidth()
@@ -243,9 +243,9 @@ fun CollectionDropdown(
                     }
 
 
-                // Collection items
-                filteredCollections.forEach { collection ->
-                    println("whkq63 rendering collection item: ${collection.name}")
+                // Category items
+                filteredCategories.forEach { category ->
+                    println("whkq63 rendering category item: ${category.name}")
                     DropdownMenuItem(
                         text = {
                             Row(
@@ -257,7 +257,7 @@ fun CollectionDropdown(
                                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    if (collection.id == selectedCollectionId) {
+                                    if (category.id == selectedCategoryId) {
                                         Icon(
                                             imageVector = Icons.Default.Check,
                                             contentDescription = null,
@@ -268,13 +268,13 @@ fun CollectionDropdown(
                                         Spacer(modifier = Modifier.width(20.dp))
                                     }
 
-                                    // Collection icon
-                                    collection.icon?.let { icon ->
+                                    // Category icon
+                                    category.icon?.let { icon ->
                                         Icon(
                                             imageVector = icon,
                                             contentDescription = null,
-                                            tint = if (collection.color != androidx.compose.ui.graphics.Color.Unspecified) {
-                                                collection.color
+                                            tint = if (category.color != androidx.compose.ui.graphics.Color.Unspecified) {
+                                                category.color
                                             } else {
                                                 MaterialTheme.colorScheme.primary
                                             },
@@ -284,11 +284,11 @@ fun CollectionDropdown(
 
                                     Column {
                                         Text(
-                                            text = collection.name,
+                                            text = category.name,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
                                         )
-                                        collection.description?.let { description ->
+                                        category.description?.let { description ->
                                             Text(
                                                 text = description,
                                                 style = MaterialTheme.typography.labelSmall,
@@ -301,9 +301,9 @@ fun CollectionDropdown(
                                 }
 
                                 // Link count
-                                if (showLinkCounts && collection.linkCount > 0) {
+                                if (showLinkCounts && category.linkCount > 0) {
                                     Text(
-                                        text = "${collection.linkCount}",
+                                        text = "${category.linkCount}",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -311,14 +311,14 @@ fun CollectionDropdown(
                             }
                         },
                         onClick = {
-                            onCollectionSelected(collection.id)
+                            onCategorySelected(category.id)
                             expanded = false
                         },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
 
-                // Create new collection option
+                // Create new category option
                 if (searchText.isNotEmpty()) {
                     DropdownMenuItem(
                             text = {
@@ -339,7 +339,7 @@ fun CollectionDropdown(
                                             color = MaterialTheme.colorScheme.primary
                                         )
                                         Text(
-                                            text = "New collection",
+                                            text = "New category",
                                             style = MaterialTheme.typography.labelSmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -356,13 +356,13 @@ fun CollectionDropdown(
             }
         }
 
-        // Create collection dialog
+        // Create category dialog
         if (showCreateDialog) {
-            CreateCollectionDialog(
+            CreateCategoryDialog(
                 initialName = searchText,
                 onDismiss = { showCreateDialog = false },
                 onCreate = { name, description ->
-                    onCollectionCreate(name, description.orEmpty())
+                    onCategoryCreate(name, description.orEmpty())
                     showCreateDialog = false
                 }
             )
@@ -370,7 +370,7 @@ fun CollectionDropdown(
     }
 
 @Composable
-private fun CreateCollectionDialog(
+private fun CreateCategoryDialog(
     initialName: String,
     onDismiss: () -> Unit,
     onCreate: (String, String?) -> Unit
@@ -393,7 +393,7 @@ private fun CreateCollectionDialog(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Create New Collection",
+                    text = "Create New Category",
                     style = MaterialTheme.typography.titleLarge
                 )
 
@@ -403,7 +403,7 @@ private fun CreateCollectionDialog(
                         name = it
                         nameError = if (it.isBlank()) "Name is required" else null
                     },
-                    label = { Text("Collection name") },
+                    label = { Text("Category name") },
                     isError = nameError != null,
                     singleLine = true,
                     shape = RoundedCornerShape(8.dp),
@@ -448,15 +448,15 @@ private fun CreateCollectionDialog(
  * Compact version for limited spaces
  */
 @Composable
-fun CollectionSelectorCompact(
-    collections: List<CollectionItem>,
-    selectedCollectionId: String?,
-    onCollectionSelected: (String) -> Unit,
+fun CategorySelectorCompact(
+    categories: List<CategoryItem>,
+    selectedCategoryId: String?,
+    onCategorySelected: (String) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val selectedCollection = collections.find { it.id == selectedCollectionId }
+    val selectedCategory = categories.find { it.id == selectedCategoryId }
 
     Box(modifier = modifier) {
         Surface(
@@ -471,7 +471,7 @@ fun CollectionSelectorCompact(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                selectedCollection?.icon?.let { icon ->
+                selectedCategory?.icon?.let { icon ->
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
@@ -480,7 +480,7 @@ fun CollectionSelectorCompact(
                 }
 
                 Text(
-                    text = selectedCollection?.name ?: "No collection",
+                    text = selectedCategory?.name ?: "No category",
                     style = MaterialTheme.typography.bodyMedium
                 )
 
@@ -497,25 +497,25 @@ fun CollectionSelectorCompact(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            collections.forEach { collection ->
+            categories.forEach { category ->
                 DropdownMenuItem(
                     text = {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            collection.icon?.let { icon ->
+                            category.icon?.let { icon ->
                                 Icon(
                                     imageVector = icon,
                                     contentDescription = null,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
-                            Text(collection.name)
+                            Text(category.name)
                         }
                     },
                     onClick = {
-                        onCollectionSelected(collection.id)
+                        onCategorySelected(category.id)
                         expanded = false
                     }
                 )

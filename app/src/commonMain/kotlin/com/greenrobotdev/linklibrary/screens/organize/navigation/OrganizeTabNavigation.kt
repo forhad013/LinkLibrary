@@ -6,9 +6,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
-import com.greenrobotdev.linklibrary.bookmarks.screens.addCollection.AddCollectionScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.addCategory.AddCategoryScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen
-import com.greenrobotdev.linklibrary.bookmarks.screens.collections.CollectionsScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.categories.CategoriesScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreenEnhanced
 import com.greenrobotdev.linklibrary.screens.organize.OrganizeScreen
 import com.greenrobotdev.linklibrary.screens.root.TabNavigator
@@ -30,34 +30,34 @@ fun OrganizeTabNavigation() {
         entries = tabNavState.toEntries { route ->
             NavEntry(route) {
                 when (route) {
-                    // Base Organize Screen - Shows collections and tags overview
+                    // Base Organize Screen - Shows categoryNames and tags overview
                     is OrganizeNavRoutes.OrganizeBase -> OrganizeScreen(
                         routeKey = route,
-                        onNavigateToCollections = {
-                            tabNavigator.navigate(OrganizeNavRoutes.CollectionDetail("all"))
+                        onNavigateToCategories = {
+                            tabNavigator.navigate(OrganizeNavRoutes.CategoryDetail("all"))
                         },
                         onNavigateToTags = {
                             tabNavigator.navigate(OrganizeNavRoutes.TagDetail("all"))
                         },
-                        onCreateCollection = {
-                            tabNavigator.navigate(OrganizeNavRoutes.CollectionEdit(null))
+                        onCreateCategory = {
+                            tabNavigator.navigate(OrganizeNavRoutes.CategoryEdit(null))
                         },
                         onCreateTag = {
                             tabNavigator.navigate(OrganizeNavRoutes.TagEdit(null))
                         }
                     )
 
-                    // Collection Detail Screen
-                    is OrganizeNavRoutes.CollectionDetail -> CollectionsScreen(
+                    // Category Detail Screen
+                    is OrganizeNavRoutes.CategoryDetail -> CategoriesScreen(
                         routeKey = route,
                         onBack = { tabNavigator.goBack() },
-                        onCreateCollection = {
-                            tabNavigator.navigate(OrganizeNavRoutes.CollectionEdit(null))
+                        onCreateCategory = {
+                            tabNavigator.navigate(OrganizeNavRoutes.CategoryEdit(null))
                         }
                     )
 
-                    // Collection Edit Screen
-                    is OrganizeNavRoutes.CollectionEdit -> AddCollectionScreen(
+                    // Category Edit Screen
+                    is OrganizeNavRoutes.CategoryEdit -> AddCategoryScreen(
                         routeKey = route,
                         onBack = { tabNavigator.goBack() }
                     )
@@ -78,11 +78,11 @@ fun OrganizeTabNavigation() {
                     )
 
                     // Bulk Organize Screen
-                    is OrganizeNavRoutes.BulkOrganize -> CollectionsScreen(
+                    is OrganizeNavRoutes.BulkOrganize -> CategoriesScreen(
                         routeKey = route,
                         onBack = { tabNavigator.goBack() },
-                        onCreateCollection = {
-                            tabNavigator.navigate(OrganizeNavRoutes.CollectionEdit(null))
+                        onCreateCategory = {
+                            tabNavigator.navigate(OrganizeNavRoutes.CategoryEdit(null))
                         }
                     )
 

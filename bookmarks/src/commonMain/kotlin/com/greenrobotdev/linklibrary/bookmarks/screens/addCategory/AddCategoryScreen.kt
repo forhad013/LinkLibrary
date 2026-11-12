@@ -1,4 +1,4 @@
-package com.greenrobotdev.linklibrary.bookmarks.screens.addCollection
+package com.greenrobotdev.linklibrary.bookmarks.screens.addCategory
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,16 +38,16 @@ import androidx.navigation3.runtime.NavKey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddCollectionScreen(
+fun AddCategoryScreen(
     routeKey: NavKey,
     onBack: () -> Unit
 ) {
-    val viewModel: AddCollectionViewModel = viewModel(key = routeKey.toString()) {
-        AddCollectionViewModel()
+    val viewModel: AddCategoryViewModel = viewModel(key = routeKey.toString()) {
+        AddCategoryViewModel()
     }
     val state by viewModel.models.collectAsState()
 
-    // Navigate back after successful collection creation
+    // Navigate back after successful category creation
     LaunchedEffect(state.success) {
         if (state.success) {
             onBack()
@@ -57,7 +57,7 @@ fun AddCollectionScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("New Collection") },
+                title = { Text("New Category") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -81,17 +81,17 @@ fun AddCollectionScreen(
         ) {
             // Introduction Card
             AppIntroductionCard(
-                title = "Create New Collection",
-                description = "Organize your links into collections to easily find them later",
+                title = "Create New Category",
+                description = "Organize your links into categoryNames to easily find them later",
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Collection Name Field
+            // Category Name Field
             AppTextField(
                 value = state.name,
-                onValueChange = { viewModel.take(AddCollectionEvent.NameChanged(it)) },
+                onValueChange = { viewModel.take(AddCategoryEvent.NameChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
-                label = "Collection Name",
+                label = "Category Name",
                 placeholder = "e.g., AI & Tech, Design Resources",
                 singleLine = true,
                 isError = state.error != null,
@@ -101,10 +101,10 @@ fun AddCollectionScreen(
             // Description Field
             AppTextField(
                 value = state.description,
-                onValueChange = { viewModel.take(AddCollectionEvent.DescriptionChanged(it)) },
+                onValueChange = { viewModel.take(AddCategoryEvent.DescriptionChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
                 label = "Description",
-                placeholder = "What type of links will this collection contain?",
+                placeholder = "What type of links will this category contain?",
                 singleLine = false,
                 minLines = 3,
                 maxLines = 5,
@@ -115,8 +115,8 @@ fun AddCollectionScreen(
 
             // Submit Button
             AppButton(
-                text = "Create Collection",
-                onClick = { viewModel.take(AddCollectionEvent.Submit) },
+                text = "Create Category",
+                onClick = { viewModel.take(AddCategoryEvent.Submit) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = state.isFormValid,
                 isLoading = state.isLoading
@@ -127,7 +127,7 @@ fun AddCollectionScreen(
                 AppErrorCard(
                     error = error,
                     modifier = Modifier.fillMaxWidth(),
-                    onDismiss = { viewModel.take(AddCollectionEvent.ClearError) }
+                    onDismiss = { viewModel.take(AddCategoryEvent.ClearError) }
                 )
             }
         }

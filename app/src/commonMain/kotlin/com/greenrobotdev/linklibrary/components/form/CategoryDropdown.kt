@@ -22,26 +22,26 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CollectionDropdown(
-    selectedCollection: String?,
-    availableCollections: List<String>,
-    onCollectionSelected: (String?) -> Unit,
-    onAddNewCollection: () -> Unit,
+fun CategoryDropdown(
+    selectedCategory: String?,
+    availableCategories: List<String>,
+    onCategorySelected: (String?) -> Unit,
+    onAddNewCategory: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    placeholder: String = "Select a collection"
+    placeholder: String = "Select a category"
 ) {
     var expanded by remember { mutableStateOf(false) }
 
     Box(modifier = modifier) {
         OutlinedTextField(
-            value = selectedCollection ?: "",
+            value = selectedCategory ?: "",
             onValueChange = { },
             readOnly = true,
             placeholder = { Text(placeholder) },
             trailingIcon = {
-                IconButton(onClick = onAddNewCollection) {
-                    Icon(Icons.Default.Add, contentDescription = "Add new collection")
+                IconButton(onClick = onAddNewCategory) {
+                    Icon(Icons.Default.Add, contentDescription = "Add new category")
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -57,32 +57,32 @@ fun CollectionDropdown(
 }
 
 @Composable
-fun CollectionSelectorRow(
-    selectedCollection: String?,
-    availableCollections: List<String>,
-    onCollectionSelected: (String) -> Unit,
+fun CategorySelectorRow(
+    selectedCategory: String?,
+    availableCategories: List<String>,
+    onCategorySelected: (String) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
-    // Simple row-based collection selector as an alternative to dropdown
+    // Simple row-based category selector as an alternative to dropdown
     androidx.compose.foundation.lazy.LazyRow(
         modifier = modifier,
         horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
     ) {
         item {
-            CollectionChip(
+            CategoryChip(
                 name = "All",
-                isSelected = selectedCollection == null,
-                onClick = { onCollectionSelected("") },
+                isSelected = selectedCategory == null,
+                onClick = { onCategorySelected("") },
                 enabled = enabled
             )
         }
-        items(availableCollections.size) { index ->
-            val collection = availableCollections[index]
-            CollectionChip(
-                name = collection,
-                isSelected = selectedCollection == collection,
-                onClick = { onCollectionSelected(collection) },
+        items(availableCategories.size) { index ->
+            val category = availableCategories[index]
+            CategoryChip(
+                name = category,
+                isSelected = selectedCategory == category,
+                onClick = { onCategorySelected(category) },
                 enabled = enabled
             )
         }
@@ -90,7 +90,7 @@ fun CollectionSelectorRow(
 }
 
 @Composable
-private fun CollectionChip(
+private fun CategoryChip(
     name: String,
     isSelected: Boolean,
     onClick: () -> Unit,

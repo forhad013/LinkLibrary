@@ -24,6 +24,6 @@ class AndroidDatabaseBuilder(
         return Room.databaseBuilder<LinkDatabase>(
             context = appContext,
             name = dbFile.absolutePath
-        )
+        ).fallbackToDestructiveMigration(dropAllTables = true) // shortcut: dev-only, no real migrations yet
     }
 }

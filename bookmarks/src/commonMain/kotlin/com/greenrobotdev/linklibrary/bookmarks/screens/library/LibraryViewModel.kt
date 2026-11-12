@@ -46,7 +46,7 @@ fun LibraryPresenter(
 
     // Load links reactively
     LaunchedEffect(Unit) {
-        linkRepository.getLinksWithTagsAndCollections().collect { result ->
+        linkRepository.getLinksWithTags().collect { result ->
             result.onSuccess { entities ->
                 links.clear()
                 links.addAll(entities.map { it.toDomain() })

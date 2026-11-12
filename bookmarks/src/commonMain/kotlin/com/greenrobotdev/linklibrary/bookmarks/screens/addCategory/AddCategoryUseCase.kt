@@ -1,11 +1,11 @@
-package com.greenrobotdev.linklibrary.bookmarks.screens.addCollection
+package com.greenrobotdev.linklibrary.bookmarks.screens.addCategory
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import com.greenrobotdev.linklibrary.database.repository.CollectionRepository
-import com.greenrobotdev.linklibrary.bookmarks.model.Collection
+import com.greenrobotdev.linklibrary.database.repository.CategoryRepository
+import com.greenrobotdev.linklibrary.bookmarks.model.Category
 import com.greenrobotdev.linklibrary.bookmarks.model.toEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -14,50 +14,49 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 /**
- * Use case for Add Collection screen
- * Handles collection creation form logic
+ * Use case for Add Category screen
+ * Handles category creation form logic
  */
 @OptIn(ExperimentalUuidApi::class)
 @Composable
-fun AddCollectionPresenter(
-    initialState: AddCollectionState,
-    events: Flow<AddCollectionEvent>,
-    collectionRepository: CollectionRepository = koinInject()
-): AddCollectionState {
+fun AddCategoryPresenter(
+    initialState: AddCategoryState,
+    events: Flow<AddCategoryEvent>,
+    categoryRepository: CategoryRepository = koinInject()
+): AddCategoryState {
     var state = remember { mutableStateOf(initialState) }
 
     // Handle events
     LaunchedEffect(Unit) {
         events.collect { event ->
             when (event) {
-                is AddCollectionEvent.NameChanged -> {
+                is AddCategoryEvent.NameChanged -> {
                     state.value = state.value.copy(
                         name = event.name,
                         isFormValid = isFormValid(event.name, state.value.description)
                     )
                 }
 
-                is AddCollectionEvent.DescriptionChanged -> {
+                is AddCategoryEvent.DescriptionChanged -> {
                     state.value = state.value.copy(
                         description = event.description,
                         isFormValid = isFormValid(state.value.name, event.description)
                     )
                 }
 
-                is AddCollectionEvent.Submit -> {
+                is AddCategoryEvent.Submit -> {
                     if (state.value.isFormValid) {
                         state.value = state.value.copy(isLoading = true, error = null)
                         try {
-                            // Create the collection entity
-                            val collection = Collection(
+                            // Create the category entity
+                            val category = Category(
                                 id = Uuid.random().toString(),
                                 name = state.value.name,
-                                description = state.value.description,
                                 count = 0,
                             )
 
                             // Save to database using the repository
-                            val result = collectionRepository.addCollection(collection.toEntity()).first()
+                            val result = categoryRepository.addCategory(category.toEntity()).first()
 
                             result.fold(
                                 onSuccess = {
@@ -70,20 +69,20 @@ fun AddCollectionPresenter(
                                 onFailure = { error ->
                                     state.value = state.value.copy(
                                         isLoading = false,
-                                        error = error.message ?: "Failed to create collection"
+                                        error = error.message ?: "Failed to create category"
                                     )
                                 }
                             )
                         } catch (e: Exception) {
                             state.value = state.value.copy(
                                 isLoading = false,
-                                error = e.message ?: "Failed to create collection"
+                                error = e.message ?: "Failed to create category"
                             )
                         }
                     }
                 }
 
-                is AddCollectionEvent.ClearError -> {
+                is AddCategoryEvent.ClearError -> {
                     state.value = state.value.copy(error = null)
                 }
             }

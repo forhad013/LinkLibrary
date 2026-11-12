@@ -27,7 +27,7 @@ fun LinkDetailPresenter(
     LaunchedEffect(linkId) {
         state.value = state.value.copy(isLoading = true, error = null)
         try {
-            linkRepository.getLinksWithTagsAndCollections()
+            linkRepository.getLinksWithTags()
                 .catch { e ->
                     state.value = state.value.copy(
                         isLoading = false,
@@ -67,7 +67,7 @@ fun LinkDetailPresenter(
                 is LinkDetailEvent.LoadLink -> {
                     state.value = state.value.copy(isLoading = true, error = null)
                     try {
-                        linkRepository.getLinksWithTagsAndCollections()
+                        linkRepository.getLinksWithTags()
                             .catch { e ->
                                 state.value = state.value.copy(
                                     isLoading = false,

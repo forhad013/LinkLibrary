@@ -37,7 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.greenrobotdev.linklibrary.bookmarks.model.Collection
+import com.greenrobotdev.linklibrary.bookmarks.model.Category
 import com.greenrobotdev.linklibrary.bookmarks.model.Tag
 
 /**
@@ -192,16 +192,16 @@ fun TagSelector(
 }
 
 /**
- * Collection selection component with filter chips
+ * Category selection component with filter chips
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CollectionSelector(
-    collections: List<Collection>,
-    selectedCollections: Set<String>,
-    onCollectionToggle: (String) -> Unit,
+fun CategorySelector(
+    categoryNames: List<Category>,
+    selectedCategoryIds: Set<String>,
+    onCategoryToggle: (String) -> Unit,
     isLoading: Boolean = false,
-    onAddCollection: () -> Unit = {},
+    onAddCategory: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -221,19 +221,19 @@ fun CollectionSelector(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Collections",
+                    text = "Categories",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
             IconButton(
-                onClick = onAddCollection,
+                onClick = onAddCategory,
                 enabled = !isLoading
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add new collection",
+                    contentDescription = "Add new category",
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -252,16 +252,16 @@ fun CollectionSelector(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Loading collections...",
+                        text = "Loading categoryNames...",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
-            collections.isEmpty() -> {
+            categoryNames.isEmpty() -> {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = onAddCollection,
+                    onClick = onAddCategory,
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
                     ),
@@ -282,7 +282,7 @@ fun CollectionSelector(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Create collections to organize your links",
+                            text = "Create categoryNames to organize your links",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
@@ -295,19 +295,19 @@ fun CollectionSelector(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    collections.forEach { collection ->
+                    categoryNames.forEach { category ->
                         FilterChip(
-                            selected = selectedCollections.contains(collection.id),
-                            onClick = { onCollectionToggle(collection.id) },
+                            selected = selectedCategoryIds.contains(category.id),
+                            onClick = { onCategoryToggle(category.id) },
                             label = {
                                 Text(
-                                    text = collection.name,
+                                    text = category.name,
                                     style = MaterialTheme.typography.labelMedium,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
                             },
-                            leadingIcon = if (selectedCollections.contains(collection.id)) {
+                            leadingIcon = if (selectedCategoryIds.contains(category.id)) {
                                 {
                                     Icon(
                                         imageVector = Icons.Default.CheckCircle,
@@ -328,10 +328,10 @@ fun CollectionSelector(
                     }
                 }
 
-                if (selectedCollections.isNotEmpty()) {
+                if (selectedCategoryIds.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "${selectedCollections.size} collection${if (selectedCollections.size > 1) "s" else ""} selected",
+                        text = "${selectedCategoryIds.size} category${if (selectedCategoryIds.size > 1) "s" else ""} selected",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(start = 4.dp)
@@ -343,19 +343,19 @@ fun CollectionSelector(
 }
 
 /**
- * Compact tag and collection selector for use in forms
+ * Compact tag and category selector for use in forms
  */
 @Composable
-fun CompactTagCollectionSelector(
+fun CompactTagCategorySelector(
     tags: List<Tag>,
-    collections: List<Collection>,
+    categoryNames: List<Category>,
     selectedTags: Set<String>,
-    selectedCollections: Set<String>,
+    selectedCategoryIds: Set<String>,
     onTagToggle: (String) -> Unit,
-    onCollectionToggle: (String) -> Unit,
+    onCategoryToggle: (String) -> Unit,
     isLoading: Boolean = false,
     onAddTag: () -> Unit = {},
-    onAddCollection: () -> Unit = {},
+    onAddCategory: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -370,12 +370,12 @@ fun CompactTagCollectionSelector(
             onAddTag = onAddTag
         )
 
-        CollectionSelector(
-            collections = collections,
-            selectedCollections = selectedCollections,
-            onCollectionToggle = onCollectionToggle,
+        CategorySelector(
+            categoryNames = categoryNames,
+            selectedCategoryIds = selectedCategoryIds,
+            onCategoryToggle = onCategoryToggle,
             isLoading = isLoading,
-            onAddCollection = onAddCollection
+            onAddCategory = onAddCategory
         )
     }
 }

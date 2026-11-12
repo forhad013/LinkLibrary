@@ -7,12 +7,12 @@ import androidx.navigation3.runtime.NavKey
  * Manages all screens within the Organize tab
  */
 sealed class OrganizeNavRoutes : NavKey {
-    // Base organize screen - collections and tags overview
+    // Base organize screen - categoryNames and tags overview
     data object OrganizeBase : OrganizeNavRoutes()
 
-    // Collection management
-    data class CollectionDetail(val collectionId: String) : OrganizeNavRoutes()
-    data class CollectionEdit(val collectionId: String? = null) : OrganizeNavRoutes()
+    // Category management
+    data class CategoryDetail(val categoryId: String) : OrganizeNavRoutes()
+    data class CategoryEdit(val categoryId: String? = null) : OrganizeNavRoutes()
 
     // Tag management
     data class TagDetail(val tagId: String) : OrganizeNavRoutes()

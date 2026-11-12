@@ -93,8 +93,8 @@ fun LibraryScreen(
     routeKey: NavKey,
     onNavigateToDetail: (String) -> Unit,
     onAddLink: (String?) -> Unit,
-    onAddCollection: () -> Unit,
-    onNavigateToCollections: () -> Unit = {},
+    onAddCategory: () -> Unit,
+    onNavigateToCategories: () -> Unit = {},
     onNavigateToTags: () -> Unit = {}
 ) {
     val viewModel: LibraryViewModel = viewModel<LibraryViewModel>(key = routeKey.toString()) { LibraryViewModel() }

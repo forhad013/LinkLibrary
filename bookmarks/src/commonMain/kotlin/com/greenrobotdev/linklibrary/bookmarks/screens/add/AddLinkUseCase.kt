@@ -7,11 +7,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.greenrobotdev.linklibrary.bookmarks.service.MetadataFetchService
-import com.greenrobotdev.linklibrary.database.repository.CollectionRepository
+import com.greenrobotdev.linklibrary.database.repository.CategoryRepository
 import com.greenrobotdev.linklibrary.database.repository.LinkRepository
 import com.greenrobotdev.linklibrary.database.repository.TagRepository
 import com.greenrobotdev.linklibrary.bookmarks.model.Link
-import com.greenrobotdev.linklibrary.bookmarks.model.toCollection
+import com.greenrobotdev.linklibrary.bookmarks.model.toCategory
 import com.greenrobotdev.linklibrary.bookmarks.model.toEntity
 import com.greenrobotdev.linklibrary.bookmarks.model.toTag
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +27,7 @@ fun AddLinkPresenter(
     events: Flow<AddLinkEvent>,
     linkRepository: LinkRepository,
     tagRepository: TagRepository = koinInject(),
-    collectionRepository: CollectionRepository = koinInject(),
+    categoryRepository: CategoryRepository = koinInject(),
     metadataFetchService: MetadataFetchService = koinInject(),
     initialUrl: String?
 ): AddLinkState {
@@ -40,7 +40,7 @@ fun AddLinkPresenter(
         }
     }
 
-    // Load available tags and collections reactively
+    // Load available tags and categoryNames reactively
     // These flows will continuously listen to database changes
     LaunchedEffect(Unit) {
         // Subscribe to tags changes reactively
@@ -48,18 +48,18 @@ fun AddLinkPresenter(
             val tags = result.getOrElse { emptyList() }.map { it.toTag() }
             state = state.copy(
                 availableTags = tags,
-                isLoadingTagsAndCollections = false
+                isLoadingTagsAndCategories = false
             )
         }
     }
 
     LaunchedEffect(Unit) {
-        // Subscribe to collections changes reactively
-        collectionRepository.getCollections().collect { result ->
-            val collections = result.getOrElse { emptyList() }.map { it.toCollection() }
+        // Subscribe to categoryNames changes reactively
+        categoryRepository.getCategories().collect { result ->
+            val categoryNames = result.getOrElse { emptyList() }.map { it.toCategory() }
             state = state.copy(
-                availableCollections = collections,
-                isLoadingTagsAndCollections = false
+                availableCategories = categoryNames,
+                isLoadingTagsAndCategories = false
             )
         }
     }
@@ -94,7 +94,7 @@ fun AddLinkPresenter(
                             )
                             val result = linkRepository.addLink(link.toEntity())
 
-                            // After successfully adding the link, assign tags and collections
+                            // After successfully adding the link, assign tags and categoryNames
                             val linkId = link.id
                             try {
                                 // Assign selected tags
@@ -102,13 +102,13 @@ fun AddLinkPresenter(
                                     tagRepository.assignTagToLink(linkId, tagId).first()
                                 }
 
-                                // Assign selected collections
-                                state.selectedCollections.forEach { collectionId ->
-                                    collectionRepository.assignLinkToCollection(linkId, collectionId).first()
+                                // Assign selected categoryNames
+                                state.selectedCategoryIds.forEach { categoryId ->
+                                    categoryRepository.assignLinkToCategory(linkId, categoryId).first()
                                 }
                             } catch (e: Exception) {
                                 // Log error but don't fail the entire operation
-                                println("Error assigning tags/collections: ${e.message}")
+                                println("Error assigning tags/categoryNames: ${e.message}")
                             }
 
                             // Set success flag after successful submission
@@ -188,9 +188,9 @@ fun AddLinkPresenter(
                         fetchError = event.error
                     )
                 }
-                // Tag and Collection selection handlers
-                is AddLinkEvent.LoadAvailableTagsAndCollections -> {
-                    // No longer needed - tags and collections are now reactive
+                // Tag and Category selection handlers
+                is AddLinkEvent.LoadAvailableTagsAndCategories -> {
+                    // No longer needed - tags and categoryNames are now reactive
                     // This event is kept for backwards compatibility but does nothing
                 }
                 is AddLinkEvent.ToggleTag -> {
@@ -201,25 +201,25 @@ fun AddLinkPresenter(
                     }
                     state = state.copy(selectedTags = newSelectedTags)
                 }
-                is AddLinkEvent.ToggleCollection -> {
-                    val newSelectedCollections = if (state.selectedCollections.contains(event.collectionId)) {
-                        state.selectedCollections - event.collectionId
+                is AddLinkEvent.ToggleCategory -> {
+                    val newSelectedCategories = if (state.selectedCategoryIds.contains(event.categoryId)) {
+                        state.selectedCategoryIds - event.categoryId
                     } else {
-                        state.selectedCollections + event.collectionId
+                        state.selectedCategoryIds + event.categoryId
                     }
-                    state = state.copy(selectedCollections = newSelectedCollections)
+                    state = state.copy(selectedCategoryIds = newSelectedCategories)
                 }
-                is AddLinkEvent.SetCollection -> {
-                    // Single selection mode: set exactly one collection (or none)
-                    state = state.copy(selectedCollections = if (event.collectionId != null) {
-                        setOf(event.collectionId)
+                is AddLinkEvent.SetCategory -> {
+                    // Single selection mode: set exactly one category (or none)
+                    state = state.copy(selectedCategoryIds = if (event.categoryId != null) {
+                        setOf(event.categoryId)
                     } else {
                         emptySet()
                     })
                 }
-                is AddLinkEvent.ClearAllCollections -> {
-                    // Clear all selected collections
-                    state = state.copy(selectedCollections = emptySet())
+                is AddLinkEvent.ClearAllCategories -> {
+                    // Clear all selected categoryNames
+                    state = state.copy(selectedCategoryIds = emptySet())
                 }
                 // Task-related event handlers
                 is AddLinkEvent.ToggleTask -> {

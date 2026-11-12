@@ -1,4 +1,4 @@
-package com.greenrobotdev.linklibrary.bookmarks.screens.collections
+package com.greenrobotdev.linklibrary.bookmarks.screens.categories
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -6,54 +6,54 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.linklibrary.database.repository.CollectionRepository
-import com.greenrobotdev.linklibrary.bookmarks.model.toCollection
+import com.greenrobotdev.linklibrary.database.repository.CategoryRepository
+import com.greenrobotdev.linklibrary.bookmarks.model.toCategory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import org.koin.compose.koinInject
 
 /**
- * Use case for Collections screen
- * Loads and displays collections using CollectionRepository
+ * Use case for Categories screen
+ * Loads and displays categoryNames using CategoryRepository
  */
 @Composable
-fun CollectionsPresenter(
-    initialState: CollectionsState,
-    events: Flow<CollectionsEvent>,
-    collectionRepository: CollectionRepository = koinInject()
-): CollectionsState {
+fun CategoriesPresenter(
+    initialState: CategoriesState,
+    events: Flow<CategoriesEvent>,
+    categoryRepository: CategoryRepository = koinInject()
+): CategoriesState {
     var state by remember { mutableStateOf(initialState) }
 
-    // Load collections on init
+    // Load categoryNames on init
     LaunchedEffect(Unit) {
         state = state.copy(
             isLoading = true,
             error = null
         )
         try {
-            val result = collectionRepository.getCollections().first()
+            val result = categoryRepository.getCategories().first()
             result.fold(
-                onSuccess = { collectionEntities ->
+                onSuccess = { categoryEntities ->
                     // Convert entities to UI models with counts
-                    val collections = collectionEntities.map { entity ->
-                        entity.toCollection(count = 0) // TODO: Fetch actual counts
+                    val categoryNames = categoryEntities.map { entity ->
+                        entity.toCategory(count = 0) // TODO: Fetch actual counts
                     }
                     state = state.copy(
                         isLoading = false,
-                        collections = collections
+                        categoryNames = categoryNames
                     )
                 },
                 onFailure = { error ->
                     state = state.copy(
                         isLoading = false,
-                        error = error.message ?: "Failed to load collections"
+                        error = error.message ?: "Failed to load categoryNames"
                     )
                 }
             )
         } catch (e: Exception) {
             state = state.copy(
                 isLoading = false,
-                error = e.message ?: "Failed to load collections"
+                error = e.message ?: "Failed to load categoryNames"
             )
         }
     }
@@ -62,36 +62,36 @@ fun CollectionsPresenter(
     LaunchedEffect(Unit) {
         events.collect { event ->
             when (event) {
-                is CollectionsEvent.LoadCollections -> {
+                is CategoriesEvent.LoadCategories -> {
                     state = state.copy(isLoading = true, error = null)
                     try {
-                        val result = collectionRepository.getCollections().first()
+                        val result = categoryRepository.getCategories().first()
                         result.fold(
-                            onSuccess = { collectionEntities ->
-                                val collections = collectionEntities.map { entity ->
-                                    entity.toCollection(count = 0) // TODO: Fetch actual counts
+                            onSuccess = { categoryEntities ->
+                                val categoryNames = categoryEntities.map { entity ->
+                                    entity.toCategory(count = 0) // TODO: Fetch actual counts
                                 }
                                 state = state.copy(
                                     isLoading = false,
-                                    collections = collections
+                                    categoryNames = categoryNames
                                 )
                             },
                             onFailure = { error ->
                                 state = state.copy(
                                     isLoading = false,
-                                    error = error.message ?: "Failed to load collections"
+                                    error = error.message ?: "Failed to load categoryNames"
                                 )
                             }
                         )
                     } catch (e: Exception) {
                         state = state.copy(
                             isLoading = false,
-                            error = e.message ?: "Failed to load collections"
+                            error = e.message ?: "Failed to load categoryNames"
                         )
                     }
                 }
 
-                is CollectionsEvent.ClearError -> {
+                is CategoriesEvent.ClearError -> {
                     state = state.copy(error = null)
                 }
             }

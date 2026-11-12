@@ -1,6 +1,6 @@
-package com.greenrobotdev.linklibrary.bookmarks.screens.collections
+package com.greenrobotdev.linklibrary.bookmarks.screens.categories
 
-import com.greenrobotdev.linklibrary.bookmarks.model.Collection
+import com.greenrobotdev.linklibrary.bookmarks.model.Category
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -52,20 +52,20 @@ private fun getIconForType(iconType: String): androidx.compose.ui.graphics.vecto
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CollectionsScreen(
+fun CategoriesScreen(
     routeKey: NavKey,
     onBack: () -> Unit = {},
-    onCreateCollection: () -> Unit = {}
+    onCreateCategory: () -> Unit = {}
 ) {
-    val viewModel: CollectionsViewModel = viewModel(key = routeKey.toString()) {
-        CollectionsViewModel()
+    val viewModel: CategoriesViewModel = viewModel(key = routeKey.toString()) {
+        CategoriesViewModel()
     }
     val state by viewModel.models.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Collections") },
+                title = { Text("Categories") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -75,8 +75,8 @@ fun CollectionsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onCreateCollection) {
-                        Icon(Icons.Default.Add, contentDescription = "Create collection")
+                    IconButton(onClick = onCreateCategory) {
+                        Icon(Icons.Default.Add, contentDescription = "Create category")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -103,14 +103,14 @@ fun CollectionsScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Loading collections...",
+                        text = "Loading categoryNames...",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-            state.collections.isNotEmpty() -> {
+            state.categoryNames.isNotEmpty() -> {
                 // Content state
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
@@ -120,10 +120,10 @@ fun CollectionsScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(state.collections) { collection ->
-                        CollectionCard(
-                            collection = collection,
-                            onClick = { /* TODO: Navigate to collection detail */ }
+                    items(state.categoryNames) { category ->
+                        CategoryCard(
+                            category = category,
+                            onClick = { /* TODO: Navigate to category detail */ }
                         )
                     }
                 }
@@ -145,7 +145,7 @@ fun CollectionsScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     TextButton(
-                        onClick = { viewModel.take(CollectionsEvent.ClearError) }
+                        onClick = { viewModel.take(CategoriesEvent.ClearError) }
                     ) {
                         Text("Dismiss")
                     }
@@ -169,13 +169,13 @@ fun CollectionsScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "No collections yet",
+                        text = "No categoryNames yet",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Create your first collection to organize your links",
+                        text = "Create your first category to organize your links",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -186,8 +186,8 @@ fun CollectionsScreen(
 }
 
 @Composable
-fun CollectionCard(
-    collection: Collection,
+fun CategoryCard(
+    category: Category,
     onClick: () -> Unit
 ) {
     Card(
@@ -209,20 +209,20 @@ fun CollectionCard(
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = getIconForType(collection.iconType),
+                imageVector = getIconForType(category.iconType),
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = collection.name,
+                text = category.name,
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 maxLines = 1
             )
             Text(
-                text = "${collection.count} articles",
+                text = "${category.count} articles",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

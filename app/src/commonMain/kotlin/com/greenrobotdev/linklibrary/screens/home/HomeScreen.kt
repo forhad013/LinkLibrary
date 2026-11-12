@@ -150,7 +150,7 @@ private fun HomeView(
             // Quick Access Section
             QuickAccessSection(
                 onAddLink = { onAddLink(null) },
-                onViewCollections = { /* TODO: Navigate to collections */ },
+                onViewCategories = { /* TODO: Navigate to categoryNames */ },
                 onViewTags = { /* TODO: Navigate to tags */ },
                 onOpenSettings = { /* TODO: Navigate to settings */ }
             )
@@ -253,7 +253,7 @@ private fun HomeView(
 @Composable
 private fun QuickAccessSection(
     onAddLink: () -> Unit,
-    onViewCollections: () -> Unit,
+    onViewCategories: () -> Unit,
     onViewTags: () -> Unit,
     onOpenSettings: () -> Unit
 ) {
@@ -283,8 +283,8 @@ private fun QuickAccessSection(
 
             QuickAccessButton(
                 icon = Icons.Outlined.GridView,
-                label = "Collections",
-                onClick = onViewCollections,
+                label = "Categories",
+                onClick = onViewCategories,
                 colors = MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
             )
 

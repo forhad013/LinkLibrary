@@ -1,6 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add
 
-import com.greenrobotdev.linklibrary.bookmarks.model.Collection
+import com.greenrobotdev.linklibrary.bookmarks.model.Category
 import com.greenrobotdev.linklibrary.bookmarks.model.Tag
 import com.greenrobotdev.linklibrary.bookmarks.service.LinkMetadata
 import kotlinx.serialization.Serializable
@@ -19,12 +19,12 @@ data class AddLinkState(
     val isFetching: Boolean = false,
     val fetchError: String? = null,
     val fetchedMetadata: LinkMetadata? = null,
-    // Tag and Collection selection fields
+    // Tag and Category selection fields
     val selectedTags: Set<String> = emptySet(),
-    val selectedCollections: Set<String> = emptySet(),
+    val selectedCategoryIds: Set<String> = emptySet(),
     val availableTags: List<Tag> = emptyList(),
-    val availableCollections: List<Collection> = emptyList(),
-    val isLoadingTagsAndCollections: Boolean = false,
+    val availableCategories: List<Category> = emptyList(),
+    val isLoadingTagsAndCategories: Boolean = false,
     // Task-related fields
     val isTask: Boolean = false,
     val taskPriority: String = "Medium",
@@ -43,12 +43,12 @@ sealed interface AddLinkEvent {
     object ClearFetchError : AddLinkEvent
     data class MetadataFetchResult(val metadata: LinkMetadata) : AddLinkEvent
     data class MetadataFetchError(val error: String) : AddLinkEvent
-    // Tag and Collection selection events
-    object LoadAvailableTagsAndCollections : AddLinkEvent
+    // Tag and Category selection events
+    object LoadAvailableTagsAndCategories : AddLinkEvent
     data class ToggleTag(val tagId: String) : AddLinkEvent
-    data class ToggleCollection(val collectionId: String) : AddLinkEvent
-    data class SetCollection(val collectionId: String?) : AddLinkEvent
-    object ClearAllCollections : AddLinkEvent
+    data class ToggleCategory(val categoryId: String) : AddLinkEvent
+    data class SetCategory(val categoryId: String?) : AddLinkEvent
+    object ClearAllCategories : AddLinkEvent
     // Task-related events
     data class ToggleTask(val isTask: Boolean) : AddLinkEvent
     data class SetTaskPriority(val priority: String) : AddLinkEvent
