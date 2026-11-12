@@ -9,3 +9,8 @@ captures
 .cxx
 local.properties
 xcuserdata
+# Local shell config (contains secrets)
+.zshrcT
+
+# Graphify output
+graphify-out/

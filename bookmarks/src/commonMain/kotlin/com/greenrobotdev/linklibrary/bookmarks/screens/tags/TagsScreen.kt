@@ -89,9 +89,7 @@ fun TagsScreen(
     onBack: () -> Unit = {},
     onCreateTag: () -> Unit = {}
 ) {
-    val viewModel: TagsViewModel = viewModel(key = routeKey.toString()) {
-        TagsViewModel()
-    }
+    val viewModel: TagsViewModel = viewModel<TagsViewModel>(key = routeKey.toString()) { TagsViewModel() }
     val state by viewModel.models.collectAsState()
 
     var searchQuery by remember { mutableStateOf("") }

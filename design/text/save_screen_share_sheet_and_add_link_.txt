@@ -1,0 +1,19 @@
+The app you shared from
+Save to Lords of Links
+Already saved. Edit it below.
+Link kept. Details are optional.
+Fetching preview…
+youtube.com · No preview
+https://www.youtube.com/watch?v=[ID]
+Retry
+Video · youtube.com
+How sleep shapes focus and memory
+[Description fetched from the page, two lines at most.]
+Category (optional)
+Health › Sleep
+Tags (optional)
+{{tag.label}}
+Note (optional)
+Discard
+Saved
+Save

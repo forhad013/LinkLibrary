@@ -41,6 +41,7 @@ fun AddLinkPresenter(
     }
 
     // Load available tags and collections reactively
+    // These flows will continuously listen to database changes
     LaunchedEffect(Unit) {
         // Subscribe to tags changes reactively
         tagRepository.getTags().collect { result ->
@@ -207,6 +208,18 @@ fun AddLinkPresenter(
                         state.selectedCollections + event.collectionId
                     }
                     state = state.copy(selectedCollections = newSelectedCollections)
+                }
+                is AddLinkEvent.SetCollection -> {
+                    // Single selection mode: set exactly one collection (or none)
+                    state = state.copy(selectedCollections = if (event.collectionId != null) {
+                        setOf(event.collectionId)
+                    } else {
+                        emptySet()
+                    })
+                }
+                is AddLinkEvent.ClearAllCollections -> {
+                    // Clear all selected collections
+                    state = state.copy(selectedCollections = emptySet())
                 }
                 // Task-related event handlers
                 is AddLinkEvent.ToggleTask -> {

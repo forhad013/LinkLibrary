@@ -1,0 +1,171 @@
+package com.greenrobotdev.linklibrary.design.components.card
+
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.greenrobotdev.linklibrary.design.expressive.animation.SpringPhysics
+
+/**
+ * Outlined card component with Material 3 Expressive features
+ *
+ * Card with outlined border and enhanced animations:
+ * - Press scale effect (0.98x when pressed)
+ * - Border color transitions
+ * - Background color fill on hover/press
+ * - Smooth visual feedback
+ *
+ * @param modifier Modifier to be applied to the card
+ * @param shape Shape to be applied to the card. Defaults to theme's medium shape
+ * @param backgroundColor Background color. Defaults to transparent
+ * @param contentColor Content color. Defaults to theme's onSurface color
+ * @param borderColor Border color. Defaults to theme's outline variant color
+ * @param borderWidth Border width. Defaults to 1dp
+ * @param onClick Optional click handler for interactive cards
+ * @param content Content to be displayed inside the card
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun OutlinedCard(
+    modifier: Modifier = Modifier,
+    shape: Shape = MaterialTheme.shapes.medium,
+    backgroundColor: Color = Color.Transparent,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    borderColor: Color = MaterialTheme.colorScheme.outlineVariant,
+    borderWidth: Dp = 1.dp,
+    onClick: (() -> Unit)? = null,
+    content: @Composable () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Expressive: Press scale effect
+    val scale by animateFloatAsState(
+        targetValue = if (onClick != null && isPressed) 0.98f else 1f,
+        animationSpec = SpringPhysics.gentleSpring(),
+        label = "outlined_card_scale"
+    )
+
+    // Expressive: Border color transitions
+    val animatedBorderColor by animateColorAsState(
+        targetValue = borderColor,
+        animationSpec = tween(durationMillis = 300),
+        label = "outlined_card_border"
+    )
+
+    // Expressive: Background fill on interaction
+    val animatedBackgroundColor by animateColorAsState(
+        targetValue = if (onClick != null && isPressed) {
+            MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.5f)
+        } else {
+            backgroundColor
+        },
+        animationSpec = tween(durationMillis = 300),
+        label = "outlined_card_background"
+    )
+
+    if (onClick != null) {
+        Card(
+            onClick = onClick,
+            modifier = modifier.scale(scale),
+            shape = shape,
+            border = BorderStroke(borderWidth, animatedBorderColor),
+            interactionSource = interactionSource,
+            colors = CardDefaults.cardColors(
+                containerColor = animatedBackgroundColor,
+                contentColor = contentColor,
+                disabledContainerColor = backgroundColor,
+                disabledContentColor = contentColor.copy(alpha = 0.38f)
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        ) {
+            content()
+        }
+    } else {
+        Card(
+            modifier = modifier,
+            shape = shape,
+            border = BorderStroke(borderWidth, animatedBorderColor),
+            colors = CardDefaults.cardColors(
+                containerColor = animatedBackgroundColor,
+                contentColor = contentColor,
+                disabledContainerColor = backgroundColor,
+                disabledContentColor = contentColor.copy(alpha = 0.38f)
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        ) {
+            content()
+        }
+    }
+}
+
+/**
+ * Simple outlined card - basic variant with expressive features
+ *
+ * Non-interactive outlined card with smooth animations:
+ * - Border color transitions
+ * - Smooth background color changes
+ * - Visual polish
+ *
+ * @param modifier Modifier to be applied to the card
+ * @param shape Shape to be applied to the card. Defaults to theme's medium shape
+ * @param backgroundColor Background color. Defaults to transparent
+ * @param contentColor Content color. Defaults to theme's onSurface color
+ * @param borderColor Border color. Defaults to theme's outline variant color
+ * @param borderWidth Border width. Defaults to 1dp
+ * @param content Content to be displayed inside the card
+ */
+@Composable
+fun SimpleOutlinedCard(
+    modifier: Modifier = Modifier,
+    shape: Shape = MaterialTheme.shapes.medium,
+    backgroundColor: Color = Color.Transparent,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    borderColor: Color = MaterialTheme.colorScheme.outlineVariant,
+    borderWidth: Dp = 1.dp,
+    content: @Composable () -> Unit
+) {
+    // Expressive: Smooth border color animation
+    val animatedBorderColor by animateColorAsState(
+        targetValue = borderColor,
+        animationSpec = tween(durationMillis = 300),
+        label = "simple_outlined_card_border"
+    )
+
+    // Expressive: Smooth background color animation
+    val animatedBackgroundColor by animateColorAsState(
+        targetValue = backgroundColor,
+        animationSpec = tween(durationMillis = 300),
+        label = "simple_outlined_card_background"
+    )
+
+    Card(
+        modifier = modifier,
+        shape = shape,
+        border = BorderStroke(borderWidth, animatedBorderColor),
+        colors = CardDefaults.cardColors(
+            containerColor = animatedBackgroundColor,
+            contentColor = contentColor,
+            disabledContainerColor = backgroundColor,
+            disabledContentColor = contentColor.copy(alpha = 0.38f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        content()
+    }
+}

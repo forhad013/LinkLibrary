@@ -1,0 +1,15 @@
+# Keep graphify on source code only (gitignore syntax)
+.kotlin/
+kotlin-js-store/
+.claude/
+.github/
+docs/
+design/
+figma/
+icon/
+plan/
+*.md
+*.png
+*.jpg
+*.zip
+*.html

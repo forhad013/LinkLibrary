@@ -12,9 +12,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import android.os.Build
 import com.greenrobotdev.linklibrary.bookmarks.model.SharedContent
 import com.greenrobotdev.linklibrary.design.theme.LinkLibraryTheme
 import com.greenrobotdev.linklibrary.screens.root.RootScreen
+import com.greenrobotdev.linklibrary.utils.settings.SettingsFactory
+import com.greenrobotdev.linklibrary.utils.preferences.ThemePreferenceManager
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -23,13 +31,39 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Initialize SettingsFactory with application context
+        SettingsFactory.initialize(this)
+
         // Check if activity was started from a share intent
         handleIntent(intent)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
+            val themePreferenceManager = remember { ThemePreferenceManager() }
+            val coroutineScope = rememberCoroutineScope()
+
+            // Reactive theme state that updates when theme preference changes
+            var darkTheme by remember { mutableStateOf(false) }
+
+            // Load theme preference on startup
+            LaunchedEffect(Unit) {
+                val isDarkMode = themePreferenceManager.isDarkModeEnabled()
+                darkTheme = isDarkMode ?: isSystemInDarkTheme()
+
+                // Continuously check for theme changes every second
+                // This ensures theme updates are applied immediately without app restart
+                while (true) {
+                    kotlinx.coroutines.delay(1000) // Check every second
+                    val newIsDarkMode = themePreferenceManager.isDarkModeEnabled()
+                    val newDarkTheme = newIsDarkMode ?: isSystemInDarkTheme()
+                    if (darkTheme != newDarkTheme) {
+                        darkTheme = newDarkTheme
+                    }
+                }
+            }
+
             CompositionLocalProvider {
-                LinkLibraryTheme {
+                LinkLibraryTheme(darkTheme = darkTheme) {
                     RootScreen(
                         sharedContent = sharedContent,
                         onSharedContentHandled = { sharedContent = null }
@@ -109,6 +143,24 @@ class MainActivity : ComponentActivity() {
         }
 
         return null
+    }
+
+    /**
+     * Check if system is in dark mode
+     */
+    private fun isSystemInDarkTheme(): Boolean {
+        return when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                // Use night mode flag for API 29+
+                val nightMode = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+                nightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            }
+            else -> {
+                // Fallback for older devices - assume light mode
+                // This is a reasonable default as most modern devices support API 29+
+                false
+            }
+        }
     }
 }
 

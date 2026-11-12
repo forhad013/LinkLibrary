@@ -36,6 +36,10 @@ kotlin {
                 // KotlinX Coroutines
                 implementation(libs.kotlinx.coroutines.core)
 
+                // Multiplatform Settings - base library (common code)
+                implementation(libs.multiplatform.settings)
+                implementation(libs.multiplatform.settings.coroutines)
+
                 // Note: Molecule runtime is platform-specific and added to androidMain, desktopMain, iosMain
                 // It is not available for WASM
             }
@@ -47,6 +51,8 @@ kotlin {
                 implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
                 // Molecule Runtime for Android
                 implementation(libs.molecule.runtime)
+                // Multiplatform Settings - ensure Android implementation is available
+                implementation(libs.multiplatform.settings)
             }
         }
 
@@ -73,6 +79,7 @@ kotlin {
             dependencies {
                 // Note: Molecule runtime not available for WASM
                 // WASM targets cannot use MoleculeViewModel
+                // Multiplatform Settings not yet available for WASM
             }
         }
     }

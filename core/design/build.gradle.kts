@@ -31,17 +31,21 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 // Compose
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material3)
-                implementation(compose.ui)
-                implementation(compose.materialIconsExtended)
+                implementation("org.jetbrains.compose.runtime:runtime:1.12.0")
+                implementation("org.jetbrains.compose.foundation:foundation:1.12.0")
+                implementation("org.jetbrains.compose.material3:material3:1.9.0-alpha04")
+                implementation("org.jetbrains.compose.ui:ui:1.12.0")
+                implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
             }
         }
 
         val androidMain by getting {
             dependencies {
                 implementation("androidx.appcompat:appcompat:1.6.1")
+                // Coil for image loading (Android only)
+                implementation(libs.coil.compose)
+                // Compose UI Tooling Preview for @Preview functions
+                implementation("androidx.compose.ui:ui-tooling-preview:1.7.6")
             }
         }
     }

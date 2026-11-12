@@ -69,7 +69,7 @@ class MetadataFetchService(private val httpClient: HttpClient) {
                 }
             }
         } catch (e: Exception) {
-            println("❌ MetadataFetchService: Exception - ${e.javaClass.simpleName}: ${e.message}")
+            println("❌ MetadataFetchService: Exception - ${e::class.simpleName}: ${e.message}")
             e.printStackTrace()
 
             val errorMessage = when {

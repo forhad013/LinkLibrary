@@ -1,0 +1,9 @@
+Your feed, behind the sheet
+Add a link
+Paste or type a web address. You can add a category, tags and a note next.
+Link
+If it is not a valid link, this line says: "This is not a valid link".
+Paste from clipboard
+https://kotlinlang.org/docs/multiplatform.html
+Cancel
+Continue

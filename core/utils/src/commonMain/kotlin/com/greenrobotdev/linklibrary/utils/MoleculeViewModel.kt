@@ -1,6 +1,8 @@
 package com.greenrobotdev.linklibrary.utils
 
+import androidx.compose.runtime.Composable
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -71,4 +73,22 @@ expect abstract class MoleculeViewModel<Event, Model> {
      * Protected visibility to match AndroidX ViewModel's onCleared().
      */
     protected open fun onCleared()
+
+    /**
+     * Composable presenter function that produces state models from events.
+     * Platform-specific implementation provided by expect/actual.
+     *
+     * @param events Flow of user events/actions to process
+     * @return The current state model
+     */
+    @Composable
+    protected abstract fun models(events: Flow<Event>): Model
+
+    /**
+     * Provides initial state value before first composition.
+     * Platform-specific implementation provided by expect/actual.
+     *
+     * @return The initial state model
+     */
+    protected open fun initialValue(): Model
 }

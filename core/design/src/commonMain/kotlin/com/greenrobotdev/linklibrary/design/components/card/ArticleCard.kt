@@ -1,6 +1,7 @@
 package com.greenrobotdev.linklibrary.design.components.card
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -111,9 +112,9 @@ fun ArticleCard(
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = if (trailingContent != null) {
-                            androidx.compose.foundation.layout.Arrangement.SpaceBetween
+                            Arrangement.SpaceBetween
                         } else {
-                            androidx.compose.foundation.layout.Arrangement.Start
+                            Arrangement.Start
                         },
                         verticalAlignment = Alignment.CenterVertically
                     ) {

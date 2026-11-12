@@ -18,23 +18,22 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Article
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.outlined.Sort
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.GridView
-import androidx.compose.material.icons.outlined.List
-import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,9 +41,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -60,12 +57,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import com.greenrobotdev.linklibrary.bookmarks.model.Link
+import com.greenrobotdev.linklibrary.design.components.button.IconButton as DesignIconButton
+import com.greenrobotdev.linklibrary.design.components.card.ElevatedCard
+import com.greenrobotdev.linklibrary.design.components.progress.CircularProgress
+import com.greenrobotdev.linklibrary.design.components.textfield.OutlinedTextField
+import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
+import com.greenrobotdev.linklibrary.design.foundation.layout.HorizontalDivider
+import com.greenrobotdev.linklibrary.design.foundation.layout.MediumVerticalSpacer
+import com.greenrobotdev.linklibrary.design.foundation.layout.SmallVerticalSpacer
+import com.greenrobotdev.linklibrary.design.foundation.text.AppText
 
 @Composable
 fun HomeScreen(
@@ -105,45 +113,30 @@ private fun HomeView(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Link Library",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { /* TODO: Open navigation drawer */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Navigation menu",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* TODO: Open profile */ }) {
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Profile",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
+            // Modern search bar as top bar
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp)
+            ) {
+                OutlinedTextField(
+                    value = state.searchQuery,
+                    onValueChange = { /* TODO: Handle search */ },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = "Search links...",
+                    leadingIcon = Icons.Default.Search
                 )
-            )
+            }
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { onAddLink(null) },
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
                 Icon(
-                    imageVector = Icons.Default.Article,
+                    imageVector = Icons.AutoMirrored.Filled.Article,
                     contentDescription = "Add new link"
                 )
             }
@@ -154,10 +147,18 @@ private fun HomeView(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Search and Filter Section
-            SearchAndFilterSection(
-                searchQuery = state.searchQuery,
-                onSearchQueryChange = { /* TODO: Handle search */ },
+            // Quick Access Section
+            QuickAccessSection(
+                onAddLink = { onAddLink(null) },
+                onViewCollections = { /* TODO: Navigate to collections */ },
+                onViewTags = { /* TODO: Navigate to tags */ },
+                onOpenSettings = { /* TODO: Navigate to settings */ }
+            )
+
+            SmallVerticalSpacer()
+
+            // Filter and View Controls
+            FilterAndControlsSection(
                 isGridView = isGridView,
                 onViewModeToggle = { isGridView = !isGridView },
                 showSortMenu = showSortMenu,
@@ -179,9 +180,7 @@ private fun HomeView(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        CircularProgress()
                     }
 
                     state.error != null -> Box(
@@ -216,20 +215,19 @@ private fun HomeView(
                             verticalArrangement = Arrangement.Center,
                             modifier = Modifier.padding(24.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Article,
+                            AppIcon(
+                                imageVector = Icons.AutoMirrored.Filled.Article,
                                 contentDescription = null,
-                                modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                modifier = Modifier.size(64.dp)
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(
+                            MediumVerticalSpacer()
+                            AppText(
                                 text = "No links yet",
                                 style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
+                            SmallVerticalSpacer()
+                            AppText(
                                 text = "Tap the + button to add your first link",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -249,11 +247,110 @@ private fun HomeView(
     }
 }
 
+/**
+ * Quick Access Section - Circular quick access buttons
+ */
+@Composable
+private fun QuickAccessSection(
+    onAddLink: () -> Unit,
+    onViewCollections: () -> Unit,
+    onViewTags: () -> Unit,
+    onOpenSettings: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = "Quick Access",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            QuickAccessButton(
+                icon = Icons.AutoMirrored.Filled.Article,
+                label = "Add Link",
+                onClick = onAddLink,
+                colors = MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
+            )
+
+            QuickAccessButton(
+                icon = Icons.Outlined.GridView,
+                label = "Collections",
+                onClick = onViewCollections,
+                colors = MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
+            )
+
+            QuickAccessButton(
+                icon = Icons.Default.Favorite,
+                label = "Tags",
+                onClick = onViewTags,
+                colors = MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
+            )
+
+            QuickAccessButton(
+                icon = Icons.Default.Settings,
+                label = "Settings",
+                onClick = onOpenSettings,
+                colors = MaterialTheme.colorScheme.surfaceContainerHighest to MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+@Composable
+private fun QuickAccessButton(
+    icon: ImageVector,
+    label: String,
+    onClick: () -> Unit,
+    colors: Pair<Color, Color>
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(8.dp)
+    ) {
+        Surface(
+            onClick = onClick,
+            modifier = Modifier.size(56.dp),
+            shape = RoundedCornerShape(16.dp),
+            color = colors.first,
+            tonalElevation = 2.dp
+        ) {
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = label,
+                    tint = colors.second,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        AppText(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+/**
+ * Filter and View Controls Section
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SearchAndFilterSection(
-    searchQuery: String,
-    onSearchQueryChange: (String) -> Unit,
+private fun FilterAndControlsSection(
     isGridView: Boolean,
     onViewModeToggle: () -> Unit,
     showSortMenu: Boolean,
@@ -262,152 +359,103 @@ private fun SearchAndFilterSection(
     onSortSelected: (String) -> Unit,
     onSortMenuDismiss: () -> Unit
 ) {
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        // Search Bar
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = onSearchQueryChange,
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Search links...") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            trailingIcon = {
-                IconButton(
-                    onClick = { /* TODO: Open filter dialog */ },
-                    modifier = Modifier.minimumInteractiveComponentSize()
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.FilterList,
-                        contentDescription = "Filter",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            },
-            singleLine = true,
-            shape = RoundedCornerShape(24.dp),
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Filter and View Controls
+        // Filter Chips
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            AssistChip(
+                onClick = { /* TODO: Filter by recent */ },
+                label = { Text("Recent") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.DateRange,
+                        contentDescription = null,
+                        modifier = Modifier.size(AssistChipDefaults.IconSize)
+                    )
+                },
+                colors = AssistChipDefaults.assistChipColors(
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
+        }
+
+        // View Mode and Sort Controls
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Filter Chips
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.weight(1f)
-            ) {
-                AssistChip(
-                    onClick = { /* TODO: Filter by recent */ },
-                    label = { Text("Recent") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Outlined.DateRange,
-                            contentDescription = null,
-                            modifier = Modifier.size(AssistChipDefaults.IconSize)
-                        )
-                    },
-
-                    colors = AssistChipDefaults.assistChipColors(
-                        labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+            // Grid/List Toggle
+            FilterChip(
+                selected = isGridView,
+                onClick = onViewModeToggle,
+                label = {
+                    Icon(
+                        imageVector = if (isGridView) Icons.Outlined.GridView else Icons.AutoMirrored.Outlined.List,
+                        contentDescription = if (isGridView) "Grid view" else "List view"
                     )
+                },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer
                 )
-            }
+            )
 
-            // View Mode and Sort Controls
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Grid/List Toggle
-                FilterChip(
-                    selected = isGridView,
-                    onClick = onViewModeToggle,
-                    label = {
-                        Icon(
-                            imageVector = if (isGridView) Icons.Outlined.GridView else Icons.Outlined.List,
-                            contentDescription = if (isGridView) "Grid view" else "List view"
-                        )
-                    },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
+            // Sort Dropdown
+            Box {
+                DesignIconButton(
+                    onClick = onSortMenuToggle,
+                    icon = Icons.AutoMirrored.Outlined.Sort,
+                    contentDescription = "Sort"
                 )
 
-                // Sort Dropdown
-                Box {
-                    IconButton(
-                        onClick = onSortMenuToggle,
-                        modifier = Modifier.minimumInteractiveComponentSize()
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Sort,
-                            contentDescription = "Sort",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    DropdownMenu(
-                        expanded = showSortMenu,
-                        onDismissRequest = onSortMenuDismiss,
-                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                    ) {
-                        val sortOptions = listOf("Recent", "Name", "Favorite")
-                        sortOptions.forEach { option ->
-                            DropdownMenuItem(
-                                text = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                    ) {
-                                        Text(
-                                            text = option,
-                                            style = MaterialTheme.typography.bodyMedium
+                DropdownMenu(
+                    expanded = showSortMenu,
+                    onDismissRequest = onSortMenuDismiss,
+                    modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                ) {
+                    val sortOptions = listOf("Recent", "Name", "Favorite")
+                    sortOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Text(
+                                        text = option,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    if (option == selectedSort) {
+                                        Icon(
+                                            imageVector = Icons.Default.Favorite,
+                                            contentDescription = "Selected",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(16.dp)
                                         )
-                                        if (option == selectedSort) {
-                                            Icon(
-                                                imageVector = Icons.Default.Favorite,
-                                                contentDescription = "Selected",
-                                                tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(16.dp)
-                                            )
-                                        }
                                     }
-                                },
-                                onClick = { onSortSelected(option) },
-                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                                }
+                            },
+                            onClick = { onSortSelected(option) },
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                        if (option != sortOptions.last()) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 8.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant
                             )
-                            if (option != sortOptions.last()) {
-                                Divider(
-                                    modifier = Modifier.padding(horizontal = 8.dp),
-                                    color = MaterialTheme.colorScheme.outlineVariant
-                                )
-                            }
                         }
                     }
                 }
             }
         }
     }
-
-    Divider(
-        modifier = Modifier.padding(vertical = 8.dp),
-        color = MaterialTheme.colorScheme.outlineVariant
-    )
 }
 
 @Composable
@@ -446,7 +494,7 @@ private fun ArticleGrid(
                     onClick = { onArticleClick(link.id) },
                     onFavoriteClick = { onFavoriteClick(link.id) }
                 )
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier.padding(vertical = 8.dp),
                     color = MaterialTheme.colorScheme.outlineVariant
                 )
@@ -461,16 +509,11 @@ private fun ArticleCard(
     onClick: () -> Unit,
     onFavoriteClick: () -> Unit
 ) {
-    Card(
+    ElevatedCard(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+            .height(220.dp)
     ) {
         Column {
             // Article Image/Thumbnail Section
@@ -482,7 +525,7 @@ private fun ArticleCard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Article,
+                    imageVector = Icons.AutoMirrored.Filled.Article,
                     contentDescription = null,
                     modifier = Modifier.size(36.dp),
                     tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.4f)
@@ -567,19 +610,16 @@ private fun ArticleCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
-                    IconButton(
+                    DesignIconButton(
                         onClick = onFavoriteClick,
-                        modifier = Modifier.size(28.dp)
-                    ) {
-                        Icon(
-                            imageVector = if (link.isFavorite)
-                                Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = if (link.isFavorite) "Remove from favorites" else "Add to favorites",
-                            tint = if (link.isFavorite)
-                                MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
+                        icon = if (link.isFavorite)
+                            Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = if (link.isFavorite) "Remove from favorites" else "Add to favorites",
+                        colors = com.greenrobotdev.linklibrary.design.components.button.ComponentColors(
+                            content = if (link.isFavorite)
+                                MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                    }
+                    )
                 }
             }
         }
@@ -617,7 +657,7 @@ private fun ArticleListItem(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Article,
+                    imageVector = Icons.AutoMirrored.Filled.Article,
                     contentDescription = null,
                     modifier = Modifier.size(32.dp),
                     tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.4f)
@@ -685,19 +725,16 @@ private fun ArticleListItem(
             }
 
             // Favorite Button
-            IconButton(
+            DesignIconButton(
                 onClick = onFavoriteClick,
-                modifier = Modifier.size(36.dp)
-            ) {
-                Icon(
-                    imageVector = if (link.isFavorite)
-                        Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = if (link.isFavorite) "Remove from favorites" else "Add to favorites",
-                    tint = if (link.isFavorite)
-                        MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(24.dp)
+                icon = if (link.isFavorite)
+                    Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                contentDescription = if (link.isFavorite) "Remove from favorites" else "Add to favorites",
+                colors = com.greenrobotdev.linklibrary.design.components.button.ComponentColors(
+                    content = if (link.isFavorite)
+                        MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
+            )
         }
     }
 }

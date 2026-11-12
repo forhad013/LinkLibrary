@@ -51,6 +51,9 @@ kotlin {
 
                 // Utils module (MoleculeViewModel and utilities)
                 implementation(project(":core:utils"))
+
+                // Database module (for repositories and entities)
+                implementation(project(":database"))
             }
         }
 

@@ -4,7 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import kotlinx.coroutines.flow.Flow
+import com.greenrobotdev.linklibrary.utils.preferences.ThemePreferenceManager
 
 /**
  * Use case for Settings screen
@@ -17,6 +20,7 @@ fun SettingsPresenter(
     events: Flow<SettingsEvent>
 ): SettingsState {
     var state = remember { mutableStateOf(initialState) }
+    val themePreferenceManager = remember { ThemePreferenceManager() }
 
     // Load settings on init
     LaunchedEffect(Unit) {
@@ -31,10 +35,18 @@ fun SettingsPresenter(
             val userProfile = loadStaticUserProfile()
             val settingItems = loadStaticSettings()
 
+            // Load theme preference from storage
+            val currentThemeMode = themePreferenceManager.getThemeMode()
+
             state.value = state.value.copy(
                 isLoading = false,
                 userProfile = userProfile,
-                settingItems = settingItems
+                settingItems = settingItems,
+                themeMode = when (currentThemeMode) {
+                    is ThemePreferenceManager.ThemeMode.Light -> ThemeMode.Light
+                    is ThemePreferenceManager.ThemeMode.Dark -> ThemeMode.Dark
+                    is ThemePreferenceManager.ThemeMode.System -> ThemeMode.System
+                }
             )
         } catch (e: Exception) {
             state.value = state.value.copy(
@@ -54,10 +66,18 @@ fun SettingsPresenter(
                         val userProfile = loadStaticUserProfile()
                         val settingItems = loadStaticSettings()
 
+                        // Load theme preference from storage
+                        val currentThemeMode = themePreferenceManager.getThemeMode()
+
                         state.value = state.value.copy(
                             isLoading = false,
                             userProfile = userProfile,
-                            settingItems = settingItems
+                            settingItems = settingItems,
+                            themeMode = when (currentThemeMode) {
+                                is ThemePreferenceManager.ThemeMode.Light -> ThemeMode.Light
+                                is ThemePreferenceManager.ThemeMode.Dark -> ThemeMode.Dark
+                                is ThemePreferenceManager.ThemeMode.System -> ThemeMode.System
+                            }
                         )
                     } catch (e: Exception) {
                         state.value = state.value.copy(
@@ -74,6 +94,20 @@ fun SettingsPresenter(
 
                 is SettingsEvent.ClearError -> {
                     state.value = state.value.copy(error = null)
+                }
+
+                is SettingsEvent.SetThemeMode -> {
+                    // Update theme preference in storage
+                    val preferenceMode = when (event.themeMode) {
+                        is ThemeMode.Light -> ThemePreferenceManager.ThemeMode.Light
+                        is ThemeMode.Dark -> ThemePreferenceManager.ThemeMode.Dark
+                        is ThemeMode.System -> ThemePreferenceManager.ThemeMode.System
+                    }
+
+                    themePreferenceManager.setThemeMode(preferenceMode)
+
+                    // Update state
+                    state.value = state.value.copy(themeMode = event.themeMode)
                 }
             }
         }

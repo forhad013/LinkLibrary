@@ -1,0 +1,81 @@
+package com.greenrobotdev.linklibrary.design.foundation.icon
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+
+/**
+ * Icon size tokens following Material 3 guidelines
+ */
+object IconSizes {
+    val Small = 18.dp
+    val Medium = 24.dp
+    val Large = 32.dp
+    val ExtraLarge = 40.dp
+}
+
+/**
+ * Foundation icon component with automatic theme integration and sizing
+ *
+ * This wrapper provides a simplified icon component that automatically integrates
+ * with the Material 3 theme while offering sensible defaults for common use cases.
+ *
+ * @param imageVector Image vector to display
+ * @param contentDescription Content description for accessibility
+ * @param modifier Modifier to be applied to the icon
+ * @param tint Color tint to apply. Defaults to theme's onSurfaceVariant color
+ * @param size Icon size. Defaults to Medium (24dp)
+ */
+@Composable
+fun AppIcon(
+    imageVector: ImageVector,
+    contentDescription: String? = null,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    size: IconSize = IconSize.Medium
+) {
+    Icon(
+        imageVector = imageVector,
+        contentDescription = contentDescription,
+//        modifier = modifier.then(androidx.compose.ui.draw.size(size.dp)),
+        tint = color
+    )
+}
+
+/**
+ * Sealed class for icon size variants
+ */
+sealed class IconSize(val dp: Dp) {
+    object Small : IconSize(IconSizes.Small)
+    object Medium : IconSize(IconSizes.Medium)
+    object Large : IconSize(IconSizes.Large)
+    object ExtraLarge : IconSize(IconSizes.ExtraLarge)
+}
+
+/**
+ * Convenience overloads for commonly used icons
+ */
+
+/** Error icon for validation states */
+@Composable
+fun ErrorIcon(
+    contentDescription: String? = "Error",
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.error,
+    size: IconSize = IconSize.Medium
+) {
+    AppIcon(
+        imageVector = Icons.Filled.Error,
+        contentDescription = contentDescription,
+        modifier = modifier,
+        color = color,
+        size = size
+    )
+}
