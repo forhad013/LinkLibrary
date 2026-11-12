@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import com.greenrobotdev.linklibrary.design.components.emptystate.EmptyState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
@@ -188,27 +189,6 @@ fun LibraryScreen(
                 }
             }
         },
-        floatingActionButton = {
-            // Mobile FAB
-            FloatingActionButton(
-                onClick = { onAddLink(null) },
-                modifier = Modifier
-                    .size(56.dp)
-                    .graphicsLayer {
-                        scaleX = animatedFabScale
-                        scaleY = animatedFabScale
-                    },
-                containerColor = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = "Add new link",
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
-        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -287,29 +267,17 @@ fun LibraryScreen(
 
             // Links Grid - Responsive layout
             if (state.filteredLinks.isEmpty()) {
-                // Empty state
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Book,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.size(64.dp)
-                    )
-                    Text(
-                        text = "No links found",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = "Start by adding your first link to the library",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                EmptyState(
+                    title = if (state.searchQuery.isNotBlank()) "No links found" else "Your saves",
+                    description = if (state.searchQuery.isNotBlank())
+                        "Nothing matches this search."
+                    else
+                        "Save your first link — articles, videos and posts, all in one place.",
+                    icon = Icons.Default.Book,
+                    actionLabel = "Add a link",
+                    onActionClick = { onAddLink(null) },
+                    modifier = Modifier.fillMaxWidth()
+                )
             } else {
                 // Responsive grid: 1 col mobile, 2 cols tablet, 3 cols desktop
                 LazyVerticalGrid(
