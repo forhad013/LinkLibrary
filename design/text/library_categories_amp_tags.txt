@@ -1,0 +1,26 @@
+Library
+Manage
+Unopened
+[N] links
+Favorites
+[N] links
+Archived
+[N] links
+Uncategorized
+[N] links
+Categories
++ Category
+{{row.label}}
+[N]
+A category shows its own links and everything inside it.
+Tags
+#kotlin
+#sleep
+#watch-later
+#aws
+#recipes
+#german
+Feed
+Search
+Library
+Settings

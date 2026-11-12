@@ -1,0 +1,15 @@
+Manage
+Categories
+Tags
+{{row.label}}
+[N]
+{{hint}}
+{{selLabel}}
+Rename
+Move
+Delete
+Delete "{{selLabel}}"?
+{{confirmText}}
+No links are deleted.
+Cancel
+Delete

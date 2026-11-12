@@ -1,0 +1,9 @@
+Category
+One per link. Up to 5 levels deep.
+New
+{{row.label}}
+{{row.count}}
+Selected
+{{path}}
+"New" creates a category inside the selected one.
+Done
