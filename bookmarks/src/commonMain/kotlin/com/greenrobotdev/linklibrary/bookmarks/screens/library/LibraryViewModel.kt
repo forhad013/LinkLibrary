@@ -53,7 +53,8 @@ fun LibraryPresenter(
                 state = state.copy(
                     searchQuery = state.searchQuery,
                     links = links.toList(),
-                    filteredLinks = filterLinks(state.searchQuery, links.toList())
+                    filteredLinks = filterLinks(state.searchQuery, links.toList()),
+                    isLoading = false
                 )
             }
         }

@@ -8,6 +8,8 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,12 +35,14 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.FolderShared
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -63,6 +67,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
@@ -71,6 +76,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greenrobotdev.linklibrary.design.components.utils.PlatformAsyncImage
+import com.greenrobotdev.linklibrary.design.components.button.AppButton
 import androidx.navigation3.runtime.NavKey
 import com.greenrobotdev.linklibrary.bookmarks.model.Link
 import kotlin.time.Clock
@@ -98,7 +104,7 @@ fun LibraryScreen(
     onNavigateToCategories: () -> Unit = {},
     onNavigateToTags: () -> Unit = {}
 ) {
-    val viewModel: LibraryViewModel = viewModel<LibraryViewModel>(key = routeKey.toString()) { LibraryViewModel() }
+    val viewModel: LibraryViewModel = viewModel(key = routeKey.toString()) { LibraryViewModel() }
     val state by viewModel.models.collectAsState()
 
     // Filter states
@@ -140,50 +146,56 @@ fun LibraryScreen(
         label = "fab_scale"
     )
 
-    Scaffold(
-        topBar = {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.background,
-                tonalElevation = 0.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(64.dp)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Lords of Links",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+    val firstLaunch = !state.isLoading && state.links.isEmpty() && state.searchQuery.isBlank()
 
+    Scaffold(
+        topBar = if (!firstLaunch) {
+            {} // design: first-launch screen has no app bar
+        } else {
+            {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.background,
+                    tonalElevation = 0.dp
+                ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(
-                            onClick = { /* Navigate to profile */ },
-                            modifier = Modifier.size(40.dp)
+                        Text(
+                            text = "Lords of Links",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.AccountCircle,
-                                contentDescription = "Account",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        IconButton(
-                            onClick = { /* Navigate to settings */ },
-                            modifier = Modifier.size(40.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = "Settings",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            IconButton(
+                                onClick = { /* Navigate to profile */ },
+                                modifier = Modifier.size(40.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.AccountCircle,
+                                    contentDescription = "Account",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            IconButton(
+                                onClick = { /* Navigate to settings */ },
+                                modifier = Modifier.size(40.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Settings,
+                                    contentDescription = "Settings",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }
@@ -201,13 +213,14 @@ fun LibraryScreen(
                 },
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Sticky Search and Filters Section
+            // Sticky Search and Filters Section (hidden on first launch)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.background.copy(alpha = 0.9f)),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                if (firstLaunch) return@Column
                 // Search Input
                 OutlinedTextField(
                     value = state.searchQuery,
@@ -266,7 +279,9 @@ fun LibraryScreen(
             }
 
             // Links Grid - Responsive layout
-            if (state.filteredLinks.isEmpty()) {
+            if (firstLaunch) {
+                FirstLaunchEmptyState(onAddLink = onAddLink)
+            } else if (state.filteredLinks.isEmpty()) {
                 EmptyState(
                     title = if (state.searchQuery.isNotBlank()) "No links found" else "Your saves",
                     description = if (state.searchQuery.isNotBlank())
@@ -465,7 +480,8 @@ fun ModernLinkCard(
 
                 // Description
                 Text(
-                    text = link.description.takeIf { it.isNotBlank() } ?: "No description available",
+                    text = link.description.takeIf { it.isNotBlank() }
+                        ?: "No description available",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
@@ -525,19 +541,127 @@ fun ModernLinkCard(
     }
 }
 
-@OptIn(ExperimentalTime::class)
-fun getRelativeTimeString(timestamp: Long?): String {
-    if (timestamp == null) return "Saved recently"
+/**
+ * First-launch empty state shown only when no link has ever been saved.
+ * Matches design/screens/Feed first launch.png.
+ */
+@Composable
+fun FirstLaunchEmptyState(
+    onAddLink: (String?) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp, vertical = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
 
-    val now = Clock.System.now().toEpochMilliseconds()
-    val differenceMs = now - timestamp
-    val days = differenceMs / (24 * 60 * 60 * 1000)
+        // Outer shape: larger, differently-rounded corner frame behind the icon tile
+        Surface(
+            shape = RoundedCornerShape(
+                topStart = 44.dp,
+                topEnd = 12.dp,
+                bottomStart = 12.dp,
+                bottomEnd = 44.dp
+            ),
+            color = MaterialTheme.colorScheme.primaryContainer
+        ) {
+            // Inner icon tile
+            Surface(
+                shape = RoundedCornerShape(28.dp),
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(30.dp)
+                    .rotate(-15f)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Bookmark,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .size(40.dp)
+                )
+            }
+        }
 
-    return when {
-        days == 0L -> "Saved today"
-        days == 1L -> "Saved yesterday"
-        days < 7L -> "Saved ${days} days ago"
-        days < 30L -> "Saved ${days / 7} weeks ago"
-        else -> "Saved ${days / 30} months ago"
+
+        Spacer(Modifier.height(24.dp))
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Your saves",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                text = "Save your first link",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "Keep articles, videos and posts in one place, and find them again later.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        // How-to steps
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            val steps = listOf(
+                "Open a page or video in any app",
+                "Tap Share",
+                "Choose Lords of Links"
+            )
+            steps.forEachIndexed { index, step ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.tertiaryContainer
+                    ) {
+                        Text(
+                            text = "${index + 1}",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                        )
+                    }
+                    Text(
+                        text = step,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(32.dp))
+
+        AppButton(
+            text = "Or paste a link here",
+            onClick = { onAddLink(null) },
+            icon = Icons.Default.Add,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
+
