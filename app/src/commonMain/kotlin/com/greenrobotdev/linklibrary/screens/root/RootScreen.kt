@@ -3,7 +3,7 @@ package com.greenrobotdev.linklibrary.screens.root
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MenuBook
@@ -19,11 +19,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.greenrobotdev.linklibrary.bookmarks.model.SharedContent
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.sheet.AddLinkSheet
 import com.greenrobotdev.linklibrary.design.components.emptystate.EmptyState
 import com.greenrobotdev.linklibrary.screens.library.navigation.LibraryNavRoutes
 import com.greenrobotdev.linklibrary.screens.library.navigation.LibraryTabNavigation
@@ -71,19 +75,34 @@ fun RootScreen(
     )
     val feedTabNavigator = remember { TabNavigator(feedTabNavState) }
 
+    // Step one of Add link is a modal sheet; Continue opens the existing full add-link screen
+    var addLinkSheetUrl by remember { mutableStateOf<String?>(null) }
+    val openAddLinkSheet = { url: String? -> addLinkSheetUrl = url ?: "" }
+
     // Share sheet: open Add link on the Feed tab
     LaunchedEffect(sharedContent) {
         if (sharedContent != null && sharedContent.url != null) {
             rootNavigator.switchTab(RootScreens.FeedTab)
-            feedTabNavigator.navigateToNew(LibraryNavRoutes.AddLink(sharedContent.url))
+            openAddLinkSheet(sharedContent.url)
             onSharedContentHandled()
         }
+    }
+    addLinkSheetUrl?.let { url ->
+        AddLinkSheet(
+            initialUrl = url.takeIf { it.isNotEmpty() },
+            onContinue = { continued ->
+                addLinkSheetUrl = null
+                feedTabNavigator.navigateToNew(LibraryNavRoutes.AddLink(continued))
+            },
+            onDismiss = { addLinkSheetUrl = null },
+        )
     }
 
     Scaffold(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.primaryContainer)
-            .safeDrawingPadding(),
+            // systemBars only (not IME) so the keyboard doesn't push the background content up
+            .systemBarsPadding(),
         bottomBar = {
             NavigationBar {
                 APP_TABS.forEach { tabDef ->
@@ -100,7 +119,7 @@ fun RootScreen(
             // FAB only on Feed; opens Add link
             if (rootNavigator.getCurrentTab() == RootScreens.FeedTab) {
                 FloatingActionButton(
-                    onClick = { feedTabNavigator.navigateToNew(LibraryNavRoutes.AddLink(null)) },
+                    onClick = { openAddLinkSheet(null) },
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add link")
@@ -110,7 +129,10 @@ fun RootScreen(
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             when (rootNavigator.getCurrentTab()) {
-                RootScreens.FeedTab -> LibraryTabNavigation(feedTabNavigator)
+                RootScreens.FeedTab -> LibraryTabNavigation(
+                    tabNavigator = feedTabNavigator,
+                    onAddLink = openAddLinkSheet,
+                )
                 RootScreens.SearchTab -> EmptyState(
                     title = "Search",
                     description = "Search is coming soon."

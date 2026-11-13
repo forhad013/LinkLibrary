@@ -21,7 +21,10 @@ import com.greenrobotdev.linklibrary.screens.root.toEntries
  */
 @Composable
 fun LibraryTabNavigation(
-    tabNavigator: TabNavigator
+    tabNavigator: TabNavigator,
+    onAddLink: (String?) -> Unit = { initialUrl ->
+        tabNavigator.navigateToNew(LibraryNavRoutes.AddLink(initialUrl))
+    }
 ) {
     val tabNavState = tabNavigator.state
 
@@ -35,9 +38,7 @@ fun LibraryTabNavigation(
                         onNavigateToDetail = { linkId ->
                             tabNavigator.navigate(LibraryNavRoutes.LinkDetail(linkId))
                         },
-                        onAddLink = { initialUrl ->
-                            tabNavigator.navigateToNew(LibraryNavRoutes.AddLink(initialUrl))
-                        },
+                        onAddLink = onAddLink,
                         onAddCategory = {
                             tabNavigator.navigate(LibraryNavRoutes.AddCategory)
                         }
