@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,9 +28,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,13 +52,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.bookmarks.domain.isValidLink
 import com.greenrobotdev.linklibrary.design.components.button.StandardButton
 import com.greenrobotdev.linklibrary.design.components.textfield.AppTextFieldEnhanced
 import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
 import com.greenrobotdev.linklibrary.design.theme.ComponentStyle
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * Step one of adding a link, as a modal bottom sheet.
@@ -74,20 +82,41 @@ fun AddLinkSheet(
     val state by viewModel.models.collectAsState()
 
     // The keyboard starts later than the sheet's own slide-in, so keep the sheet below the
-    // screen until the keyboard begins to rise; then both come up as one motion.
-    val hidden = remember { Animatable(1f) } // 1 = fully below the screen
+    // screen and uncover it by exactly as much as the keyboard has risen: one motion, not two.
+    var imeNow by remember { mutableStateOf<WindowInsets?>(null) }
+    var imeTarget by remember { mutableStateOf<WindowInsets?>(null) }
+    val fallback = remember { Animatable(0f) } // reveal when there is no keyboard to follow
+    var opened by remember { mutableStateOf(false) } // latched, so a closing keyboard never hides the sheet
+
+    // 0 = keyboard down, 1 = keyboard fully up
+    fun keyboardProgress(density: Density): Float {
+        val target = imeTarget?.getBottom(density) ?: 0
+        val now = imeNow?.getBottom(density) ?: 0
+        return if (target > 0) (now.toFloat() / target).coerceAtMost(1f) else 0f
+    }
+    // 0 = sheet fully below the screen, 1 = in place
+    fun shown(density: Density): Float =
+        if (opened) 1f else maxOf(keyboardProgress(density), fallback.value)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        modifier = Modifier.graphicsLayer { translationY = hidden.value * size.height },
+        // Read in the draw phase so the sheet moves on the same frame as the keyboard
+        modifier = Modifier.graphicsLayer { translationY = (1f - shown(this)) * size.height },
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     ) {
-        // Read inside the sheet: it is its own window with its own keyboard insets
-        val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-        LaunchedEffect(imeVisible) {
-            // shortcut: fixed wait when no keyboard shows (hardware keyboard, desktop); raise it if a slow IME beats it
-            if (!imeVisible) delay(500)
-            hidden.animateTo(0f, tween(250))
+        // Taken inside the sheet: it is its own window with its own keyboard insets
+        val ime = WindowInsets.ime
+        val target = imeAnimationTargetInsets()
+        SideEffect { imeNow = ime; imeTarget = target }
+        val density = LocalDensity.current
+        LaunchedEffect(Unit) {
+            // shortcut: fixed waits when no keyboard shows (hardware keyboard, desktop) or it stops
+            // part-way; raise them if a slow IME beats them
+            val started = withTimeoutOrNull(500) { snapshotFlow { keyboardProgress(density) > 0f }.first { it } }
+            val arrived = started != null &&
+                withTimeoutOrNull(1000) { snapshotFlow { shown(density) >= 1f }.first { it } } != null
+            if (!arrived) fallback.animateTo(1f, tween(250))
+            opened = true
         }
         AddLinkSheetContent(
             state = state,
@@ -122,8 +151,17 @@ private fun AddLinkSheetContent(
         }
     }
 
-    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(18.dp)) {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            // Dragging the content down takes the keyboard with it; needs a scroll container to hook into
+            .imeNestedScroll()
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(18.dp)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
             Text(
                 "Add a link",
                 style = MaterialTheme.typography.headlineSmall,
