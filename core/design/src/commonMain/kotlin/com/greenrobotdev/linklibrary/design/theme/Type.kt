@@ -1,23 +1,23 @@
 package com.greenrobotdev.linklibrary.design.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.greenrobotdev.linklibrary.design.resources.Res
+import com.greenrobotdev.linklibrary.design.resources.roboto_flex
+import org.jetbrains.compose.resources.Font
 
 /**
- * Lords of Links Typography — Roboto Flex, per the approved wireframes.
- *
- * The font is bundled as a shared Compose resource once the file is added:
- * put `RobotoFlex.ttf` (variable font) in
- *   core/design/src/commonMain/composeResources/font/
- * then replace `RobotoFlex` below with:
- *   FontFamily(org.jetbrains.compose.resources.Res.font.roboto_flex)
- * Until then FontFamily.Default (Roboto on Android) is used.
+ * Lords of Links Typography — Roboto Flex (variable font), per the approved wireframes.
+ * File: core/design/src/commonMain/composeResources/font/roboto_flex.ttf
  */
-val RobotoFlex: FontFamily = FontFamily.Default
+val RobotoFlex: FontFamily
+    @Composable get() = FontFamily(Font(Res.font.roboto_flex))
 
+@Composable
 internal fun getTypography() = Typography(
     displaySmall = TextStyle(
         fontFamily = RobotoFlex,
@@ -85,9 +85,9 @@ internal fun getTypography() = Typography(
     )
 )
 
-// Large primary buttons (Save, Continue): 18sp / weight 800
-val LargeButtonTextStyle = TextStyle(
-    fontFamily = RobotoFlex,
-    fontWeight = FontWeight.ExtraBold,
-    fontSize = 18.sp
-)
+//// Large primary buttons (Save, Continue): 18sp / weight 800
+//val LargeButtonTextStyle = TextStyle(
+//    fontFamily = RobotoFlex,
+//    fontWeight = FontWeight.ExtraBold,
+//    fontSize = 18.sp
+//)
