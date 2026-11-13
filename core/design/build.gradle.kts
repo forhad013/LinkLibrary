@@ -8,6 +8,7 @@ kotlin {
     android {
         namespace = "com.greenrobotdev.linklibrary.design"
         compileSdk = 37
+        androidResources { enable = true } // required for Compose resources on the KMP Android library plugin
     }
 
     jvm("desktop")
@@ -36,6 +37,7 @@ kotlin {
                 implementation("org.jetbrains.compose.material3:material3:1.9.0-alpha04")
                 implementation("org.jetbrains.compose.ui:ui:1.12.0")
                 implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
+                implementation("org.jetbrains.compose.components:components-resources:1.12.0")
             }
         }
 
@@ -51,3 +53,6 @@ kotlin {
     }
 }
 
+compose.resources {
+    packageOfResClass = "com.greenrobotdev.linklibrary.design.resources"
+}
