@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,8 +19,13 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -224,8 +230,15 @@ fun AppTextFieldEnhanced(
     leadingIcon: ImageVector? = null,
     singleLine: Boolean = true,
     enabled: Boolean = true,
-    isError: Boolean = false
+    isError: Boolean = false,
+    keyboardOptions: androidx.compose.foundation.text.KeyboardOptions = androidx.compose.foundation.text.KeyboardOptions.Default,
+    keyboardActions: androidx.compose.foundation.text.KeyboardActions = androidx.compose.foundation.text.KeyboardActions.Default,
+    textFieldModifier: Modifier = Modifier,
+    // "Open" variant for hero inputs (e.g. Add-link sheet): flat surface, wider shape, primary focus border
+    openStyle: Boolean = false
 ) {
+    var fieldFocused by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier,
         verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
@@ -234,30 +247,32 @@ fun AppTextFieldEnhanced(
         label?.let {
             Text(
                 text = it,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Medium,
+                style = if (openStyle) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.labelMedium,
+                color = if (openStyle) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = if (openStyle) FontWeight.Bold else FontWeight.Medium,
                 modifier = Modifier.padding(start = 4.dp)
             )
         }
 
         // Enhanced text field with custom styling
         Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            modifier = Modifier.fillMaxWidth().then(if (openStyle) Modifier.heightIn(min = 60.dp) else Modifier),
+            shape = RoundedCornerShape(if (openStyle) 18.dp else 16.dp),
+            color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(
-                width = 1.dp,
-                color = if (isError) {
-                    MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
-                } else {
-                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
+                width = if (openStyle) 2.dp else 1.dp,
+                color = when {
+                    isError -> MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
+                    openStyle && fieldFocused -> MaterialTheme.colorScheme.primary
+                    openStyle -> MaterialTheme.colorScheme.outlineVariant
+                    else -> MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
                 }
             ),
-            tonalElevation = 2.dp
+            tonalElevation = if (openStyle) 0.dp else 2.dp
         ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            Row(modifier = Modifier
+                .padding(horizontal = if (openStyle) 18.dp else 16.dp, vertical = 12.dp)
+                .onFocusChanged { fieldFocused = it.hasFocus },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -280,11 +295,13 @@ fun AppTextFieldEnhanced(
                     OutlinedTextField(
                         value = value,
                         onValueChange = onValueChange,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = textFieldModifier.fillMaxWidth(),
                         placeholder = placeholder?.let { { Text(it) } },
                         singleLine = singleLine,
                         enabled = enabled,
                         isError = isError,
+                        keyboardOptions = keyboardOptions,
+                        keyboardActions = keyboardActions,
                         colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.Transparent,
                             unfocusedBorderColor = Color.Transparent,
