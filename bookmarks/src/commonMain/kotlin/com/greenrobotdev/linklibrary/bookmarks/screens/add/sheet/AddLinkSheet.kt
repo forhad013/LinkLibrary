@@ -1,12 +1,16 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add.sheet
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -30,7 +34,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -65,10 +73,22 @@ fun AddLinkSheet(
     val viewModel = remember { AddLinkSheetViewModel(clipboardUrl, initialUrl) }
     val state by viewModel.models.collectAsState()
 
+    // The keyboard starts later than the sheet's own slide-in, so keep the sheet below the
+    // screen until the keyboard begins to rise; then both come up as one motion.
+    val hidden = remember { Animatable(1f) } // 1 = fully below the screen
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
+        modifier = Modifier.graphicsLayer { translationY = hidden.value * size.height },
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     ) {
+        // Read inside the sheet: it is its own window with its own keyboard insets
+        val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+        LaunchedEffect(imeVisible) {
+            // shortcut: fixed wait when no keyboard shows (hardware keyboard, desktop); raise it if a slow IME beats it
+            if (!imeVisible) delay(500)
+            hidden.animateTo(0f, tween(250))
+        }
         AddLinkSheetContent(
             state = state,
             onUrlChange = { viewModel.take(AddLinkSheetEvent.UrlChanged(it)) },
@@ -91,13 +111,18 @@ private fun AddLinkSheetContent(
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
-    // shortcut: fixed delay instead of observing sheet settle state; revisit if enter animation changes
-    LaunchedEffect(Unit) {
-        delay(250)
-        runCatching { focusRequester.requestFocus() }
+    val keyboard = LocalSoftwareKeyboardController.current
+    // The sheet is its own window; Android ignores a keyboard request until that window has focus.
+    // Asking at that exact moment starts the keyboard while the sheet is still sliding in.
+    val windowFocused = LocalWindowInfo.current.isWindowFocused
+    LaunchedEffect(windowFocused) {
+        if (windowFocused) {
+            runCatching { focusRequester.requestFocus() }
+            keyboard?.show()
+        }
     }
 
-    Column(modifier = modifier.fillMaxWidth().imePadding(), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
                 "Add a link",
@@ -177,7 +202,8 @@ private fun AddLinkSheetContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 4.dp),
+                // gap between the buttons and the keyboard
+                .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             StandardButton(
