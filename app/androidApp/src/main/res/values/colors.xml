@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Launcher icon background color -->
-    <color name="ic_launcher_background">#3DDC84</color>
+    <color name="ic_launcher_background">#5B3BB5</color>
 
     <!-- Launcher icon foreground color -->
     <color name="ic_launcher_foreground">#FFFFFF</color>
