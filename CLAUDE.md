@@ -18,6 +18,15 @@ AGP 9.0.0 · Kotlin 2.2.10 · Gradle 9.1.0 · KSP 2.2.10-2.0.2 · JDK 17+
 ## AGP 9 & key patterns
 See `docs/architecture/AGP9_AND_PATTERNS.md`. Highlights: KMP modules use `com.android.kotlin.multiplatform.library` (not `com.android.library`); repos return `Flow<Result<T>>` (reactive `.collect {}`, not `.first()`); never depend on `app` from `database`.
 
+## Device automation (adb on the owner's real phone)
+The test device is the owner's personal Pixel. A blind tap once opened the Camera app from the home screen, so these rules are mandatory:
+- **Package id is `com.greenrobotdev.linklibrary.android`.** Launch with `adb shell am start -n com.greenrobotdev.linklibrary.android/.MainActivity` and check the output for errors. Never silence launch output (`>/dev/null`).
+- **Check before every tap batch:** `adb shell dumpsys window | grep mCurrentFocus` must show `com.greenrobotdev.linklibrary.android`. If it shows the launcher, lock screen, or any other app: stop. Don't tap.
+- **Tap by element, not guesswork:** take bounds from `uiautomator dump` for the current screen; never reuse coordinates from an earlier run without re-checking the screen.
+- **Never open, tap into, or act in other apps** (camera, settings, messages, …). Don't send global keys that can launch apps (`KEYCODE_CAMERA`, double `KEYCODE_POWER`, `KEYCODE_HOME` followed by taps).
+- **Never try to unlock the phone** (no swipe/keyevent 82/`wm dismiss-keyguard`, never type a PIN). If it's locked, ask the owner and wait.
+- Prefer an emulator for long automated flows.
+
 # Design System (TheLordsOfLinks — authoritative)
 
 Material 3 Expressive, Royal Purple `#6D28D9` + Gold `#F59E0B`. Source of truth: `core/design/src/commonMain/kotlin/com/greenrobotdev/linklibrary/design/theme/Color.kt`.
@@ -34,4 +43,4 @@ Material 3 Expressive, Royal Purple `#6D28D9` + Gold `#F59E0B`. Source of truth:
 2. Migrate any raw `Card()` to templates
 3. Test both light and dark themes (WCAG AA)
 
-Last updated: 2026-11-12
+Last updated: 2026-11-16
