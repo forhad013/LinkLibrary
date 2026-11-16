@@ -119,8 +119,10 @@ fun RootScreen(
             }
         },
         floatingActionButton = {
-            // FAB only on Feed; opens Add link
-            if (rootNavigator.getCurrentTab() == RootScreens.FeedTab) {
+            // FAB only on the Feed list itself (hidden on Add link, link details, …); opens Add link
+            if (rootNavigator.getCurrentTab() == RootScreens.FeedTab &&
+                feedTabNavState.backStack.lastOrNull() is LibraryNavRoutes.LibraryBase
+            ) {
                 FloatingActionButton(
                     onClick = { openAddLinkSheet(null) },
                     containerColor = MaterialTheme.colorScheme.primaryContainer
