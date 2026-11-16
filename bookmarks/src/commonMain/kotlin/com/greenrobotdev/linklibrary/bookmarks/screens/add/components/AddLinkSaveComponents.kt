@@ -394,3 +394,29 @@ internal fun SaveActions(
         }
     }
 }
+
+/** Small text action with a chevron, e.g. "All tags ›" next to a section title. */
+@Composable
+internal fun BrowseAllButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .clip(CircleShape)
+            .clickable(role = Role.Button, onClick = onClick)
+            .heightIn(min = 40.dp)
+            .padding(start = 12.dp, end = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text,
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        AppIcon(
+            Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(20.dp),
+        )
+    }
+}
