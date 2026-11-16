@@ -10,16 +10,6 @@ sealed class OrganizeNavRoutes : NavKey {
     // Base organize screen - categoryNames and tags overview
     data object OrganizeBase : OrganizeNavRoutes()
 
-    // Category management
-    data class CategoryDetail(val categoryId: String) : OrganizeNavRoutes()
-
-    // Tag management
-    data class TagDetail(val tagId: String) : OrganizeNavRoutes()
-    data class TagEdit(val tagId: String? = null) : OrganizeNavRoutes()
-
-    // Bulk operations
-    data object BulkOrganize : OrganizeNavRoutes()
-
     // Manage categories and tags (rename/move/delete)
     data object Manage : OrganizeNavRoutes()
 }

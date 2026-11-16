@@ -6,10 +6,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkScreen
-import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.details.LinkDetailScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryScreen
-import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreenEnhanced
 import com.greenrobotdev.linklibrary.screens.notes.NoteEditorScreen
 import com.greenrobotdev.linklibrary.screens.root.TabNavigator
 import com.greenrobotdev.linklibrary.screens.root.toEntries
@@ -60,21 +58,6 @@ fun LibraryTabNavigation(
                     is LibraryNavRoutes.NoteEditor -> NoteEditorScreen(
                         routeKey = route,
                         noteId = route.noteId,
-                        onBack = { tabNavigator.goBack() }
-                    )
-
-                    // Tags Screen
-                    is LibraryNavRoutes.Tags -> TagsScreenEnhanced(
-                        routeKey = route,
-                        onBack = { tabNavigator.goBack() },
-                        onCreateTag = {
-                            tabNavigator.navigate(LibraryNavRoutes.AddTag)
-                        }
-                    )
-
-                    // Add Tag Screen
-                    is LibraryNavRoutes.AddTag -> AddTagScreen(
-                        routeKey = route,
                         onBack = { tabNavigator.goBack() }
                     )
 
