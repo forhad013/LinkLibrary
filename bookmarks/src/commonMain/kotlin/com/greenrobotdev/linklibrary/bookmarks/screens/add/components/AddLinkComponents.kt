@@ -401,6 +401,7 @@ fun OrganizationSection(
     onTagToggle: (String) -> Unit,
     onAddTag: () -> Unit,
     onAddCategory: () -> Unit,
+    onPickCategory: () -> Unit = {},
     isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -409,13 +410,12 @@ fun OrganizationSection(
         headerIcon = Icons.Default.Folder,
         headerTitle = "Organization",
     ) {
-        CategorySelector(
-            categoryNames = availableCategories.toSet(),
-            selectedCategoryIds = selectedCategoryIds.toSet(),
-            onCategoryToggle = onCategoryToggle,
-            onClearAllCategories = onClearAllCategories,
-            onAddCategory = onAddCategory,
-            isLoading = isLoading
+        // Single category per link (GRE-42): the field opens the category picker sheet
+        CategoryField(
+            selectedName = availableCategories
+                .firstOrNull { it.id in selectedCategoryIds }
+                ?.let { selected -> selected.path(availableCategories) },
+            onClick = onPickCategory,
         )
 
         // Tags Section
@@ -425,6 +425,43 @@ fun OrganizationSection(
             onTagToggle = onTagToggle,
             onAddTag = onAddTag
         )
+    }
+}
+
+/** Tappable category field for the Organization card; opens the category picker sheet. */
+@Composable
+internal fun CategoryField(selectedName: String?, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(
+                Icons.Default.Folder,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Column(Modifier.weight(1f)) {
+                Text(
+                    "Category (optional)",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    selectedName ?: "No category",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = if (selectedName != null) FontWeight.Medium else FontWeight.Normal,
+                    color = if (selectedName != null) MaterialTheme.colorScheme.onSurface
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
     }
 }
 
