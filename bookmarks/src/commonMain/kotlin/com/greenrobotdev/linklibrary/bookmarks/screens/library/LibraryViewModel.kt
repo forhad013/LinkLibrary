@@ -3,91 +3,83 @@ package com.greenrobotdev.linklibrary.bookmarks.screens.library
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.linklibrary.utils.MoleculeViewModel
-import com.greenrobotdev.linklibrary.database.repository.LinkRepository
-import com.greenrobotdev.linklibrary.bookmarks.model.Link
+import com.greenrobotdev.linklibrary.bookmarks.model.toCategory
 import com.greenrobotdev.linklibrary.bookmarks.model.toDomain
+import com.greenrobotdev.linklibrary.bookmarks.model.toTag
+import com.greenrobotdev.linklibrary.database.repository.CategoryRepository
+import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import com.greenrobotdev.linklibrary.database.repository.TagRepository
+import com.greenrobotdev.linklibrary.utils.MoleculeViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class LibraryViewModel : MoleculeViewModel<LibraryEvent, LibraryState>(), KoinComponent {
 
     private val linkRepository: LinkRepository by inject()
+    private val categoryRepository: CategoryRepository by inject()
+    private val tagRepository: TagRepository by inject()
 
-    
     @Composable
-    override fun models(events: Flow<LibraryEvent>): LibraryState {
-        return LibraryPresenter(events, linkRepository)
-    }
+    override fun models(events: Flow<LibraryEvent>): LibraryState =
+        LibraryPresenter(events, linkRepository, categoryRepository, tagRepository)
 
-    
-    override fun initialValue(): LibraryState {
-        return LibraryState()
-    }
+    override fun initialValue(): LibraryState = LibraryState()
 }
 
-/**
- * Presenter function that processes events and produces the library state.
- * This is where the business logic lives - separate from the ViewModel.
- */
-
+/** Feed presenter: four live sources (links, categories, link→category, tags) plus filter events. */
 @Composable
 fun LibraryPresenter(
     events: Flow<LibraryEvent>,
-    linkRepository: LinkRepository
+    linkRepository: LinkRepository,
+    categoryRepository: CategoryRepository,
+    tagRepository: TagRepository,
 ): LibraryState {
     var state by remember { mutableStateOf(LibraryState()) }
-    val links = remember { mutableStateListOf<Link>() }
 
-    // Load links reactively
     LaunchedEffect(Unit) {
         linkRepository.getLinksWithTags().collect { result ->
-            result.onSuccess { entities ->
-                links.clear()
-                links.addAll(entities.map { it.toDomain() })
-                state = state.copy(
-                    searchQuery = state.searchQuery,
-                    links = links.toList(),
-                    filteredLinks = filterLinks(state.searchQuery, links.toList()),
-                    isLoading = false
-                )
-            }
+            result.onSuccess { entities -> state = state.copy(links = entities.map { it.toDomain() }, isLoading = false) }
+                .onFailure { state = state.copy(isLoading = false) }
+        }
+    }
+    LaunchedEffect(Unit) {
+        categoryRepository.getCategories().collect { result ->
+            result.onSuccess { rows -> state = state.copy(categories = rows.map { it.toCategory() }) }
+        }
+    }
+    LaunchedEffect(Unit) {
+        categoryRepository.getLinkCategoryIds().collect { result ->
+            result.onSuccess { state = state.copy(linkCategoryIds = it) }
+        }
+    }
+    LaunchedEffect(Unit) {
+        tagRepository.getTagsWithCounts().collect { result ->
+            result.onSuccess { rows -> state = state.copy(tags = rows.map { it.toTag() }) }
         }
     }
 
-    // Handle events
     LaunchedEffect(Unit) {
         events.collect { event ->
-            when (event) {
-                is LibraryEvent.SearchChanged -> {
-                    state = state.copy(
-                        searchQuery = event.query,
-                        filteredLinks = filterLinks(event.query, links.toList())
-                    )
+            state = when (event) {
+                is LibraryEvent.SearchChanged -> state.copy(searchQuery = event.query)
+                is LibraryEvent.SetFilter -> state.copy(filter = event.filter)
+                is LibraryEvent.SetCategory -> state.copy(categoryId = event.categoryId)
+                is LibraryEvent.SetTags -> state.copy(tagIds = event.tagIds)
+                LibraryEvent.ToggleArchived -> state.copy(showArchived = !state.showArchived)
+                LibraryEvent.ToggleSort -> state.copy(newestFirst = !state.newestFirst)
+                is LibraryEvent.Opened -> {
+                    // the links flow re-emits with isOpened = true; nothing to change here
+                    linkRepository.markOpened(event.linkId).first()
+                    state
                 }
             }
         }
     }
 
     return state
-}
-
-private fun filterLinks(
-    query: String,
-    allLinks: List<Link>
-): List<Link> {
-    return if (query.isBlank()) {
-        allLinks
-    } else {
-        allLinks.filter { link ->
-            link.title.contains(query, ignoreCase = true) ||
-                    link.url.contains(query, ignoreCase = true) ||
-                    (link.description?.contains(query, ignoreCase = true) ?: false)
-        }
-    }
 }

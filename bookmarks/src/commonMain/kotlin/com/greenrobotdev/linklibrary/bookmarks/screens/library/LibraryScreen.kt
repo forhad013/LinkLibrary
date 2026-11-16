@@ -58,6 +58,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.automirrored.outlined.Label
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.ui.platform.LocalUriHandler
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.ChoiceChip
+import com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker.CategoryPickerSheet
+import com.greenrobotdev.linklibrary.bookmarks.screens.tagPicker.TagPickerSheet
+import com.greenrobotdev.linklibrary.design.components.textfield.SearchField
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -94,7 +103,6 @@ import kotlin.time.ExperimentalTime
  * - Mobile Bottom Navigation and FAB
  * - Material 3 Expressive animations and spring physics
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryScreen(
     routeKey: NavKey,
@@ -105,245 +113,124 @@ fun LibraryScreen(
 ) {
     val viewModel: LibraryViewModel = viewModel(key = routeKey.toString()) { LibraryViewModel() }
     val state by viewModel.models.collectAsState()
+    val uriHandler = LocalUriHandler.current
 
-    // Filter states
-    var selectedFilter by remember { mutableStateOf("All") }
-    val filters = listOf("All", "Design", "Tech", "Articles")
-
-    // Entrance animations
-    var contentVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        contentVisible = true
+    var pickCategory by remember { mutableStateOf(false) }
+    var pickTags by remember { mutableStateOf(false) }
+    if (pickCategory) {
+        CategoryPickerSheet(
+            onDismiss = { pickCategory = false },
+            initialSelection = state.categoryId,
+            onApplied = { viewModel.take(LibraryEvent.SetCategory(it)) },
+        )
+    }
+    if (pickTags) {
+        TagPickerSheet(
+            onDismiss = { pickTags = false },
+            initialChecked = state.tagIds,
+            onApplied = { viewModel.take(LibraryEvent.SetTags(it)) },
+        )
     }
 
-    val contentAlpha by animateFloatAsState(
-        targetValue = if (contentVisible) 1f else 0f,
-        animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
-        label = "content_alpha"
-    )
-
-    val contentOffsetY by animateFloatAsState(
-        targetValue = if (contentVisible) 0f else 20f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
-        label = "content_offset_y"
-    )
-
-    // FAB animation
-    val fabScale by androidx.compose.runtime.remember {
-        androidx.compose.runtime.mutableStateOf(1f)
+    val firstLaunch = !state.isLoading && state.links.isEmpty()
+    if (firstLaunch) {
+        FirstLaunchEmptyState(onAddLink = onAddLink, modifier = Modifier.background(MaterialTheme.colorScheme.background))
+        return
     }
-    val animatedFabScale by animateFloatAsState(
-        targetValue = fabScale,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
-        label = "fab_scale"
-    )
 
-    val firstLaunch = !state.isLoading && state.links.isEmpty() && state.searchQuery.isBlank()
-
-    Scaffold(
-        topBar = if (!firstLaunch) {
-            {} // design: first-launch screen has no app bar
-        } else {
-            {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.background,
-                    tonalElevation = 0.dp
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(64.dp)
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Lords of Links",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            IconButton(
-                                onClick = { /* Navigate to profile */ },
-                                modifier = Modifier.size(40.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.AccountCircle,
-                                    contentDescription = "Account",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            IconButton(
-                                onClick = { /* Navigate to settings */ },
-                                modifier = Modifier.size(40.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Settings,
-                                    contentDescription = "Settings",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        },
-    ) { padding ->
+    val links = state.filteredLinks
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+    ) {
+        // Fixed top: header, search, quick filters, secondary filters
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp, vertical = 16.dp)
-                .graphicsLayer {
-                    alpha = contentAlpha
-                    translationY = contentOffsetY
-                },
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // Sticky Search and Filters Section (hidden on first launch)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.9f)),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                if (firstLaunch) return@Column
-                // Search Input
-                OutlinedTextField(
-                    value = state.searchQuery,
-                    onValueChange = {
-                        viewModel.take(LibraryEvent.SearchChanged(it))
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Search your library...") },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    },
-//                    colors = OutlinedTextFieldDefaults.colors().copy(
-//                        foc = MaterialTheme.colorScheme.secondary,
-//                        unfocusedBorderColor = Color.Transparent,
-//                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
-//                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    singleLine = true
+            FeedHeader(newestFirst = state.newestFirst, onToggleSort = { viewModel.take(LibraryEvent.ToggleSort) })
+            SearchField(
+                query = state.searchQuery,
+                onQueryChange = { viewModel.take(LibraryEvent.SearchChanged(it)) },
+                placeholder = "Search everything you saved",
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
+        }
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            items(FeedFilter.entries) { f ->
+                ChoiceChip(
+                    text = f.label,
+                    selected = state.filter == f,
+                    onClick = { viewModel.take(LibraryEvent.SetFilter(f)) },
                 )
-
-                // Filter Chips
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(vertical = 8.dp)
-                ) {
-                    items(filters) { filter ->
-                        FilterChip(
-                            selected = selectedFilter == filter,
-                            onClick = { selectedFilter = filter },
-                            label = { Text(filter) },
-                            colors = if (selectedFilter == filter) {
-                                FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            } else {
-                                FilterChipDefaults.filterChipColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            },
-                            border = if (selectedFilter == filter) null else BorderStroke(
-                                1.dp,
-                                MaterialTheme.colorScheme.outlineVariant
-                            ),
-                            shape = RoundedCornerShape(999.dp),
-                            modifier = Modifier.height(32.dp)
-                        )
-                    }
-                }
             }
-
-            // Links Grid - Responsive layout
-            if (firstLaunch) {
-                FirstLaunchEmptyState(onAddLink = onAddLink)
-            } else if (state.filteredLinks.isEmpty()) {
-                EmptyState(
-                    title = if (state.searchQuery.isNotBlank()) "No links found" else "Your saves",
-                    description = if (state.searchQuery.isNotBlank())
-                        "Nothing matches this search."
-                    else
-                        "Save your first link — articles, videos and posts, all in one place.",
-                    icon = Icons.Default.Book,
-                    actionLabel = "Add a link",
-                    onActionClick = { onAddLink(null) },
-                    modifier = Modifier.fillMaxWidth()
+        }
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            item {
+                FeedFilterButton(
+                    text = state.category?.name ?: "Category",
+                    icon = Icons.Outlined.Folder,
+                    active = state.categoryId != null,
+                    onClick = { pickCategory = true },
                 )
-            } else {
-                // Responsive grid: 1 col mobile, 2 cols tablet, 3 cols desktop
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 300.dp),
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(bottom = 80.dp) // Space for FAB
-                ) {
-                    items(state.filteredLinks) { link ->
-                        val itemIndex = state.filteredLinks.indexOf(link)
+            }
+            item {
+                FeedFilterButton(
+                    text = if (state.tagIds.isEmpty()) "Tags" else "Tags · ${state.tagIds.size}",
+                    icon = Icons.AutoMirrored.Outlined.Label,
+                    active = state.tagIds.isNotEmpty(),
+                    onClick = { pickTags = true },
+                )
+            }
+            item {
+                FeedFilterButton(
+                    text = "Show archived",
+                    icon = null,
+                    active = state.showArchived,
+                    onClick = { viewModel.take(LibraryEvent.ToggleArchived) },
+                )
+            }
+        }
+        HorizontalDivider(Modifier.padding(top = 12.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
-                        // Staggered entrance animation for each card
-                        var itemVisible by remember { mutableStateOf(false) }
-                        val itemAlpha by animateFloatAsState(
-                            targetValue = if (itemVisible) 1f else 0f,
-                            animationSpec = tween(
-                                durationMillis = 300,
-                                delayMillis = itemIndex * 50, // Stagger each item by 50ms
-                                easing = FastOutSlowInEasing
-                            ),
-                            label = "item_alpha_$itemIndex"
-                        )
-
-                        val itemOffsetY by animateFloatAsState(
-                            targetValue = if (itemVisible) 0f else 30f,
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            label = "item_offset_y_$itemIndex"
-                        )
-
-                        LaunchedEffect(contentVisible) {
-                            if (contentVisible) {
-                                itemVisible = true
-                            }
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .graphicsLayer {
-                                    alpha = itemAlpha
-                                    translationY = itemOffsetY
-                                }
-                        ) {
-                            ModernLinkCard(
-                                link = link,
-                                onClick = { onNavigateToDetail(link.id) }
-                            )
-                        }
-                    }
+        if (links.isEmpty()) {
+            EmptyState(
+                title = "Nothing here",
+                description = "No saved link matches these filters.",
+                icon = Icons.Default.Search,
+                actionLabel = "Clear filters",
+                onActionClick = {
+                    viewModel.take(LibraryEvent.SearchChanged(""))
+                    viewModel.take(LibraryEvent.SetFilter(FeedFilter.ALL))
+                    viewModel.take(LibraryEvent.SetCategory(null))
+                    viewModel.take(LibraryEvent.SetTags(emptySet()))
+                },
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 96.dp), // room for the FAB
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(links, key = { it.id }) { link ->
+                    FeedLinkCard(
+                        link = link,
+                        categoryPath = state.categoryOf(link)?.path(state.categories),
+                        onOpen = {
+                            runCatching { uriHandler.openUri(link.url) }
+                            viewModel.take(LibraryEvent.Opened(link.id))
+                        },
+                        onDetails = { onNavigateToDetail(link.id) },
+                    )
                 }
             }
         }
