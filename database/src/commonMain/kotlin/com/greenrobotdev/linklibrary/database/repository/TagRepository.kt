@@ -1,6 +1,7 @@
 package com.greenrobotdev.linklibrary.database.repository
 
 import com.greenrobotdev.linklibrary.database.room.TagEntity
+import com.greenrobotdev.linklibrary.database.room.TagWithCount
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -11,6 +12,9 @@ interface TagRepository {
      * Get all tags with their link counts
      */
     suspend fun getTags(): Flow<Result<List<TagEntity>>>
+
+    /** All tags with how many links use each, sorted by name. */
+    suspend fun getTagsWithCounts(): Flow<Result<List<TagWithCount>>>
 
     /**
      * Get a specific tag by ID
