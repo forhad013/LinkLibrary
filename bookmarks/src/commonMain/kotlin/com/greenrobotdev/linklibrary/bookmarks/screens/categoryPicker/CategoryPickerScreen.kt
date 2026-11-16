@@ -40,7 +40,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -66,13 +65,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.greenrobotdev.linklibrary.design.components.button.ComponentColors
-import com.greenrobotdev.linklibrary.design.components.button.StandardButton
 import com.greenrobotdev.linklibrary.design.components.feedback.ErrorMessageCard
 import com.greenrobotdev.linklibrary.design.components.textfield.AppTextFieldEnhanced
 import com.greenrobotdev.linklibrary.design.components.textfield.SearchField
 import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
-import com.greenrobotdev.linklibrary.design.theme.ComponentStyle
 
 /**
  * Category picker as a modal bottom sheet (GRE-44).
@@ -142,6 +138,29 @@ fun CategoryPickerScreen(
     )
 }
 
+private sealed interface PickerItem {
+    val key: String
+    data class Row(val row: TreeRow) : PickerItem { override val key = row.category.id }
+    data class SubField(val depth: Int) : PickerItem { override val key = "add-sub-field" }
+    data class RenameField(val depth: Int, val categoryId: String) : PickerItem { override val key = "rename-$categoryId" }
+}
+
+private fun buildPickerItems(rows: List<TreeRow>, creatingSubOf: String?, renamingId: String?): List<PickerItem> = buildList {
+    val parentIdx = if (creatingSubOf != null) rows.indexOfFirst { it.category.id == creatingSubOf } else -1
+    val parentDepth = if (parentIdx >= 0) rows[parentIdx].depth else -1
+    val insertAfter = if (parentIdx >= 0) {
+        var last = parentIdx
+        for (i in parentIdx + 1 until rows.size) { if (rows[i].depth > parentDepth) last = i else break }
+        last
+    } else -1
+
+    for ((i, row) in rows.withIndex()) {
+        if (row.category.id == renamingId) add(PickerItem.RenameField(row.depth, row.category.id))
+        else add(PickerItem.Row(row))
+        if (i == insertAfter) add(PickerItem.SubField(parentDepth + 1))
+    }
+}
+
 @Composable
 internal fun CategoryPickerContent(
     state: CategoryPickerState,
@@ -153,16 +172,45 @@ internal fun CategoryPickerContent(
     else searchRows(state.categories, state.query)
     val selected = state.selected
 
-    // "New top-level category" flow: the ViewModel's ADD_SUB dialog with no parent, drawn inline in the tree
+    // Inline editing modes derived from the dialog
     val creatingTopLevel = state.dialog?.let { it.kind == CategoryPickerDialog.Kind.ADD_SUB && it.categoryId == null } == true
+    val creatingSubOf = state.dialog?.let { if (it.kind == CategoryPickerDialog.Kind.ADD_SUB && it.categoryId != null) it.categoryId else null }
+    val renamingId = state.dialog?.let { if (it.kind == CategoryPickerDialog.Kind.RENAME) it.categoryId else null }
+    val isEditing = creatingTopLevel || creatingSubOf != null || renamingId != null
+
+    // New top-level name
     var newName by remember(creatingTopLevel) { mutableStateOf("") }
     val newNameTaken = newName.isNotBlank() && validateCategoryName(newName, null, state.categories) != null
     val canCreate = newName.isNotBlank() && !newNameTaken
     val createTopLevel = { if (canCreate) onEvent(CategoryPickerEvent.DialogName(newName.trim())) }
+
+    // Add sub-category name
+    var subName by remember(creatingSubOf) { mutableStateOf("") }
+    val subParent = creatingSubOf?.let { id -> state.categories.firstOrNull { it.id == id } }
+    val subNameTaken = subName.isNotBlank() && creatingSubOf != null &&
+        validateCategoryName(subName, creatingSubOf, state.categories) != null
+    val canCreateSub = subName.isNotBlank() && !subNameTaken
+    val createSub = { if (canCreateSub) onEvent(CategoryPickerEvent.DialogName(subName.trim())) }
+
+    // Rename
+    val renamingCategory = renamingId?.let { id -> state.categories.firstOrNull { it.id == id } }
+    var renameName by remember(renamingId) { mutableStateOf(state.dialog?.initialName ?: "") }
+    val renameParent = renamingCategory?.parentId?.let { pid -> state.categories.firstOrNull { it.id == pid } }
+    val renameNameTaken = renameName.isNotBlank() && renamingCategory != null &&
+        validateCategoryName(renameName, renamingCategory.parentId, state.categories, excludeId = renamingId) != null
+    val canRename = renameName.isNotBlank() && !renameNameTaken && renameName.trim() != (state.dialog?.initialName ?: "")
+    val doRename = { if (canRename) onEvent(CategoryPickerEvent.DialogName(renameName.trim())) }
+
+    val pickerItems = if (state.browsing) buildPickerItems(rows, creatingSubOf, renamingId) else emptyList()
     val listState = rememberLazyListState()
     LaunchedEffect(creatingTopLevel) {
-        // keep the field (last item) visible above the keyboard
         if (creatingTopLevel) listState.animateScrollToItem(listState.layoutInfo.totalItemsCount.coerceAtLeast(1) - 1)
+    }
+    LaunchedEffect(creatingSubOf) {
+        if (creatingSubOf != null) {
+            val idx = pickerItems.indexOfFirst { it is PickerItem.SubField }
+            if (idx >= 0) listState.animateScrollToItem(idx + 1) // +1 for "no-category" header
+        }
     }
 
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -207,7 +255,7 @@ internal fun CategoryPickerContent(
         }
 
         // Recent: label and chips share one scrolling line, chips are plain outlined pills
-        if (state.browsing && state.recent.isNotEmpty() && !creatingTopLevel) {
+        if (state.browsing && state.recent.isNotEmpty() && !isEditing) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     "Recent",
@@ -238,17 +286,41 @@ internal fun CategoryPickerContent(
                         onClick = { onEvent(CategoryPickerEvent.Select(null)) },
                     )
                 }
-                items(rows, key = { it.category.id }) { row ->
-                    SelectableRow(
-                        text = row.category.name,
-                        count = row.category.count,
-                        depth = row.depth,
-                        selected = row.category.id == state.selectedCategoryId,
-                        expandable = row.hasChildren,
-                        expanded = row.category.id in state.expandedIds,
-                        onClick = { onEvent(CategoryPickerEvent.Select(row.category.id)) },
-                        onToggle = { onEvent(CategoryPickerEvent.ToggleExpand(row.category.id)) },
-                    )
+                items(pickerItems, key = { it.key }) { item ->
+                    when (item) {
+                        is PickerItem.Row -> SelectableRow(
+                            text = item.row.category.name,
+                            count = item.row.category.count,
+                            depth = item.row.depth,
+                            selected = item.row.category.id == state.selectedCategoryId,
+                            expandable = item.row.hasChildren,
+                            expanded = item.row.category.id in state.expandedIds,
+                            onClick = { onEvent(CategoryPickerEvent.Select(item.row.category.id)) },
+                            onToggle = { onEvent(CategoryPickerEvent.ToggleExpand(item.row.category.id)) },
+                        )
+                        is PickerItem.SubField -> InlineTreeField(
+                            name = subName,
+                            onNameChange = { subName = it },
+                            taken = subNameTaken,
+                            hint = "Inside ${subParent?.name ?: "?"} · you can nest deeper after",
+                            errorHint = "\"${subName.trim()}\" already exists in ${subParent?.name ?: "this category"}",
+                            onDone = createSub,
+                            depth = item.depth,
+                        )
+                        is PickerItem.RenameField -> InlineTreeField(
+                            name = renameName,
+                            onNameChange = { renameName = it },
+                            taken = renameNameTaken,
+                            hint = if (renameParent != null) "Inside ${renameParent.name} · its links keep this category"
+                                else "Top level · its links keep this category",
+                            errorHint = "\"${renameName.trim()}\" already exists ${
+                                if (renameParent != null) "in ${renameParent.name}" else "at the top level"
+                            }",
+                            onDone = doRename,
+                            depth = item.depth,
+                            icon = Icons.Filled.Edit,
+                        )
+                    }
                 }
             } else {
                 items(rows, key = { it.category.id }) { row ->
@@ -282,11 +354,14 @@ internal fun CategoryPickerContent(
             if (state.browsing) {
                 item(key = "new-top-level") {
                     if (creatingTopLevel) {
-                        NewTopLevelField(
+                        InlineTreeField(
                             name = newName,
                             onNameChange = { newName = it },
                             taken = newNameTaken,
+                            hint = "Top level · you can add subcategories after",
+                            errorHint = "\"${newName.trim()}\" already exists at the top level",
                             onDone = createTopLevel,
+                            depth = 0,
                             modifier = Modifier.padding(top = 8.dp),
                         )
                     } else {
@@ -306,41 +381,33 @@ internal fun CategoryPickerContent(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                if (creatingTopLevel) "New top-level: " else "Selected: ",
+                when {
+                    creatingTopLevel -> "New top-level: "
+                    creatingSubOf != null -> "New sub in: "
+                    renamingId != null -> "Renaming: "
+                    else -> "Selected: "
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                if (creatingTopLevel) newName.trim() else state.selectedPath ?: "No category",
+                when {
+                    creatingTopLevel -> newName.trim()
+                    creatingSubOf != null -> subParent?.path(state.categories) ?: ""
+                    renamingId != null -> renamingCategory?.path(state.categories) ?: ""
+                    else -> state.selectedPath ?: "No category"
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
             )
         }
 
+        // Delete confirm (kept until swipe-to-delete lands in the VM)
         state.dialog?.let { dialog ->
-            val category = state.categories.firstOrNull { it.id == dialog.categoryId }
-            when (dialog.kind) {
-                CategoryPickerDialog.Kind.ADD_SUB -> if (!creatingTopLevel) InlineNamePanel(
-                    title = "New category in ${category?.path(state.categories) ?: "top level"}",
-                    confirmLabel = "Create",
-                    onDismiss = { onEvent(CategoryPickerEvent.CancelDialog) },
-                    onConfirm = { onEvent(CategoryPickerEvent.DialogName(it)) },
-                    helperText = when (category) {
-                        null -> "Top level · you can add subcategories after"
-                        else -> "Subcategory of ${category.name}"
-                    },
-                )
-
-                CategoryPickerDialog.Kind.RENAME -> InlineNamePanel(
-                    title = "Rename \"${dialog.initialName}\"",
-                    confirmLabel = "Save",
-                    onDismiss = { onEvent(CategoryPickerEvent.CancelDialog) },
-                    onConfirm = { onEvent(CategoryPickerEvent.DialogName(it)) },
-                    initialName = dialog.initialName,
-                )
-
-                CategoryPickerDialog.Kind.CONFIRM_REMOVE -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (dialog.kind == CategoryPickerDialog.Kind.CONFIRM_REMOVE) {
+                val category = state.categories.firstOrNull { it.id == dialog.categoryId }
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
                         "Delete \"${category?.name ?: ""}\"? No links are deleted. They just lose this category.",
                         style = MaterialTheme.typography.bodyMedium,
@@ -355,14 +422,22 @@ internal fun CategoryPickerContent(
             }
         }
 
-        if (creatingTopLevel) {
-            // Edit bar: Cancel + Create replace the selection actions until the name is saved
-            BarContainer {
+        // Bar: mode-dependent
+        when {
+            creatingTopLevel || creatingSubOf != null -> BarContainer {
                 BarAction(Icons.Filled.Close, "Cancel", { onEvent(CategoryPickerEvent.CancelDialog) }, enabled = true)
-                BarPill("Create", onClick = createTopLevel, enabled = canCreate, modifier = Modifier.weight(1f))
+                BarPill(
+                    "Create",
+                    onClick = if (creatingTopLevel) createTopLevel else createSub,
+                    enabled = if (creatingTopLevel) canCreate else canCreateSub,
+                    modifier = Modifier.weight(1f),
+                )
             }
-        } else {
-            ActionBar(
+            renamingId != null -> BarContainer {
+                BarAction(Icons.Filled.Close, "Cancel", { onEvent(CategoryPickerEvent.CancelDialog) }, enabled = true)
+                BarPill("Save name", onClick = doRename, enabled = canRename, modifier = Modifier.weight(1f))
+            }
+            else -> ActionBar(
                 hasSelection = selected != null,
                 canAddSub = selected != null && canAddChildUnder(selected.id, state.categories),
                 onAddSub = { onEvent(CategoryPickerEvent.AddSub) },
@@ -374,105 +449,71 @@ internal fun CategoryPickerContent(
     }
 }
 
-/** Inline name field that replaces the dashed pill while creating a top-level category (design: typing / taken). */
+/** Inline field for creating or renaming a category at a given tree depth (design: add-sub / rename / new top-level). */
 @Composable
-private fun NewTopLevelField(
+private fun InlineTreeField(
     name: String,
     onNameChange: (String) -> Unit,
     taken: Boolean,
+    hint: String,
+    errorHint: String,
     onDone: () -> Unit,
+    depth: Int,
+    icon: androidx.compose.ui.graphics.vector.ImageVector = Icons.Filled.CreateNewFolder,
     modifier: Modifier = Modifier,
 ) {
     val focus = remember { FocusRequester() }
-    LaunchedEffect(Unit) { focus.requestFocus() } // opens the keyboard
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        AppTextFieldEnhanced(
-            value = name,
-            onValueChange = onNameChange,
-            placeholder = "Category name",
-            leadingIcon = Icons.Filled.CreateNewFolder,
-            isError = taken,
-            openStyle = true,
-            textFieldModifier = Modifier.focusRequester(focus),
-            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { onDone() }),
-        )
-        if (taken) {
-            Row(
-                modifier = Modifier.padding(start = 14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                AppIcon(
-                    imageVector = Icons.Filled.Info,
-                    contentDescription = null,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(16.dp),
-                )
+    LaunchedEffect(Unit) { focus.requestFocus() }
+    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+        // Gutter matching SelectableRow's indent
+        if (depth > 0) Box(modifier = Modifier.width((40 + (depth - 1) * 20).dp))
+        Column(
+            modifier = Modifier.weight(1f).padding(top = 4.dp, bottom = 6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            AppTextFieldEnhanced(
+                value = name,
+                onValueChange = onNameChange,
+                placeholder = "Category name",
+                leadingIcon = icon,
+                isError = taken,
+                showClear = true,
+                openStyle = true,
+                textFieldModifier = Modifier.focusRequester(focus),
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { onDone() }),
+            )
+            if (taken) {
+                Row(
+                    modifier = Modifier.padding(start = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    AppIcon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = null,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Text(
+                        errorHint,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            } else {
                 Text(
-                    "\"${name.trim()}\" already exists at the top level",
+                    hint,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.error,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 14.dp),
                 )
             }
-        } else {
-            Text(
-                "Top level · you can add subcategories after",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = 14.dp),
-            )
         }
     }
 }
 
-/** Inline name entry panel (avoids nested dialog windows inside the bottom sheet). */
-@Composable
-private fun InlineNamePanel(
-    title: String,
-    confirmLabel: String,
-    onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit,
-    initialName: String = "",
-    helperText: String? = null,
-) {
-    // fresh each time: the panel leaves composition whenever state.dialog is null
-    var name by remember { mutableStateOf(initialName) }
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(title, style = MaterialTheme.typography.titleSmall)
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            singleLine = true,
-            placeholder = { Text("Name") },
-            modifier = Modifier.fillMaxWidth(),
-        )
-        helperText?.let {
-            Text(
-                it,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            StandardButton(
-                onClick = onDismiss,
-                text = "Cancel",
-                style = ComponentStyle.Outlined,
-            )
-            StandardButton(
-                onClick = { onConfirm(name.trim()) },
-                text = confirmLabel,
-                enabled = name.isNotBlank(),
-                colors = ComponentColors(
-                    container = MaterialTheme.colorScheme.tertiary,
-                    onContainer = MaterialTheme.colorScheme.onTertiary,
-                ),
-            )
-        }
-    }
-}
 
 /**
  * One tree/search result row (mock: 50dp tall). A 40dp gutter holds the chevron; each level indents the
