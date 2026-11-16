@@ -10,9 +10,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -27,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -231,10 +235,10 @@ fun AppTextFieldEnhanced(
     singleLine: Boolean = true,
     enabled: Boolean = true,
     isError: Boolean = false,
+    showClear: Boolean = false,
     keyboardOptions: androidx.compose.foundation.text.KeyboardOptions = androidx.compose.foundation.text.KeyboardOptions.Default,
     keyboardActions: androidx.compose.foundation.text.KeyboardActions = androidx.compose.foundation.text.KeyboardActions.Default,
     textFieldModifier: Modifier = Modifier,
-    // "Open" variant for hero inputs (e.g. Add-link sheet): flat surface, wider shape, primary focus border
     openStyle: Boolean = false
 ) {
     var fieldFocused by remember { mutableStateOf(false) }
@@ -243,7 +247,6 @@ fun AppTextFieldEnhanced(
         modifier = modifier,
         verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
     ) {
-        // Label if provided
         label?.let {
             Text(
                 text = it,
@@ -254,9 +257,8 @@ fun AppTextFieldEnhanced(
             )
         }
 
-        // Enhanced text field with custom styling
         Surface(
-            modifier = Modifier.fillMaxWidth().then(if (openStyle) Modifier.heightIn(min = 60.dp) else Modifier),
+            modifier = Modifier.fillMaxWidth().then(if (openStyle) Modifier.heightIn(min = 48.dp) else Modifier),
             shape = RoundedCornerShape(if (openStyle) 18.dp else 16.dp),
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(
@@ -270,53 +272,62 @@ fun AppTextFieldEnhanced(
             ),
             tonalElevation = if (openStyle) 0.dp else 2.dp
         ) {
-            Row(modifier = Modifier
-                .padding(horizontal = if (openStyle) 18.dp else 16.dp, vertical = 12.dp)
-                .onFocusChanged { fieldFocused = it.hasFocus },
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = if (openStyle) 16.dp else 16.dp, vertical = if (openStyle) 12.dp else 12.dp)
+                    .onFocusChanged { fieldFocused = it.hasFocus },
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Leading icon
                 if (leadingIcon != null) {
                     Icon(
                         leadingIcon,
                         contentDescription = null,
-                        tint = if (isError) {
-                            MaterialTheme.colorScheme.error
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
+                        tint = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
                 }
 
-                // Text field
                 Box(modifier = Modifier.weight(1f)) {
-                    OutlinedTextField(
+                    val textColor = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                    val cursorColor = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+                    BasicTextField(
                         value = value,
                         onValueChange = onValueChange,
                         modifier = textFieldModifier.fillMaxWidth(),
-                        placeholder = placeholder?.let { { Text(it) } },
-                        singleLine = singleLine,
                         enabled = enabled,
-                        isError = isError,
+                        singleLine = singleLine,
                         keyboardOptions = keyboardOptions,
                         keyboardActions = keyboardActions,
-                        colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            cursorColor = MaterialTheme.colorScheme.secondary,
-                            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            errorBorderColor = Color.Transparent,
-                            errorCursorColor = MaterialTheme.colorScheme.error,
-                            errorTextColor = MaterialTheme.colorScheme.error
-                        )
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = textColor),
+                        cursorBrush = SolidColor(cursorColor),
+                        decorationBox = { innerTextField ->
+                            if (value.isEmpty() && placeholder != null) {
+                                Text(
+                                    placeholder,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                        alpha = if (fieldFocused) 1f else 0.7f
+                                    ),
+                                )
+                            }
+                            innerTextField()
+                        }
                     )
+                }
+
+                if (showClear && value.isNotEmpty()) {
+                    IconButton(
+                        onClick = { onValueChange("") },
+                        modifier = Modifier.size(20.dp)
+                    ) {
+                        Icon(
+                            Icons.Filled.Cancel,
+                            contentDescription = "Clear",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
         }
