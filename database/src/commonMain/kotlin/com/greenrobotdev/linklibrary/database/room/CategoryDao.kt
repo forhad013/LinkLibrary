@@ -41,6 +41,18 @@ interface CategoryDao {
     suspend fun deleteCategoryById(categoryId: String)
 
     /**
+     * Delete a category; its links become uncategorized (link_categories rows cascade).
+     * Fails if it still has subcategories — move or remove them first.
+     */
+    @Transaction
+    suspend fun deleteCategoryLeafOnly(categoryId: String) {
+        if (getChildrenOnce(categoryId).isNotEmpty()) {
+            throw Exception("Category has subcategories. Move or remove subcategories first.")
+        }
+        deleteCategoryById(categoryId)
+    }
+
+    /**
      * Insert, rejecting if the resulting depth would exceed MAX_DEPTH.
      */
     @Transaction
@@ -92,6 +104,16 @@ interface CategoryDao {
     @Query("SELECT * FROM categories WHERE parentId = :parentId")
     suspend fun getChildrenOnce(parentId: String): List<CategoryEntity>
 
+    /** Recent categories: the 5 distinct categories most recently assigned to any link. */
+    @Query("""
+        SELECT c.* FROM categories c
+        INNER JOIN link_categories lc ON c.id = lc.categoryId
+        GROUP BY c.id
+        ORDER BY MAX(lc.assignedAt) DESC
+        LIMIT 5
+    """)
+    suspend fun getRecentCategories(): List<CategoryEntity>
+
     // Link relations
 
     @Query("""
@@ -106,6 +128,10 @@ interface CategoryDao {
 
     @Query("DELETE FROM link_categories WHERE linkId = :linkId")
     suspend fun removeLinkCategory(linkId: String)
+
+    /** Clear the category of a link (makes it uncategorized). */
+    @Transaction
+    suspend fun clearLinkCategory(linkId: String) = removeLinkCategory(linkId)
 
     @Query("DELETE FROM link_categories WHERE categoryId = :categoryId")
     suspend fun removeLinksFromCategory(categoryId: String)

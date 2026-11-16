@@ -31,6 +31,9 @@ class RoomCategoryRepository(
             val toSave = if (category.id.isEmpty()) category.copy(id = Uuid.random().toString()) else category
             categoryDao.insertCategory(toSave)
             emit(Result.success(toSave))
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+            // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
+            throw e
         } catch (e: Exception) {
             emit(Result.failure(e))
         }
@@ -42,6 +45,9 @@ class RoomCategoryRepository(
                 ?: return@flow emit(Result.failure(Exception("Category not found: $categoryId")))
             categoryDao.updateCategory(category.copy(name = newName, updatedAt = System.currentTimeMillis()))
             emit(Result.success(Unit))
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+            // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
+            throw e
         } catch (e: Exception) {
             emit(Result.failure(e))
         }
@@ -51,6 +57,9 @@ class RoomCategoryRepository(
         try {
             categoryDao.moveCategory(categoryId, newParentId)
             emit(Result.success(Unit))
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+            // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
+            throw e
         } catch (e: Exception) {
             emit(Result.failure(e))
         }
@@ -58,16 +67,23 @@ class RoomCategoryRepository(
 
     override suspend fun deleteCategory(categoryId: String): Flow<Result<Unit>> = flow {
         try {
-            categoryDao.deleteCategoryById(categoryId)
+            categoryDao.deleteCategoryLeafOnly(categoryId)
             emit(Result.success(Unit))
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+            // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
+            throw e
         } catch (e: Exception) {
             emit(Result.failure(e))
         }
     }
 
+
     override suspend fun getCategoryForLink(linkId: String): Flow<Result<CategoryEntity?>> = flow {
         try {
             emit(Result.success(categoryDao.getCategoryForLink(linkId)))
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+            // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
+            throw e
         } catch (e: Exception) {
             emit(Result.failure(e))
         }
@@ -77,6 +93,32 @@ class RoomCategoryRepository(
         try {
             categoryDao.assignLinkToCategory(LinkCategoryEntity(linkId = linkId, categoryId = categoryId))
             emit(Result.success(Unit))
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+            // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
+            throw e
+        } catch (e: Exception) {
+            emit(Result.failure(e))
+        }
+    }
+
+    override suspend fun clearLinkCategory(linkId: String): Flow<Result<Unit>> = flow {
+        try {
+            categoryDao.clearLinkCategory(linkId)
+            emit(Result.success(Unit))
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+            // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
+            throw e
+        } catch (e: Exception) {
+            emit(Result.failure(e))
+        }
+    }
+
+    override suspend fun getRecentCategories(): Flow<Result<List<CategoryEntity>>> = flow {
+        try {
+            emit(Result.success(categoryDao.getRecentCategories()))
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+            // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
+            throw e
         } catch (e: Exception) {
             emit(Result.failure(e))
         }
