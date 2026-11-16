@@ -85,4 +85,51 @@ class CategoryDaoTest {
         // REPLACE on unique linkId: last assignment wins
         assertTrue(category?.id == "c2")
     }
+
+    @Test
+    fun recentCategoriesAreTheFiveMostRecentlyAssigned() = runTest {
+        val dao = db.categoryDao()
+        (1..6).forEach { insert("c$it") }
+        (1..6).forEach { i ->
+            db.linkDao().insertLink(
+                com.greenrobotdev.linklibrary.database.room.LinkEntity(
+                    id = "l$i", title = "t", url = "https://example.com/$i", description = "", isFavorite = false
+                )
+            )
+        }
+        // assign in ascending time order: c6 is the most recent
+        (1..6).forEach { i ->
+            dao.assignLinkToCategory(
+                com.greenrobotdev.linklibrary.database.room.LinkCategoryEntity(
+                    linkId = "l$i", categoryId = "c$i", assignedAt = i.toLong()
+                )
+            )
+        }
+        val recent = dao.getRecentCategories()
+        assertEquals(listOf("c6", "c5", "c4", "c3", "c2"), recent.map { it.id })
+    }
+
+    @Test
+    fun clearLinkCategoryMakesItUncategorized() = runTest {
+        val dao = db.categoryDao()
+        insert("c1")
+        db.linkDao().insertLink(
+            com.greenrobotdev.linklibrary.database.room.LinkEntity(
+                id = "link", title = "t", url = "https://example.com", description = "", isFavorite = false
+            )
+        )
+        dao.assignLinkToCategory(
+            com.greenrobotdev.linklibrary.database.room.LinkCategoryEntity(linkId = "link", categoryId = "c1")
+        )
+        dao.clearLinkCategory("link")
+        assertTrue(dao.getCategoryForLink("link") == null)
+    }
+
+    @Test
+    fun deleteRejectsCategoryWithSubcategories() = runTest {
+        insert("p"); insert("c", "p")
+        assertFailsWith<Exception> { db.categoryDao().deleteCategoryLeafOnly("p") }
+        db.categoryDao().deleteCategoryLeafOnly("c")
+        db.categoryDao().deleteCategoryLeafOnly("p")
+    }
 }
