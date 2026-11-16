@@ -11,15 +11,33 @@ import com.greenrobotdev.linklibrary.bookmarks.model.toCategory
 import com.greenrobotdev.linklibrary.bookmarks.model.toEntity
 import com.greenrobotdev.linklibrary.database.repository.CategoryRepository
 import com.greenrobotdev.linklibrary.utils.MoleculeViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+
+/** Undo window for a swiped category (ms). */
+const val DELETE_UNDO_MS = 5_000L
+
+/** Internal: undo timer expired → the soft delete becomes the real DB write. */
+private data class CommitDelete(
+    val categoryId: String,
+    val choice: ParentDeleteChoiceKind,
+) : CategoryPickerEvent
 
 /**
  * Category picker (GRE-44): single selection over the nested tree.
  * "Use this" assigns the link's category and flips [CategoryPickerState.applied];
  * the sheet observes it and closes. Close/back never writes anything.
+ *
+ * Delete flow: Remove (or a swipe start) sets CONFIRM with the target and link count;
+ * SwipeComplete hides the subtree in memory ([CategoryPickerState.categories] filters it)
+ * and starts a [DELETE_UNDO_MS] timer. Only when the timer fires is the DB written, so
+ * UndoDelete is a pure in-memory restore. KEEP_CHILDREN reparents children to the deleted
+ * category's parent; DELETE_ALL cascades to the whole subtree.
  */
 class CategoryPickerViewModel(
     private val linkId: String?,
@@ -28,6 +46,17 @@ class CategoryPickerViewModel(
 
     private val categoryRepository: CategoryRepository by inject()
     private val initialSelection = initialSelection
+
+    // shortcut: if the sheet closes mid-undo-window the delete never commits (row reappears next open),
+    // because viewModelScope is cancelled before onCleared could flush it; acceptable while deletes are re-triggerable
+    private var undoJob: Job? = null
+
+    init {
+        // Keep-alive: SharingStarted.Lazily stops (and molecule discards all remember{} state,
+        // incl. expandedIds) whenever models has zero collectors; a permanent self-collector
+        // prevents the expanded tree collapsing on its own ~5s after the sheet opens.
+        moleculeScope.launch { models.collect {} }
+    }
 
     @Composable
     override fun models(events: Flow<CategoryPickerEvent>): CategoryPickerState {
@@ -44,12 +73,12 @@ class CategoryPickerViewModel(
                                 ?: linkId?.let { id -> categoryRepository.getCategoryForLink(id).first().getOrNull()?.id }
                             state.copy(
                                 isLoading = false,
-                                categories = categories,
+                                allCategories = categories,
                                 selectedCategoryId = selected,
                                 expandedIds = selected?.let { ancestorsOf(it, categories).toSet() } ?: emptySet(),
                             )
                         } else {
-                            state.copy(categories = categories)
+                            state.copy(allCategories = categories) // categories getter re-filters the pending subtree
                         }
                     },
                     onFailure = { state = state.copy(isLoading = false, error = it.message) }
@@ -72,7 +101,7 @@ class CategoryPickerViewModel(
                         } else {
                             state.copy(
                                 selectedCategoryId = id,
-                                expandedIds = state.expandedIds + ancestorsOf(id, state.categories),
+                                expandedIds = state.expandedIds + ancestorsOf(id, state.allCategories),
                             )
                         }
                     }
@@ -80,7 +109,6 @@ class CategoryPickerViewModel(
                     is CategoryPickerEvent.Search -> state = state.copy(query = event.query)
 
                     is CategoryPickerEvent.ToggleExpand -> {
-                        println("LLDBG toggle ${event.categoryId} was=${state.expandedIds}") // TEMP debug
                         val id = event.categoryId
                         state = state.copy(
                             expandedIds = if (id in state.expandedIds) state.expandedIds - id else state.expandedIds + id
@@ -90,8 +118,8 @@ class CategoryPickerViewModel(
                     CategoryPickerEvent.CreateFromSearch -> {
                         val name = state.query.trim()
                         val parent = state.selectedCategoryId
-                        val error = validateCategoryName(name, parent, state.categories)
-                            ?: if (!canAddChildUnder(parent, state.categories))
+                        val error = validateCategoryName(name, parent, state.allCategories)
+                            ?: if (!canAddChildUnder(parent, state.allCategories))
                                 "Categories can be up to $MAX_CATEGORY_DEPTH levels deep" else null
                         if (error != null) {
                             state = state.copy(error = error)
@@ -121,19 +149,20 @@ class CategoryPickerViewModel(
 
                     CategoryPickerEvent.Rename -> {
                         val id = state.selectedCategoryId ?: return@collect
-                        val name = state.categories.firstOrNull { it.id == id }?.name ?: return@collect
+                        val name = state.allCategories.firstOrNull { it.id == id }?.name ?: return@collect
                         state = state.copy(dialog = CategoryPickerDialog(
                             CategoryPickerDialog.Kind.RENAME, id, initialName = name
                         ))
                     }
 
-                    is CategoryPickerEvent.DialogName -> {                        val dialog = state.dialog ?: return@collect
+                    is CategoryPickerEvent.DialogName -> {
+                        val dialog = state.dialog ?: return@collect
                         val name = event.name.trim()
                         when (dialog.kind) {
                             CategoryPickerDialog.Kind.ADD_SUB -> {
                                 val parent = dialog.categoryId
-                                val error = validateCategoryName(name, parent, state.categories)
-                                    ?: if (!canAddChildUnder(parent, state.categories))
+                                val error = validateCategoryName(name, parent, state.allCategories)
+                                    ?: if (!canAddChildUnder(parent, state.allCategories))
                                         "Categories can be up to $MAX_CATEGORY_DEPTH levels deep" else null
                                 if (error != null) {
                                     state = state.copy(error = error)
@@ -154,12 +183,12 @@ class CategoryPickerViewModel(
 
                             CategoryPickerDialog.Kind.RENAME -> {
                                 val id = dialog.categoryId ?: return@collect
-                                val category = state.categories.firstOrNull { it.id == id }
+                                val category = state.allCategories.firstOrNull { it.id == id }
                                 if (category == null) {
                                     state = state.copy(dialog = null)
                                 } else {
                                     val error = validateCategoryName(
-                                        name, category.parentId, state.categories, excludeId = category.id
+                                        name, category.parentId, state.allCategories, excludeId = category.id
                                     )
                                     if (error != null) {
                                         state = state.copy(error = error)
@@ -177,35 +206,57 @@ class CategoryPickerViewModel(
                     }
 
                     CategoryPickerEvent.Remove -> {
-                        val id = state.selectedCategoryId ?: return@collect
-                        state.categories.firstOrNull { it.id == id } ?: return@collect
-                        state = state.copy(dialog = CategoryPickerDialog(
-                            CategoryPickerDialog.Kind.CONFIRM_REMOVE, id
-                        ))
+                        val category = state.selected ?: return@collect
+                        val hasChildren = state.allCategories.any { it.parentId == category.id }
+                        state = state.copy(
+                            dialog = null,
+                            deletePhase = DeletePhase.CONFIRM,
+                            deletingCategory = category,
+                            deletedLinkCount = category.count,
+                            // no children → the parent-choice card never applies; DELETE_ALL of a leaf == plain delete
+                            parentDeleteChoice = if (hasChildren) null else ParentDeleteChoiceKind.DELETE_ALL,
+                        )
+                    }
+
+                    CategoryPickerEvent.SwipeComplete -> {
+                        val category = state.deletingCategory ?: return@collect
+                        undoJob?.cancel()
+                        undoJob = moleculeScope.launch {
+                            delay(DELETE_UNDO_MS)
+                            take(CommitDelete(category.id, state.parentDeleteChoice ?: ParentDeleteChoiceKind.KEEP_CHILDREN))
+                        }
+                        state = state.copy(deletePhase = DeletePhase.UNDO)
+                    }
+
+                    CategoryPickerEvent.UndoDelete -> {
+                        undoJob?.cancel(); undoJob = null
+                        // rows were only hidden by the categories getter; dropping the delete state restores them
+                        state = state.copy(
+                            deletePhase = DeletePhase.NONE,
+                            deletingCategory = null,
+                            deletedLinkCount = 0,
+                            parentDeleteChoice = null,
+                        )
+                    }
+
+                    is CategoryPickerEvent.ParentDeleteChoice -> {
+                        state = state.copy(parentDeleteChoice = event.choice)
                     }
 
                     CategoryPickerEvent.ConfirmRemove -> {
-                        val dialog = state.dialog ?: return@collect
-                        val id = dialog.categoryId ?: return@collect
-                        val hasChildren = state.categories.any { it.parentId == id }
-                        if (hasChildren) {
-                            state = state.copy(dialog = null, error = "Move or remove subcategories first.")
-                        } else {
-                            categoryRepository.deleteCategory(id).first().fold(
-                                onSuccess = {
-                                    state = if (state.selectedCategoryId == id) {
-                                        state.copy(dialog = null, selectedCategoryId = null)
-                                    } else {
-                                        state.copy(dialog = null)
-                                    }
-                                },
-                                onFailure = { state = state.copy(dialog = null, error = it.message ?: "Could not remove") }
-                            )
-                        }
+                        val category = state.deletingCategory ?: return@collect
+                        undoJob?.cancel(); undoJob = null
+                        val failure = performDelete(category.id, state.parentDeleteChoice ?: ParentDeleteChoiceKind.KEEP_CHILDREN)
+                        state = resetDeleteState(state, failure)
+                    }
+
+                    is CommitDelete -> {
+                        undoJob = null
+                        val failure = performDelete(event.categoryId, event.choice)
+                        state = resetDeleteState(state, failure)
                     }
 
                     CategoryPickerEvent.CancelDialog -> state = state.copy(dialog = null)
-
                     CategoryPickerEvent.UseThis -> {
                         val linkId = linkId
                         if (linkId == null) {
@@ -234,6 +285,33 @@ class CategoryPickerViewModel(
         }
 
         return state
+    }
+
+    /**
+     * The real DB write (undo timer expiry or confirm-card Delete). On success the tree flow
+     * re-emits without the row and the selection falls back handled in [resetDeleteState]'s caller.
+     */
+    private suspend fun performDelete(categoryId: String, choice: ParentDeleteChoiceKind): String? {
+        val result = when (choice) {
+            ParentDeleteChoiceKind.DELETE_ALL -> categoryRepository.deleteCategoryTree(categoryId).first()
+            ParentDeleteChoiceKind.KEEP_CHILDREN -> categoryRepository.deleteCategoryKeepChildren(categoryId).first()
+        }
+        // null = done; a message means the delete failed and the tree flow will re-show the row
+        return result.exceptionOrNull()?.message ?: "Could not delete".takeIf { result.isFailure }
+    }
+
+    /** Clear delete state; on success the selection falls to the deleted category's parent (or null). */
+    private fun resetDeleteState(state: CategoryPickerState, failure: String? = null): CategoryPickerState {
+        val deleted = state.deletingCategory
+        return state.copy(
+            deletePhase = DeletePhase.NONE,
+            deletingCategory = null,
+            deletedLinkCount = 0,
+            parentDeleteChoice = null,
+            error = failure ?: state.error,
+            selectedCategoryId = if (failure != null || deleted == null) state.selectedCategoryId
+            else if (state.selectedCategoryId == deleted.id) deleted.parentId else state.selectedCategoryId,
+        )
     }
 
     override fun initialValue(): CategoryPickerState = CategoryPickerState()
