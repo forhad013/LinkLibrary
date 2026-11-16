@@ -6,10 +6,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
-import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryTabScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.manage.ManageScreen
-import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreenEnhanced
 import com.greenrobotdev.linklibrary.screens.root.TabNavigator
 import com.greenrobotdev.linklibrary.screens.root.rememberTabNavigationState
 import com.greenrobotdev.linklibrary.screens.root.toEntries
@@ -32,38 +30,12 @@ fun OrganizeTabNavigation() {
                     // Library tab base (design: library_categories_amp_tags)
                     is OrganizeNavRoutes.OrganizeBase -> LibraryTabScreen(
                         onManage = { tabNavigator.navigate(OrganizeNavRoutes.Manage) },
-                        onCategoryClick = { categoryId ->
-                            tabNavigator.navigate(OrganizeNavRoutes.CategoryDetail(categoryId))
-                        }
+                        // No category detail screen yet; a leaf category opens Manage
+                        onCategoryClick = { tabNavigator.navigate(OrganizeNavRoutes.Manage) }
                     )
 
                     // Manage categories and tags
                     is OrganizeNavRoutes.Manage -> ManageScreen(
-                        onBack = { tabNavigator.goBack() }
-                    )
-
-                    // Old CategoriesScreen ignored the id; categories are managed in Manage now
-                    is OrganizeNavRoutes.CategoryDetail -> ManageScreen(
-                        onBack = { tabNavigator.goBack() }
-                    )
-
-                    // Tag Detail Screen
-                    is OrganizeNavRoutes.TagDetail -> TagsScreenEnhanced(
-                        routeKey = route,
-                        onBack = { tabNavigator.goBack() },
-                        onCreateTag = {
-                            tabNavigator.navigate(OrganizeNavRoutes.TagEdit(null))
-                        }
-                    )
-
-                    // Tag Edit Screen
-                    is OrganizeNavRoutes.TagEdit -> AddTagScreen(
-                        routeKey = route,
-                        onBack = { tabNavigator.goBack() }
-                    )
-
-                    // Bulk Organize Screen
-                    is OrganizeNavRoutes.BulkOrganize -> ManageScreen(
                         onBack = { tabNavigator.goBack() }
                     )
 

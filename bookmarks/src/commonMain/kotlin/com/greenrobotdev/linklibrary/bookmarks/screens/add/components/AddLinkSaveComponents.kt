@@ -22,12 +22,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -68,15 +68,28 @@ internal fun SaveHeader(onClose: () -> Unit, modifier: Modifier = Modifier) {
                 .clickable(role = Role.Button, onClick = onClose),
             contentAlignment = Alignment.Center,
         ) {
-            AppIcon(Icons.Filled.Close, contentDescription = "Close", color = MaterialTheme.colorScheme.onSurface)
+            AppIcon(
+                Icons.Filled.Close,
+                contentDescription = "Close",
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }
 
 @Composable
 internal fun LinkKeptLine(modifier: Modifier = Modifier) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        AppIcon(Icons.Filled.Check, contentDescription = null, color = LordsExtraColors.success, modifier = Modifier.size(18.dp))
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        AppIcon(
+            Icons.Filled.Check,
+            contentDescription = null,
+            color = LordsExtraColors.success,
+            modifier = Modifier.size(18.dp)
+        )
         Text(
             "Link kept. Details are optional.",
             style = MaterialTheme.typography.bodyMedium,
@@ -154,7 +167,11 @@ internal fun LinkPreviewCard(
 
 /** Outlined field: folder icon, "Category (optional)" over the selected path, chevron. Opens the picker. */
 @Composable
-internal fun CategoryField(selectedPath: String?, onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun CategoryField(
+    selectedPath: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -166,7 +183,11 @@ internal fun CategoryField(selectedPath: String?, onClick: () -> Unit, modifier:
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        AppIcon(Icons.Outlined.Folder, contentDescription = null, color = MaterialTheme.colorScheme.onSurface)
+        AppIcon(
+            Icons.Outlined.Folder,
+            contentDescription = null,
+            color = MaterialTheme.colorScheme.onSurface
+        )
         Column(Modifier.weight(1f)) {
             Text(
                 "Category (optional)",
@@ -182,13 +203,22 @@ internal fun CategoryField(selectedPath: String?, onClick: () -> Unit, modifier:
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        AppIcon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, color = MaterialTheme.colorScheme.onSurface)
+        AppIcon(
+            Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 
 /** Pill chip: filled primary when selected, outlined otherwise. */
 @Composable
-internal fun ChoiceChip(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun ChoiceChip(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val shape = CircleShape
     Text(
         text,
@@ -269,7 +299,11 @@ internal fun SelectedTagChip(name: String, onRemove: () -> Unit) {
 @Composable
 internal fun TagInput(onAdd: (String) -> Unit, modifier: Modifier = Modifier) {
     var text by remember { mutableStateOf("") }
-    val submit = { if (text.isNotBlank()) { onAdd(text); text = "" } }
+    val submit = {
+        if (text.isNotBlank()) {
+            onAdd(text); text = ""
+        }
+    }
     Box(
         modifier = modifier
             .widthIn(min = 200.dp)
@@ -281,7 +315,11 @@ internal fun TagInput(onAdd: (String) -> Unit, modifier: Modifier = Modifier) {
         BasicTextField(
             value = text,
             // Enter/comma also commit, for hardware keyboards
-            onValueChange = { v -> if (v.endsWith("\n") || v.endsWith(",")) { text = v.dropLast(1); submit() } else text = v },
+            onValueChange = { v ->
+                if (v.endsWith("\n") || v.endsWith(",")) {
+                    text = v.dropLast(1); submit()
+                } else text = v
+            },
             singleLine = true,
             textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
@@ -314,7 +352,11 @@ internal fun SectionTitle(text: String, modifier: Modifier = Modifier) {
 
 /** Outlined multi-line note box. */
 @Composable
-internal fun NoteField(value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier) {
+internal fun NoteField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
@@ -327,7 +369,11 @@ internal fun NoteField(value: String, onValueChange: (String) -> Unit, modifier:
                 Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+                    .border(
+                        1.dp,
+                        MaterialTheme.colorScheme.outlineVariant,
+                        RoundedCornerShape(16.dp)
+                    )
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(horizontal = 16.dp, vertical = 14.dp)
             ) {
@@ -379,12 +425,24 @@ internal fun SaveActions(
                     if (saveEnabled) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                 )
-                .clickable(role = Role.Button, enabled = saveEnabled && !isSaving, onClick = onSave),
+                .clickable(
+                    role = Role.Button,
+                    enabled = saveEnabled && !isSaving,
+                    onClick = onSave
+                ),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val fg = if (saveEnabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-            AppIcon(Icons.Outlined.BookmarkBorder, contentDescription = null, color = fg, modifier = Modifier.size(20.dp))
+            val fg =
+                if (saveEnabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface.copy(
+                    alpha = 0.38f
+                )
+            AppIcon(
+                Icons.Outlined.BookmarkBorder,
+                contentDescription = null,
+                color = fg,
+                modifier = Modifier.size(20.dp)
+            )
             Text(
                 if (isSaving) "  Saving…" else "  Save",
                 style = MaterialTheme.typography.titleMedium,
