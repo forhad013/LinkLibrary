@@ -3,6 +3,7 @@ package com.greenrobotdev.linklibrary.screens.root
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -103,6 +104,7 @@ fun RootScreen(
             .background(MaterialTheme.colorScheme.primaryContainer)
             // systemBars only (not IME) so the keyboard doesn't push the background content up
             .systemBarsPadding(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             NavigationBar {
                 APP_TABS.forEach { tabDef ->
