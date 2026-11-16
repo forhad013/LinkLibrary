@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen
-import com.greenrobotdev.linklibrary.bookmarks.screens.categories.CategoriesScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryTabScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.manage.ManageScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreenEnhanced
@@ -43,9 +42,8 @@ fun OrganizeTabNavigation() {
                         onBack = { tabNavigator.goBack() }
                     )
 
-                    // Category Detail Screen
-                    is OrganizeNavRoutes.CategoryDetail -> CategoriesScreen(
-                        routeKey = route,
+                    // Old CategoriesScreen ignored the id; categories are managed in Manage now
+                    is OrganizeNavRoutes.CategoryDetail -> ManageScreen(
                         onBack = { tabNavigator.goBack() }
                     )
 
@@ -65,8 +63,7 @@ fun OrganizeTabNavigation() {
                     )
 
                     // Bulk Organize Screen
-                    is OrganizeNavRoutes.BulkOrganize -> CategoriesScreen(
-                        routeKey = route,
+                    is OrganizeNavRoutes.BulkOrganize -> ManageScreen(
                         onBack = { tabNavigator.goBack() }
                     )
 
