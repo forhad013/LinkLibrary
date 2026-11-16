@@ -50,6 +50,7 @@ sealed interface AddLinkEvent {
     data class ToggleTag(val tagId: String) : AddLinkEvent
     data class ToggleCategory(val categoryId: String) : AddLinkEvent
     data class SetCategory(val categoryId: String?) : AddLinkEvent
+    data class SetTags(val tagIds: Set<String>) : AddLinkEvent
     object ClearAllCategories : AddLinkEvent
     // Task-related events
     data class ToggleTask(val isTask: Boolean) : AddLinkEvent

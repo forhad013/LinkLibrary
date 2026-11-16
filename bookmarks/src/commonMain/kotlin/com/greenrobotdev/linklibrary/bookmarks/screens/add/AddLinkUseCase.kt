@@ -217,6 +217,7 @@ fun AddLinkPresenter(
                     }
                     state = state.copy(selectedCategoryIds = newSelectedCategories)
                 }
+                is AddLinkEvent.SetTags -> state = state.copy(selectedTags = event.tagIds)
                 is AddLinkEvent.SetCategory -> {
                     // Single selection mode: set exactly one category (or none)
                     state = state.copy(selectedCategoryIds = if (event.categoryId != null) {

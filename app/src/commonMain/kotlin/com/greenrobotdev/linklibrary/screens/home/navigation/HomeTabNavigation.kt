@@ -41,8 +41,7 @@ fun HomeTabNavigation(
                     is HomeNavRoutes.QuickAdd -> AddLinkScreen(
                         routeKey = route,
                         initialUrl = route.initialUrl,
-                        onBack = { tabNavigator.goBack() },
-                        onAddTag = { /* Navigate to Library tab */ }
+                        onBack = { tabNavigator.goBack() }
                     )
 
                     // Quick Search Screen
