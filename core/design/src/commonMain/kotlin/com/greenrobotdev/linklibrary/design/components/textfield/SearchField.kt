@@ -1,29 +1,27 @@
 package com.greenrobotdev.linklibrary.design.components.textfield
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField as MaterialOutlinedTextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 
-/**
- * Search field component with Material 3 styling
- *
- * Specialized text input field optimized for search functionality with
- * search icon and proper theming. Supports both String and TextFieldValue.
- *
- * @param query Current search query
- * @param onQueryChange Callback invoked when query changes
- * @param modifier Modifier to be applied to the search field
- * @param placeholder Optional placeholder text (defaults to "Search...")
- * @param enabled Whether the field is enabled for input
- * @param singleLine Whether to restrict to single line (default true)
- */
 @Composable
 fun SearchField(
     query: String,
@@ -35,54 +33,64 @@ fun SearchField(
     shape: androidx.compose.ui.graphics.Shape = MaterialTheme.shapes.small,
     containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surfaceContainerHighest
 ) {
-    val colors = TextFieldDefaults.colors(
-        focusedContainerColor = containerColor,
-        unfocusedContainerColor = containerColor,
-        disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.04f),
-        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-        cursorColor = MaterialTheme.colorScheme.primary,
-        focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-        unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-        disabledIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
-    )
-
-    MaterialOutlinedTextField(
-        value = query,
-        onValueChange = onQueryChange,
+    Surface(
         modifier = modifier.fillMaxWidth(),
-        enabled = enabled,
-        readOnly = false,
-        placeholder = {
-            androidx.compose.material3.Text(
-                placeholder,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        },
-        leadingIcon = {
+        shape = shape,
+        color = containerColor,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
             Icon(
                 imageVector = Icons.Filled.Search,
                 contentDescription = "Search",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp),
             )
-        },
-        singleLine = singleLine,
-        colors = colors,
-        shape = shape
-    )
+
+            Box(modifier = Modifier.weight(1f)) {
+                BasicTextField(
+                    value = query,
+                    onValueChange = onQueryChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = enabled,
+                    singleLine = singleLine,
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    decorationBox = { innerTextField ->
+                        if (query.isEmpty()) {
+                            Text(
+                                placeholder,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        innerTextField()
+                    }
+                )
+            }
+
+            if (query.isNotEmpty()) {
+                IconButton(
+                    onClick = { onQueryChange("") },
+                    modifier = Modifier.size(20.dp),
+                ) {
+                    Icon(
+                        Icons.Filled.Cancel,
+                        contentDescription = "Clear",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            }
+        }
+    }
 }
 
-/**
- * Search field with TextFieldValue support for advanced cursor management
- *
- * @param query Current search query as TextFieldValue
- * @param onQueryChange Callback invoked when query changes
- * @param modifier Modifier to be applied to the search field
- * @param placeholder Optional placeholder text (defaults to "Search...")
- * @param enabled Whether the field is enabled for input
- * @param singleLine Whether to restrict to single line (default true)
- */
 @Composable
 fun SearchField(
     query: TextFieldValue,
@@ -91,42 +99,63 @@ fun SearchField(
     placeholder: String = "Search...",
     enabled: Boolean = true,
     singleLine: Boolean = true,
-    shape: androidx.compose.ui.graphics.Shape = MaterialTheme.shapes.small
+    shape: androidx.compose.ui.graphics.Shape = MaterialTheme.shapes.small,
+    containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surfaceContainerHighest
 ) {
-    val colors = TextFieldDefaults.colors(
-        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-        disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.04f),
-        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-        cursorColor = MaterialTheme.colorScheme.primary,
-        focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-        unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-        disabledIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
-    )
-
-    MaterialOutlinedTextField(
-        value = query,
-        onValueChange = onQueryChange,
+    Surface(
         modifier = modifier.fillMaxWidth(),
-        enabled = enabled,
-        readOnly = false,
-        placeholder = {
-            androidx.compose.material3.Text(
-                placeholder,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        },
-        leadingIcon = {
+        shape = shape,
+        color = containerColor,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
             Icon(
                 imageVector = Icons.Filled.Search,
                 contentDescription = "Search",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp),
             )
-        },
-        singleLine = singleLine,
-        colors = colors,
-        shape = shape
-    )
+
+            Box(modifier = Modifier.weight(1f)) {
+                BasicTextField(
+                    value = query,
+                    onValueChange = onQueryChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = enabled,
+                    singleLine = singleLine,
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    decorationBox = { innerTextField ->
+                        if (query.text.isEmpty()) {
+                            Text(
+                                placeholder,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        innerTextField()
+                    }
+                )
+            }
+
+            if (query.text.isNotEmpty()) {
+                IconButton(
+                    onClick = { onQueryChange(TextFieldValue("")) },
+                    modifier = Modifier.size(20.dp),
+                ) {
+                    Icon(
+                        Icons.Filled.Cancel,
+                        contentDescription = "Clear",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            }
+        }
+    }
 }
