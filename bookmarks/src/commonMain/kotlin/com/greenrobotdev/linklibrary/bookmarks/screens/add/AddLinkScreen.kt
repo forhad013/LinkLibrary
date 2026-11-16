@@ -54,8 +54,7 @@ fun AddLinkScreen(
     routeKey: NavKey,
     initialUrl: String?,
     onBack: () -> Unit,
-    onAddTag: () -> Unit,
-    onAddCategory: () -> Unit
+    onAddTag: () -> Unit
 ) {
     // Screen owns the ViewModel and state
     val viewModel: AddLinkViewModel = viewModel<AddLinkViewModel>(key = routeKey.toString()) { AddLinkViewModel(initialUrl) }
@@ -92,7 +91,6 @@ fun AddLinkScreen(
         state = state,
         onEvent = { viewModel.take(it) },
         onAddTag = onAddTag,
-        onAddCategory = onAddCategory,
         onBack = onBack,
         onPickCategory = { pickCategory = true }
     )
@@ -104,7 +102,6 @@ fun AddLinkView(
     state: AddLinkState,
     onEvent: (AddLinkEvent) -> Unit,
     onAddTag: () -> Unit,
-    onAddCategory: () -> Unit,
     onBack: () -> Unit,
     onPickCategory: () -> Unit = {},
     modifier: Modifier = Modifier
@@ -140,7 +137,6 @@ fun AddLinkView(
             onDueTimeChange = { onEvent(AddLinkEvent.SetDueTime(it)) },
             modifier = Modifier.padding(padding),
             onAddTag = onAddTag,
-            onAddCategory = onAddCategory,
             onPickCategory = onPickCategory
         )
     }
@@ -163,7 +159,6 @@ fun AddLinkFormContent(
     onDueTimeChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     onAddTag: () -> Unit = {},
-    onAddCategory: () -> Unit = {},
     onPickCategory: () -> Unit = {}
 ) {
     Column(
@@ -196,7 +191,6 @@ fun AddLinkFormContent(
             onCategoryToggle = { onEvent(AddLinkEvent.ToggleCategory(it)) },
             onTagToggle = { onEvent(AddLinkEvent.ToggleTag(it)) },
             onAddTag = onAddTag,
-            onAddCategory = onAddCategory,
             onPickCategory = onPickCategory,
             isLoading = state.isLoading,
             onClearAllCategories = { onEvent(AddLinkEvent.ClearAllCategories) }

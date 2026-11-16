@@ -44,7 +44,6 @@ import com.greenrobotdev.linklibrary.design.theme.LordsExtraColors
 @Composable
 fun LibraryTabScreen(
     onManage: () -> Unit,
-    onCreateCategory: () -> Unit,
     onCategoryClick: (String) -> Unit,
 ) {
     val viewModel: LibraryTabViewModel = viewModel { LibraryTabViewModel() }
@@ -84,33 +83,50 @@ fun LibraryTabScreen(
         // Smart lists — 2x2 colored tiles
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                    SmartTile("Unopened", "${state.unopenedCount} links", MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary, Modifier.weight(1f))
-                    SmartTile("Favorites", "${state.favoritesCount} links", MaterialTheme.colorScheme.tertiaryContainer, MaterialTheme.colorScheme.onTertiaryContainer, Modifier.weight(1f))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    SmartTile(
+                        "Unopened",
+                        "${state.unopenedCount} links",
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.onPrimary,
+                        Modifier.weight(1f)
+                    )
+                    SmartTile(
+                        "Favorites",
+                        "${state.favoritesCount} links",
+                        MaterialTheme.colorScheme.tertiaryContainer,
+                        MaterialTheme.colorScheme.onTertiaryContainer,
+                        Modifier.weight(1f)
+                    )
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                    SmartTile("Archived", "${state.archivedCount} links", MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Modifier.weight(1f))
-                    SmartTile("Uncategorized", "${state.uncategorizedCount} links", LordsExtraColors.successContainer, LordsExtraColors.onSuccessContainer, Modifier.weight(1f))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    SmartTile(
+                        "Archived",
+                        "${state.archivedCount} links",
+                        MaterialTheme.colorScheme.secondaryContainer,
+                        MaterialTheme.colorScheme.onSecondaryContainer,
+                        Modifier.weight(1f)
+                    )
+                    SmartTile(
+                        "Uncategorized",
+                        "${state.uncategorizedCount} links",
+                        LordsExtraColors.successContainer,
+                        LordsExtraColors.onSuccessContainer,
+                        Modifier.weight(1f)
+                    )
                 }
             }
         }
 
         // Categories header
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Categories", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                Text(
-                    "+ Category",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .clickable(onClick = onCreateCategory)
-                        .padding(4.dp)
-                )
-            }
+            Text("Categories", style = MaterialTheme.typography.titleMedium)
         }
 
         // Category tree card
@@ -187,7 +203,11 @@ private fun CategoryTreeRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { if (children.isNotEmpty()) expanded = !expanded else onCategoryClick(category.id) }
+                .clickable {
+                    if (children.isNotEmpty()) expanded = !expanded else onCategoryClick(
+                        category.id
+                    )
+                }
                 .padding(start = 16.dp + indent, end = 16.dp, top = 12.dp, bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
