@@ -30,6 +30,8 @@ data class AddLinkState(
     val savedLinkId: String? = null,
     /** Opened without a URL (quick add): show a URL field; the link is stored on Save instead. */
     val askForUrl: Boolean = false,
+    /** Epoch ms fixed when the link is first stored; later updates keep it (Feed sorts by it). */
+    val createdAt: Long? = null,
     // Task-related fields
     val isTask: Boolean = false,
     val taskPriority: String = "Medium",

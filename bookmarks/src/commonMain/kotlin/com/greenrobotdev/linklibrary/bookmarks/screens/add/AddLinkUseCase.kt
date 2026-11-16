@@ -20,10 +20,12 @@ import com.greenrobotdev.linklibrary.bookmarks.domain.linkTypeOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import org.koin.compose.koinInject
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
+@OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 @Composable
 fun AddLinkPresenter(
     initialState: AddLinkState,
@@ -80,12 +82,18 @@ fun AddLinkPresenter(
         isFavorite = state.isFavorite,
         type = linkTypeOf(state.url),
         fetchedDescription = state.fetchedMetadata?.description?.takeIf { it.isNotBlank() },
+        createdAt = state.createdAt,
     ).toEntity()
+
+    fun stampCreatedAt() {
+        if (state.createdAt == null) state = state.copy(createdAt = Clock.System.now().toEpochMilliseconds())
+    }
 
     LaunchedEffect(Unit) {
         // "Link kept": store the link before handling any event, so Save/Discard always see savedLinkId
         val url = initialUrl?.trim().orEmpty()
         if (state.savedLinkId == null && isValidLink(url)) {
+            stampCreatedAt()
             linkRepository.addLink(linkFromState(Uuid.random().toString())).first()
                 .onSuccess { state = state.copy(savedLinkId = it.id) }
                 .onFailure { state = state.copy(error = it.message ?: "Could not save link") }
@@ -112,6 +120,7 @@ fun AddLinkPresenter(
                     if (state.url.isNotBlank() && !state.isLoading) {
                         state = state.copy(isLoading = true, error = null)
                         try {
+                            stampCreatedAt()
                             val savedId = state.savedLinkId
                             // must collect: these wrap an eager write whose failure lands in the Result
                             val saved = (if (savedId != null) linkRepository.updateLink(linkFromState(savedId))
