@@ -31,11 +31,13 @@ fun SearchField(
     modifier: Modifier = Modifier,
     placeholder: String = "Search...",
     enabled: Boolean = true,
-    singleLine: Boolean = true
+    singleLine: Boolean = true,
+    shape: androidx.compose.ui.graphics.Shape = MaterialTheme.shapes.small,
+    containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surfaceContainerHighest
 ) {
     val colors = TextFieldDefaults.colors(
-        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        focusedContainerColor = containerColor,
+        unfocusedContainerColor = containerColor,
         disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.04f),
         focusedTextColor = MaterialTheme.colorScheme.onSurface,
         unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
@@ -67,7 +69,7 @@ fun SearchField(
         },
         singleLine = singleLine,
         colors = colors,
-        shape = MaterialTheme.shapes.small
+        shape = shape
     )
 }
 
@@ -88,7 +90,8 @@ fun SearchField(
     modifier: Modifier = Modifier,
     placeholder: String = "Search...",
     enabled: Boolean = true,
-    singleLine: Boolean = true
+    singleLine: Boolean = true,
+    shape: androidx.compose.ui.graphics.Shape = MaterialTheme.shapes.small
 ) {
     val colors = TextFieldDefaults.colors(
         focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -124,6 +127,6 @@ fun SearchField(
         },
         singleLine = singleLine,
         colors = colors,
-        shape = MaterialTheme.shapes.small
+        shape = shape
     )
 }

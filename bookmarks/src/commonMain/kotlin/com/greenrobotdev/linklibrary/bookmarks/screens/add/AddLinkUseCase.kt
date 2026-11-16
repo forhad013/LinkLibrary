@@ -92,10 +92,15 @@ fun AddLinkPresenter(
                                 description = "", // Empty string since we removed the description field
                                 isFavorite = state.isFavorite,
                             )
-                            val result = linkRepository.addLink(link.toEntity())
+                            // must collect: addLink wraps an eager insert whose failure lands in the Result
+                            val saved = linkRepository.addLink(link.toEntity()).first()
+                                .getOrElse { e ->
+                                    state = state.copy(isLoading = false, error = e.message ?: "Failed to add link")
+                                    return@collect
+                                }
 
                             // After successfully adding the link, assign tags and categoryNames
-                            val linkId = link.id
+                            val linkId = saved.id
                             try {
                                 // Assign selected tags
                                 state.selectedTags.forEach { tagId ->
@@ -126,6 +131,9 @@ fun AddLinkPresenter(
                 }
                 is AddLinkEvent.ClearError -> {
                     state = state.copy(error = null)
+                }
+                is AddLinkEvent.Consumed -> {
+                    state = state.copy(success = false)
                 }
                 // Auto-fetch event handlers
                 is AddLinkEvent.FetchMetadata -> {
