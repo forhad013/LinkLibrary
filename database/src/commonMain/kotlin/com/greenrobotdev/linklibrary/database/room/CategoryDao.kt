@@ -52,6 +52,13 @@ interface CategoryDao {
         deleteCategoryById(categoryId)
     }
 
+    /** Reparent all direct children of categoryId to newParentId (delete-with-kept-children). */
+    @Transaction
+    suspend fun moveChildrenTo(categoryId: String, newParentId: String?) {
+        val now = System.currentTimeMillis()
+        getChildrenOnce(categoryId).forEach { updateCategory(it.copy(parentId = newParentId, updatedAt = now)) }
+    }
+
     /**
      * Insert, rejecting if the resulting depth would exceed MAX_DEPTH.
      */

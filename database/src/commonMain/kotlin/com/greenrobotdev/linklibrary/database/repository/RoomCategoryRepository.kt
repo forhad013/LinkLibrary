@@ -77,6 +77,32 @@ class RoomCategoryRepository(
         }
     }
 
+    override suspend fun deleteCategoryKeepChildren(categoryId: String): Flow<Result<Unit>> = flow {
+        try {
+            val category = categoryDao.getCategoryByIdOnce(categoryId)
+                ?: return@flow emit(Result.failure(Exception("Category not found: $categoryId")))
+            categoryDao.moveChildrenTo(categoryId, category.parentId)
+            categoryDao.deleteCategoryById(categoryId)
+            emit(Result.success(Unit))
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emit(Result.failure(e))
+        }
+    }
+
+    override suspend fun deleteCategoryTree(categoryId: String): Flow<Result<Unit>> = flow {
+        try {
+            // categories.parentId FK CASCADE removes descendants; link_categories CASCADE uncategorizes their links
+            categoryDao.deleteCategoryById(categoryId)
+            emit(Result.success(Unit))
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emit(Result.failure(e))
+        }
+    }
+
 
     override suspend fun getCategoryForLink(linkId: String): Flow<Result<CategoryEntity?>> = flow {
         try {
