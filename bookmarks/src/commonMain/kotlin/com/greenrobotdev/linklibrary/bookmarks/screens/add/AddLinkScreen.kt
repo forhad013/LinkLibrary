@@ -41,6 +41,9 @@ import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.SectionTit
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.SelectedTagChip
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.TagInput
 import com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker.CategoryPickerSheet
+import com.greenrobotdev.linklibrary.bookmarks.screens.tagPicker.TagPickerSheet
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.BrowseAllButton
+import androidx.compose.foundation.layout.Row
 import com.greenrobotdev.linklibrary.design.components.feedback.ErrorMessageCard
 import com.greenrobotdev.linklibrary.design.components.textfield.AppTextFieldEnhanced
 
@@ -78,11 +81,21 @@ fun AddLinkScreen(
         )
     }
 
+    var pickTags by remember { mutableStateOf(false) }
+    if (pickTags) {
+        TagPickerSheet(
+            onDismiss = { pickTags = false },
+            initialChecked = state.selectedTags,
+            onApplied = { viewModel.take(AddLinkEvent.SetTags(it)) },
+        )
+    }
+
     AddLinkView(
         state = state,
         onEvent = viewModel::take,
         onClose = onBack,
         onPickCategory = { pickCategory = true },
+        onBrowseTags = { pickTags = true },
     )
 }
 
@@ -93,6 +106,7 @@ fun AddLinkView(
     onEvent: (AddLinkEvent) -> Unit,
     onClose: () -> Unit,
     onPickCategory: () -> Unit,
+    onBrowseTags: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val selectedCategory = state.availableCategories.firstOrNull { it.id in state.selectedCategoryIds }
@@ -156,7 +170,11 @@ fun AddLinkView(
                 }
             }
 
-            SectionTitle("Tags (optional)", Modifier.padding(top = 4.dp))
+            // "All tags" opens the tag picker sheet: search and multi-select when there are many tags
+            Row(Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                SectionTitle("Tags (optional)", Modifier.weight(1f))
+                BrowseAllButton("All tags", onClick = onBrowseTags)
+            }
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
