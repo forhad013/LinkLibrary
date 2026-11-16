@@ -25,6 +25,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.Tag
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -398,8 +400,7 @@ fun OrganizationSection(
     selectedTags: List<String>,
     onCategoryToggle: (String) -> Unit,
     onClearAllCategories: () -> Unit,
-    onTagToggle: (String) -> Unit,
-    onAddTag: () -> Unit,
+    onPickTags: () -> Unit,
     onPickCategory: () -> Unit = {},
     isLoading: Boolean,
     modifier: Modifier = Modifier
@@ -417,19 +418,28 @@ fun OrganizationSection(
             onClick = onPickCategory,
         )
 
-        // Tags Section
-        TagsSection(
-            availableTags = availableTags,
-            selectedTags = selectedTags,
-            onTagToggle = onTagToggle,
-            onAddTag = onAddTag
+        // Tags: the field opens the tag picker sheet (multi-select)
+        CategoryField(
+            selectedName = availableTags.filter { it.id in selectedTags }
+                .joinToString(", ") { it.name }.ifEmpty { null },
+            onClick = onPickTags,
+            label = "Tags (optional)",
+            emptyText = "No tags",
+            icon = Icons.Default.Tag,
         )
     }
 }
 
 /** Tappable category field for the Organization card; opens the category picker sheet. */
 @Composable
-internal fun CategoryField(selectedName: String?, onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun CategoryField(
+    selectedName: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    label: String = "Category (optional)",
+    emptyText: String = "No category",
+    icon: ImageVector = Icons.Default.Folder,
+) {
     Surface(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
@@ -442,98 +452,23 @@ internal fun CategoryField(selectedName: String?, onClick: () -> Unit, modifier:
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Icon(
-                Icons.Default.Folder,
+                icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
             )
             Column(Modifier.weight(1f)) {
                 Text(
-                    "Category (optional)",
+                    label,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    selectedName ?: "No category",
+                    selectedName ?: emptyText,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = if (selectedName != null) FontWeight.Medium else FontWeight.Normal,
                     color = if (selectedName != null) MaterialTheme.colorScheme.onSurface
                     else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-            }
-        }
-    }
-}
-
-/**
- * TagsSection - Tags display using standardized SelectionPill components
- *
- * Features:
- * - Material 3 Expressive styling using SelectionPill from design module
- * - Consistent pill appearance and behavior
- * - Proper selection states with visual feedback
- * - Add new tag functionality with AddPill component
- */
-@Composable
-private fun TagsSection(
-    availableTags: List<Tag>,
-    selectedTags: List<String>,
-    onTagToggle: (String) -> Unit,
-    onAddTag: () -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = "Tags",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        when {
-            // Empty state - no tags available
-            availableTags.isEmpty() -> {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextButton(
-                        onClick = onAddTag,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            "Create your first tag",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-            }
-
-            // Show tags as standardized pill-shaped buttons
-            else -> {
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    availableTags.forEach { tag ->
-                        val isSelected = selectedTags.contains(tag.id)
-
-                        SelectionPill(
-                            selected = isSelected,
-                            onClick = { onTagToggle(tag.id) },
-                            text = tag.name,
-                            selectedIcon = Icons.Default.Schedule
-                        )
-                    }
-
-                    // Add New Tag button
-                    AddPill(
-                        onClick = onAddTag,
-                        text = "New Tag"
-                    )
-                }
             }
         }
     }
