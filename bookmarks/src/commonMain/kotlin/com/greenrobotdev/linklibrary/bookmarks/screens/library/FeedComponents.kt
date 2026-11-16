@@ -1,0 +1,248 @@
+package com.greenrobotdev.linklibrary.bookmarks.screens.library
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Article
+import androidx.compose.material.icons.automirrored.outlined.Sort
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.greenrobotdev.linklibrary.bookmarks.domain.hostOf
+import com.greenrobotdev.linklibrary.bookmarks.model.Link
+import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
+import com.greenrobotdev.linklibrary.design.theme.LordsExtraColors
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+
+// Feed pieces (design: Feed)
+
+/** "Lords of Links" / "Your saves" header with the Newest/Oldest sort pill. */
+@Composable
+internal fun FeedHeader(newestFirst: Boolean, onToggleSort: () -> Unit, modifier: Modifier = Modifier) {
+    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                "Lords of Links",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text("Your saves", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.ExtraBold)
+        }
+        Row(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .clickable(role = Role.Button, onClickLabel = "Change sort order", onClick = onToggleSort)
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            AppIcon(Icons.AutoMirrored.Outlined.Sort, contentDescription = null, color = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(18.dp))
+            Text(
+                if (newestFirst) "Newest" else "Oldest",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+        }
+    }
+}
+
+/** Secondary filter button (Category / Tags / Show archived): outlined, filled when active. */
+@Composable
+internal fun FeedFilterButton(
+    text: String,
+    icon: ImageVector?,
+    active: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val shape = RoundedCornerShape(10.dp)
+    val fg = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+    Row(
+        modifier = modifier
+            .clip(shape)
+            .then(
+                if (active) Modifier.background(MaterialTheme.colorScheme.primaryContainer)
+                else Modifier.background(MaterialTheme.colorScheme.surface).border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape)
+            )
+            .clickable(role = Role.Button, onClick = onClick)
+            .heightIn(min = 36.dp)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        icon?.let { AppIcon(it, contentDescription = null, color = fg, modifier = Modifier.size(18.dp)) }
+        Text(
+            text,
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+            color = fg,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+/**
+ * One saved link. Tapping the card opens the link; ⓘ opens its details.
+ * A link whose title was never fetched shows its URL and "No preview yet".
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+internal fun FeedLinkCard(
+    link: Link,
+    categoryPath: String?,
+    onOpen: () -> Unit,
+    onDetails: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val host = hostOf(link.url)
+    val noPreview = link.title.isBlank() || link.title == link.url
+    val typeLabel = link.type.replaceFirstChar { it.uppercaseChar() }
+    val meta = buildList {
+        add(if (noPreview) host else "$typeLabel · $host")
+        if (noPreview) add("No preview yet")
+        relativeDay(link.createdAt)?.let(::add)
+    }.joinToString(" · ")
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable(onClickLabel = "Open link", onClick = onOpen)
+            .padding(start = 14.dp, top = 14.dp, bottom = 14.dp, end = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TypeThumb(type = if (noPreview) "none" else link.type)
+
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                if (!link.isOpened) {
+                    Box(Modifier.size(8.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary))
+                }
+                Text(
+                    meta,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+                if (link.isFavorite) {
+                    AppIcon(Icons.Filled.Star, contentDescription = "Favorite", color = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(14.dp))
+                }
+            }
+            Text(
+                if (noPreview) link.url else link.title,
+                style = if (noPreview) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (categoryPath != null || link.tags.isNotEmpty()) {
+                FlowRow(
+                    modifier = Modifier.padding(top = 2.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    categoryPath?.let {
+                        MetaChip(it, MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer)
+                    }
+                    link.tags.forEach {
+                        MetaChip("#$it", MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .clickable(role = Role.Button, onClick = onDetails),
+            contentAlignment = Alignment.Center,
+        ) {
+            AppIcon(Icons.Outlined.Info, contentDescription = "Details", color = MaterialTheme.colorScheme.onSurface)
+        }
+    }
+}
+
+@Composable
+private fun TypeThumb(type: String) {
+    data class Look(val shape: Shape, val bg: Color, val fg: Color, val icon: ImageVector)
+    val look = when (type) {
+        "video" -> Look(RoundedCornerShape(18.dp), LordsExtraColors.mediaPlaceholder, MaterialTheme.colorScheme.secondary, Icons.Filled.PlayArrow)
+        "social" -> Look(CircleShape, MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Icons.Outlined.ChatBubbleOutline)
+        "article" -> Look(RoundedCornerShape(18.dp), MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer, Icons.AutoMirrored.Outlined.Article)
+        else -> Look(RoundedCornerShape(18.dp), MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Filled.Link)
+    }
+    Box(
+        modifier = Modifier.size(72.dp).clip(look.shape).background(look.bg),
+        contentAlignment = Alignment.Center,
+    ) {
+        AppIcon(look.icon, contentDescription = null, color = look.fg)
+    }
+}
+
+@Composable
+private fun MetaChip(text: String, bg: Color, fg: Color) {
+    Text(
+        text,
+        style = MaterialTheme.typography.labelMedium,
+        fontWeight = FontWeight.Bold,
+        color = fg,
+        maxLines = 1,
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(bg)
+            .padding(horizontal = 8.dp, vertical = 3.dp),
+    )
+}
+
+/** "Today", "Yesterday", "3 days ago", "2 weeks ago", "4 months ago"; null when unknown. */
+@OptIn(ExperimentalTime::class)
+internal fun relativeDay(epochMs: Long?, nowMs: Long = Clock.System.now().toEpochMilliseconds()): String? {
+    if (epochMs == null || epochMs <= 0L) return null
+    val days = (nowMs - epochMs).coerceAtLeast(0) / 86_400_000L
+    return when {
+        days == 0L -> "Today"
+        days == 1L -> "Yesterday"
+        days < 7L -> "$days days ago"
+        days < 30L -> "${days / 7} week${if (days / 7 > 1) "s" else ""} ago"
+        else -> "${days / 30} month${if (days / 30 > 1) "s" else ""} ago"
+    }
+}
