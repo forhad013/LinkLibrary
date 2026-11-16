@@ -20,6 +20,8 @@ interface CategoryRepository {
     suspend fun assignLinkToCategory(linkId: String, categoryId: String): Flow<Result<Unit>>
     suspend fun clearLinkCategory(linkId: String): Flow<Result<Unit>>
     suspend fun getRecentCategories(): Flow<Result<List<CategoryEntity>>>
+    /** linkId → categoryId for every categorized link; re-emits on change. */
+    fun getLinkCategoryIds(): Flow<Result<Map<String, String>>>
     suspend fun getCategoriesWithCounts(): Flow<Result<List<CategoryWithCount>>>
     suspend fun getSmartListCounts(): Flow<Result<CategoryDao.SmartListCounts>>
 }
