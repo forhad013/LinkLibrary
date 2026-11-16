@@ -122,6 +122,7 @@ fun LibraryScreen(
             onDismiss = { pickCategory = false },
             initialSelection = state.categoryId,
             onApplied = { viewModel.take(LibraryEvent.SetCategory(it)) },
+            selectOnly = true,
         )
     }
     if (pickTags) {
@@ -129,6 +130,7 @@ fun LibraryScreen(
             onDismiss = { pickTags = false },
             initialChecked = state.tagIds,
             onApplied = { viewModel.take(LibraryEvent.SetTags(it)) },
+            selectOnly = true,
         )
     }
 

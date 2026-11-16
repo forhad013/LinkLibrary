@@ -56,6 +56,8 @@ internal fun TagPickerContent(
     onEvent: (TagPickerEvent) -> Unit,
     modifier: Modifier = Modifier,
     multiSelect: Boolean = true,
+    /** Filtering: pick tags only. No create, rename or delete; bar is Clear + Apply. */
+    selectOnly: Boolean = false,
 ) {
     val rows = state.visibleTags
     val renaming = state.renamingId?.let { id -> state.tags.firstOrNull { it.id == id } }
@@ -70,7 +72,7 @@ internal fun TagPickerContent(
     val canRename = renameName.isNotBlank() && !renameTaken && renameName.trim() != renaming?.name
     val doRename = { if (canRename) onEvent(TagPickerEvent.SubmitName(renameName.trim())) }
 
-    val showCreateRow = state.query.isNotBlank() && state.tags.none { it.name.equals(state.query.trim(), ignoreCase = true) }
+    val showCreateRow = !selectOnly && state.query.isNotBlank() && state.tags.none { it.name.equals(state.query.trim(), ignoreCase = true) }
 
     val listState = rememberLazyListState()
     LaunchedEffect(state.creating) {
@@ -109,7 +111,7 @@ internal fun TagPickerContent(
                     SelectableRow(
                         text = tag.name,
                         count = tag.count,
-                        selected = !state.isEditing && tag.id == state.focusedId,
+                        selected = !selectOnly && !state.isEditing && tag.id == state.focusedId,
                         onClick = { onEvent(TagPickerEvent.Tap(tag.id)) },
                         isDeleting = isDeleteTarget && state.deletePhase == DeletePhase.CONFIRM,
                         isSwiping = isDeleteTarget && state.deletePhase == DeletePhase.SWIPING,
@@ -135,7 +137,7 @@ internal fun TagPickerContent(
                     )
                 }
             }
-            if (state.query.isBlank()) {
+            if (state.query.isBlank() && !selectOnly) {
                 item(key = "new-tag") {
                     if (state.creating) {
                         InlineTreeField(
@@ -168,6 +170,7 @@ internal fun TagPickerContent(
                     state.deletePhase != DeletePhase.NONE -> "Deleting: "
                     state.creating -> "New tag: "
                     renaming != null -> "Renaming: "
+                    selectOnly -> "Filtering by: "
                     else -> "Selected: "
                 },
                 style = MaterialTheme.typography.bodyMedium,
@@ -178,7 +181,8 @@ internal fun TagPickerContent(
                     state.deletePhase != DeletePhase.NONE -> state.deletingTag?.name ?: ""
                     state.creating -> newName.trim()
                     renaming != null -> renaming.name
-                    multiSelect -> state.allTags.filter { it.id in state.checkedIds }.joinToString(", ") { it.name }.ifEmpty { "No tags" }
+                    multiSelect -> state.allTags.filter { it.id in state.checkedIds }.joinToString(", ") { "#" + it.name }
+                        .ifEmpty { if (selectOnly) "all tags" else "No tags" }
                     else -> state.focused?.name ?: "None"
                 },
                 style = MaterialTheme.typography.bodyMedium,
@@ -220,6 +224,14 @@ internal fun TagPickerContent(
                 AppBarAction(Icons.Filled.Close, "Cancel", { onEvent(TagPickerEvent.CancelEdit) }, enabled = true)
                 AppBarPill("Save name", onClick = doRename, enabled = canRename, modifier = Modifier.weight(1f))
             }
+            selectOnly -> AppActionBar {
+                AppBarAction(
+                    Icons.Filled.Close, "Clear", { onEvent(TagPickerEvent.ClearChecked) },
+                    enabled = state.checkedIds.isNotEmpty(),
+                )
+                val n = state.checkedIds.size
+                AppBarPill(if (n == 0) "Show all" else "Apply ($n)", onClick = { onEvent(TagPickerEvent.Done) }, modifier = Modifier.weight(1f))
+            }
             else -> AppActionBar {
                 val spread = if (multiSelect) Modifier else Modifier.weight(1f)
                 val focused = state.focused != null
@@ -243,6 +255,8 @@ fun TagPickerSheet(
     onDismiss: () -> Unit,
     initialChecked: Set<String>,
     onApplied: (Set<String>) -> Unit,
+    /** Filtering mode: see [TagPickerContent]'s selectOnly. */
+    selectOnly: Boolean = false,
 ) {
     val viewModel = remember { TagPickerViewModel(multiSelect = true, initialChecked = initialChecked) }
     val state by viewModel.models.collectAsState()
@@ -254,7 +268,7 @@ fun TagPickerSheet(
         }
     }
 
-    BaseBottomSheet(title = "Tags", onClose = onDismiss, closeContentDescription = "Close tag picker") {
-        TagPickerContent(state = state, onEvent = viewModel::take, modifier = Modifier.fillMaxWidth().weight(1f))
+    BaseBottomSheet(title = if (selectOnly) "Filter by tags" else "Tags", onClose = onDismiss, closeContentDescription = "Close tag picker") {
+        TagPickerContent(state = state, onEvent = viewModel::take, modifier = Modifier.fillMaxWidth().weight(1f), selectOnly = selectOnly)
     }
 }

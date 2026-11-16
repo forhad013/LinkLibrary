@@ -73,6 +73,8 @@ internal fun CategoryPickerContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     showUseThis: Boolean = true,
+    /** Filtering: pick one category only. No create, rename or delete; bar is Clear + Apply. */
+    selectOnly: Boolean = false,
 ) {
     val rows = if (state.browsing) flattenTree(state.categories, state.expandedIds)
     else searchRows(state.categories, state.query)
@@ -228,7 +230,7 @@ internal fun CategoryPickerContent(
                         disabled = isEditing,
                     )
                 }
-                if (needsCreateRow(state.categories, state.query)) {
+                if (!selectOnly && needsCreateRow(state.categories, state.query)) {
                     item(key = "create") {
                         CreateRow(
                             text = state.query.trim(),
@@ -236,7 +238,7 @@ internal fun CategoryPickerContent(
                         )
                     }
                 }
-                if (rows.isEmpty() && !needsCreateRow(state.categories, state.query)) {
+                if (rows.isEmpty() && (selectOnly || !needsCreateRow(state.categories, state.query))) {
                     item(key = "empty") {
                         Text(
                             "No matching category",
@@ -248,7 +250,7 @@ internal fun CategoryPickerContent(
                 }
             }
 
-            if (state.browsing) {
+            if (state.browsing && !selectOnly) {
                 item(key = "new-top-level") {
                     if (creatingTopLevel) {
                         InlineTreeField(
@@ -283,6 +285,7 @@ internal fun CategoryPickerContent(
                     creatingTopLevel -> "New top-level: "
                     creatingSubOf != null -> "New sub in: "
                     renamingId != null -> "Renaming: "
+                    selectOnly -> "Filtering by: "
                     else -> "Selected: "
                 },
                 style = MaterialTheme.typography.bodyMedium,
@@ -294,7 +297,7 @@ internal fun CategoryPickerContent(
                     creatingTopLevel -> newName.trim()
                     creatingSubOf != null -> subParent?.path(state.categories) ?: ""
                     renamingId != null -> renamingCategory?.path(state.categories) ?: ""
-                    else -> state.selectedPath ?: "No category"
+                    else -> state.selectedPath ?: if (selectOnly) "all categories" else "No category"
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
@@ -348,6 +351,17 @@ internal fun CategoryPickerContent(
             renamingId != null -> AppActionBar {
                 AppBarAction(Icons.Filled.Close, "Cancel", { onEvent(CategoryPickerEvent.CancelDialog) }, enabled = true)
                 AppBarPill("Save name", onClick = doRename, enabled = canRename, modifier = Modifier.weight(1f))
+            }
+            selectOnly -> AppActionBar {
+                AppBarAction(
+                    Icons.Filled.Close, "Clear", { onEvent(CategoryPickerEvent.Select(null)) },
+                    enabled = selected != null,
+                )
+                AppBarPill(
+                    text = if (selected == null) "Show all" else "Apply",
+                    onClick = { onEvent(CategoryPickerEvent.UseThis) },
+                    modifier = Modifier.weight(1f),
+                )
             }
             else -> AppActionBar {
                 // Without the confirm pill (e.g. Manage's embedded tab), spread actions evenly

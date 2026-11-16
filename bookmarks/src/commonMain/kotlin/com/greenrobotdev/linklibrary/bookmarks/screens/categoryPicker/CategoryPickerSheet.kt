@@ -22,6 +22,8 @@ fun CategoryPickerSheet(
     linkId: String? = null,
     initialSelection: String? = null,
     onApplied: (categoryId: String?) -> Unit = {},
+    /** Filtering mode: see [CategoryPickerContent]'s selectOnly. */
+    selectOnly: Boolean = false,
 ) {
     val viewModel = remember { CategoryPickerViewModel(linkId, initialSelection) }
     val state by viewModel.models.collectAsState()
@@ -34,7 +36,7 @@ fun CategoryPickerSheet(
     }
 
     BaseBottomSheet(
-        title = "Category",
+        title = if (selectOnly) "Filter by category" else "Category",
         onClose = onDismiss,
         closeContentDescription = "Close category picker",
     ) {
@@ -43,6 +45,7 @@ fun CategoryPickerSheet(
             onEvent = viewModel::take,
             onBack = onDismiss,
             modifier = Modifier.fillMaxWidth().weight(1f),
+            selectOnly = selectOnly,
         )
     }
 }
