@@ -13,7 +13,10 @@ import com.greenrobotdev.linklibrary.database.repository.TagRepository
 import com.greenrobotdev.linklibrary.bookmarks.model.Link
 import com.greenrobotdev.linklibrary.bookmarks.model.toCategory
 import com.greenrobotdev.linklibrary.bookmarks.model.toEntity
+import com.greenrobotdev.linklibrary.bookmarks.model.Tag
 import com.greenrobotdev.linklibrary.bookmarks.model.toTag
+import com.greenrobotdev.linklibrary.bookmarks.domain.isValidLink
+import com.greenrobotdev.linklibrary.bookmarks.domain.linkTypeOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import org.koin.compose.koinInject
@@ -44,7 +47,7 @@ fun AddLinkPresenter(
     // These flows will continuously listen to database changes
     LaunchedEffect(Unit) {
         // Subscribe to tags changes reactively
-        tagRepository.getTags().collect { result ->
+        tagRepository.getTagsWithCounts().collect { result ->
             val tags = result.getOrElse { emptyList() }.map { it.toTag() }
             state = state.copy(
                 availableTags = tags,
@@ -64,6 +67,29 @@ fun AddLinkPresenter(
         }
     }
     LaunchedEffect(Unit) {
+        categoryRepository.getRecentCategories().first()
+            .onSuccess { rows -> state = state.copy(recentCategories = rows.map { it.toCategory() }) }
+    }
+
+    // Builds the stored row from the form; notes go in description, the page text in fetchedDescription
+    fun linkFromState(id: String) = Link(
+        id = id,
+        title = state.title.ifBlank { extractTitleFromUrl(state.url) },
+        url = state.url.trim(),
+        description = state.notes.orEmpty(),
+        isFavorite = state.isFavorite,
+        type = linkTypeOf(state.url),
+        fetchedDescription = state.fetchedMetadata?.description?.takeIf { it.isNotBlank() },
+    ).toEntity()
+
+    LaunchedEffect(Unit) {
+        // "Link kept": store the link before handling any event, so Save/Discard always see savedLinkId
+        val url = initialUrl?.trim().orEmpty()
+        if (state.savedLinkId == null && isValidLink(url)) {
+            linkRepository.addLink(linkFromState(Uuid.random().toString())).first()
+                .onSuccess { state = state.copy(savedLinkId = it.id) }
+                .onFailure { state = state.copy(error = it.message ?: "Could not save link") }
+        }
         events.collect { event ->
             when (event) {
                 is AddLinkEvent.TitleChanged -> {
@@ -82,18 +108,14 @@ fun AddLinkPresenter(
                     state = state.copy(isFavorite = event.isFavorite)
                 }
                 is AddLinkEvent.Submit -> {
-                    if (state.isFormValid) {
+                    // title may still be blank while fetching; linkFromState falls back to one from the URL
+                    if (state.url.isNotBlank() && !state.isLoading) {
                         state = state.copy(isLoading = true, error = null)
                         try {
-                            val link = Link(
-                                id = Uuid.random().toString(),
-                                title = state.title.ifBlank { state.url },
-                                url = state.url,
-                                description = "", // Empty string since we removed the description field
-                                isFavorite = state.isFavorite,
-                            )
-                            // must collect: addLink wraps an eager insert whose failure lands in the Result
-                            val saved = linkRepository.addLink(link.toEntity()).first()
+                            val savedId = state.savedLinkId
+                            // must collect: these wrap an eager write whose failure lands in the Result
+                            val saved = (if (savedId != null) linkRepository.updateLink(linkFromState(savedId))
+                            else linkRepository.addLink(linkFromState(Uuid.random().toString()))).first()
                                 .getOrElse { e ->
                                     state = state.copy(isLoading = false, error = e.message ?: "Failed to add link")
                                     return@collect
@@ -155,6 +177,8 @@ fun AddLinkPresenter(
                                         title = if (metadata.title.isNotBlank()) metadata.title else autoTitle,
                                         isFormValid = isFormValid(state.url, autoTitle)
                                     )
+                                    // keep the stored link's title/description current even if the user never taps Save
+                                    state.savedLinkId?.let { linkRepository.updateLink(linkFromState(it)).first() }
                                 },
                                 onFailure = { error ->
                                     // Provide fallback title even on failure
@@ -218,6 +242,26 @@ fun AddLinkPresenter(
                     state = state.copy(selectedCategoryIds = newSelectedCategories)
                 }
                 is AddLinkEvent.SetTags -> state = state.copy(selectedTags = event.tagIds)
+                is AddLinkEvent.AddTagByName -> {
+                    val name = event.name.trim().removePrefix("#").trim()
+                    if (name.isNotEmpty()) {
+                        val existing = state.availableTags.firstOrNull { it.name.equals(name, ignoreCase = true) }
+                        if (existing != null) {
+                            state = state.copy(selectedTags = state.selectedTags + existing.id)
+                        } else {
+                            tagRepository.addTag(Tag(id = "", name = name, count = 0).toEntity()).first().fold(
+                                onSuccess = { created -> state = state.copy(selectedTags = state.selectedTags + created.id) },
+                                onFailure = { state = state.copy(error = it.message ?: "Could not create tag") },
+                            )
+                        }
+                    }
+                }
+                is AddLinkEvent.Discard -> {
+                    val id = state.savedLinkId
+                    val failure = id?.let { linkRepository.deleteLink(it).first().exceptionOrNull() }
+                    state = if (failure != null) state.copy(error = failure.message ?: "Could not discard link")
+                    else state.copy(savedLinkId = null, success = true)
+                }
                 is AddLinkEvent.SetCategory -> {
                     // Single selection mode: set exactly one category (or none)
                     state = state.copy(selectedCategoryIds = if (event.categoryId != null) {

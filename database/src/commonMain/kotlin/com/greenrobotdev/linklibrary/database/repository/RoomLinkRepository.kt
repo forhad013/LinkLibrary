@@ -65,6 +65,16 @@ class RoomLinkRepository(
         }
     }
 
+    /** Plain UPDATE: unlike addLink's REPLACE it keeps the link's tag/category rows (FK cascade). */
+    override suspend fun updateLink(link: LinkEntity): Flow<Result<LinkEntity>> {
+        return try {
+            linkDao.updateLink(link)
+            flow { emit(Result.success(link)) }
+        } catch (e: Exception) {
+            flow { emit(Result.failure(e)) }
+        }
+    }
+
     override suspend fun deleteLink(linkId: String): Flow<Result<Unit>> {
         return try {
             linkDao.deleteLinkById(linkId)

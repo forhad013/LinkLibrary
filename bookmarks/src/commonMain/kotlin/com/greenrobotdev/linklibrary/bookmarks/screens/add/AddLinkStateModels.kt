@@ -25,6 +25,11 @@ data class AddLinkState(
     val availableTags: List<Tag> = emptyList(),
     val availableCategories: List<Category> = emptyList(),
     val isLoadingTagsAndCategories: Boolean = false,
+    val recentCategories: List<Category> = emptyList(),
+    /** Set once the link is stored (on open when a URL is given); Save then updates it. */
+    val savedLinkId: String? = null,
+    /** Opened without a URL (quick add): show a URL field; the link is stored on Save instead. */
+    val askForUrl: Boolean = false,
     // Task-related fields
     val isTask: Boolean = false,
     val taskPriority: String = "Medium",
@@ -51,6 +56,10 @@ sealed interface AddLinkEvent {
     data class ToggleCategory(val categoryId: String) : AddLinkEvent
     data class SetCategory(val categoryId: String?) : AddLinkEvent
     data class SetTags(val tagIds: Set<String>) : AddLinkEvent
+    /** Tag input: select the tag with this name, creating it if needed. */
+    data class AddTagByName(val name: String) : AddLinkEvent
+    /** Delete the already-saved link and close. */
+    object Discard : AddLinkEvent
     object ClearAllCategories : AddLinkEvent
     // Task-related events
     data class ToggleTask(val isTask: Boolean) : AddLinkEvent
