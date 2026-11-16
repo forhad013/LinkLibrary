@@ -1,16 +1,18 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,37 +20,34 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.AddLinkTopBar
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.ErrorMessageCard
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.OrganizationSection
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.PersonalNotesSection
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.TaskSection
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.UrlTitleCard
+import com.greenrobotdev.linklibrary.bookmarks.domain.hostOf
+import com.greenrobotdev.linklibrary.bookmarks.domain.linkTypeOf
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.CategoryField
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.ChipRow
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.ChoiceChip
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.LinkKeptLine
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.LinkPreviewCard
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.NoteField
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.SaveActions
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.SaveHeader
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.SectionTitle
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.SelectedTagChip
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.TagInput
 import com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker.CategoryPickerSheet
-import com.greenrobotdev.linklibrary.bookmarks.screens.tagPicker.TagPickerSheet
-import com.greenrobotdev.linklibrary.design.components.form.FixedFormActionsBar
+import com.greenrobotdev.linklibrary.design.components.feedback.ErrorMessageCard
+import com.greenrobotdev.linklibrary.design.components.textfield.AppTextFieldEnhanced
 
 /**
- * Enhanced Add Link Screen - Material 3 Expressive Design
- *
- * Screen-led architecture approach:
- * - Screen owns ViewModel and business logic
- * - Screen handles navigation and side effects
- * - View components are presentational and receive state/callbacks
- *
- * Business Logic Responsibilities:
- * - ViewModel creation and lifecycle management
- * - Navigation effects (success -> back navigation)
- * - Auto-fetch logic based on URL changes
- * - Event flow to ViewModel
- *
- * UI Composition:
- * - AddLinkView: Presentational component with state and callbacks
- * - Individual sections: Reusable UI components
+ * Save screen (design: "Save screen (share sheet and Add link)").
+ * The link is stored as soon as the screen opens ("Link kept"); Save writes the optional
+ * details, Discard deletes the link, close/back keeps it as is.
  */
 @Composable
 fun AddLinkScreen(
@@ -56,11 +55,9 @@ fun AddLinkScreen(
     initialUrl: String?,
     onBack: () -> Unit,
 ) {
-    // Screen owns the ViewModel and state
     val viewModel: AddLinkViewModel = viewModel<AddLinkViewModel>(key = routeKey.toString()) { AddLinkViewModel(initialUrl) }
     val state by viewModel.models.collectAsState()
 
-    // Screen handles navigation effects
     LaunchedEffect(state.success) {
         if (state.success) {
             onBack()
@@ -68,213 +65,129 @@ fun AddLinkScreen(
         }
     }
 
-    // Screen handles business logic (auto-fetch)
     LaunchedEffect(state.url) {
-        if (shouldAutoFetch(state)) {
-            viewModel.take(AddLinkEvent.FetchMetadata)
-        }
+        if (shouldAutoFetch(state)) viewModel.take(AddLinkEvent.FetchMetadata)
     }
 
-    // Screen passes state and event callbacks to presentational view
     var pickCategory by remember { mutableStateOf(false) }
     if (pickCategory) {
         CategoryPickerSheet(
             onDismiss = { pickCategory = false },
             initialSelection = state.selectedCategoryIds.firstOrNull(),
-            onApplied = { categoryId ->
-                viewModel.take(AddLinkEvent.SetCategory(categoryId))
-            },
-        )
-    }
-
-    var pickTags by remember { mutableStateOf(false) }
-    if (pickTags) {
-        TagPickerSheet(
-            onDismiss = { pickTags = false },
-            initialChecked = state.selectedTags,
-            onApplied = { viewModel.take(AddLinkEvent.SetTags(it)) },
+            onApplied = { viewModel.take(AddLinkEvent.SetCategory(it)) },
         )
     }
 
     AddLinkView(
         state = state,
-        onEvent = { viewModel.take(it) },
-        onBack = onBack,
+        onEvent = viewModel::take,
+        onClose = onBack,
         onPickCategory = { pickCategory = true },
-        onPickTags = { pickTags = true },
     )
 }
 
-
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AddLinkView(
     state: AddLinkState,
     onEvent: (AddLinkEvent) -> Unit,
-    onBack: () -> Unit,
-    onPickCategory: () -> Unit = {},
-    onPickTags: () -> Unit = {},
-    modifier: Modifier = Modifier
-) {
-    // Use ViewModel state for task section instead of local state
-    var isTaskEnabled by remember { mutableStateOf(  state.isTask ) }
-
-    val selectedPriority = state.taskPriority
-    val dueTime = state.dueTime
-
-    // Animated container for the form
-    val contentAlpha by animateFloatAsState(
-        targetValue = 1f,
-        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
-        label = "content_alpha"
-    )
-
-    AddLinkFormScaffold(
-        onSaveClick = { onEvent(AddLinkEvent.Submit) },
-        onBackClick = onBack,
-        isFormValid = state.isFormValid,
-        isLoading = state.isLoading,
-        modifier = modifier
-    ) { padding ->
-        AddLinkFormContent(
-            state = state,
-            onEvent = onEvent,
-            isTaskEnabled = isTaskEnabled,
-            onTaskEnabledChange = { onEvent(AddLinkEvent.ToggleTask(it)) },
-            selectedPriority = selectedPriority,
-            onPriorityChange = { onEvent(AddLinkEvent.SetTaskPriority(it)) },
-            dueTime = dueTime,
-            onDueTimeChange = { onEvent(AddLinkEvent.SetDueTime(it)) },
-            modifier = Modifier.padding(padding),
-            onPickCategory = onPickCategory,
-            onPickTags = onPickTags,
-        )
-    }
-}
-
-/**
- * AddLinkFormContent - Main form content layout
- *
- * Orchestrates all the form sections in a scrollable layout
- */
-@Composable
-fun AddLinkFormContent(
-    state: AddLinkState,
-    onEvent: (AddLinkEvent) -> Unit,
-    isTaskEnabled: Boolean,
-    onTaskEnabledChange: (Boolean) -> Unit,
-    selectedPriority: String,
-    onPriorityChange: (String) -> Unit,
-    dueTime: String,
-    onDueTimeChange: (String) -> Unit,
+    onClose: () -> Unit,
+    onPickCategory: () -> Unit,
     modifier: Modifier = Modifier,
-    onPickCategory: () -> Unit = {},
-    onPickTags: () -> Unit = {},
 ) {
+    val selectedCategory = state.availableCategories.firstOrNull { it.id in state.selectedCategoryIds }
+    val selectedTags = state.availableTags.filter { it.id in state.selectedTags }
+    val mostUsed = state.availableTags
+        .filter { it.id !in state.selectedTags }
+        .sortedByDescending { it.count }
+        .take(8)
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .background(MaterialTheme.colorScheme.background)
+            .imePadding()
+            .padding(horizontal = 20.dp),
     ) {
-        // Combined URL and Title Card with enhanced contrast
-        UrlTitleCard(
-            url = state.url,
-            onUrlChange = { onEvent(AddLinkEvent.UrlChanged(it)) },
-            title = state.title,
-            onTitleChange = { onEvent(AddLinkEvent.TitleChanged(it)) },
-            onFetchClick = { onEvent(AddLinkEvent.FetchMetadata) },
-            isFetching = state.isFetching,
-            fetchError = state.fetchError,
-            titleFetched = state.title.isNotEmpty(),
-            urlNotEmpty = state.url.isNotEmpty(),
-            isLoading = state.isLoading
-        )
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(top = 20.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                SaveHeader(onClose = onClose)
+                if (state.savedLinkId != null) LinkKeptLine()
+            }
 
-        // Organization Section
-        OrganizationSection(
-            availableCategories = state.availableCategories,
-            selectedCategoryIds = state.selectedCategoryIds.toList(),
-            availableTags = state.availableTags,
-            selectedTags = state.selectedTags.toList(),
-            onCategoryToggle = { onEvent(AddLinkEvent.ToggleCategory(it)) },
-            onPickTags = onPickTags,
-            onPickCategory = onPickCategory,
-            isLoading = state.isLoading,
-            onClearAllCategories = { onEvent(AddLinkEvent.ClearAllCategories) }
-        )
+            if (state.askForUrl) {
+                // Opened without a URL (e.g. quick add): ask for it; saved on Save instead of on open
+                AppTextFieldEnhanced(
+                    value = state.url,
+                    onValueChange = { onEvent(AddLinkEvent.UrlChanged(it)) },
+                    label = "Link",
+                    placeholder = "https://",
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Done),
+                    openStyle = true,
+                )
+            } else {
+                LinkPreviewCard(
+                    type = linkTypeOf(state.url),
+                    host = hostOf(state.url),
+                    title = state.title,
+                    description = state.fetchedMetadata?.description,
+                    isFetching = state.isFetching,
+                )
+            }
 
-        // Personal Notes Section
-        PersonalNotesSection(
-            notes = state.notes ?: "",
-            onNotesChange = { onEvent(AddLinkEvent.NotesChanged(it)) },
-            isLoading = state.isLoading
-        )
-
-        // Add to Tasks Section
-        TaskSection(
-            isEnabled = isTaskEnabled,
-            onEnabledChange = onTaskEnabledChange,
-            selectedPriority = selectedPriority,
-            onPriorityChange = onPriorityChange,
-            dueTime = dueTime,
-            onDueTimeChange = onDueTimeChange,
-            isLoading = state.isLoading
-        )
-
-        // Error Messages
-        state.error?.let { error ->
-            ErrorMessageCard(
-                error = error,
-                onDismiss = { /* Optional: Add error dismiss logic */ }
+            CategoryField(
+                selectedPath = selectedCategory?.path(state.availableCategories),
+                onClick = onPickCategory,
             )
+            if (state.recentCategories.isNotEmpty()) {
+                ChipRow(state.recentCategories, key = { it.id }) { category ->
+                    val selected = category.id in state.selectedCategoryIds
+                    ChoiceChip(
+                        text = category.path(state.availableCategories),
+                        selected = selected,
+                        onClick = { onEvent(AddLinkEvent.SetCategory(if (selected) null else category.id)) },
+                    )
+                }
+            }
+
+            SectionTitle("Tags (optional)", Modifier.padding(top = 4.dp))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                itemVerticalAlignment = Alignment.CenterVertically,
+            ) {
+                selectedTags.forEach { tag ->
+                    SelectedTagChip(tag.name, onRemove = { onEvent(AddLinkEvent.ToggleTag(tag.id)) })
+                }
+                TagInput(onAdd = { onEvent(AddLinkEvent.AddTagByName(it)) })
+            }
+            if (mostUsed.isNotEmpty()) {
+                ChipRow(mostUsed, key = { it.id }, label = "Most used") { tag ->
+                    ChoiceChip(text = "+ #${tag.name}", selected = false, onClick = { onEvent(AddLinkEvent.ToggleTag(tag.id)) })
+                }
+            }
+
+            SectionTitle("Note (optional)", Modifier.padding(top = 4.dp))
+            NoteField(value = state.notes.orEmpty(), onValueChange = { onEvent(AddLinkEvent.NotesChanged(it)) })
+
+            state.error?.let { ErrorMessageCard(error = it, onDismiss = { onEvent(AddLinkEvent.ClearError) }) }
         }
+
+        SaveActions(
+            onDiscard = { if (state.savedLinkId != null) onEvent(AddLinkEvent.Discard) else onClose() },
+            onSave = { onEvent(AddLinkEvent.Submit) },
+            saveEnabled = state.url.isNotBlank(),
+            isSaving = state.isLoading,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+        )
     }
 }
 
-/**
- * AddLinkFormScaffold - Scaffold with top bar and bottom action bar
- *
- * Provides the standard Material 3 layout for the add link form
- */
-@Composable
-fun AddLinkFormScaffold(
-    onSaveClick: () -> Unit,
-    onBackClick: () -> Unit,
-    isFormValid: Boolean,
-    isLoading: Boolean,
-    modifier: Modifier = Modifier,
-    content: @Composable (PaddingValues) -> Unit
-) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            AddLinkTopBar(
-                onBackClick = onBackClick,
-                onSaveClick = onSaveClick,
-                isFormValid = isFormValid,
-                isLoading = isLoading
-            )
-        },
-        bottomBar = {
-            FixedFormActionsBar(
-                primaryText = "Capture Link",
-                onPrimaryClick = onSaveClick,
-                enabled = isFormValid && !isLoading,
-                isLoading = isLoading
-            )
-        }
-    ) { padding ->
-        content(padding)
-    }
-}
-
-/**
- * Determines if auto-fetch should be triggered based on current state
- */
-private fun shouldAutoFetch(state: AddLinkState): Boolean {
-    return state.url.isNotBlank() &&
-           state.url.startsWith("http") &&
-           !state.isFetching &&
-           state.title.isBlank()
-}
+private fun shouldAutoFetch(state: AddLinkState): Boolean =
+    state.url.isNotBlank() && state.url.startsWith("http") && !state.isFetching && state.title.isBlank()
