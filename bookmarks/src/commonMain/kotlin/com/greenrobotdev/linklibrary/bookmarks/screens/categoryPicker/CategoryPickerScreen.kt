@@ -1,20 +1,28 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -37,25 +45,37 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.semantics.contentDescription
@@ -63,12 +83,15 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.design.components.feedback.ErrorMessageCard
 import com.greenrobotdev.linklibrary.design.components.textfield.AppTextFieldEnhanced
 import com.greenrobotdev.linklibrary.design.components.textfield.SearchField
 import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
+import kotlin.math.roundToInt
 
 /**
  * Category picker as a modal bottom sheet (GRE-44).
@@ -201,6 +224,19 @@ internal fun CategoryPickerContent(
     val canRename = renameName.isNotBlank() && !renameNameTaken && renameName.trim() != (state.dialog?.initialName ?: "")
     val doRename = { if (canRename) onEvent(CategoryPickerEvent.DialogName(renameName.trim())) }
 
+    // Delete flow: which rows are in the danger zone
+    val deletingIds: Set<String> = remember(state.deletingCategory, state.allCategories) {
+        val dc = state.deletingCategory ?: return@remember emptySet()
+        subtreeIds(dc.id, state.allCategories)
+    }
+    val hasChildren = state.deletingCategory?.let { dc ->
+        state.allCategories.any { it.parentId == dc.id }
+    } == true
+    val childNames = remember(state.deletingCategory, state.allCategories) {
+        val dc = state.deletingCategory ?: return@remember emptyList()
+        state.allCategories.filter { it.parentId == dc.id }.map { it.name }
+    }
+
     val pickerItems = if (state.browsing) buildPickerItems(rows, creatingSubOf, renamingId) else emptyList()
     val listState = rememberLazyListState()
     LaunchedEffect(creatingTopLevel) {
@@ -288,16 +324,23 @@ internal fun CategoryPickerContent(
                 }
                 items(pickerItems, key = { it.key }) { item ->
                     when (item) {
-                        is PickerItem.Row -> SelectableRow(
-                            text = item.row.category.name,
-                            count = item.row.category.count,
-                            depth = item.row.depth,
-                            selected = item.row.category.id == state.selectedCategoryId,
-                            expandable = item.row.hasChildren,
-                            expanded = item.row.category.id in state.expandedIds,
-                            onClick = { onEvent(CategoryPickerEvent.Select(item.row.category.id)) },
-                            onToggle = { onEvent(CategoryPickerEvent.ToggleExpand(item.row.category.id)) },
-                        )
+                        is PickerItem.Row -> {
+                            val catId = item.row.category.id
+                            val isDeleteTarget = state.deletePhase != DeletePhase.NONE &&
+                                catId in deletingIds
+                            SelectableRow(
+                                text = item.row.category.name,
+                                count = item.row.category.count,
+                                depth = item.row.depth,
+                                selected = item.row.category.id == state.selectedCategoryId,
+                                expandable = item.row.hasChildren,
+                                expanded = item.row.category.id in state.expandedIds,
+                                onClick = { onEvent(CategoryPickerEvent.Select(item.row.category.id)) },
+                                onToggle = { onEvent(CategoryPickerEvent.ToggleExpand(item.row.category.id)) },
+                                isDeleting = isDeleteTarget && state.deletePhase == DeletePhase.CONFIRM,
+                                isSwiping = isDeleteTarget && state.deletePhase == DeletePhase.SWIPING,
+                            )
+                        }
                         is PickerItem.SubField -> InlineTreeField(
                             name = subName,
                             onNameChange = { subName = it },
@@ -382,6 +425,7 @@ internal fun CategoryPickerContent(
         ) {
             Text(
                 when {
+                    state.deletePhase != DeletePhase.NONE -> "Deleting: "
                     creatingTopLevel -> "New top-level: "
                     creatingSubOf != null -> "New sub in: "
                     renamingId != null -> "Renaming: "
@@ -392,6 +436,7 @@ internal fun CategoryPickerContent(
             )
             Text(
                 when {
+                    state.deletePhase != DeletePhase.NONE -> state.deletingCategory?.name ?: ""
                     creatingTopLevel -> newName.trim()
                     creatingSubOf != null -> subParent?.path(state.categories) ?: ""
                     renamingId != null -> renamingCategory?.path(state.categories) ?: ""
@@ -403,27 +448,38 @@ internal fun CategoryPickerContent(
             )
         }
 
-        // Delete confirm (kept until swipe-to-delete lands in the VM)
-        state.dialog?.let { dialog ->
-            if (dialog.kind == CategoryPickerDialog.Kind.CONFIRM_REMOVE) {
-                val category = state.categories.firstOrNull { it.id == dialog.categoryId }
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        "Delete \"${category?.name ?: ""}\"? No links are deleted. They just lose this category.",
-                        style = MaterialTheme.typography.bodyMedium,
+        // Delete flow: impact card + parent choice
+        if (state.deletePhase == DeletePhase.CONFIRM || state.deletePhase == DeletePhase.SWIPING) {
+            state.deletingCategory?.let { dc ->
+                ImpactCard(
+                    categoryName = dc.name,
+                    linkCount = state.deletedLinkCount,
+                    isSwiping = state.deletePhase == DeletePhase.SWIPING,
+                )
+                if (hasChildren) {
+                    ParentChoiceCard(
+                        parentName = dc.name,
+                        childNames = childNames,
+                        choice = state.parentDeleteChoice,
+                        onChoice = { onEvent(CategoryPickerEvent.ParentDeleteChoice(it)) },
                     )
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        TextButton(onClick = { onEvent(CategoryPickerEvent.CancelDialog) }) { Text("Cancel") }
-                        TextButton(onClick = { onEvent(CategoryPickerEvent.ConfirmRemove) }) {
-                            Text("Delete", color = MaterialTheme.colorScheme.error)
-                        }
-                    }
                 }
             }
         }
 
         // Bar: mode-dependent
         when {
+            state.deletePhase == DeletePhase.UNDO -> UndoBar(
+                categoryName = state.deletingCategory?.name ?: "",
+                linkCount = state.deletedLinkCount,
+                onUndo = { onEvent(CategoryPickerEvent.UndoDelete) },
+            )
+            state.deletePhase == DeletePhase.CONFIRM || state.deletePhase == DeletePhase.SWIPING ->
+                SwipeDeleteBar(
+                    onKeep = { onEvent(CategoryPickerEvent.UndoDelete) },
+                    onSwipeComplete = { onEvent(CategoryPickerEvent.SwipeComplete) },
+                    enabled = !hasChildren || state.parentDeleteChoice != null,
+                )
             creatingTopLevel || creatingSubOf != null -> BarContainer {
                 BarAction(Icons.Filled.Close, "Cancel", { onEvent(CategoryPickerEvent.CancelDialog) }, enabled = true)
                 BarPill(
@@ -531,8 +587,13 @@ private fun SelectableRow(
     expanded: Boolean = false,
     onToggle: () -> Unit = {},
     muted: Boolean = false,
+    isDeleting: Boolean = false,
+    isSwiping: Boolean = false,
 ) {
+    val dangerBg = Color(0xFFFBE9E7)
+    val dangerFg = Color(0xFF9A2418)
     val labelColor = when {
+        isDeleting -> dangerFg
         selected -> MaterialTheme.colorScheme.onPrimaryContainer
         muted -> MaterialTheme.colorScheme.onSurfaceVariant
         else -> MaterialTheme.colorScheme.onSurface
@@ -541,6 +602,7 @@ private fun SelectableRow(
         modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
+            .then(if (isSwiping) Modifier.alpha(0.45f).scale(0.96f) else Modifier)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -563,7 +625,7 @@ private fun SelectableRow(
                     AppIcon(
                         imageVector = if (expanded) Icons.Filled.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = "$text, ${if (expanded) "expanded" else "collapsed"}, ${count ?: 0} links",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = if (isDeleting) dangerFg else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -573,7 +635,13 @@ private fun SelectableRow(
                 .weight(1f)
                 .height(48.dp)
                 .clip(RoundedCornerShape(14.dp))
-                .background(if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
+                .background(
+                    when {
+                        isDeleting -> dangerBg
+                        selected -> MaterialTheme.colorScheme.primaryContainer
+                        else -> Color.Transparent
+                    }
+                )
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -581,7 +649,8 @@ private fun SelectableRow(
                 text,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = when {
-                    selected -> FontWeight.Bold // spec: "bold text"; ExtraBold reads as a black shadow on the pill
+                    isDeleting -> FontWeight.ExtraBold
+                    selected -> FontWeight.Bold
                     muted -> FontWeight.Medium
                     else -> FontWeight.SemiBold
                 },
@@ -589,13 +658,17 @@ private fun SelectableRow(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
+                textDecoration = if (isSwiping) TextDecoration.LineThrough else TextDecoration.None,
             )
             count?.let {
                 Text(
                     "[$it]",
                     style = MaterialTheme.typography.labelLarge,
-                    color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = when {
+                        isDeleting -> dangerFg
+                        selected -> MaterialTheme.colorScheme.onPrimaryContainer
+                        else -> MaterialTheme.colorScheme.onSurfaceVariant
+                    },
                 )
             }
         }
@@ -687,7 +760,7 @@ private fun ActionBar(
         BarAction(Icons.Filled.CreateNewFolder, "Add sub", onAddSub, enabled = hasSelection && canAddSub)
         BarAction(Icons.Filled.Edit, "Rename", onRename, enabled = hasSelection)
         BarAction(Icons.Filled.Delete, "Remove", onRemove, enabled = hasSelection, isError = true)
-        BarPill("Use this", onClick = onUseThis, modifier = Modifier.weight(1f))
+        BarPill(text = "Use this", onClick = onUseThis, modifier = Modifier.weight(1f))
     }
 }
 
@@ -708,24 +781,38 @@ private fun BarContainer(modifier: Modifier = Modifier, content: @Composable Row
 
 /** Orange check pill ("Use this" / "Create"). Own Row: StandardButton's inner padding wraps the label at this width. */
 @Composable
-private fun BarPill(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+private fun BarPill(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    icon: androidx.compose.ui.graphics.vector.ImageVector = Icons.Filled.Check,
+) {
     val container = if (enabled) MaterialTheme.colorScheme.tertiary
     else MaterialTheme.colorScheme.inverseOnSurface.copy(alpha = 0.12f)
     val content = if (enabled) MaterialTheme.colorScheme.onTertiary
     else MaterialTheme.colorScheme.inverseOnSurface.copy(alpha = 0.38f)
     Row(
         modifier = modifier
-            .padding(start = 4.dp, end = 6.dp)
             .fillMaxHeight()
             .clip(CircleShape)
             .background(container)
             .clickable(enabled = enabled, onClick = onClick)
+            .padding(start = 8.dp, end = 8.dp)
             .semantics { if (!enabled) contentDescription = "$text (disabled)" },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
     ) {
-        AppIcon(imageVector = Icons.Filled.Check, contentDescription = null, color = content)
-        Text(text, style = MaterialTheme.typography.titleMedium, color = content, maxLines = 1)
+        AppIcon(
+            imageVector = icon,
+            contentDescription = null,
+            color = content
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            color = content, maxLines = 1
+        )
     }
 }
 
@@ -760,5 +847,318 @@ private fun BarAction(
             style = MaterialTheme.typography.labelLarge,
             color = if (enabled) tint else tint.copy(alpha = 0.38f),
         )
+    }
+}
+
+// ─── Delete-flow composables ────────────────────────────────────────
+
+/** Red-bordered card showing the delete impact: trash icon circle, title, link count, reassurance. */
+@Composable
+private fun ImpactCard(
+    categoryName: String,
+    linkCount: Int,
+    isSwiping: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val borderColor = Color(0xFFF3C9C2)
+    val iconBg = Color(0xFFFFCDD2)
+    val dangerFg = Color(0xFF9A2418)
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .border(1.dp, borderColor, RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(iconBg),
+            contentAlignment = Alignment.Center,
+        ) {
+            AppIcon(Icons.Filled.Delete, contentDescription = null, color = dangerFg, modifier = Modifier.size(20.dp))
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.weight(1f)) {
+            Text(
+                if (isSwiping) "Deleting…" else "Delete \"$categoryName\"?",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = dangerFg,
+            )
+            if (linkCount > 0) {
+                Text(
+                    "$linkCount link${if (linkCount != 1) "s" else ""} move to No category",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Text(
+                "The links themselves are never deleted.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+/** Radio choice card for how to handle a parent category's children. */
+@Composable
+private fun ParentChoiceCard(
+    parentName: String,
+    childNames: List<String>,
+    choice: ParentDeleteChoiceKind?,
+    onChoice: (ParentDeleteChoiceKind) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val childLabel = when {
+        childNames.size == 1 -> childNames.first()
+        childNames.size <= 3 -> childNames.joinToString(", ")
+        else -> "${childNames.take(2).joinToString(", ")} +${childNames.size - 2}"
+    }
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        // Keep children option (recommended)
+        val keepSelected = choice == ParentDeleteChoiceKind.KEEP_CHILDREN
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(if (keepSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
+                .border(
+                    1.dp,
+                    if (keepSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+                    RoundedCornerShape(16.dp),
+                )
+                .clickable { onChoice(ParentDeleteChoiceKind.KEEP_CHILDREN) }
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            RadioButton(
+                selected = keepSelected,
+                onClick = { onChoice(ParentDeleteChoiceKind.KEEP_CHILDREN) },
+                colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary),
+            )
+            Column {
+                Text(
+                    "Keep $childLabel",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    "Move up a level",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
+        // Delete all option
+        val deleteAllSelected = choice == ParentDeleteChoiceKind.DELETE_ALL
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(if (deleteAllSelected) Color(0xFFFBE9E7) else Color.Transparent)
+                .border(
+                    1.dp,
+                    if (deleteAllSelected) Color(0xFF9A2418) else MaterialTheme.colorScheme.outlineVariant,
+                    RoundedCornerShape(16.dp),
+                )
+                .clickable { onChoice(ParentDeleteChoiceKind.DELETE_ALL) }
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            RadioButton(
+                selected = deleteAllSelected,
+                onClick = { onChoice(ParentDeleteChoiceKind.DELETE_ALL) },
+                colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF9A2418)),
+            )
+            Text(
+                "Delete $parentName and $childLabel",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+    }
+}
+
+/** Dark bar with "Keep" button + horizontal swipe track. User drags the thumb to confirm delete. */
+@Composable
+private fun SwipeDeleteBar(
+    onKeep: () -> Unit,
+    onSwipeComplete: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val trackBg = Color(0xFF3A3D45)
+    val fillColor = Color(0xFFFFB4A6)
+    val thumbSize = 48.dp
+    val trackHeight = 56.dp
+    val trackRadius = 28.dp
+
+    var trackWidthPx by remember { mutableIntStateOf(0) }
+    val thumbSizePx = with(LocalDensity.current) { thumbSize.toPx() }
+    val maxDrag = (trackWidthPx - thumbSizePx).coerceAtLeast(0f)
+    var dragOffset by remember { mutableFloatStateOf(0f) }
+    val progress = if (maxDrag > 0f) (dragOffset / maxDrag).coerceIn(0f, 1f) else 0f
+
+    BarContainer(modifier) {
+        // Keep button
+        Box(
+            modifier = Modifier
+                .width(84.dp)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(12.dp))
+                .clickable(onClick = onKeep),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                "Keep",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.inverseOnSurface,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+
+        // Swipe track
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(trackHeight)
+                .padding(end = 8.dp)
+                .clip(RoundedCornerShape(trackRadius))
+                .onSizeChanged { trackWidthPx = it.width }
+                .drawBehind {
+                    drawRoundRect(trackBg, cornerRadius = CornerRadius(trackRadius.toPx()))
+                    if (progress > 0f) {
+                        drawRoundRect(
+                            fillColor.copy(alpha = 0.5f + progress * 0.5f),
+                            size = Size(size.width * progress, size.height),
+                            cornerRadius = CornerRadius(trackRadius.toPx()),
+                        )
+                    }
+                }
+                .draggable(
+                    orientation = Orientation.Horizontal,
+                    enabled = enabled,
+                    state = rememberDraggableState { delta ->
+                        dragOffset = (dragOffset + delta).coerceIn(0f, maxDrag)
+                    },
+                    onDragStopped = {
+                        if (progress >= 0.7f) {
+                            onSwipeComplete()
+                        }
+                        dragOffset = 0f
+                    },
+                ),
+        ) {
+            // Thumb
+            Box(
+                modifier = Modifier
+                    .offset { IntOffset(dragOffset.roundToInt(), 0) }
+                    .padding(4.dp)
+                    .size(thumbSize)
+                    .clip(CircleShape)
+                    .background(if (progress > 0.5f) Color(0xFFD32F2F) else MaterialTheme.colorScheme.errorContainer),
+                contentAlignment = Alignment.Center,
+            ) {
+                AppIcon(Icons.Filled.Delete, contentDescription = "Swipe to delete", color = Color.White, modifier = Modifier.size(22.dp))
+            }
+
+            // Label
+            if (progress < 0.3f) {
+                Row(
+                    modifier = Modifier.matchParentSize(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        "Swipe to delete",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.7f),
+                        modifier = Modifier.padding(start = thumbSize),
+                    )
+                    Text(" ›››", style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.4f))
+                }
+            }
+        }
+    }
+}
+
+/** Dark bar with countdown ring, deleted message, and orange Undo button. */
+@Composable
+private fun UndoBar(
+    categoryName: String,
+    linkCount: Int,
+    onUndo: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val countdownProgress = remember { Animatable(1f) }
+    LaunchedEffect(Unit) {
+        countdownProgress.animateTo(0f, tween(durationMillis = 5000, easing = LinearEasing))
+    }
+
+    BarContainer(modifier) {
+        // Countdown ring
+        Spacer(Modifier.width(8.dp))
+        val ringColor = MaterialTheme.colorScheme.errorContainer
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .drawBehind {
+                    drawCircle(ringColor.copy(alpha = 0.3f), style = Stroke(width = 3.dp.toPx()))
+                    drawArc(
+                        ringColor,
+                        startAngle = -90f,
+                        sweepAngle = 360f * countdownProgress.value,
+                        useCenter = false,
+                        style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round),
+                    )
+                },
+            contentAlignment = Alignment.Center,
+        ) {
+            AppIcon(Icons.Filled.Delete, contentDescription = null, color = ringColor, modifier = Modifier.size(16.dp))
+        }
+
+        // Message
+        Column(
+            modifier = Modifier
+                .weight(1f).
+                padding(horizontal = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(0.dp),
+        ) {
+            Text(
+                text = "$categoryName deleted",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.inverseOnSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (linkCount > 0) {
+                Text(
+                    "$linkCount link${if (linkCount != 1) "s" else ""} now uncategorized",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.inverseOnSurface.copy(alpha = 0.7f),
+                    maxLines = 1,
+                )
+            }
+        }
+
+        // Undo button
+        BarPill(
+            text = "Undo",
+            onClick = onUndo,
+            icon = Icons.Filled.Refresh,
+        )
+        Spacer(Modifier.width(4.dp))
     }
 }
