@@ -24,6 +24,8 @@ data class CategoryPickerState(
     val deletedLinkCount: Int = 0,
     /** User's choice for children of a deleted parent (parent-choice card); null = card unanswered. */
     val parentDeleteChoice: ParentDeleteChoiceKind? = null,
+    /** Select-only (filter) mode: the ticked categories; several allowed. */
+    val checkedIds: Set<String> = emptySet(),
 ) {
     /** Rows the UI lists: everything except the subtree hidden while a delete waits out its undo window. */
     val categories: List<Category>
@@ -91,4 +93,8 @@ sealed interface CategoryPickerEvent {
     object UndoDelete : CategoryPickerEvent
     /** Parent-choice card: what to do with the children when deleting. */
     data class ParentDeleteChoice(val choice: ParentDeleteChoiceKind) : CategoryPickerEvent
+    /** Filter mode: tick or untick a category. */
+    data class ToggleChecked(val categoryId: String) : CategoryPickerEvent
+    /** Filter mode: untick everything. */
+    object ClearChecked : CategoryPickerEvent
 }

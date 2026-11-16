@@ -162,7 +162,9 @@ internal fun CategoryPickerContent(
                     items(state.recent, key = { it.id }) { category ->
                         RecentChip(
                             text = category.path(state.categories),
-                            onClick = { onEvent(CategoryPickerEvent.Select(category.id)) },
+                            onClick = {
+                                onEvent(if (selectOnly) CategoryPickerEvent.ToggleChecked(category.id) else CategoryPickerEvent.Select(category.id))
+                            },
                         )
                     }
                 }
@@ -186,10 +188,14 @@ internal fun CategoryPickerContent(
                                 text = item.row.category.name,
                                 count = item.row.category.count,
                                 depth = item.row.depth,
-                                selected = !isEditing && item.row.category.id == state.selectedCategoryId,
+                                selected = if (selectOnly) item.row.category.id in state.checkedIds
+                                else !isEditing && item.row.category.id == state.selectedCategoryId,
                                 expandable = item.row.hasChildren,
                                 expanded = item.row.category.id in state.expandedIds,
-                                onClick = { if (!isEditing) onEvent(CategoryPickerEvent.Select(item.row.category.id)) },
+                                onClick = {
+                                    if (selectOnly) onEvent(CategoryPickerEvent.ToggleChecked(item.row.category.id))
+                                    else if (!isEditing) onEvent(CategoryPickerEvent.Select(item.row.category.id))
+                                },
                                 onToggle = { onEvent(CategoryPickerEvent.ToggleExpand(item.row.category.id)) },
                                 isDeleting = isDeleteTarget && state.deletePhase == DeletePhase.CONFIRM,
                                 isSwiping = isDeleteTarget && state.deletePhase == DeletePhase.SWIPING,
@@ -225,8 +231,12 @@ internal fun CategoryPickerContent(
                     SelectableRow(
                         text = row.breadcrumb,
                         count = row.category.count,
-                        selected = !isEditing && row.category.id == state.selectedCategoryId,
-                        onClick = { if (!isEditing) onEvent(CategoryPickerEvent.Select(row.category.id)) },
+                        selected = if (selectOnly) row.category.id in state.checkedIds
+                        else !isEditing && row.category.id == state.selectedCategoryId,
+                        onClick = {
+                            if (selectOnly) onEvent(CategoryPickerEvent.ToggleChecked(row.category.id))
+                            else if (!isEditing) onEvent(CategoryPickerEvent.Select(row.category.id))
+                        },
                         disabled = isEditing,
                     )
                 }
@@ -297,7 +307,9 @@ internal fun CategoryPickerContent(
                     creatingTopLevel -> newName.trim()
                     creatingSubOf != null -> subParent?.path(state.categories) ?: ""
                     renamingId != null -> renamingCategory?.path(state.categories) ?: ""
-                    else -> state.selectedPath ?: if (selectOnly) "all categories" else "No category"
+                    selectOnly -> state.categories.filter { it.id in state.checkedIds }
+                        .joinToString(", ") { it.path(state.categories) }.ifEmpty { "all categories" }
+                    else -> state.selectedPath ?: "No category"
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
@@ -354,11 +366,12 @@ internal fun CategoryPickerContent(
             }
             selectOnly -> AppActionBar {
                 AppBarAction(
-                    Icons.Filled.Close, "Clear", { onEvent(CategoryPickerEvent.Select(null)) },
-                    enabled = selected != null,
+                    Icons.Filled.Close, "Clear", { onEvent(CategoryPickerEvent.ClearChecked) },
+                    enabled = state.checkedIds.isNotEmpty(),
                 )
+                val n = state.checkedIds.size
                 AppBarPill(
-                    text = if (selected == null) "Show all" else "Apply",
+                    text = if (n == 0) "Show all" else "Apply ($n)",
                     onClick = { onEvent(CategoryPickerEvent.UseThis) },
                     modifier = Modifier.weight(1f),
                 )
