@@ -38,6 +38,8 @@ sealed interface AddLinkEvent {
     data class ToggleFavorite(val isFavorite: Boolean) : AddLinkEvent
     object Submit : AddLinkEvent
     object ClearError : AddLinkEvent
+    /** One-shot: reset success after the screen has reacted (VMs are cached per route key). */
+    object Consumed : AddLinkEvent
     // Auto-fetch events
     object FetchMetadata : AddLinkEvent
     object ClearFetchError : AddLinkEvent
