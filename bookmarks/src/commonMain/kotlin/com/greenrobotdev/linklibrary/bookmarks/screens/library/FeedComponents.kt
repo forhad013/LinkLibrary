@@ -40,7 +40,11 @@ import com.greenrobotdev.linklibrary.bookmarks.domain.hostOf
 import com.greenrobotdev.linklibrary.bookmarks.model.Link
 import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
 import com.greenrobotdev.linklibrary.design.theme.LordsExtraColors
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Instant
 import kotlin.time.ExperimentalTime
 
 // Feed pieces (design: Feed)
@@ -133,7 +137,7 @@ internal fun FeedLinkCard(
     val meta = buildList {
         add(if (noPreview) host else "$typeLabel · $host")
         if (noPreview) add("No preview yet")
-        relativeDay(link.createdAt)?.let(::add)
+        savedAtLabel(link.createdAt)?.let(::add)
     }.joinToString(" · ")
 
     Row(
@@ -233,16 +237,31 @@ private fun MetaChip(text: String, bg: Color, fg: Color) {
     )
 }
 
-/** "Today", "Yesterday", "3 days ago", "2 weeks ago", "4 months ago"; null when unknown. */
+/**
+ * When a link was saved, in the device's time zone:
+ * "Just now" (under a minute), "Today, 14:32", "Yesterday, 09:15", "Monday, 18:04" (last 6 days),
+ * "12 Nov, 18:04" (this year), "12 Nov 2025" (older). null when unknown.
+ * shortcut: 24-hour clock and English names; switch to platform formatters if the app gets localized.
+ */
 @OptIn(ExperimentalTime::class)
-internal fun relativeDay(epochMs: Long?, nowMs: Long = Clock.System.now().toEpochMilliseconds()): String? {
+internal fun savedAtLabel(
+    epochMs: Long?,
+    nowMs: Long = Clock.System.now().toEpochMilliseconds(),
+    zone: TimeZone = TimeZone.currentSystemDefault(),
+): String? {
     if (epochMs == null || epochMs <= 0L) return null
-    val days = (nowMs - epochMs).coerceAtLeast(0) / 86_400_000L
+    if (nowMs - epochMs in 0 until 60_000L) return "Just now"
+    val then = Instant.fromEpochMilliseconds(epochMs).toLocalDateTime(zone)
+    val today = Instant.fromEpochMilliseconds(nowMs).toLocalDateTime(zone).date
+    val time = "${then.hour.toString().padStart(2, '0')}:${then.minute.toString().padStart(2, '0')}"
+    val daysAgo = then.date.daysUntil(today)
+    val month = then.month.name.take(3).lowercase().replaceFirstChar { it.uppercaseChar() }
+    val day = then.date.day
     return when {
-        days == 0L -> "Today"
-        days == 1L -> "Yesterday"
-        days < 7L -> "$days days ago"
-        days < 30L -> "${days / 7} week${if (days / 7 > 1) "s" else ""} ago"
-        else -> "${days / 30} month${if (days / 30 > 1) "s" else ""} ago"
+        daysAgo == 0 -> "Today, $time"
+        daysAgo == 1 -> "Yesterday, $time"
+        daysAgo in 2..6 -> "${then.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercaseChar() }}, $time"
+        then.year == today.year -> "$day $month, $time"
+        else -> "$day $month ${then.year}" // also covers future dates from a wrong clock
     }
 }
