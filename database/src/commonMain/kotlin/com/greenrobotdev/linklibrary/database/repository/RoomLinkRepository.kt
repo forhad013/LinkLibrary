@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -56,10 +58,11 @@ class RoomLinkRepository(
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
+    @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
     override suspend fun addLink(link: LinkEntity): Flow<Result<LinkEntity>> {
         return try {
-            val linkToSave = if (link.id.isEmpty()) link.copy(id = Uuid.random().toString()) else link
+            val withId = if (link.id.isEmpty()) link.copy(id = Uuid.random().toString()) else link
+            val linkToSave = if (withId.createdAt == null) withId.copy(createdAt = Clock.System.now().toEpochMilliseconds()) else withId
             linkDao.insertLink(linkToSave)
             flow { emit(Result.success(linkToSave)) }
         } catch (e: Exception) {

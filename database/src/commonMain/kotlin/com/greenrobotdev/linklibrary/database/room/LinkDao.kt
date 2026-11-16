@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LinkDao {
-    @Query("SELECT * FROM links ORDER BY createdAt DESC")
+    // rowid breaks ties (and orders links saved before createdAt was stamped) by insertion order
+    @Query("SELECT * FROM links ORDER BY createdAt DESC, rowid DESC")
     fun getAllLinks(): Flow<List<LinkEntity>>
 
     @Query("SELECT * FROM links WHERE id = :linkId")
