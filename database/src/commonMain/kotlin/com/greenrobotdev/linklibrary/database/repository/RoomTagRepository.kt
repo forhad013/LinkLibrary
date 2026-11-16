@@ -4,6 +4,7 @@ import com.greenrobotdev.linklibrary.database.room.LinkTagDao
 import com.greenrobotdev.linklibrary.database.room.LinkTagEntity
 import com.greenrobotdev.linklibrary.database.room.TagDao
 import com.greenrobotdev.linklibrary.database.room.TagEntity
+import com.greenrobotdev.linklibrary.database.room.TagWithCount
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -31,6 +32,12 @@ class RoomTagRepository(
                 }
                 Result.success(tags)
             }
+            .catch { e -> emit(Result.failure(e)) }
+    }
+
+    override suspend fun getTagsWithCounts(): Flow<Result<List<TagWithCount>>> {
+        return tagDao.getAllTagsWithCounts()
+            .map { Result.success(it) }
             .catch { e -> emit(Result.failure(e)) }
     }
 

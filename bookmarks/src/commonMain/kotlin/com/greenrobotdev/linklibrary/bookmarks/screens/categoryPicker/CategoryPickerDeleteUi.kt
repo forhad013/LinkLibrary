@@ -34,6 +34,7 @@ internal fun ImpactCard(
     linkCount: Int,
     isSwiping: Boolean,
     modifier: Modifier = Modifier,
+    consequence: String = "move to No category",
 ) {
     val dangerFg = MaterialTheme.colorScheme.onErrorContainer
     Row(
@@ -64,7 +65,7 @@ internal fun ImpactCard(
             )
             if (linkCount > 0) {
                 Text(
-                    "$linkCount link${if (linkCount != 1) "s" else ""} move to No category",
+                    "$linkCount link${if (linkCount != 1) "s" else ""} $consequence",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

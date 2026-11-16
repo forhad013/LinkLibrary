@@ -43,6 +43,14 @@ fun TagEntity.toTag(count: Int = 0) = Tag(
     iconType = iconType
 )
 
+fun com.greenrobotdev.linklibrary.database.room.TagWithCount.toTag() = Tag(
+    id = id,
+    name = name,
+    description = description,
+    count = linkCount,
+    iconType = iconType
+)
+
 fun Tag.toEntity() = TagEntity(
     id = id,
     name = name,
