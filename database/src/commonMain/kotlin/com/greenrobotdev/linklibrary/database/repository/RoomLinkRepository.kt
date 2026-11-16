@@ -6,6 +6,7 @@ import com.greenrobotdev.linklibrary.database.room.LinkEntity
 import com.greenrobotdev.linklibrary.database.room.TagDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -26,7 +27,8 @@ class RoomLinkRepository(
     override suspend fun getLinksWithTags(): Flow<Result<List<LinkEntity>>> {
         return flow {
             try {
-                linkDao.getAllLinks().collect { entities ->
+                // tag counts change with link_tags, so tags assigned after a save re-emit too
+                combine(linkDao.getAllLinks(), tagDao.getAllTagsWithCounts()) { entities, _ -> entities }.collect { entities ->
                     val enriched = entities.map { entity ->
                         val tagNames = tagDao.getTagsForLink(entity.id).first()
                             .map { it.name }
@@ -70,6 +72,15 @@ class RoomLinkRepository(
         return try {
             linkDao.updateLink(link)
             flow { emit(Result.success(link)) }
+        } catch (e: Exception) {
+            flow { emit(Result.failure(e)) }
+        }
+    }
+
+    override suspend fun markOpened(linkId: String): Flow<Result<Unit>> {
+        return try {
+            linkDao.markOpened(linkId)
+            flow { emit(Result.success(Unit)) }
         } catch (e: Exception) {
             flow { emit(Result.failure(e)) }
         }
