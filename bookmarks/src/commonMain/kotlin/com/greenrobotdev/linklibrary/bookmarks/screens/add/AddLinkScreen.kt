@@ -160,7 +160,7 @@ fun AddLinkView(
                 onClick = onPickCategory,
             )
             if (state.recentCategories.isNotEmpty()) {
-                ChipRow(state.recentCategories, key = { it.id }) { category ->
+                ChipRow(state.recentCategories, key = { it.id }, label = "Recent") { category ->
                     val selected = category.id in state.selectedCategoryIds
                     ChoiceChip(
                         text = category.path(state.availableCategories),
