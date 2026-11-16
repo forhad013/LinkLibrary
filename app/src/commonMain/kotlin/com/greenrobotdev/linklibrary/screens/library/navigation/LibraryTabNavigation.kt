@@ -53,10 +53,7 @@ fun LibraryTabNavigation(
                     is LibraryNavRoutes.AddLink -> AddLinkScreen(
                         routeKey = route,
                         initialUrl = route.initialUrl,
-                        onBack = { tabNavigator.goBack() },
-                        onAddTag = {
-                            tabNavigator.navigate(LibraryNavRoutes.AddTag)
-                        }
+                        onBack = { tabNavigator.goBack() }
                     )
 
                     // Note Editor Screen

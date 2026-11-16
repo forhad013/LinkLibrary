@@ -29,6 +29,7 @@ import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.PersonalNo
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.TaskSection
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.UrlTitleCard
 import com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker.CategoryPickerSheet
+import com.greenrobotdev.linklibrary.bookmarks.screens.tagPicker.TagPickerSheet
 import com.greenrobotdev.linklibrary.design.components.form.FixedFormActionsBar
 
 /**
@@ -54,7 +55,6 @@ fun AddLinkScreen(
     routeKey: NavKey,
     initialUrl: String?,
     onBack: () -> Unit,
-    onAddTag: () -> Unit
 ) {
     // Screen owns the ViewModel and state
     val viewModel: AddLinkViewModel = viewModel<AddLinkViewModel>(key = routeKey.toString()) { AddLinkViewModel(initialUrl) }
@@ -87,12 +87,21 @@ fun AddLinkScreen(
         )
     }
 
+    var pickTags by remember { mutableStateOf(false) }
+    if (pickTags) {
+        TagPickerSheet(
+            onDismiss = { pickTags = false },
+            initialChecked = state.selectedTags,
+            onApplied = { viewModel.take(AddLinkEvent.SetTags(it)) },
+        )
+    }
+
     AddLinkView(
         state = state,
         onEvent = { viewModel.take(it) },
-        onAddTag = onAddTag,
         onBack = onBack,
-        onPickCategory = { pickCategory = true }
+        onPickCategory = { pickCategory = true },
+        onPickTags = { pickTags = true },
     )
 }
 
@@ -101,9 +110,9 @@ fun AddLinkScreen(
 fun AddLinkView(
     state: AddLinkState,
     onEvent: (AddLinkEvent) -> Unit,
-    onAddTag: () -> Unit,
     onBack: () -> Unit,
     onPickCategory: () -> Unit = {},
+    onPickTags: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     // Use ViewModel state for task section instead of local state
@@ -136,8 +145,8 @@ fun AddLinkView(
             dueTime = dueTime,
             onDueTimeChange = { onEvent(AddLinkEvent.SetDueTime(it)) },
             modifier = Modifier.padding(padding),
-            onAddTag = onAddTag,
-            onPickCategory = onPickCategory
+            onPickCategory = onPickCategory,
+            onPickTags = onPickTags,
         )
     }
 }
@@ -158,8 +167,8 @@ fun AddLinkFormContent(
     dueTime: String,
     onDueTimeChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    onAddTag: () -> Unit = {},
-    onPickCategory: () -> Unit = {}
+    onPickCategory: () -> Unit = {},
+    onPickTags: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -189,8 +198,7 @@ fun AddLinkFormContent(
             availableTags = state.availableTags,
             selectedTags = state.selectedTags.toList(),
             onCategoryToggle = { onEvent(AddLinkEvent.ToggleCategory(it)) },
-            onTagToggle = { onEvent(AddLinkEvent.ToggleTag(it)) },
-            onAddTag = onAddTag,
+            onPickTags = onPickTags,
             onPickCategory = onPickCategory,
             isLoading = state.isLoading,
             onClearAllCategories = { onEvent(AddLinkEvent.ClearAllCategories) }
