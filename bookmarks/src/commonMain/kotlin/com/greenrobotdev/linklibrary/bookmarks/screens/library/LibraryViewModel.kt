@@ -67,10 +67,10 @@ fun LibraryPresenter(
         events.collect { event ->
             state = when (event) {
                 is LibraryEvent.SearchChanged -> state.copy(searchQuery = event.query)
-                is LibraryEvent.SetFilter -> state.copy(filter = event.filter)
-                is LibraryEvent.SetCategory -> state.copy(categoryId = event.categoryId)
-                is LibraryEvent.SetTags -> state.copy(tagIds = event.tagIds)
-                LibraryEvent.ToggleArchived -> state.copy(showArchived = !state.showArchived)
+                is LibraryEvent.ApplyFilters -> state.copy(filters = event.filters)
+                is LibraryEvent.RemoveCategory -> state.copy(filters = state.filters.copy(categoryIds = state.filters.categoryIds - event.categoryId))
+                is LibraryEvent.RemoveTag -> state.copy(filters = state.filters.copy(tagIds = state.filters.tagIds - event.tagId))
+                LibraryEvent.ClearFilters -> state.copy(searchQuery = "", filters = FeedFilters())
                 LibraryEvent.ToggleSort -> state.copy(newestFirst = !state.newestFirst)
                 is LibraryEvent.Opened -> {
                     // the links flow re-emits with isOpened = true; nothing to change here

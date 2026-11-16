@@ -58,14 +58,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.platform.LocalUriHandler
-import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.ChoiceChip
-import com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker.CategoryPickerSheet
-import com.greenrobotdev.linklibrary.bookmarks.screens.tagPicker.TagPickerSheet
 import com.greenrobotdev.linklibrary.design.components.textfield.SearchField
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -103,6 +100,7 @@ import kotlin.time.ExperimentalTime
  * - Mobile Bottom Navigation and FAB
  * - Material 3 Expressive animations and spring physics
  */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun LibraryScreen(
     routeKey: NavKey,
@@ -115,22 +113,12 @@ fun LibraryScreen(
     val state by viewModel.models.collectAsState()
     val uriHandler = LocalUriHandler.current
 
-    var pickCategory by remember { mutableStateOf(false) }
-    var pickTags by remember { mutableStateOf(false) }
-    if (pickCategory) {
-        CategoryPickerSheet(
-            onDismiss = { pickCategory = false },
-            initialSelection = state.categoryId,
-            onApplied = { viewModel.take(LibraryEvent.SetCategory(it)) },
-            selectOnly = true,
-        )
-    }
-    if (pickTags) {
-        TagPickerSheet(
-            onDismiss = { pickTags = false },
-            initialChecked = state.tagIds,
-            onApplied = { viewModel.take(LibraryEvent.SetTags(it)) },
-            selectOnly = true,
+    var showFilters by remember { mutableStateOf(false) }
+    if (showFilters) {
+        FeedFilterSheet(
+            state = state,
+            onApply = { viewModel.take(LibraryEvent.ApplyFilters(it)) },
+            onDismiss = { showFilters = false },
         )
     }
 
@@ -141,64 +129,59 @@ fun LibraryScreen(
     }
 
     val links = state.filteredLinks
+    val pickedCategories = state.categories.filter { it.id in state.filters.categoryIds }
+    val pickedTags = state.tags.filter { it.id in state.filters.tagIds }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
     ) {
-        // Fixed top: header, search, quick filters, secondary filters
+        // Fixed top: header, then search + Filters
         Column(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             FeedHeader(newestFirst = state.newestFirst, onToggleSort = { viewModel.take(LibraryEvent.ToggleSort) })
-            SearchField(
-                query = state.searchQuery,
-                onQueryChange = { viewModel.take(LibraryEvent.SearchChanged(it)) },
-                placeholder = "Search everything you saved",
-                shape = CircleShape,
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
-        }
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            items(FeedFilter.entries) { f ->
-                ChoiceChip(
-                    text = f.label,
-                    selected = state.filter == f,
-                    onClick = { viewModel.take(LibraryEvent.SetFilter(f)) },
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                SearchField(
+                    query = state.searchQuery,
+                    onQueryChange = { viewModel.take(LibraryEvent.SearchChanged(it)) },
+                    placeholder = "Search everything you saved",
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.weight(1f),
                 )
+                FiltersButton(activeCount = state.filters.activeCount, onClick = { showFilters = true })
             }
         }
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            item {
-                FeedFilterButton(
-                    text = state.category?.name ?: "Category",
-                    icon = Icons.Outlined.Folder,
-                    active = state.categoryId != null,
-                    onClick = { pickCategory = true },
-                )
-            }
-            item {
-                FeedFilterButton(
-                    text = if (state.tagIds.isEmpty()) "Tags" else "Tags · ${state.tagIds.size}",
-                    icon = Icons.AutoMirrored.Outlined.Label,
-                    active = state.tagIds.isNotEmpty(),
-                    onClick = { pickTags = true },
-                )
-            }
-            item {
-                FeedFilterButton(
-                    text = "Show archived",
-                    icon = null,
-                    active = state.showArchived,
-                    onClick = { viewModel.take(LibraryEvent.ToggleArchived) },
-                )
+
+        // Only the picked categories and tags show here; everything else lives in the Filters sheet
+        if (pickedCategories.isNotEmpty() || pickedTags.isNotEmpty()) {
+            // Wraps instead of scrolling: a tap on a scrolled row is eaten while the scroll/overscroll
+            // settles, so chips at the far end could not be removed. Every chip stays on screen.
+            FlowRow(
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                pickedCategories.forEach { category ->
+                    key("c-" + category.id) {
+                        SelectedFilterChip(
+                            text = category.path(state.categories),
+                            isTag = false,
+                            onRemove = { viewModel.take(LibraryEvent.RemoveCategory(category.id)) },
+                        )
+                    }
+                }
+                pickedTags.forEach { tag ->
+                    key("t-" + tag.id) {
+                        SelectedFilterChip(
+                            text = "#${tag.name}",
+                            isTag = true,
+                            onRemove = { viewModel.take(LibraryEvent.RemoveTag(tag.id)) },
+                        )
+                    }
+                }
             }
         }
         HorizontalDivider(Modifier.padding(top = 12.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
@@ -209,12 +192,7 @@ fun LibraryScreen(
                 description = "No saved link matches these filters.",
                 icon = Icons.Default.Search,
                 actionLabel = "Clear filters",
-                onActionClick = {
-                    viewModel.take(LibraryEvent.SearchChanged(""))
-                    viewModel.take(LibraryEvent.SetFilter(FeedFilter.ALL))
-                    viewModel.take(LibraryEvent.SetCategory(null))
-                    viewModel.take(LibraryEvent.SetTags(emptySet()))
-                },
+                onActionClick = { viewModel.take(LibraryEvent.ClearFilters) },
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
             )
         } else {
