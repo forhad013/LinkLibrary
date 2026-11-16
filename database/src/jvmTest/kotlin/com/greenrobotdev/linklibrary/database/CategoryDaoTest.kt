@@ -4,6 +4,7 @@ import androidx.room.Room
 import com.greenrobotdev.linklibrary.database.room.CategoryEntity
 import com.greenrobotdev.linklibrary.database.room.LinkDatabase
 import com.greenrobotdev.linklibrary.database.room.MaxDepthExceededException
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -131,5 +132,32 @@ class CategoryDaoTest {
         assertFailsWith<Exception> { db.categoryDao().deleteCategoryLeafOnly("p") }
         db.categoryDao().deleteCategoryLeafOnly("c")
         db.categoryDao().deleteCategoryLeafOnly("p")
+    }
+
+    @Test
+    fun moveChildrenToReparentsChildrenToGrandparent() = runTest {
+        val dao = db.categoryDao()
+        insert("root"); insert("p", "root"); insert("c1", "p"); insert("c2", "p"); insert("other")
+        dao.moveChildrenTo("p", "root")
+        assertEquals(listOf("root", "root"), dao.getChildrenOnce("root").filter { it.id in setOf("c1", "c2") }.map { it.parentId })
+        assertTrue(dao.getChildrenOnce("p").isEmpty())
+    }
+
+    @Test
+    fun deleteCategoryTreeCascadesToDescendantsAndTheirLinks() = runTest {
+        val dao = db.categoryDao()
+        insert("root"); insert("a", "root"); insert("a1", "a"); insert("b", "root")
+        db.linkDao().insertLink(
+            com.greenrobotdev.linklibrary.database.room.LinkEntity(
+                id = "link", title = "t", url = "https://example.com", description = "", isFavorite = false
+            )
+        )
+        dao.assignLinkToCategory(
+            com.greenrobotdev.linklibrary.database.room.LinkCategoryEntity(linkId = "link", categoryId = "a1")
+        )
+        dao.deleteCategoryById("a")
+        assertTrue(dao.getAllCategories().first().map { it.id }.none { it in setOf("a", "a1") })
+        assertEquals("b", dao.getAllCategories().first().first { it.id == "b" }.id)
+        assertTrue(dao.getCategoryForLink("link") == null) // cascaded to uncategorized
     }
 }

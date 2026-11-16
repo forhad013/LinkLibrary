@@ -12,6 +12,10 @@ interface CategoryRepository {
     suspend fun renameCategory(categoryId: String, newName: String): Flow<Result<Unit>>
     suspend fun moveCategory(categoryId: String, newParentId: String?): Flow<Result<Unit>>
     suspend fun deleteCategory(categoryId: String): Flow<Result<Unit>>
+    /** Delete a category keeping its subtree: children are reparented to the deleted category's parent. */
+    suspend fun deleteCategoryKeepChildren(categoryId: String): Flow<Result<Unit>>
+    /** Delete a category and every descendant (links become uncategorized). */
+    suspend fun deleteCategoryTree(categoryId: String): Flow<Result<Unit>>
     suspend fun getCategoryForLink(linkId: String): Flow<Result<CategoryEntity?>>
     suspend fun assignLinkToCategory(linkId: String, categoryId: String): Flow<Result<Unit>>
     suspend fun clearLinkCategory(linkId: String): Flow<Result<Unit>>

@@ -45,6 +45,18 @@ fun ancestorsOf(categoryId: String, categories: List<Category>): List<String> {
     return chain
 }
 
+/** The category and every descendant id (delete-all scope; includes the root id even if missing). */
+fun subtreeIds(categoryId: String, categories: List<Category>): Set<String> {
+    val byParent = categories.groupBy { it.parentId }
+    val out = mutableSetOf(categoryId)
+    var frontier = byParent[categoryId].orEmpty().map { it.id }
+    while (frontier.isNotEmpty()) {
+        out += frontier
+        frontier = frontier.flatMap { byParent[it].orEmpty().map { c -> c.id } }
+    }
+    return out
+}
+
 /** Depth of a category (root = 1); null/missing id → 0. */
 fun depthOf(categoryId: String?, categories: List<Category>): Int {
     var depth = 0

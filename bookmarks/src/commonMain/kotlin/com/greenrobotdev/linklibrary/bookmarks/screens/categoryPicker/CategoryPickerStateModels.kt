@@ -6,7 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CategoryPickerState(
     val isLoading: Boolean = true,
-    val categories: List<Category> = emptyList(),
+    /** Raw category list from the DB (never filtered). */
+    val allCategories: List<Category> = emptyList(),
     val selectedCategoryId: String? = null,
     val error: String? = null,
     val query: String = "",
@@ -15,11 +16,43 @@ data class CategoryPickerState(
     val dialog: CategoryPickerDialog? = null,
     /** "Use this" succeeded — the sheet closes. */
     val applied: Boolean = false,
+    /** Delete-flow phase; see [DeletePhase]. */
+    val deletePhase: DeletePhase = DeletePhase.NONE,
+    /** The category pending delete (confirm card / undo bar target). */
+    val deletingCategory: Category? = null,
+    /** How many links lose this category if deleted. */
+    val deletedLinkCount: Int = 0,
+    /** User's choice for children of a deleted parent (parent-choice card); null = card unanswered. */
+    val parentDeleteChoice: ParentDeleteChoiceKind? = null,
 ) {
+    /** Rows the UI lists: everything except the subtree hidden while a delete waits out its undo window. */
+    val categories: List<Category>
+        get() = if (pendingDeleteIds.isEmpty()) allCategories
+        else allCategories.filter { it.id !in pendingDeleteIds }
+
     val selected: Category? get() = categories.firstOrNull { it.id == selectedCategoryId }
     val selectedPath: String? get() = selected?.path(categories)
     val browsing: Boolean get() = query.isBlank()
+
+    /**
+     * Ids hidden during the undo window: the whole subtree. (Filtering the parent id alone
+     * already drops its children from the browse tree; hiding the set keeps search consistent.)
+     */
+    val pendingDeleteIds: Set<String>
+        get() {
+            val category = deletingCategory ?: return emptySet()
+            if (deletePhase != DeletePhase.UNDO) return emptySet()
+            return subtreeIds(category.id, allCategories)
+        }
 }
+
+/** Phases of the swipe/confirm delete flow. SWIPING is UI-local drag progress; state stays CONFIRM. */
+@Serializable
+enum class DeletePhase { NONE, CONFIRM, SWIPING, UNDO }
+
+/** What happens to a deleted category's children. */
+@Serializable
+enum class ParentDeleteChoiceKind { KEEP_CHILDREN, DELETE_ALL }
 
 /** Which modal dialog the sheet is showing, if any. */
 @Serializable
@@ -52,4 +85,10 @@ sealed interface CategoryPickerEvent {
     /** Assign the selection to the link (or clear it for "No category"). */
     object UseThis : CategoryPickerEvent
     object ClearError : CategoryPickerEvent
+    /** User finished the swipe (or the confirm card's Delete) → soft delete, start the undo timer. */
+    object SwipeComplete : CategoryPickerEvent
+    /** Undo bar tapped → cancel timer, restore the hidden rows. */
+    object UndoDelete : CategoryPickerEvent
+    /** Parent-choice card: what to do with the children when deleting. */
+    data class ParentDeleteChoice(val choice: ParentDeleteChoiceKind) : CategoryPickerEvent
 }
