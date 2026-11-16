@@ -12,7 +12,6 @@ sealed class OrganizeNavRoutes : NavKey {
 
     // Category management
     data class CategoryDetail(val categoryId: String) : OrganizeNavRoutes()
-    data class CategoryEdit(val categoryId: String? = null) : OrganizeNavRoutes()
 
     // Tag management
     data class TagDetail(val tagId: String) : OrganizeNavRoutes()
@@ -23,7 +22,4 @@ sealed class OrganizeNavRoutes : NavKey {
 
     // Manage categories and tags (rename/move/delete)
     data object Manage : OrganizeNavRoutes()
-
-    // Move a category: reuse the category picker to choose the new parent
-    data class MoveCategory(val categoryId: String) : OrganizeNavRoutes()
 }

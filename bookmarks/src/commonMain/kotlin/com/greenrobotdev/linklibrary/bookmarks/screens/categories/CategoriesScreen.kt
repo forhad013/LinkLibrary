@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material3.Card
@@ -54,8 +53,7 @@ private fun getIconForType(iconType: String): androidx.compose.ui.graphics.vecto
 @Composable
 fun CategoriesScreen(
     routeKey: NavKey,
-    onBack: () -> Unit = {},
-    onCreateCategory: () -> Unit = {}
+    onBack: () -> Unit = {}
 ) {
     val viewModel: CategoriesViewModel = viewModel(key = routeKey.toString()) {
         CategoriesViewModel()
@@ -75,9 +73,6 @@ fun CategoriesScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onCreateCategory) {
-                        Icon(Icons.Default.Add, contentDescription = "Create category")
-                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,

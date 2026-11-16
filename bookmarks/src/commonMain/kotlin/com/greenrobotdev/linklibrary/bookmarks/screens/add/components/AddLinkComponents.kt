@@ -400,7 +400,6 @@ fun OrganizationSection(
     onClearAllCategories: () -> Unit,
     onTagToggle: (String) -> Unit,
     onAddTag: () -> Unit,
-    onAddCategory: () -> Unit,
     onPickCategory: () -> Unit = {},
     isLoading: Boolean,
     modifier: Modifier = Modifier
@@ -460,94 +459,6 @@ internal fun CategoryField(selectedName: String?, onClick: () -> Unit, modifier:
                     color = if (selectedName != null) MaterialTheme.colorScheme.onSurface
                     else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-            }
-        }
-    }
-}
-
-/**
- * CategoryInputRow - Category input with dropdown and add button
- */
-@Composable
-private fun CategoryInputRow(
-    categoryNames: List<Category>,
-    selectedCategoryId: String?,
-    onCategorySelected: (String?) -> Unit,
-    onCategoryCreate: (String, String) -> Unit,
-    onAddCategory: () -> Unit,
-    isLoading: Boolean
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = "Category",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        when {
-            // Empty state - no categoryNames available
-            categoryNames.isEmpty() -> {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextButton(
-                        onClick = onAddCategory,
-                        modifier = Modifier.weight(1f),
-                        enabled = !isLoading
-                    ) {
-                        Text(
-                            "Create your first category",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-            }
-
-            // Show category dropdown
-            else -> {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    CategoryDropdown(
-                        categories = categoryNames.map {
-                            CategoryItem(
-                                id = it.id,
-                                name = it.name,
-                                icon = Icons.Default.Folder,
-                                linkCount = 0,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        },
-                        selectedCategoryId = selectedCategoryId,
-                        onCategorySelected = onCategorySelected,
-                        onCategoryCreate = onCategoryCreate,
-                        modifier = Modifier.weight(1f),
-                        placeholder = "Select category",
-                        showLinkCounts = true,
-                        enabled = !isLoading
-                    )
-
-                    // Add Category Button - using standardized IconButton
-                    IconButton(
-                        onClick = onAddCategory,
-                        icon = Icons.Default.Add,
-                        contentDescription = "Add category",
-                        style = ComponentStyle.Filled,
-                        size = ComponentSize.Medium,
-                        colors = com.greenrobotdev.linklibrary.design.components.button.ComponentColors(
-                            container = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-                            content = MaterialTheme.colorScheme.onPrimary
-                        ),
-                        enabled = !isLoading
-                    )
-                }
             }
         }
     }

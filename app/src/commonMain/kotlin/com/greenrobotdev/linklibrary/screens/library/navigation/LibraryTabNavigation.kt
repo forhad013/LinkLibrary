@@ -6,7 +6,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkScreen
-import com.greenrobotdev.linklibrary.bookmarks.screens.addCategory.AddCategoryScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.categories.CategoriesScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.details.LinkDetailScreen
@@ -38,10 +37,7 @@ fun LibraryTabNavigation(
                         onNavigateToDetail = { linkId ->
                             tabNavigator.navigate(LibraryNavRoutes.LinkDetail(linkId))
                         },
-                        onAddLink = onAddLink,
-                        onAddCategory = {
-                            tabNavigator.navigate(LibraryNavRoutes.AddCategory)
-                        }
+                        onAddLink = onAddLink
                     )
 
                     // Link Detail Screen
@@ -61,9 +57,6 @@ fun LibraryTabNavigation(
                         onBack = { tabNavigator.goBack() },
                         onAddTag = {
                             tabNavigator.navigate(LibraryNavRoutes.AddTag)
-                        },
-                        onAddCategory = {
-                            tabNavigator.navigate(LibraryNavRoutes.AddCategory)
                         }
                     )
 
@@ -77,10 +70,7 @@ fun LibraryTabNavigation(
                     // Categories Screen
                     is LibraryNavRoutes.Categories -> CategoriesScreen(
                         routeKey = route,
-                        onBack = { tabNavigator.goBack() },
-                        onCreateCategory = {
-                            tabNavigator.navigate(LibraryNavRoutes.AddCategory)
-                        }
+                        onBack = { tabNavigator.goBack() }
                     )
 
                     // Tags Screen
@@ -90,12 +80,6 @@ fun LibraryTabNavigation(
                         onCreateTag = {
                             tabNavigator.navigate(LibraryNavRoutes.AddTag)
                         }
-                    )
-
-                    // Add Category Screen
-                    is LibraryNavRoutes.AddCategory -> AddCategoryScreen(
-                        routeKey = route,
-                        onBack = { tabNavigator.goBack() }
                     )
 
                     // Add Tag Screen
