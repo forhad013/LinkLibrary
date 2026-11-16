@@ -80,6 +80,7 @@ class CategoryPickerViewModel(
                     is CategoryPickerEvent.Search -> state = state.copy(query = event.query)
 
                     is CategoryPickerEvent.ToggleExpand -> {
+                        println("LLDBG toggle ${event.categoryId} was=${state.expandedIds}") // TEMP debug
                         val id = event.categoryId
                         state = state.copy(
                             expandedIds = if (id in state.expandedIds) state.expandedIds - id else state.expandedIds + id
