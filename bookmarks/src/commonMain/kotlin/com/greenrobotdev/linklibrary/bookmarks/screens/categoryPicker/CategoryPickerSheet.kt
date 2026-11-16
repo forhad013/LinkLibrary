@@ -47,7 +47,7 @@ fun CategoryPickerSheet(
     }
 }
 
-/** Full-screen host for the same picker UI (Organize tab's "move category" entry). */
+/** Full-screen host for the same picker UI. */
 @Composable
 fun CategoryPickerScreen(
     initialSelection: String? = null,

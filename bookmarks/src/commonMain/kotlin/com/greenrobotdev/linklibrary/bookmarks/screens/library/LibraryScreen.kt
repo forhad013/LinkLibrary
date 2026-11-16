@@ -100,7 +100,6 @@ fun LibraryScreen(
     routeKey: NavKey,
     onNavigateToDetail: (String) -> Unit,
     onAddLink: (String?) -> Unit,
-    onAddCategory: () -> Unit,
     onNavigateToCategories: () -> Unit = {},
     onNavigateToTags: () -> Unit = {}
 ) {

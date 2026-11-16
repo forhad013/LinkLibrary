@@ -7,7 +7,7 @@ import kotlinx.coroutines.launch
 
 /**
  * Thin ViewModel shell for the category picker; all logic lives in [CategoryPickerPresenter]
- * (same shape as AddCategoryViewModel → AddCategoryPresenter).
+ * (thin ViewModel shell → presenter reducer).
  */
 class CategoryPickerViewModel(
     private val linkId: String?,

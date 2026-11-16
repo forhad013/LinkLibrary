@@ -33,26 +33,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker.CategoryPickerContent
+import com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker.CategoryPickerViewModel
 
 /**
  * Manage categories and tags (design: Manage categories & tags).
- * Categories/Tags toggle, pill rows; selecting a row shows a bottom action bar
- * (Rename / Move / Delete). Delete confirms; links are never deleted.
+ * Categories tab embeds the category picker content (create/rename/delete inline);
+ * Tags tab is a pill list with a bottom action bar (Rename / Delete).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ManageScreen(onBack: () -> Unit, onMoveCategory: (String) -> Unit = {}) {
+fun ManageScreen(onBack: () -> Unit) {
     val viewModel: ManageViewModel = viewModel { ManageViewModel() }
     val state by viewModel.models.collectAsState()
 
     val showCategories = state.categoriesVisible
-    val selectedName = state.categories.firstOrNull { it.id == state.selectedCategoryId }?.name
-        ?: state.tags.firstOrNull { it.id == state.selectedTagId }?.name
-    val hasSelection = selectedName != null
+    val pickerViewModel = remember { CategoryPickerViewModel(linkId = null) }
+    val pickerState by pickerViewModel.models.collectAsState()
+    val selectedTagName = state.tags.firstOrNull { it.id == state.selectedTagId }?.name
 
     Scaffold(
         topBar = {
@@ -69,19 +70,11 @@ fun ManageScreen(onBack: () -> Unit, onMoveCategory: (String) -> Unit = {}) {
             )
         },
         bottomBar = {
-            if (hasSelection) {
+            if (!showCategories && selectedTagName != null) {
                 BottomActionBar(
-                    label = selectedName ?: "",
-                    isCategory = state.selectedCategoryId != null,
+                    label = selectedTagName,
                     onRename = { viewModel.take(ManageEvent.StartRename) },
-                    onMove = { state.selectedCategoryId?.let(onMoveCategory) },
-                    onDelete = {
-                        if (state.selectedCategoryId != null) {
-                            viewModel.take(ManageEvent.DeleteCategory(state.selectedCategoryId!!))
-                        } else {
-                            viewModel.take(ManageEvent.DeleteTag(state.selectedTagId!!))
-                        }
-                    }
+                    onDelete = { viewModel.take(ManageEvent.DeleteTag(state.selectedTagId!!)) }
                 )
             }
         },
@@ -107,39 +100,47 @@ fun ManageScreen(onBack: () -> Unit, onMoveCategory: (String) -> Unit = {}) {
                 )
             }
 
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                val rows = if (showCategories) state.categories.map { Triple(it.id, it.name, it.count) }
-                else state.tags.map { Triple(it.id, it.name, it.count) }
-                items(rows) { (id, name, count) ->
-                    val selectedId = if (showCategories) state.selectedCategoryId else state.selectedTagId
-                    ManageRow(
-                        label = name,
-                        count = count,
-                        selected = selectedId == id,
-                        onClick = {
-                            val next = if (selectedId == id) null else id
-                            if (showCategories) viewModel.take(ManageEvent.SelectCategory(next))
-                            else viewModel.take(ManageEvent.SelectTag(next))
-                        }
-                    )
-                }
-                item {
-                    Text(
-                        if (showCategories) "Categories can be nested up to 5 levels. Sorted by name."
-                        else "Tags sorted by name.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
-                    )
+            if (showCategories) {
+                // Category management reuses the picker content inline (no sheet):
+                // create top-level/nested, rename, delete with undo
+                CategoryPickerContent(
+                    state = pickerState,
+                    onEvent = pickerViewModel::take,
+                    onBack = onBack,
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    showUseThis = false,
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    val rows = state.tags.map { Triple(it.id, it.name, it.count) }
+                    items(rows) { (id, name, count) ->
+                        ManageRow(
+                            label = name,
+                            count = count,
+                            selected = state.selectedTagId == id,
+                            onClick = {
+                                val next = if (state.selectedTagId == id) null else id
+                                viewModel.take(ManageEvent.SelectTag(next))
+                            }
+                        )
+                    }
+                    item {
+                        Text(
+                            "Tags sorted by name.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
+                        )
+                    }
                 }
             }
         }
     }
 
-    // Rename dialog
+    // Tag rename dialog (categories rename inline in the picker content)
     if (state.renaming != null) {
         val target = state.renaming!!
         var nameField by remember(target) { mutableStateOf(target.second) }
@@ -156,13 +157,7 @@ fun ManageScreen(onBack: () -> Unit, onMoveCategory: (String) -> Unit = {}) {
             },
             confirmButton = {
                 TextButton(
-                    onClick = {
-                        if (state.selectedCategoryId != null) {
-                            viewModel.take(ManageEvent.RenameCategory(target.first, nameField.trim()))
-                        } else {
-                            viewModel.take(ManageEvent.RenameTag(target.first, nameField.trim()))
-                        }
-                    },
+                    onClick = { viewModel.take(ManageEvent.RenameTag(target.first, nameField.trim())) },
                     enabled = nameField.isNotBlank()
                 ) { Text("Save") }
             },
@@ -172,7 +167,7 @@ fun ManageScreen(onBack: () -> Unit, onMoveCategory: (String) -> Unit = {}) {
         )
     }
 
-    // Delete confirmation
+    // Tag delete confirmation (categories delete inline in the picker content)
     state.deleteTarget?.let { target ->
         AlertDialog(
             onDismissRequest = { viewModel.take(ManageEvent.CancelDelete) },
@@ -238,9 +233,7 @@ private fun ManageRow(label: String, count: Int, selected: Boolean, onClick: () 
 @Composable
 private fun BottomActionBar(
     label: String,
-    isCategory: Boolean,
     onRename: () -> Unit,
-    onMove: () -> Unit,
     onDelete: () -> Unit,
 ) {
     Row(
@@ -260,9 +253,6 @@ private fun BottomActionBar(
             maxLines = 1
         )
         TextButton(onClick = onRename) { Text("Rename", color = MaterialTheme.colorScheme.inverseOnSurface) }
-        if (isCategory) {
-            TextButton(onClick = onMove) { Text("Move", color = MaterialTheme.colorScheme.inverseOnSurface) }
-        }
         TextButton(
             onClick = onDelete,
             modifier = Modifier.background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(50))

@@ -18,6 +18,5 @@ sealed class LibraryNavRoutes : NavKey {
     // Categories and tags management
     data object Categories : LibraryNavRoutes()
     data object Tags : LibraryNavRoutes()
-    data object AddCategory : LibraryNavRoutes()
     data object AddTag : LibraryNavRoutes()
 }

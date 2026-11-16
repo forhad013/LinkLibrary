@@ -71,6 +71,7 @@ internal fun CategoryPickerContent(
     onEvent: (CategoryPickerEvent) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    showUseThis: Boolean = true,
 ) {
     val rows = if (state.browsing) flattenTree(state.categories, state.expandedIds)
     else searchRows(state.categories, state.query)
@@ -126,7 +127,7 @@ internal fun CategoryPickerContent(
     LaunchedEffect(creatingSubOf) {
         if (creatingSubOf != null) {
             val idx = pickerItems.indexOfFirst { it is PickerItem.SubField }
-            if (idx >= 0) listState.animateScrollToItem(idx + 1) // +1 for "no-category" header
+            if (idx >= 0) listState.animateScrollToItem(idx)
         }
     }
 
@@ -168,16 +169,6 @@ internal fun CategoryPickerContent(
         // Browse tree / search results
         LazyColumn(modifier = Modifier.weight(1f), state = listState) {
             if (state.browsing) {
-                item(key = "no-category") {
-                    SelectableRow(
-                        text = "No category",
-                        count = null,
-                        selected = selected == null,
-                        muted = true,
-                        onClick = { if (!isEditing) onEvent(CategoryPickerEvent.Select(null)) },
-                        disabled = isEditing,
-                    )
-                }
                 items(pickerItems, key = { it.key }) { item ->
                     when (item) {
                         is PickerItem.Row -> {
@@ -353,14 +344,17 @@ internal fun CategoryPickerContent(
                 AppBarPill("Save name", onClick = doRename, enabled = canRename, modifier = Modifier.weight(1f))
             }
             else -> AppActionBar {
+                // Without the confirm pill (e.g. Manage's embedded tab), spread actions evenly
+                val spread = if (showUseThis) Modifier else Modifier.weight(1f)
                 AppBarAction(
                     Icons.Filled.CreateNewFolder, "Add sub",
                     { onEvent(CategoryPickerEvent.AddSub) },
                     enabled = selected != null && canAddChildUnder(selected.id, state.categories),
+                    modifier = spread,
                 )
-                AppBarAction(Icons.Filled.Edit, "Rename", { onEvent(CategoryPickerEvent.Rename) }, enabled = selected != null)
-                AppBarAction(Icons.Filled.Delete, "Remove", { onEvent(CategoryPickerEvent.Remove) }, enabled = selected != null, isError = true)
-                AppBarPill(text = "Use this", onClick = { onEvent(CategoryPickerEvent.UseThis) }, modifier = Modifier.weight(1f))
+                AppBarAction(Icons.Filled.Edit, "Rename", { onEvent(CategoryPickerEvent.Rename) }, enabled = selected != null, modifier = spread)
+                AppBarAction(Icons.Filled.Delete, "Remove", { onEvent(CategoryPickerEvent.Remove) }, enabled = selected != null, isError = true, modifier = spread)
+                if (showUseThis) AppBarPill(text = "Use this", onClick = { onEvent(CategoryPickerEvent.UseThis) }, modifier = Modifier.weight(1f))
             }
         }
     }
