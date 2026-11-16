@@ -4,6 +4,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.greenrobotdev.linklibrary.design.resources.Res
@@ -15,7 +16,24 @@ import org.jetbrains.compose.resources.Font
  * File: core/design/src/commonMain/composeResources/font/roboto_flex.ttf
  */
 val RobotoFlex: FontFamily
-    @Composable get() = FontFamily(Font(Res.font.roboto_flex))
+    // One entry per weight with the variable "wght" axis set; a single Font() renders every weight as 400.
+    @Composable get() = FontFamily(
+        listOf(
+            FontWeight.Normal,
+            FontWeight.Medium,
+            FontWeight.SemiBold,
+            FontWeight.Bold,
+            FontWeight.ExtraBold,
+            FontWeight.Black
+        )
+            .map { w ->
+                Font(
+                    Res.font.roboto_flex,
+                    weight = w,
+                    variationSettings = FontVariation.Settings(FontVariation.weight(w.weight))
+                )
+            }
+    )
 
 @Composable
 internal fun getTypography() = Typography(
