@@ -51,6 +51,8 @@ sealed interface TagPickerEvent {
     /** Undo bar or the swipe bar's cancel: drop the pending delete. */
     object UndoDelete : TagPickerEvent
     object Done : TagPickerEvent
+    /** Select-only "Clear": untick every tag. */
+    object ClearChecked : TagPickerEvent
     object ClearError : TagPickerEvent
 }
 

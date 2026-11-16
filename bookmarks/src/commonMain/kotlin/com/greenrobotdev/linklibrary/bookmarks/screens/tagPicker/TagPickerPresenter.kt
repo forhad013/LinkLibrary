@@ -107,6 +107,8 @@ fun TagPickerPresenter(
 
                 TagPickerEvent.Done -> state = state.copy(applied = true)
 
+                TagPickerEvent.ClearChecked -> state = state.copy(checkedIds = emptySet())
+
                 TagPickerEvent.ClearError -> state = state.copy(error = null)
             }
         }
