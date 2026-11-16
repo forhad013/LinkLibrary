@@ -67,6 +67,8 @@ internal fun SelectableRow(
     isDeleting: Boolean = false,
     isSwiping: Boolean = false,
     disabled: Boolean = false,
+    /** Gutter content for non-expandable rows (e.g. the tag picker's check mark). */
+    leading: (@Composable () -> Unit)? = null,
 ) {
     val labelColor = when {
         isDeleting -> MaterialTheme.colorScheme.onErrorContainer
@@ -112,6 +114,8 @@ internal fun SelectableRow(
                         else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+            } else {
+                leading?.let { Box(Modifier.size(40.dp), contentAlignment = Alignment.Center) { it() } }
             }
         }
         Row(
@@ -171,6 +175,7 @@ internal fun InlineTreeField(
     depth: Int,
     icon: ImageVector = Icons.Filled.CreateNewFolder,
     modifier: Modifier = Modifier,
+    placeholder: String = "Category name",
 ) {
     val focus = remember { FocusRequester() }
     LaunchedEffect(Unit) { focus.requestFocus() }
@@ -184,7 +189,7 @@ internal fun InlineTreeField(
             com.greenrobotdev.linklibrary.design.components.textfield.AppTextFieldEnhanced(
                 value = name,
                 onValueChange = onNameChange,
-                placeholder = "Category name",
+                placeholder = placeholder,
                 leadingIcon = icon,
                 isError = taken,
                 showClear = true,
