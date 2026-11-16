@@ -23,7 +23,7 @@ class AddLinkViewModel(
     @Composable
     override fun models(events: Flow<AddLinkEvent>): AddLinkState {
         return AddLinkPresenter(
-            initialState = AddLinkState(url = initialUrl.orEmpty()),
+            initialState = AddLinkState(url = initialUrl.orEmpty(), askForUrl = initialUrl.isNullOrBlank()),
             events = events,
             linkRepository = linkRepository,
             tagRepository = tagRepository,
