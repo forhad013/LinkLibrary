@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreateNewFolder
@@ -34,7 +36,6 @@ import com.greenrobotdev.linklibrary.design.components.layout.AppBarPill
 import com.greenrobotdev.linklibrary.design.components.layout.AppUndoBar
 import com.greenrobotdev.linklibrary.design.components.layout.SwipeConfirmBar
 import com.greenrobotdev.linklibrary.design.components.textfield.SearchField
-import androidx.compose.foundation.shape.CircleShape
 
 /** One visible entry in the browse list: a category row, or an inline editing field. */
 internal sealed interface PickerItem {
@@ -167,7 +168,12 @@ internal fun CategoryPickerContent(
         }
 
         // Browse tree / search results
-        LazyColumn(modifier = Modifier.weight(1f), state = listState) {
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .statusBarsPadding(),
+            state = listState
+        ) {
             if (state.browsing) {
                 items(pickerItems, key = { it.key }) { item ->
                     when (item) {
