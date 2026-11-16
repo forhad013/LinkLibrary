@@ -29,5 +29,6 @@ import androidx.room.PrimaryKey
 data class LinkCategoryEntity(
     @PrimaryKey
     val linkId: String,
-    val categoryId: String
+    val categoryId: String,
+    val assignedAt: Long = System.currentTimeMillis()
 )
