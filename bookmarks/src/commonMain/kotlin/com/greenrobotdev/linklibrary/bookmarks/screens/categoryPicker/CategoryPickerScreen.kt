@@ -3,10 +3,12 @@ package com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,12 +17,16 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
@@ -29,8 +35,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -48,15 +54,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.greenrobotdev.linklibrary.design.components.button.StandardButton
 import com.greenrobotdev.linklibrary.design.components.button.ComponentColors
+import com.greenrobotdev.linklibrary.design.components.button.StandardButton
 import com.greenrobotdev.linklibrary.design.components.feedback.ErrorMessageCard
+import com.greenrobotdev.linklibrary.design.components.textfield.AppTextFieldEnhanced
 import com.greenrobotdev.linklibrary.design.components.textfield.SearchField
 import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
 import com.greenrobotdev.linklibrary.design.theme.ComponentStyle
@@ -83,9 +96,14 @@ fun CategoryPickerSheet(
         }
     }
 
+    // Fixed height from the window, not fillMaxHeight(): the sheet's constraints shrink with the keyboard,
+    // and a height that follows them feeds back into imePadding, so the sheet bounces up and down.
+    val sheetHeight = with(LocalDensity.current) { (LocalWindowInfo.current.containerSize.height * 0.92f).toDp() }
+
     ModalBottomSheet(
+        modifier = Modifier.statusBarsPadding(),
         onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true, confirmValueChange = { true }),
         containerColor = MaterialTheme.colorScheme.surface, // mock: plain white sheet
     ) {
         CategoryPickerContent(
@@ -94,6 +112,7 @@ fun CategoryPickerSheet(
             onBack = onDismiss,
             modifier = Modifier
                 .fillMaxWidth()
+                .height(sheetHeight) // mock: scrim stays visible above the sheet
                 .imePadding() // sheet rises with the keyboard instead of being pushed (same as Add-link sheet)
                 .navigationBarsPadding()
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
@@ -133,6 +152,18 @@ internal fun CategoryPickerContent(
     val rows = if (state.browsing) flattenTree(state.categories, state.expandedIds)
     else searchRows(state.categories, state.query)
     val selected = state.selected
+
+    // "New top-level category" flow: the ViewModel's ADD_SUB dialog with no parent, drawn inline in the tree
+    val creatingTopLevel = state.dialog?.let { it.kind == CategoryPickerDialog.Kind.ADD_SUB && it.categoryId == null } == true
+    var newName by remember(creatingTopLevel) { mutableStateOf("") }
+    val newNameTaken = newName.isNotBlank() && validateCategoryName(newName, null, state.categories) != null
+    val canCreate = newName.isNotBlank() && !newNameTaken
+    val createTopLevel = { if (canCreate) onEvent(CategoryPickerEvent.DialogName(newName.trim())) }
+    val listState = rememberLazyListState()
+    LaunchedEffect(creatingTopLevel) {
+        // keep the field (last item) visible above the keyboard
+        if (creatingTopLevel) listState.animateScrollToItem(listState.layoutInfo.totalItemsCount.coerceAtLeast(1) - 1)
+    }
 
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
         // Header: big title + round tonal close button (44dp)
@@ -176,7 +207,7 @@ internal fun CategoryPickerContent(
         }
 
         // Recent: label and chips share one scrolling line, chips are plain outlined pills
-        if (state.browsing && state.recent.isNotEmpty()) {
+        if (state.browsing && state.recent.isNotEmpty() && !creatingTopLevel) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     "Recent",
@@ -196,7 +227,7 @@ internal fun CategoryPickerContent(
         }
 
         // Browse tree / search results
-        LazyColumn(modifier = Modifier.weight(1f)) {
+        LazyColumn(modifier = Modifier.weight(1f), state = listState) {
             if (state.browsing) {
                 item(key = "no-category") {
                     SelectableRow(
@@ -250,11 +281,21 @@ internal fun CategoryPickerContent(
 
             if (state.browsing) {
                 item(key = "new-top-level") {
-                    DashedPill(
-                        text = "New top-level category",
-                        modifier = Modifier.padding(top = 8.dp),
-                        onClick = { onEvent(CategoryPickerEvent.AddTopLevel) },
-                    )
+                    if (creatingTopLevel) {
+                        NewTopLevelField(
+                            name = newName,
+                            onNameChange = { newName = it },
+                            taken = newNameTaken,
+                            onDone = createTopLevel,
+                            modifier = Modifier.padding(top = 8.dp),
+                        )
+                    } else {
+                        DashedPill(
+                            text = "New top-level category",
+                            modifier = Modifier.padding(top = 8.dp),
+                            onClick = { onEvent(CategoryPickerEvent.AddTopLevel) },
+                        )
+                    }
                 }
             }
         }
@@ -265,12 +306,12 @@ internal fun CategoryPickerContent(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                "Selected: ",
+                if (creatingTopLevel) "New top-level: " else "Selected: ",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                state.selectedPath ?: "No category",
+                if (creatingTopLevel) newName.trim() else state.selectedPath ?: "No category",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -280,7 +321,7 @@ internal fun CategoryPickerContent(
         state.dialog?.let { dialog ->
             val category = state.categories.firstOrNull { it.id == dialog.categoryId }
             when (dialog.kind) {
-                CategoryPickerDialog.Kind.ADD_SUB -> InlineNamePanel(
+                CategoryPickerDialog.Kind.ADD_SUB -> if (!creatingTopLevel) InlineNamePanel(
                     title = "New category in ${category?.path(state.categories) ?: "top level"}",
                     confirmLabel = "Create",
                     onDismiss = { onEvent(CategoryPickerEvent.CancelDialog) },
@@ -314,14 +355,75 @@ internal fun CategoryPickerContent(
             }
         }
 
-        ActionBar(
-            hasSelection = selected != null,
-            canAddSub = selected != null && canAddChildUnder(selected.id, state.categories),
-            onAddSub = { onEvent(CategoryPickerEvent.AddSub) },
-            onRename = { onEvent(CategoryPickerEvent.Rename) },
-            onRemove = { onEvent(CategoryPickerEvent.Remove) },
-            onUseThis = { onEvent(CategoryPickerEvent.UseThis) },
+        if (creatingTopLevel) {
+            // Edit bar: Cancel + Create replace the selection actions until the name is saved
+            BarContainer {
+                BarAction(Icons.Filled.Close, "Cancel", { onEvent(CategoryPickerEvent.CancelDialog) }, enabled = true)
+                BarPill("Create", onClick = createTopLevel, enabled = canCreate, modifier = Modifier.weight(1f))
+            }
+        } else {
+            ActionBar(
+                hasSelection = selected != null,
+                canAddSub = selected != null && canAddChildUnder(selected.id, state.categories),
+                onAddSub = { onEvent(CategoryPickerEvent.AddSub) },
+                onRename = { onEvent(CategoryPickerEvent.Rename) },
+                onRemove = { onEvent(CategoryPickerEvent.Remove) },
+                onUseThis = { onEvent(CategoryPickerEvent.UseThis) },
+            )
+        }
+    }
+}
+
+/** Inline name field that replaces the dashed pill while creating a top-level category (design: typing / taken). */
+@Composable
+private fun NewTopLevelField(
+    name: String,
+    onNameChange: (String) -> Unit,
+    taken: Boolean,
+    onDone: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val focus = remember { FocusRequester() }
+    LaunchedEffect(Unit) { focus.requestFocus() } // opens the keyboard
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        AppTextFieldEnhanced(
+            value = name,
+            onValueChange = onNameChange,
+            placeholder = "Category name",
+            leadingIcon = Icons.Filled.CreateNewFolder,
+            isError = taken,
+            openStyle = true,
+            textFieldModifier = Modifier.focusRequester(focus),
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { onDone() }),
         )
+        if (taken) {
+            Row(
+                modifier = Modifier.padding(start = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                AppIcon(
+                    imageVector = Icons.Filled.Info,
+                    contentDescription = null,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(16.dp),
+                )
+                Text(
+                    "\"${name.trim()}\" already exists at the top level",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        } else {
+            Text(
+                "Top level · you can add subcategories after",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 14.dp),
+            )
+        }
     }
 }
 
@@ -398,7 +500,11 @@ private fun SelectableRow(
         modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
-            .clickable(onClick = onClick),
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -434,7 +540,7 @@ private fun SelectableRow(
                 text,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = when {
-                    selected -> FontWeight.ExtraBold
+                    selected -> FontWeight.Bold // spec: "bold text"; ExtraBold reads as a black shadow on the pill
                     muted -> FontWeight.Medium
                     else -> FontWeight.SemiBold
                 },
@@ -536,7 +642,17 @@ private fun ActionBar(
     onUseThis: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Mock: 72dp fully-rounded dark bar, three 72dp icon+label actions, orange pill filling the rest
+    BarContainer(modifier) {
+        BarAction(Icons.Filled.CreateNewFolder, "Add sub", onAddSub, enabled = hasSelection && canAddSub)
+        BarAction(Icons.Filled.Edit, "Rename", onRename, enabled = hasSelection)
+        BarAction(Icons.Filled.Delete, "Remove", onRemove, enabled = hasSelection, isError = true)
+        BarPill("Use this", onClick = onUseThis, modifier = Modifier.weight(1f))
+    }
+}
+
+/** Mock: 72dp fully-rounded dark bar holding 72dp icon+label actions and an orange pill. */
+@Composable
+private fun BarContainer(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -545,25 +661,30 @@ private fun ActionBar(
             .background(MaterialTheme.colorScheme.inverseSurface)
             .padding(horizontal = 4.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
+        content = content,
+    )
+}
+
+/** Orange check pill ("Use this" / "Create"). Own Row: StandardButton's inner padding wraps the label at this width. */
+@Composable
+private fun BarPill(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+    val container = if (enabled) MaterialTheme.colorScheme.tertiary
+    else MaterialTheme.colorScheme.inverseOnSurface.copy(alpha = 0.12f)
+    val content = if (enabled) MaterialTheme.colorScheme.onTertiary
+    else MaterialTheme.colorScheme.inverseOnSurface.copy(alpha = 0.38f)
+    Row(
+        modifier = modifier
+            .padding(start = 4.dp, end = 6.dp)
+            .fillMaxHeight()
+            .clip(CircleShape)
+            .background(container)
+            .clickable(enabled = enabled, onClick = onClick)
+            .semantics { if (!enabled) contentDescription = "$text (disabled)" },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
     ) {
-        BarAction(Icons.Filled.CreateNewFolder, "Add sub", onAddSub, enabled = hasSelection && canAddSub)
-        BarAction(Icons.Filled.Edit, "Rename", onRename, enabled = hasSelection)
-        BarAction(Icons.Filled.Delete, "Remove", onRemove, enabled = hasSelection, isError = true)
-        StandardButton(
-            onClick = onUseThis,
-            text = "Use this",
-            icon = Icons.Filled.Check,
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 4.dp, end = 6.dp)
-                .fillMaxHeight()
-                .clip(CircleShape),
-            textStyleOverride = MaterialTheme.typography.titleMedium,
-            colors = ComponentColors(
-                container = MaterialTheme.colorScheme.tertiary,
-                onContainer = MaterialTheme.colorScheme.onTertiary,
-            ),
-        )
+        AppIcon(imageVector = Icons.Filled.Check, contentDescription = null, color = content)
+        Text(text, style = MaterialTheme.typography.titleMedium, color = content, maxLines = 1)
     }
 }
 
