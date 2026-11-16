@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -129,7 +130,8 @@ fun RootScreen(
             }
         }
     ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
+        // consume so inner imePadding doesn't re-add the bottom nav bar's height
+        Box(modifier = Modifier.padding(padding).consumeWindowInsets(padding)) {
             when (rootNavigator.getCurrentTab()) {
                 RootScreens.FeedTab -> LibraryTabNavigation(
                     tabNavigator = feedTabNavigator,
