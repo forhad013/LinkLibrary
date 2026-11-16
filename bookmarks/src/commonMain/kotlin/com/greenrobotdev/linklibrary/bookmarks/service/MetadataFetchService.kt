@@ -68,6 +68,9 @@ class MetadataFetchService(private val httpClient: HttpClient) {
                     emit(Result.failure(Exception("HTTP ${response.status.value}: ${response.status.description}")))
                 }
             }
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+            // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
+            throw e
         } catch (e: Exception) {
             println("❌ MetadataFetchService: Exception - ${e::class.simpleName}: ${e.message}")
             e.printStackTrace()

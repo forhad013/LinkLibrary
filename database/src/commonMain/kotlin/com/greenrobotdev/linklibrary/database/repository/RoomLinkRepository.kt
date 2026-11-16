@@ -34,6 +34,9 @@ class RoomLinkRepository(
                     }
                     emit(Result.success(enriched))
                 }
+            } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+                // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
+                throw e
             } catch (e: Exception) {
                 emit(Result.failure(e))
             }
