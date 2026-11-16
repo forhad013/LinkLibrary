@@ -22,8 +22,6 @@ fun CategoryPickerSheet(
     linkId: String? = null,
     initialSelection: String? = null,
     onApplied: (categoryId: String?) -> Unit = {},
-    /** Filtering mode: see [CategoryPickerContent]'s selectOnly. */
-    selectOnly: Boolean = false,
 ) {
     val viewModel = remember { CategoryPickerViewModel(linkId, initialSelection) }
     val state by viewModel.models.collectAsState()
@@ -36,7 +34,7 @@ fun CategoryPickerSheet(
     }
 
     BaseBottomSheet(
-        title = if (selectOnly) "Filter by category" else "Category",
+        title = "Category",
         onClose = onDismiss,
         closeContentDescription = "Close category picker",
     ) {
@@ -45,7 +43,37 @@ fun CategoryPickerSheet(
             onEvent = viewModel::take,
             onBack = onDismiss,
             modifier = Modifier.fillMaxWidth().weight(1f),
-            selectOnly = selectOnly,
+        )
+    }
+}
+
+/**
+ * Feed filter: pick any number of categories (each includes everything inside it).
+ * Only selection; no create, rename or delete. Apply hands back the ticked ids.
+ */
+@Composable
+fun CategoryFilterSheet(
+    initialChecked: Set<String>,
+    onDismiss: () -> Unit,
+    onApplied: (Set<String>) -> Unit,
+) {
+    val viewModel = remember { CategoryPickerViewModel(linkId = null, initialChecked = initialChecked) }
+    val state by viewModel.models.collectAsState()
+
+    LaunchedEffect(state.applied) {
+        if (state.applied) {
+            onApplied(state.checkedIds)
+            onDismiss()
+        }
+    }
+
+    BaseBottomSheet(title = "Filter by category", onClose = onDismiss, closeContentDescription = "Close category filter") {
+        CategoryPickerContent(
+            state = state,
+            onEvent = viewModel::take,
+            onBack = onDismiss,
+            modifier = Modifier.fillMaxWidth().weight(1f),
+            selectOnly = true,
         )
     }
 }

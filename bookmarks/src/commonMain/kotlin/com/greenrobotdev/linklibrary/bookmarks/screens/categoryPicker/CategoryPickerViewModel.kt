@@ -12,6 +12,8 @@ import kotlinx.coroutines.launch
 class CategoryPickerViewModel(
     private val linkId: String?,
     initialSelection: String? = null,
+    /** Filter mode: categories ticked when the sheet opens. */
+    private val initialChecked: Set<String> = emptySet(),
 ) : MoleculeViewModel<CategoryPickerEvent, CategoryPickerState>() {
 
     private val initialSelection = initialSelection
@@ -26,7 +28,7 @@ class CategoryPickerViewModel(
     @Composable
     override fun models(events: Flow<CategoryPickerEvent>): CategoryPickerState =
         CategoryPickerPresenter(
-            initialState = CategoryPickerState(),
+            initialState = CategoryPickerState(checkedIds = initialChecked),
             events = events,
             linkId = linkId,
             initialSelection = initialSelection,

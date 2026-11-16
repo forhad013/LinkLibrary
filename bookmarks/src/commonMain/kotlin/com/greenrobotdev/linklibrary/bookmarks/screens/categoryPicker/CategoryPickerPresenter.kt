@@ -53,7 +53,9 @@ fun CategoryPickerPresenter(
                             isLoading = false,
                             allCategories = categories,
                             selectedCategoryId = selected,
-                            expandedIds = selected?.let { ancestorsOf(it, categories).toSet() } ?: emptySet(),
+                            // open the tree down to the link's category, or to every ticked filter category
+                            expandedIds = (listOfNotNull(selected) + state.checkedIds)
+                                .flatMap { ancestorsOf(it, categories) }.toSet(),
                         )
                     } else {
                         state.copy(allCategories = categories) // categories getter re-filters the pending subtree
@@ -215,6 +217,13 @@ fun CategoryPickerPresenter(
                     // rows were only hidden by the categories getter; dropping the delete state restores them
                     state = resetDeleteState(state)
                 }
+
+                is CategoryPickerEvent.ToggleChecked -> {
+                    val id = event.categoryId
+                    state = state.copy(checkedIds = if (id in state.checkedIds) state.checkedIds - id else state.checkedIds + id)
+                }
+
+                CategoryPickerEvent.ClearChecked -> state = state.copy(checkedIds = emptySet())
 
                 is CategoryPickerEvent.ParentDeleteChoice -> {
                     state = state.copy(parentDeleteChoice = event.choice)
