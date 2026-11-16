@@ -52,8 +52,10 @@ fun filterFeed(state: LibraryState): List<Link> {
                 link.title, link.url, link.description, link.fetchedDescription, state.categoryOf(link)?.name,
             ).any { it.contains(q, ignoreCase = true) } || link.tags.any { it.contains(q.removePrefix("#"), ignoreCase = true) })
     }.let { list ->
-        // null createdAt (links saved before it was stamped) sorts as oldest
-        if (state.newestFirst) list.sortedByDescending { it.createdAt ?: 0L } else list.sortedBy { it.createdAt ?: 0L }
+        // Repo order is newest first (createdAt, then insertion order for undated links); the stable
+        // sort keeps that tie-break, and Oldest is its exact reverse so undated links flip too.
+        val newest = list.sortedByDescending { it.createdAt ?: Long.MIN_VALUE }
+        if (state.newestFirst) newest else newest.asReversed()
     }
 }
 
