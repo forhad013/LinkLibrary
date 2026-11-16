@@ -319,7 +319,8 @@ internal fun CategoryPickerContent(
                         count = null,
                         selected = selected == null,
                         muted = true,
-                        onClick = { onEvent(CategoryPickerEvent.Select(null)) },
+                        onClick = { if (!isEditing) onEvent(CategoryPickerEvent.Select(null)) },
+                        disabled = isEditing,
                     )
                 }
                 items(pickerItems, key = { it.key }) { item ->
@@ -332,13 +333,14 @@ internal fun CategoryPickerContent(
                                 text = item.row.category.name,
                                 count = item.row.category.count,
                                 depth = item.row.depth,
-                                selected = item.row.category.id == state.selectedCategoryId,
+                                selected = !isEditing && item.row.category.id == state.selectedCategoryId,
                                 expandable = item.row.hasChildren,
                                 expanded = item.row.category.id in state.expandedIds,
-                                onClick = { onEvent(CategoryPickerEvent.Select(item.row.category.id)) },
+                                onClick = { if (!isEditing) onEvent(CategoryPickerEvent.Select(item.row.category.id)) },
                                 onToggle = { onEvent(CategoryPickerEvent.ToggleExpand(item.row.category.id)) },
                                 isDeleting = isDeleteTarget && state.deletePhase == DeletePhase.CONFIRM,
                                 isSwiping = isDeleteTarget && state.deletePhase == DeletePhase.SWIPING,
+                                disabled = isEditing,
                             )
                         }
                         is PickerItem.SubField -> InlineTreeField(
@@ -370,8 +372,9 @@ internal fun CategoryPickerContent(
                     SelectableRow(
                         text = row.breadcrumb,
                         count = row.category.count,
-                        selected = row.category.id == state.selectedCategoryId,
-                        onClick = { onEvent(CategoryPickerEvent.Select(row.category.id)) },
+                        selected = !isEditing && row.category.id == state.selectedCategoryId,
+                        onClick = { if (!isEditing) onEvent(CategoryPickerEvent.Select(row.category.id)) },
+                        disabled = isEditing,
                     )
                 }
                 if (needsCreateRow(state.categories, state.query)) {
@@ -589,6 +592,7 @@ private fun SelectableRow(
     muted: Boolean = false,
     isDeleting: Boolean = false,
     isSwiping: Boolean = false,
+    disabled: Boolean = false,
 ) {
     val dangerBg = Color(0xFFFBE9E7)
     val dangerFg = Color(0xFF9A2418)
@@ -602,10 +606,11 @@ private fun SelectableRow(
         modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
-            .then(if (isSwiping) Modifier.alpha(0.45f).scale(0.96f) else Modifier)
+            .then(if (isSwiping) Modifier.alpha(0.45f).scale(0.96f) else if (disabled) Modifier.alpha(0.38f) else Modifier)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
+                enabled = !disabled,
                 onClick = onClick
             ),
         verticalAlignment = Alignment.CenterVertically,
