@@ -28,6 +28,9 @@ interface LinkDao {
     @Delete
     suspend fun deleteLink(link: LinkEntity)
 
+    @Query("UPDATE links SET isOpened = 1 WHERE id = :linkId")
+    suspend fun markOpened(linkId: String): Int
+
     @Query("UPDATE links SET isFavorite = NOT isFavorite WHERE id = :linkId")
     suspend fun toggleFavorite(linkId: String): Int
 

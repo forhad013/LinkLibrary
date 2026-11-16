@@ -139,6 +139,11 @@ class RoomCategoryRepository(
         }
     }
 
+    override fun getLinkCategoryIds(): Flow<Result<Map<String, String>>> =
+        categoryDao.getAllLinkCategories()
+            .map { rows -> Result.success(rows.associate { it.linkId to it.categoryId }) }
+            .catch { e -> emit(Result.failure(e)) }
+
     override suspend fun getRecentCategories(): Flow<Result<List<CategoryEntity>>> = flow {
         try {
             emit(Result.success(categoryDao.getRecentCategories()))

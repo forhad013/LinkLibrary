@@ -133,6 +133,10 @@ interface CategoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun assignLinkToCategory(linkCategory: LinkCategoryEntity)
 
+    /** Every link → category row, for the Feed's category chip and filter. */
+    @Query("SELECT * FROM link_categories")
+    fun getAllLinkCategories(): Flow<List<LinkCategoryEntity>>
+
     @Query("DELETE FROM link_categories WHERE linkId = :linkId")
     suspend fun removeLinkCategory(linkId: String)
 
