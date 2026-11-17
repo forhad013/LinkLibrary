@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.MaterialTheme
@@ -168,7 +169,7 @@ internal fun FeedLinkCard(
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        TypeThumb(type = if (noPreview) "none" else link.type)
+        TypeThumb(type = if (noPreview) "none" else link.type, muted = link.isArchived)
 
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -187,11 +188,15 @@ internal fun FeedLinkCard(
                 if (link.isFavorite) {
                     AppIcon(Icons.Filled.Star, contentDescription = "Favorite", color = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(14.dp))
                 }
+                if (link.isArchived) {
+                    ArchivedPill()
+                }
             }
             Text(
                 if (noPreview) link.url else link.title,
                 style = if (noPreview) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
+                color = if (link.isArchived) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -224,7 +229,7 @@ internal fun FeedLinkCard(
 }
 
 @Composable
-private fun TypeThumb(type: String) {
+private fun TypeThumb(type: String, muted: Boolean = false) {
     data class Look(val shape: Shape, val bg: Color, val fg: Color, val icon: ImageVector)
     val look = when (type) {
         "video" -> Look(RoundedCornerShape(18.dp), LordsExtraColors.mediaPlaceholder, MaterialTheme.colorScheme.secondary, Icons.Filled.PlayArrow)
@@ -232,11 +237,29 @@ private fun TypeThumb(type: String) {
         "article" -> Look(RoundedCornerShape(18.dp), MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer, Icons.AutoMirrored.Outlined.Article)
         else -> Look(RoundedCornerShape(18.dp), MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Filled.Link)
     }
+    // Archived: same shape and icon, neutral colors
+    val bg = if (muted) MaterialTheme.colorScheme.surfaceContainerHigh else look.bg
+    val fg = if (muted) MaterialTheme.colorScheme.onSurfaceVariant else look.fg
     Box(
-        modifier = Modifier.size(72.dp).clip(look.shape).background(look.bg),
+        modifier = Modifier.size(72.dp).clip(look.shape).background(bg),
         contentAlignment = Alignment.Center,
     ) {
-        AppIcon(look.icon, contentDescription = null, color = look.fg)
+        AppIcon(look.icon, contentDescription = null, color = fg)
+    }
+}
+
+@Composable
+private fun ArchivedPill() {
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .padding(horizontal = 8.dp, vertical = 3.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AppIcon(Icons.Outlined.Archive, contentDescription = null, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(12.dp))
+        Text("Archived", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
     }
 }
 

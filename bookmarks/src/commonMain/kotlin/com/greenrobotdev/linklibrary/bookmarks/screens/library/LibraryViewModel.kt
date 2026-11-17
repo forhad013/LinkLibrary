@@ -23,10 +23,11 @@ class LibraryViewModel : MoleculeViewModel<LibraryEvent, LibraryState>(), KoinCo
     private val linkRepository: LinkRepository by inject()
     private val categoryRepository: CategoryRepository by inject()
     private val tagRepository: TagRepository by inject()
+    private val filterStore = FeedFilterStore()
 
     @Composable
     override fun models(events: Flow<LibraryEvent>): LibraryState =
-        LibraryPresenter(events, linkRepository, categoryRepository, tagRepository)
+        LibraryPresenter(events, linkRepository, categoryRepository, tagRepository, filterStore)
 
     override fun initialValue(): LibraryState = LibraryState()
 }
@@ -38,8 +39,12 @@ fun LibraryPresenter(
     linkRepository: LinkRepository,
     categoryRepository: CategoryRepository,
     tagRepository: TagRepository,
+    filterStore: FeedFilterStore,
 ): LibraryState {
-    var state by remember { mutableStateOf(LibraryState()) }
+    var state by remember { mutableStateOf(LibraryState(filters = filterStore.load())) }
+
+    // Saved on every change, so the Feed reopens with the same filters after the app is closed
+    LaunchedEffect(state.filters) { filterStore.save(state.filters) }
 
     LaunchedEffect(Unit) {
         linkRepository.getLinksWithTags().collect { result ->
@@ -49,7 +54,11 @@ fun LibraryPresenter(
     }
     LaunchedEffect(Unit) {
         categoryRepository.getCategories().collect { result ->
-            result.onSuccess { rows -> state = state.copy(categories = rows.map { it.toCategory() }) }
+            result.onSuccess { rows ->
+                // Drop picks whose category was deleted, or the Feed would stay empty with no chip to remove
+                val categories = rows.map { it.toCategory() }
+                state = state.copy(categories = categories, filters = state.filters.copy(categoryIds = state.filters.categoryIds.filterTo(mutableSetOf()) { id -> categories.any { it.id == id } }))
+            }
         }
     }
     LaunchedEffect(Unit) {
@@ -59,7 +68,10 @@ fun LibraryPresenter(
     }
     LaunchedEffect(Unit) {
         tagRepository.getTagsWithCounts().collect { result ->
-            result.onSuccess { rows -> state = state.copy(tags = rows.map { it.toTag() }) }
+            result.onSuccess { rows ->
+                val tags = rows.map { it.toTag() }
+                state = state.copy(tags = tags, filters = state.filters.copy(tagIds = state.filters.tagIds.filterTo(mutableSetOf()) { id -> tags.any { it.id == id } }))
+            }
         }
     }
 

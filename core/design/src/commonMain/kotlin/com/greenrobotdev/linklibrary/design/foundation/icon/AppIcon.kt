@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.design.foundation.icon
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Icon
@@ -44,7 +45,8 @@ fun AppIcon(
     Icon(
         imageVector = imageVector,
         contentDescription = contentDescription,
-//        modifier = modifier.then(androidx.compose.ui.draw.size(size.dp)),
+        // The caller's modifier comes first, so a size it sets wins over [size]
+        modifier = modifier.size(size.dp),
         tint = color
     )
 }

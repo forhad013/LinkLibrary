@@ -76,9 +76,17 @@ fun FeedFilterSheet(
         )
     }
 
-    BaseBottomSheet(title = "Filter saves", onClose = onDismiss, closeContentDescription = "Close filters") {
+    BaseBottomSheet(
+        title = "Filter saves",
+        onClose = onDismiss,
+        closeContentDescription = "Close filters"
+    ) {
         Column(
-            modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(bottom = 16.dp),
+            modifier = Modifier
+                .weight(1f)
+                // No stretch overscroll: taps are eaten while it settles, so the controls stopped responding
+                .verticalScroll(rememberScrollState(), overscrollEffect = null)
+                .padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(22.dp),
         ) {
             FilterSection("Show") {
@@ -88,17 +96,25 @@ fun FeedFilterSheet(
                     label = { it.label },
                     onSelect = { draft = draft.copy(opened = it) },
                 )
-                SwitchRow("Favorites only", null, draft.favoritesOnly) { draft = draft.copy(favoritesOnly = it) }
+                SwitchRow("Favorites only", null, draft.favoritesOnly) {
+                    draft = draft.copy(favoritesOnly = it)
+                }
             }
 
             FilterSection("Type") {
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     LinkKind.entries.forEach { kind ->
                         val on = kind in draft.kinds
                         ChoiceChip(
                             text = if (on) "✓ ${kind.label}" else kind.label,
                             selected = on,
-                            onClick = { draft = draft.copy(kinds = if (on) draft.kinds - kind else draft.kinds + kind) },
+                            onClick = {
+                                draft =
+                                    draft.copy(kinds = if (on) draft.kinds - kind else draft.kinds + kind)
+                            },
                         )
                     }
                 }
@@ -108,7 +124,8 @@ fun FeedFilterSheet(
                 val picked = state.categories.filter { it.id in draft.categoryIds }
                 PickerField(
                     label = "In categories",
-                    value = picked.joinToString(", ") { it.path(state.categories) }.ifEmpty { "All categories" },
+                    value = picked.joinToString(", ") { it.path(state.categories) }
+                        .ifEmpty { "All categories" },
                     active = picked.isNotEmpty(),
                     onClick = { pickCategories = true },
                 )
@@ -135,7 +152,7 @@ fun FeedFilterSheet(
             ) {
                 // Selected tags first, then the most used, so a pick never scrolls out of view
                 val shown = (state.tags.filter { it.id in draft.tagIds } +
-                    state.tags.sortedByDescending { it.count }.take(8)).distinctBy { it.id }
+                        state.tags.sortedByDescending { it.count }.take(8)).distinctBy { it.id }
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -146,7 +163,10 @@ fun FeedFilterSheet(
                         ChoiceChip(
                             text = "#${tag.name}  ${tag.count}",
                             selected = on,
-                            onClick = { draft = draft.copy(tagIds = if (on) draft.tagIds - tag.id else draft.tagIds + tag.id) },
+                            onClick = {
+                                draft =
+                                    draft.copy(tagIds = if (on) draft.tagIds - tag.id else draft.tagIds + tag.id)
+                            },
                         )
                     }
                     BrowseAllButton("All tags", onClick = { pickTags = true })
@@ -154,15 +174,28 @@ fun FeedFilterSheet(
             }
 
             FilterSection("Saved") {
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     SavedRange.entries.forEach { range ->
-                        ChoiceChip(text = range.label, selected = draft.saved == range, onClick = { draft = draft.copy(saved = range) })
+                        ChoiceChip(
+                            text = range.label,
+                            selected = draft.saved == range,
+                            onClick = { draft = draft.copy(saved = range) })
                     }
                 }
             }
 
-            SwitchRow("Include archived", "Archived saves are hidden by default", draft.includeArchived) {
-                draft = draft.copy(includeArchived = it)
+            // Meaningless when Show = Archived, which already shows only archived saves
+            if (draft.opened != OpenedFilter.ARCHIVED) {
+                SwitchRow(
+                    "Include archived",
+                    "Archived saves are hidden by default",
+                    draft.includeArchived
+                ) {
+                    draft = draft.copy(includeArchived = it)
+                }
             }
         }
 
@@ -180,7 +213,9 @@ fun FeedFilterSheet(
                 modifier = Modifier.weight(1f),
             )
             ActionButton(
-                text = when (matching) { 0 -> "No saves match"; 1 -> "Show 1 save"; else -> "Show $matching saves" },
+                text = when (matching) {
+                    0 -> "No saves match"; 1 -> "Show 1 save"; else -> "Show $matching saves"
+                },
                 container = MaterialTheme.colorScheme.primary,
                 content = MaterialTheme.colorScheme.onPrimary,
                 enabled = true,
@@ -199,7 +234,12 @@ private fun FilterSection(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f))
+            Text(
+                title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.weight(1f)
+            )
             trailing?.invoke()
         }
         content()
@@ -230,7 +270,10 @@ private fun <T> Segmented(
                     .then(if (compact) Modifier else Modifier.weight(1f))
                     .clip(CircleShape)
                     .background(if (on) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
-                    .selectable(selected = on, role = Role.RadioButton, onClick = { onSelect(option) })
+                    .selectable(
+                        selected = on,
+                        role = Role.RadioButton,
+                        onClick = { onSelect(option) })
                     .heightIn(min = if (compact) 32.dp else 40.dp)
                     .padding(horizontal = 14.dp),
                 contentAlignment = Alignment.Center,
@@ -247,7 +290,12 @@ private fun <T> Segmented(
 }
 
 @Composable
-private fun SwitchRow(title: String, subtitle: String?, checked: Boolean, onChange: (Boolean) -> Unit) {
+private fun SwitchRow(
+    title: String,
+    subtitle: String?,
+    checked: Boolean,
+    onChange: (Boolean) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -258,7 +306,11 @@ private fun SwitchRow(title: String, subtitle: String?, checked: Boolean, onChan
         Column(Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
             subtitle?.let {
-                Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
         Switch(checked = checked, onCheckedChange = null) // the row handles the toggle
@@ -278,9 +330,17 @@ private fun PickerField(label: String, value: String, active: Boolean, onClick: 
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        AppIcon(Icons.Outlined.Folder, contentDescription = null, color = MaterialTheme.colorScheme.onSurface)
+        AppIcon(
+            Icons.Outlined.Folder,
+            contentDescription = null,
+            color = MaterialTheme.colorScheme.onSurface
+        )
         Column(Modifier.weight(1f)) {
-            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Text(
                 value,
                 style = MaterialTheme.typography.bodyLarge,
@@ -290,7 +350,11 @@ private fun PickerField(label: String, value: String, active: Boolean, onClick: 
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        AppIcon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, color = MaterialTheme.colorScheme.onSurface)
+        AppIcon(
+            Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 

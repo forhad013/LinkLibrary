@@ -5,6 +5,7 @@ import com.greenrobotdev.linklibrary.bookmarks.model.Link
 import com.greenrobotdev.linklibrary.bookmarks.model.Tag
 import com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker.subtreeIds
 import kotlinx.datetime.DatePeriod
+import kotlinx.serialization.Serializable
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -14,14 +15,19 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-enum class OpenedFilter(val label: String) { ALL("All"), UNOPENED("Unopened"), OPENED("Opened") }
+/** ARCHIVED = only archived links, opened or not. */
+@Serializable
+enum class OpenedFilter(val label: String) { ALL("All"), UNOPENED("Unopened"), OPENED("Opened"), ARCHIVED("Archived") }
 
 /** Link kinds the Type section offers; NO_PREVIEW = no title fetched yet. */
+@Serializable
 enum class LinkKind(val label: String) { ARTICLE("Articles"), VIDEO("Videos"), SOCIAL("Social"), NO_PREVIEW("No preview") }
 
+@Serializable
 enum class SavedRange(val label: String) { ANY("Any time"), TODAY("Today"), THIS_WEEK("This week"), THIS_MONTH("This month") }
 
 /** Everything the Filters sheet sets. Default = no filtering (archived hidden). */
+@Serializable
 data class FeedFilters(
     val opened: OpenedFilter = OpenedFilter.ALL,
     val favoritesOnly: Boolean = false,
@@ -38,7 +44,7 @@ data class FeedFilters(
     val activeCount: Int
         get() = listOf(
             opened != OpenedFilter.ALL, favoritesOnly, kinds.isNotEmpty(), categoryIds.isNotEmpty(),
-            tagIds.isNotEmpty(), saved != SavedRange.ANY, includeArchived,
+            tagIds.isNotEmpty(), saved != SavedRange.ANY, includeArchived && opened != OpenedFilter.ARCHIVED,
         ).count { it }
 }
 
@@ -91,12 +97,12 @@ fun filterFeed(
     val since = filters.saved.startMs(nowMs)
     return state.links.filter { link ->
         val linkTags = link.tags.map { it.lowercase() }
-        (filters.includeArchived || !link.isArchived) &&
-            when (filters.opened) {
-                OpenedFilter.ALL -> true
-                OpenedFilter.UNOPENED -> !link.isOpened
-                OpenedFilter.OPENED -> link.isOpened
-            } &&
+        when (filters.opened) {
+            OpenedFilter.ALL -> filters.includeArchived || !link.isArchived
+            OpenedFilter.UNOPENED -> !link.isOpened && (filters.includeArchived || !link.isArchived)
+            OpenedFilter.OPENED -> link.isOpened && (filters.includeArchived || !link.isArchived)
+            OpenedFilter.ARCHIVED -> link.isArchived
+        } &&
             (!filters.favoritesOnly || link.isFavorite) &&
             (filters.kinds.isEmpty() || link.kind() in filters.kinds) &&
             (inCategories == null || state.linkCategoryIds[link.id] in inCategories) &&
