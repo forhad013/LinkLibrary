@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.details
 
+import com.greenrobotdev.linklibrary.design.components.layout.appVerticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
@@ -171,7 +171,7 @@ fun LinkDetailScreen(
     }
 
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).imePadding()) {
-        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+        Column(Modifier.fillMaxSize().appVerticalScroll(rememberScrollState())) {
             Hero(
                 type = link.type,
                 noPreview = link.title.isBlank() || link.title == link.url,

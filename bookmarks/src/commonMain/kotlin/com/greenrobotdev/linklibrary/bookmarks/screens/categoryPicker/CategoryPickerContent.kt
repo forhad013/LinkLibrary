@@ -1,13 +1,13 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker
 
+import com.greenrobotdev.linklibrary.design.components.layout.AppLazyRow
+import com.greenrobotdev.linklibrary.design.components.layout.AppLazyColumn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -158,7 +158,7 @@ internal fun CategoryPickerContent(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(end = 8.dp),
                 )
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                AppLazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(state.recent, key = { it.id }) { category ->
                         RecentChip(
                             text = category.path(state.categories),
@@ -172,7 +172,7 @@ internal fun CategoryPickerContent(
         }
 
         // Browse tree / search results
-        LazyColumn(
+        AppLazyColumn(
             modifier = Modifier
                 .weight(1f)
                 .statusBarsPadding(),

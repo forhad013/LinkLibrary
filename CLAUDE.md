@@ -35,6 +35,7 @@ Material 3 Expressive, Royal Purple `#6D28D9` + Gold `#F59E0B`. Source of truth:
 - **Cards**: always use templates from `:core:design` (`FormCard`, `ContentCard`, `SectionContentCard`, `ToggleCard`, `InputCard`). Never use raw `androidx.compose.material3.Card` in feature modules.
 - **Icons**: always `AppIcon` (variants: Regular, Compact) — no custom icon backgrounds
 - **Inputs**: use `AppTextFieldEnhanced`, `AppTextFieldWithCharacterLimit` from `:core:design`
+- **Scrolling**: `AppLazyColumn` / `AppLazyRow` / `AppLazyVerticalGrid` and `Modifier.appVerticalScroll` / `appHorizontalScroll` from `:core:design` — never the raw ones (their stretch overscroll eats taps while it settles)
 - **Colors**: always `MaterialTheme.colorScheme` — never hardcode brand colors
 - **Styling**: cards `RoundedCornerShape(24.dp)`, elevation 4.dp, border `1.dp outlineVariant.copy(alpha = 0.3f)`, padding 24.dp, content spacing `Arrangement.spacedBy(20.dp)`; compact 16.dp; buttons 12.dp
 

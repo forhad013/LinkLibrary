@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.library
 
+import com.greenrobotdev.linklibrary.design.components.layout.AppLazyRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -408,8 +408,7 @@ internal fun PickUpStrip(links: List<Link>, unopenedCount: Int, onOpen: (Link) -
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        // No stretch overscroll: taps are eaten while it settles (same fix as the Filters sheet)
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp), overscrollEffect = null) {
+        AppLazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             items(links, key = { it.id }) { link ->
                 PickUpCard(link, onOpen = { onOpen(link) }, modifier = Modifier.animateItem())
             }

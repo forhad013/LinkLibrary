@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add.sheet
 
+import com.greenrobotdev.linklibrary.design.components.layout.appVerticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +15,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -113,7 +113,7 @@ private fun AddLinkSheetContent(
         modifier = modifier
             .fillMaxWidth()
             .imeNestedScroll() // must come before the scroll, which feeds it the drag
-            .verticalScroll(rememberScrollState()),
+            .appVerticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(18.dp)
     ) {
         Column(

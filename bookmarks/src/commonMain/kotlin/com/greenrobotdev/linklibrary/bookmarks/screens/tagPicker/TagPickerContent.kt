@@ -1,11 +1,11 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.tagPicker
 
+import com.greenrobotdev.linklibrary.design.components.layout.AppLazyColumn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -91,7 +91,7 @@ internal fun TagPickerContent(
 
         state.error?.let { ErrorMessageCard(error = it, onDismiss = { onEvent(TagPickerEvent.ClearError) }) }
 
-        LazyColumn(modifier = Modifier.weight(1f), state = listState) {
+        AppLazyColumn(modifier = Modifier.weight(1f), state = listState) {
             items(rows, key = { it.id }) { tag ->
                 if (tag.id == state.renamingId) {
                     InlineTreeField(
