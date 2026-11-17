@@ -479,10 +479,17 @@ internal fun FeedSectionHeader(title: String, modifier: Modifier = Modifier) {
 
 /**
  * "Pick up where you left off": the newest unopened saves as a sideways row of large cards.
- * Tapping one opens the link, which marks it opened, so it leaves the row.
+ * Tapping one opens the link, which marks it opened, so it leaves the row. "Mark as opened" does the
+ * same without opening it.
  */
 @Composable
-internal fun PickUpStrip(links: List<Link>, unopenedCount: Int, onOpen: (Link) -> Unit, modifier: Modifier = Modifier) {
+internal fun PickUpStrip(
+    links: List<Link>,
+    unopenedCount: Int,
+    onOpen: (Link) -> Unit,
+    onMarkOpened: (Link) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -500,14 +507,14 @@ internal fun PickUpStrip(links: List<Link>, unopenedCount: Int, onOpen: (Link) -
         }
         AppLazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             items(links, key = { it.id }) { link ->
-                PickUpCard(link, onOpen = { onOpen(link) }, modifier = Modifier.animateItem())
+                PickUpCard(link, onOpen = { onOpen(link) }, onMarkOpened = { onMarkOpened(link) }, modifier = Modifier.animateItem())
             }
         }
     }
 }
 
 @Composable
-private fun PickUpCard(link: Link, onOpen: () -> Unit, modifier: Modifier = Modifier) {
+private fun PickUpCard(link: Link, onOpen: () -> Unit, onMarkOpened: () -> Unit, modifier: Modifier = Modifier) {
     val noPreview = link.title.isBlank() || link.title == link.url
     val look = typeLook(if (noPreview) "none" else link.type)
     val meta = listOfNotNull(hostOf(link.url), savedAtLabel(link.createdAt)).joinToString(" · ")
@@ -541,6 +548,18 @@ private fun PickUpCard(link: Link, onOpen: () -> Unit, modifier: Modifier = Modi
                 minLines = 2, // cards in the row stay the same height
                 overflow = TextOverflow.Ellipsis,
             )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(role = Role.Button, onClick = onMarkOpened)
+                .heightIn(min = 44.dp)
+                .padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            AppIcon(Icons.Filled.Check, contentDescription = null, color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+            Text("Mark as opened", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
         }
     }
 }
