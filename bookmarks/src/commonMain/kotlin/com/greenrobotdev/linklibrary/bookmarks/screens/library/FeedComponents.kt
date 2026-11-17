@@ -10,9 +10,13 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -261,15 +265,20 @@ internal fun FeedLinkCard(
     }
 }
 
+/** Thumbnail shape, colors and icon per link type ("none" = no preview yet). */
+private data class TypeLook(val shape: Shape, val bg: Color, val fg: Color, val icon: ImageVector)
+
+@Composable
+private fun typeLook(type: String): TypeLook = when (type) {
+    "video" -> TypeLook(RoundedCornerShape(18.dp), LordsExtraColors.mediaPlaceholder, MaterialTheme.colorScheme.secondary, Icons.Filled.PlayArrow)
+    "social" -> TypeLook(CircleShape, MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Icons.Outlined.ChatBubbleOutline)
+    "article" -> TypeLook(RoundedCornerShape(18.dp), MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer, Icons.AutoMirrored.Outlined.Article)
+    else -> TypeLook(RoundedCornerShape(18.dp), MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Filled.Link)
+}
+
 @Composable
 private fun TypeThumb(type: String, muted: Boolean = false) {
-    data class Look(val shape: Shape, val bg: Color, val fg: Color, val icon: ImageVector)
-    val look = when (type) {
-        "video" -> Look(RoundedCornerShape(18.dp), LordsExtraColors.mediaPlaceholder, MaterialTheme.colorScheme.secondary, Icons.Filled.PlayArrow)
-        "social" -> Look(CircleShape, MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Icons.Outlined.ChatBubbleOutline)
-        "article" -> Look(RoundedCornerShape(18.dp), MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer, Icons.AutoMirrored.Outlined.Article)
-        else -> Look(RoundedCornerShape(18.dp), MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Filled.Link)
-    }
+    val look = typeLook(type)
     // Archived: same shape and icon, neutral colors
     val bg = if (muted) MaterialTheme.colorScheme.surfaceContainerHigh else look.bg
     val fg = if (muted) MaterialTheme.colorScheme.onSurfaceVariant else look.fg
@@ -374,4 +383,73 @@ internal fun FeedSectionHeader(title: String, modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier.padding(start = 4.dp, top = 4.dp).semantics { heading() },
     )
+}
+
+/**
+ * "Pick up where you left off": the newest unopened saves as a sideways row of large cards.
+ * Tapping one opens the link, which marks it opened, so it leaves the row.
+ */
+@Composable
+internal fun PickUpStrip(links: List<Link>, unopenedCount: Int, onOpen: (Link) -> Unit, modifier: Modifier = Modifier) {
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                "Pick up where you left off",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.weight(1f).padding(start = 4.dp).semantics { heading() },
+            )
+            Text(
+                "$unopenedCount unopened",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        // No stretch overscroll: taps are eaten while it settles (same fix as the Filters sheet)
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp), overscrollEffect = null) {
+            items(links, key = { it.id }) { link ->
+                PickUpCard(link, onOpen = { onOpen(link) }, modifier = Modifier.animateItem())
+            }
+        }
+    }
+}
+
+@Composable
+private fun PickUpCard(link: Link, onOpen: () -> Unit, modifier: Modifier = Modifier) {
+    val noPreview = link.title.isBlank() || link.title == link.url
+    val look = typeLook(if (noPreview) "none" else link.type)
+    val meta = listOfNotNull(hostOf(link.url), savedAtLabel(link.createdAt)).joinToString(" · ")
+    Column(
+        modifier = modifier
+            .width(220.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable(role = Role.Button, onClickLabel = "Open link", onClick = onOpen),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxWidth().height(110.dp).background(look.bg),
+            contentAlignment = Alignment.Center,
+        ) {
+            AppIcon(look.icon, contentDescription = null, color = look.fg, modifier = Modifier.size(32.dp))
+        }
+        Column(Modifier.padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                meta,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                if (noPreview) link.url else link.title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                minLines = 2, // cards in the row stay the same height
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
 }
