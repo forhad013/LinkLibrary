@@ -1,58 +1,52 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.details
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Article
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.EditNote
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Label
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.automirrored.outlined.Article
+import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.OpenInNew
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Archive
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -62,998 +56,437 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.greenrobotdev.linklibrary.design.components.utils.PlatformAsyncImage
-import com.greenrobotdev.linklibrary.design.components.icon.AppIcon
 import androidx.navigation3.runtime.NavKey
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
+import com.greenrobotdev.linklibrary.bookmarks.domain.hostOf
+import com.greenrobotdev.linklibrary.bookmarks.model.Link
+import com.greenrobotdev.linklibrary.bookmarks.screens.add.components.CategoryField
+import com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker.CategoryPickerSheet
+import com.greenrobotdev.linklibrary.bookmarks.screens.library.savedAtLabel
+import com.greenrobotdev.linklibrary.bookmarks.screens.tagPicker.TagPickerSheet
+import com.greenrobotdev.linklibrary.design.components.feedback.ErrorMessageCard
+import com.greenrobotdev.linklibrary.design.components.layout.AppActionBar
+import com.greenrobotdev.linklibrary.design.components.layout.AppBarPill
+import com.greenrobotdev.linklibrary.design.components.textfield.AppTextFieldEnhanced
+import com.greenrobotdev.linklibrary.design.extensions.dashBorder
+import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
+import com.greenrobotdev.linklibrary.design.theme.LordsExtraColors
 
 /**
- * Enhanced Link Details Screen - Material 3 Expressive Design matching link_details.html specification
- *
- * Features:
- * - Simple mobile-first layout (not complex desktop grids)
- * - Hero card with image, gradient overlay, and category badge
- * - Metadata section with tags and info cards
- * - Notes section with edit capability
- * - Related links grid
- * - Sticky bottom action bar (Edit, Share, Open Link)
- * - Material 3 Expressive animations and spring physics
- * - Proper responsive design for mobile and desktop
+ * Link details (design: Link details). Everything edits in place and saves at once:
+ * type, title, category, tags, note (after a short pause), favorite / archive / opened.
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LinkDetailScreen(
     routeKey: NavKey,
     linkId: String,
     onBack: () -> Unit,
-    onNavigateToNoteEditor: (String) -> Unit = {}
+    @Suppress("UNUSED_PARAMETER") onNavigateToNoteEditor: (String) -> Unit = {}, // note edits inline now
 ) {
-    val viewModel: LinkDetailViewModel = viewModel(key = routeKey.toString()) {
-        LinkDetailViewModel(linkId)
-    }
+    val viewModel: LinkDetailViewModel = viewModel(key = routeKey.toString()) { LinkDetailViewModel(linkId) }
     val state by viewModel.models.collectAsState()
+    val uriHandler = LocalUriHandler.current
+    val clipboard = LocalClipboardManager.current
+    val share = rememberShareLink()
 
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var isEditingNotes by remember { mutableStateOf(false) }
-    var personalNotes by remember { mutableStateOf(state.link?.description ?: "") }
+    LaunchedEffect(state.isDeleted) { if (state.isDeleted) onBack() }
 
-    // Navigate back after successful deletion
-    LaunchedEffect(state.isDeleted) {
-        if (state.isDeleted) {
-            onBack()
+    var pickCategory by remember { mutableStateOf(false) }
+    var pickTags by remember { mutableStateOf(false) }
+    var confirmDelete by remember { mutableStateOf(false) }
+    // Tag picker result that would remove tags; held until the user confirms
+    var pendingTags by remember { mutableStateOf<Set<String>?>(null) }
+
+    val link = state.link
+    if (link == null) {
+        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+            BackButton(onBack, Modifier.padding(16.dp))
+            state.error?.let { ErrorMessageCard(error = it, onDismiss = onBack, modifier = Modifier.align(Alignment.Center).padding(24.dp)) }
         }
+        return
     }
 
-    // Navigate back if link not found
-    LaunchedEffect(state.error) {
-        if (state.error == "Link not found") {
-            onBack()
-        }
+    if (pickCategory) {
+        CategoryPickerSheet(
+            onDismiss = { pickCategory = false },
+            initialSelection = state.categoryId,
+            onApplied = { viewModel.take(LinkDetailEvent.SetCategory(it)) },
+        )
     }
-
-    // Update personal notes when link data changes
-    LaunchedEffect(state.link?.description) {
-        personalNotes = state.link?.description ?: ""
+    if (pickTags) {
+        TagPickerSheet(
+            onDismiss = { pickTags = false },
+            initialChecked = state.linkTags.map { it.id }.toSet(),
+            onApplied = { picked ->
+                val removing = state.linkTags.any { it.id !in picked }
+                if (removing) pendingTags = picked else viewModel.take(LinkDetailEvent.SetTags(picked))
+            },
+        )
     }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Link Details",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* Show more options */ }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More options",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        }
-    ) { padding ->
-        when {
-            state.isLoading -> {
-                // Loading state
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Loading link details...",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            state.link != null -> {
-                // Content state - Expressive Material 3 single-column layout
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
-                ) {
-                    // Hero Card with expressive gradient and molecular imagery
-                    HeroCard(
-                        imageUrl = state.link?.url,
-                        title = state.link?.title ?: "",
-                        url = state.link?.url?.toString() ?: "",
-                        tags = state.link?.tags ?: emptyList(),
-                        description = state.link?.description ?: ""
-                    )
-
-                    // Action Buttons Card (moved after hero for better UX)
-                    ActionButtonsCard(
-                        onOpenLink = { /* Open link */ },
-                        onEdit = { /* Navigate to edit */ },
-                        onShare = { /* Share link */ },
-                        onCopyLink = { /* Copy link */ },
-                        onDelete = { showDeleteDialog = true },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    // Summary Card
-                    SummaryCard(
-                        description = state.link?.description ?: "",
-                        createdAt = state.link?.createdAt,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    // Personal Notes Card
-                    PersonalNotesCard(
-                        notes = personalNotes,
-                        isEditing = isEditingNotes,
-                        onEditClick = { isEditingNotes = true },
-                        onNotesChange = { personalNotes = it },
-                        onSave = { isEditingNotes = false },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(32.dp)) // Bottom padding
-                }
-            }
-
-            state.error != null -> {
-                // Error state
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = state.error ?: "An error occurred",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = onBack) {
-                        Text("Go Back")
-                    }
-                }
-            }
-        }
-    }
-
-    // Delete confirmation dialog
-    if (showDeleteDialog) {
+    pendingTags?.let { picked ->
+        val removed = state.linkTags.filter { it.id !in picked }
+        val current = state.linkTags.map { it.id }.toSet()
         AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Link") },
-            text = { Text("Are you sure you want to delete this link? This action cannot be undone.") },
+            onDismissRequest = { pendingTags = null },
+            title = { Text(if (removed.size == 1) "Remove a tag?" else "Remove ${removed.size} tags?") },
+            text = { Text("${removed.joinToString(", ") { "#" + it.name }} will be removed from this link. The tags themselves stay.") },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.take(LinkDetailEvent.Delete)
-                        showDeleteDialog = false
-                    }
-                ) {
+                TextButton(onClick = { pendingTags = null; viewModel.take(LinkDetailEvent.SetTags(picked)) }) {
+                    Text("Remove", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            // Keep: still add any newly picked tags, just don't remove the old ones
+            dismissButton = {
+                TextButton(onClick = { pendingTags = null; viewModel.take(LinkDetailEvent.SetTags(current + picked)) }) {
+                    Text("Keep them")
+                }
+            },
+        )
+    }
+    if (confirmDelete) {
+        AlertDialog(
+            onDismissRequest = { confirmDelete = false },
+            title = { Text("Delete this link?") },
+            text = { Text("It is removed with its note, tags and category. This can't be undone.") },
+            confirmButton = {
+                TextButton(onClick = { confirmDelete = false; viewModel.take(LinkDetailEvent.Delete) }) {
                     Text("Delete", color = MaterialTheme.colorScheme.error)
                 }
             },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
-                }
-            }
+            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Cancel") } },
         )
+    }
+
+    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).imePadding()) {
+        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+            Hero(
+                type = link.type,
+                noPreview = link.title.isBlank() || link.title == link.url,
+                onBack = onBack,
+                onShare = { share(link.title, link.url) },
+            )
+
+            Column(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    TypeChip(type = link.type, onPick = { viewModel.take(LinkDetailEvent.SetType(it)) })
+                    Text(
+                        hostOf(link.url),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
+                TitleBlock(link = link, onRename = { viewModel.take(LinkDetailEvent.Rename(it)) })
+
+                CategoryField(
+                    selectedPath = state.category?.path(state.categories),
+                    onClick = { pickCategory = true },
+                    label = "Category",
+                )
+
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    itemVerticalAlignment = Alignment.CenterVertically,
+                ) {
+                    state.linkTags.forEach { tag ->
+                        Text(
+                            "#${tag.name}",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .clickable(onClickLabel = "Edit tags", onClick = { pickTags = true })
+                                .padding(horizontal = 12.dp, vertical = 9.dp),
+                        )
+                    }
+                    Text(
+                        "+ Tag",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .dashBorder(MaterialTheme.colorScheme.outline)
+                            .clickable(role = Role.Button, onClick = { pickTags = true })
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                    )
+                }
+
+                NoteCard(
+                    note = link.description,
+                    saving = state.noteSaving,
+                    onChange = { viewModel.take(LinkDetailEvent.NoteChanged(it)) },
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Text("Description from the page", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.ExtraBold)
+                    Text(
+                        link.fetchedDescription?.takeIf { it.isNotBlank() } ?: "The page didn't provide a description.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = if (link.fetchedDescription.isNullOrBlank()) MaterialTheme.colorScheme.onSurfaceVariant
+                        else MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+
+                state.error?.let { ErrorMessageCard(error = it, onDismiss = { viewModel.take(LinkDetailEvent.ClearError) }) }
+
+                Spacer(Modifier.height(96.dp)) // keeps the last card clear of the action bar
+            }
+        }
+
+        // Bottom action bar
+        Box(Modifier.align(Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 16.dp)) {
+            AppActionBar {
+                BarIcon(
+                    icon = if (link.isFavorite) Icons.Filled.Star else Icons.Outlined.StarOutline,
+                    label = if (link.isFavorite) "Remove from favorites" else "Add to favorites",
+                    tint = MaterialTheme.colorScheme.tertiary,
+                    onClick = { viewModel.take(LinkDetailEvent.ToggleFavorite) },
+                )
+                BarIcon(
+                    icon = if (link.isArchived) Icons.Filled.Archive else Icons.Outlined.Archive,
+                    label = if (link.isArchived) "Unarchive" else "Archive",
+                    onClick = { viewModel.take(LinkDetailEvent.ToggleArchived) },
+                )
+                BarIcon(
+                    icon = if (link.isOpened) Icons.Filled.CheckCircle else Icons.Outlined.CheckCircle,
+                    label = if (link.isOpened) "Mark as unopened" else "Mark as opened",
+                    onClick = { viewModel.take(LinkDetailEvent.ToggleOpened) },
+                )
+                MoreMenu(
+                    onCopy = { clipboard.setText(AnnotatedString(link.url)) },
+                    onDelete = { confirmDelete = true },
+                )
+                AppBarPill(
+                    text = "Open link",
+                    icon = Icons.AutoMirrored.Filled.OpenInNew,
+                    onClick = {
+                        runCatching { uriHandler.openUri(link.url) }
+                        viewModel.take(LinkDetailEvent.MarkOpened)
+                    },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
     }
 }
 
-/**
- * Hero Card Component - Material 3 Design
- *
- * Hero card matching the Material 3 design specification with:
- * - Light lavender/gray gradient background with abstract molecular 3D imagery
- * - Pill-shaped tags with proper Material 3 styling
- * - Bottom overlay with URL indicator and title
- * - 24dp rounded corners matching Material 3 design system
- */
+/** Top band coloured by link type, with a large type badge, Back (left) and Share (right). */
 @Composable
-private fun HeroCard(
-    imageUrl: String?,
-    title: String,
-    url: String,
-    tags: List<String>,
-    description: String
-) {
-    // Animation for hover effect using spring physics
-    var isHovered by remember { mutableStateOf(false) }
-    val cardScale by animateFloatAsState(
-        targetValue = if (isHovered) 1.02f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "hero_card_scale"
-    )
+private fun Hero(type: String, noPreview: Boolean, onBack: () -> Unit, onShare: () -> Unit) {
+    data class Look(val bg: Color, val badgeBg: Color, val badgeFg: Color, val icon: ImageVector)
+    val look = when {
+        noPreview -> Look(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Filled.Link)
+        type == "video" -> Look(LordsExtraColors.mediaPlaceholder, MaterialTheme.colorScheme.tertiary, MaterialTheme.colorScheme.onTertiary, Icons.Filled.PlayArrow)
+        type == "social" -> Look(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.onSecondary, Icons.Outlined.ChatBubbleOutline)
+        else -> Look(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary, Icons.AutoMirrored.Outlined.Article)
+    }
+    Box(Modifier.fillMaxWidth().height(220.dp).background(look.bg)) {
+        BackButton(onBack, Modifier.padding(16.dp))
+        Box(
+            modifier = Modifier.align(Alignment.TopEnd).padding(16.dp).size(48.dp).clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surface)
+                .clickable(role = Role.Button, onClickLabel = "Share link", onClick = onShare),
+            contentAlignment = Alignment.Center,
+        ) {
+            AppIcon(Icons.Outlined.Share, contentDescription = "Share", color = MaterialTheme.colorScheme.onSurface)
+        }
+        Box(
+            modifier = Modifier.align(Alignment.Center).size(88.dp).clip(RoundedCornerShape(24.dp)).background(look.badgeBg),
+            contentAlignment = Alignment.Center,
+        ) {
+            AppIcon(look.icon, contentDescription = null, color = look.badgeFg, modifier = Modifier.size(40.dp))
+        }
+    }
+}
 
-    Card(
+@Composable
+private fun BackButton(onBack: () -> Unit, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.size(48.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface)
+            .clickable(role = Role.Button, onClickLabel = "Back", onClick = onBack),
+        contentAlignment = Alignment.Center,
+    ) {
+        AppIcon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", color = MaterialTheme.colorScheme.onSurface)
+    }
+}
+
+/** "Video ▾" chip; the menu sets the link's type. */
+@Composable
+private fun TypeChip(type: String, onPick: (String) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Box {
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.tertiaryContainer)
+                .clickable(role = Role.DropdownList, onClickLabel = "Change type", onClick = { open = true })
+                .heightIn(min = 32.dp)
+                .padding(start = 10.dp, end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                type.replaceFirstChar { it.uppercaseChar() },
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+            )
+            AppIcon(Icons.Filled.ArrowDropDown, contentDescription = null, color = MaterialTheme.colorScheme.onTertiaryContainer)
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            listOf("article", "video", "social", "other").forEach { t ->
+                DropdownMenuItem(
+                    text = { Text(t.replaceFirstChar { it.uppercaseChar() }) },
+                    leadingIcon = if (t == type) { { AppIcon(Icons.Filled.Check, contentDescription = null) } } else null,
+                    onClick = { open = false; if (t != type) onPick(t) },
+                )
+            }
+        }
+    }
+}
+
+/** Title with a pencil; editing swaps in a field, Done/✓ saves, an empty title is ignored. */
+@Composable
+private fun TitleBlock(link: Link, onRename: (String) -> Unit) {
+    var editing by remember { mutableStateOf(false) }
+    val shown = link.title.takeIf { it.isNotBlank() && it != link.url } ?: link.url
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (editing) {
+            var draft by remember { mutableStateOf(shown) }
+            val save = { if (draft.isNotBlank()) onRename(draft); editing = false }
+            AppTextFieldEnhanced(
+                value = draft,
+                onValueChange = { draft = it },
+                placeholder = "Title",
+                showClear = true,
+                openStyle = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { save() }),
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextButton(onClick = { editing = false }) { Text("Cancel") }
+                TextButton(onClick = save, enabled = draft.isNotBlank()) { Text("Save title") }
+            }
+        } else {
+            Row(verticalAlignment = Alignment.Top) {
+                Text(
+                    shown,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Black,
+                    modifier = Modifier.weight(1f).padding(top = 4.dp),
+                )
+                Box(
+                    modifier = Modifier.size(48.dp).clip(CircleShape).clickable(role = Role.Button, onClick = { editing = true }),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AppIcon(Icons.Outlined.Edit, contentDescription = "Edit title", color = MaterialTheme.colorScheme.onSurface)
+                }
+            }
+        }
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            if (!link.isOpened) Box(Modifier.size(8.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary))
+            Text(
+                listOfNotNull(
+                    savedAtLabel(link.createdAt)?.let { label ->
+                        // "Saved today, 14:32" / "Saved Monday, 18:04" / "Saved 12 Nov 2025"
+                        "Saved " + if (label.startsWith("Today") || label.startsWith("Yesterday") || label.startsWith("Just"))
+                            label.replaceFirstChar { it.lowercaseChar() } else label
+                    },
+                    if (link.isOpened) "Opened" else "Unopened",
+                    if (link.isArchived) "Archived" else null,
+                ).joinToString(" · "),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+/** Yellow note card; edits save automatically after a short pause. */
+@Composable
+private fun NoteCard(note: String, saving: Boolean, onChange: (String) -> Unit) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .graphicsLayer {
-                scaleX = cardScale
-                scaleY = cardScale
+            .clip(RoundedCornerShape(20.dp))
+            .background(LordsExtraColors.noteContainer)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Text("Your note", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.ExtraBold, color = LordsExtraColors.onNoteContainer)
+        BasicTextField(
+            value = note,
+            onValueChange = onChange,
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+            cursorBrush = SolidColor(LordsExtraColors.onNoteContainer),
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+            modifier = Modifier.fillMaxWidth(),
+            decorationBox = { inner ->
+                Box {
+                    if (note.isEmpty()) {
+                        Text("Why did you save this?", style = MaterialTheme.typography.bodyLarge, color = LordsExtraColors.onNoteContainer.copy(alpha = 0.7f))
+                    }
+                    inner()
+                }
             },
-        shape = RoundedCornerShape(24.dp), // Material 3 extra-large rounded corners
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 1.dp,
-            hoveredElevation = 2.dp
         )
+        Text(
+            if (saving) "Saving…" else "Saved automatically",
+            style = MaterialTheme.typography.labelSmall,
+            color = LordsExtraColors.onNoteContainer,
+        )
+    }
+}
+
+@Composable
+private fun BarIcon(icon: ImageVector, label: String, onClick: () -> Unit, tint: Color = MaterialTheme.colorScheme.inverseOnSurface) {
+    Box(
+        modifier = Modifier.size(48.dp).clip(CircleShape).clickable(role = Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp) // Fixed height for mobile
-        ) {
-            // Hero Image or Expressive Material 3 Gradient Background with molecular imagery
-            if (imageUrl != null) {
-                PlatformAsyncImage(
-                    model = imageUrl,
-                    contentDescription = title,
-                    modifier = Modifier.fillMaxSize(),
-//                    contentScale = ContentScale.Crop
-                )
-            } else {
-                // Expressive organic gradient background with molecular network imagery
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    // Soft lilac top
-                                    Color(0xFFE8E0F0).copy(alpha = 0.8f),
-                                    // Light purple mid-top
-                                    Color(0xFFD4C4E8).copy(alpha = 0.7f),
-                                    // Medium purple mid-bottom
-                                    Color(0xFFC4A8E0).copy(alpha = 0.6f),
-                                    // Soft lavender bottom
-                                    Color(0xFFE0D0F0).copy(alpha = 0.5f)
-                                ),
-                                startY = 0f,
-                                endY = Float.POSITIVE_INFINITY
-                            )
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    // Expressive molecular/sphere 3D visual
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        // Large central molecular sphere
-                        Box(
-                            modifier = Modifier
-                                .size(140.dp)
-                                .graphicsLayer {
-                                    scaleX = 1f
-                                    scaleY = 1f
-                                    alpha = 0.6f
-                                }
-                                .background(
-                                    Brush.radialGradient(
-                                        colors = listOf(
-                                            Color(0xFF9B7EBD).copy(alpha = 0.4f),
-                                            Color(0xFF7B5FA0).copy(alpha = 0.2f),
-                                            Color.Transparent
-                                        ),
-                                        radius = 200f
-                                    ),
-                                    shape = CircleShape
-                                )
-                        )
+        AppIcon(icon, contentDescription = label, color = tint)
+    }
+}
 
-                        // Smaller surrounding molecular spheres
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.CenterStart)
-                                .padding(start = 40.dp, top = 20.dp)
-                                .size(60.dp)
-                                .graphicsLayer { alpha = 0.4f }
-                                .background(
-                                    Brush.radialGradient(
-                                        colors = listOf(
-                                            Color(0xFFB8A0D0).copy(alpha = 0.5f),
-                                            Color.Transparent
-                                        ),
-                                        radius = 100f
-                                    ),
-                                    shape = CircleShape
-                                )
-                        )
-
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.CenterEnd)
-                                .padding(end = 50.dp, bottom = 30.dp)
-                                .size(80.dp)
-                                .graphicsLayer { alpha = 0.35f }
-                                .background(
-                                    Brush.radialGradient(
-                                        colors = listOf(
-                                            Color(0xFFC8B0E0).copy(alpha = 0.6f),
-                                            Color.Transparent
-                                        ),
-                                        radius = 120f
-                                    ),
-                                    shape = CircleShape
-                                )
-                        )
-
-                        // Molecular connecting nodes
-                        Icon(
-                            imageVector = Icons.Default.Code,
-                            contentDescription = null,
-                            tint = Color(0xFF7B5FA0).copy(alpha = 0.15f),
-                            modifier = Modifier
-                                .size(100.dp)
-                                .graphicsLayer { alpha = 0.3f }
-                        )
-                    }
-                }
-            }
-
-            // Material 3 gradient overlay for text readability
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.3f),
-                                MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.7f)
-                            )
-                        )
-                    )
+/** ⋮: copy the URL, or delete (asks first). */
+@Composable
+private fun MoreMenu(onCopy: () -> Unit, onDelete: () -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Box {
+        BarIcon(Icons.Filled.MoreVert, "More actions", onClick = { open = true })
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            DropdownMenuItem(text = { Text("Copy link") }, onClick = { open = false; onCopy() })
+            DropdownMenuItem(
+                text = { Text("Delete link", color = MaterialTheme.colorScheme.error) },
+                onClick = { open = false; onDelete() },
             )
-
-            // Floating Pill-shaped Tags (Expressive Material 3 design)
-            if (tags.isNotEmpty()) {
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Primary tag with expressive filled tonal background
-                    Surface(
-                        shape = RoundedCornerShape(20.dp), // More pronounced pill shape
-                        color = Color(0xFF9B7EBD).copy(alpha = 0.85f), // Expressive purple
-                        tonalElevation = 3.dp
-                    ) {
-                        Text(
-                            text = tags.firstOrNull() ?: "Design System",
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.White,
-                            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp)
-                        )
-                    }
-
-                    // Secondary tags with expressive styling
-                    tags.drop(1).take(2).forEach { tag ->
-                        Surface(
-                            shape = RoundedCornerShape(20.dp), // More pronounced pill shape
-                            color = Color(0xFFE8E0F0).copy(alpha = 0.75f), // Soft lilac
-                            tonalElevation = 2.dp
-                        ) {
-                            Text(
-                                text = tag,
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF5B3F80), // Deep purple text
-                                modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Bottom Content Overlay (Material 3 typography and spacing)
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // URL row with icon
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Link,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Text(
-                        text = url,
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
-                    )
-                }
-
-                // Title with Material 3 typography
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    lineHeight = MaterialTheme.typography.headlineLarge.lineHeight,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
         }
-    }
-}
-
-/**
- * Summary Card Component - Expressive Material 3 Design
- *
- * Card displaying link summary/description with metadata badges
- * matching the expressive Material 3 design specification with:
- * - Section header: purple document icon + "Summary" (bold)
- * - Body paragraph with proper expressive Material 3 typography
- * - Meta row with pill-shaped badges (date + read time)
- */
-@Composable
-private fun SummaryCard(
-    description: String,
-    createdAt: Long?,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(24.dp), // Material 3 extra-large rounded corners
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Header with icon - Expressive Material 3 design
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                AppIcon(
-                    icon = Icons.Default.Article,
-                    backgroundColor = Color(0xFF7B5FA0)
-                )
-
-                Text(
-                    text = "Summary",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            // Description text with expressive Material 3 typography
-            Text(
-                text = description.takeIf { it.isNotBlank() }
-                    ?: "No description available for this link.",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
-            )
-
-            // Metadata badges - Expressive Material 3 pill-shaped design
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Date added badge - Expressive pill design with soft lilac
-                Surface(
-                    shape = RoundedCornerShape(14.dp), // More pronounced pill shape
-                    color = Color(0xFFE8E0F0).copy(alpha = 0.6f), // Soft lilac
-                    tonalElevation = 2.dp
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Label,
-                            contentDescription = null,
-                            tint = Color(0xFF7B5FA0).copy(alpha = 0.8f), // Deep purple
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Text(
-                            text = "Added ${formatTimestamp(createdAt)}",
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF5B3F80) // Deep purple text
-                        )
-                    }
-                }
-
-                // Read time badge - Expressive pill design with soft lilac
-                Surface(
-                    shape = RoundedCornerShape(14.dp), // More pronounced pill shape
-                    color = Color(0xFFE8E0F0).copy(alpha = 0.6f), // Soft lilac
-                    tonalElevation = 2.dp
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.VideoLibrary,
-                            contentDescription = null,
-                            tint = Color(0xFF7B5FA0).copy(alpha = 0.8f), // Deep purple
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Text(
-                            text = "5 min read",
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF5B3F80) // Deep purple text
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * Action Buttons Card Component - Expressive Material 3 Design
- *
- * Card containing primary and secondary action buttons
- * matching the expressive Material 3 design specification with:
- * - Full-width primary "Open Link" button with deep expressive purple color
- * - "Add to Task" button with filled tonal style (light lilac)
- * - "Move to Category" button with outlined style
- * - Icon-only actions (Share, Copy, Delete) separated by dividers
- */
-@Composable
-private fun ActionButtonsCard(
-    onOpenLink: () -> Unit,
-    onEdit: () -> Unit,
-    onShare: () -> Unit,
-    onCopyLink: () -> Unit,
-    onDelete: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(24.dp), // Material 3 extra-large rounded corners
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Primary Action Button (Open Link) - Expressive filled button with deep purple
-            Button(
-                onClick = onOpenLink,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp), // Material 3 rounded corners
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF7B5FA0) // Deep expressive purple
-                ),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 2.dp,
-                    pressedElevation = 4.dp
-                )
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.OpenInNew,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = Color.White
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        "Open Link",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = Color.White
-                    )
-                }
-            }
-
-            // Secondary Actions (2-column grid) - Expressive Material 3 design
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Add to Task button - Expressive filled tonal button with lilac
-                Button(
-                    onClick = { /* TODO: Add to task */ },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(64.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFD4C4E8).copy(alpha = 0.8f) // Light expressive lilac
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp)
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null,
-                            tint = Color(0xFF5B3F80), // Deep purple
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            "Add to Task",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFF5B3F80) // Deep purple
-                        )
-                    }
-                }
-
-                // Move to Category button - Expressive outlined button
-                OutlinedButton(
-                    onClick = { /* TODO: Move to category */ },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(64.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFF7B5FA0) // Deep purple
-                    ),
-                    border = BorderStroke(1.dp, Color(0xFFD4C4E8).copy(alpha = 0.6f))
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Label,
-                            contentDescription = null,
-                            tint = Color(0xFF7B5FA0), // Deep purple
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            "Move to Category",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFF7B5FA0) // Deep purple
-                        )
-                    }
-                }
-            }
-
-            // Tertiary Actions (icon row with divider) - Expressive Material 3 design
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = onShare,
-                    modifier = Modifier.size(48.dp) // Material 3 touch target
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Share,
-                        contentDescription = "Share",
-                        tint = Color(0xFF7B5FA0).copy(alpha = 0.7f) // Muted purple
-                    )
-                }
-
-                VerticalDivider(
-                    modifier = Modifier.height(24.dp),
-                    color = Color(0xFFE8E0F0).copy(alpha = 0.6f) // Soft lilac divider
-                )
-
-                IconButton(
-                    onClick = onCopyLink,
-                    modifier = Modifier.size(48.dp) // Material 3 touch target
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = "Copy link",
-                        tint = Color(0xFF7B5FA0).copy(alpha = 0.7f) // Muted purple
-                    )
-                }
-
-                VerticalDivider(
-                    modifier = Modifier.height(24.dp),
-                    color = Color(0xFFE8E0F0).copy(alpha = 0.6f) // Soft lilac divider
-                )
-
-                IconButton(
-                    onClick = onDelete,
-                    modifier = Modifier.size(48.dp) // Material 3 touch target
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-        }
-    }
-}
-
-/**
- * Personal Notes Card Component - Expressive Material 3 Design
- *
- * Large editable notes area matching the expressive Material 3 design specification with:
- * - Header with purple notes icon + "Personal Notes" (bold) + "Saved" pill badge
- * - Note body inside an inset light-gray rounded box
- * - "Format Note" link, purple, right-aligned at bottom
- * - Edit button with icon
- */
-@Composable
-private fun PersonalNotesCard(
-    notes: String,
-    isEditing: Boolean,
-    onEditClick: () -> Unit,
-    onNotesChange: (String) -> Unit,
-    onSave: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp), // Material 3 extra-large rounded corners
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Header with Expressive Material 3 design
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AppIcon(
-                        icon = Icons.Default.EditNote,
-                        backgroundColor = Color(0xFF9B7EBD)
-                    )
-
-                    Text(
-                        text = "Personal Notes",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-                // "Saved" status pill badge - Expressive Material 3 design
-                if (!isEditing) {
-                    Surface(
-                        shape = RoundedCornerShape(14.dp), // More pronounced pill shape
-                        color = Color(0xFFE8E0F0).copy(alpha = 0.7f), // Soft lilac
-                        tonalElevation = 2.dp
-                    ) {
-                        Text(
-                            text = "Saved",
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF5B3F80), // Deep purple text
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp)
-                        )
-                    }
-                }
-            }
-
-            // Notes content with expressive Material 3 inset styling
-            if (isEditing) {
-                // Edit mode - TextField with expressive Material 3 styling
-                androidx.compose.material3.TextField(
-                    value = notes,
-                    onValueChange = onNotesChange,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    placeholder = {
-                        Text(
-                            "Jot down key takeaways, action items, or why you saved this...",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                        )
-                    },
-                    colors = androidx.compose.material3.TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color(0xFF9B7EBD), // Expressive purple
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = Color(0xFFF5F0FF).copy(alpha = 0.5f), // Very light lilac
-                        unfocusedContainerColor = Color(0xFFF5F0FF).copy(alpha = 0.5f)
-                    ),
-                    shape = RoundedCornerShape(16.dp), // Material 3 rounded corners
-                    maxLines = 10,
-                    textStyle = MaterialTheme.typography.bodyMedium
-                )
-
-                // Action row with expressive Material 3 styling
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(
-                        onClick = onSave,
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = Color(0xFF7B5FA0) // Deep expressive purple
-                        )
-                    ) {
-                        Text(
-                            "Save Notes",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = Color(0xFF7B5FA0) // Deep expressive purple
-                        )
-                    }
-                }
-            } else {
-                // View mode - Read-only text area with expressive Material 3 inset styling
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    shape = RoundedCornerShape(16.dp), // Material 3 rounded corners
-                    color = Color(0xFFF5F0FF).copy(alpha = 0.4f), // Very light lilac
-                    tonalElevation = 2.dp
-                ) {
-                    Box(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = notes.takeIf { it.isNotBlank() }
-                                ?: "No notes added yet. Click Edit to add your thoughts...",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = if (notes.isNotBlank()) {
-                                MaterialTheme.colorScheme.onSurface
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            },
-                            fontStyle = if (notes.isNotBlank()) {
-                                androidx.compose.ui.text.font.FontStyle.Normal
-                            } else {
-                                androidx.compose.ui.text.font.FontStyle.Italic
-                            }
-                        )
-                    }
-                }
-
-                // Format and Edit buttons row - Expressive Material 3 design
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // "Format Note" text button - Expressive Material 3 design
-                    TextButton(
-                        onClick = { /* TODO: Format notes */ },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = Color(0xFF7B5FA0) // Deep expressive purple
-                        )
-                    ) {
-                        Text(
-                            "Format Note",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = Color(0xFF7B5FA0) // Deep expressive purple
-                        )
-                    }
-
-                    // Edit button with icon - Expressive Material 3 design
-                    TextButton(
-                        onClick = onEditClick,
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = Color(0xFF7B5FA0) // Deep expressive purple
-                        )
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = null,
-                                tint = Color(0xFF7B5FA0), // Deep expressive purple
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Text(
-                                "Edit",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = Color(0xFF7B5FA0) // Deep expressive purple
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * Format timestamp for display
- */
-@OptIn(ExperimentalTime::class)
-private fun formatTimestamp(timestamp: Long?): String {
-    if (timestamp == null) return "recently"
-
-    val now = Clock.System.now().toEpochMilliseconds()
-    val differenceMs = now - timestamp
-    val days = differenceMs / (24 * 60 * 60 * 1000)
-
-    return when {
-        days == 0L -> "today"
-        days == 1L -> "yesterday"
-        days < 7L -> "$days days ago"
-        days < 30L -> "${days / 7} weeks ago"
-        else -> "${days / 30} months ago"
     }
 }

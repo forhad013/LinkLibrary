@@ -24,7 +24,7 @@ import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
-import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -137,7 +137,7 @@ internal fun SelectedFilterChip(text: String, isTag: Boolean, onRemove: () -> Un
 }
 
 /**
- * One saved link. Tapping the card opens the link; ⓘ opens its details.
+ * One saved link. Tapping the card opens its details; the ↗ button opens the link itself.
  * A link whose title was never fetched shows its URL and "No preview yet".
  */
 @OptIn(ExperimentalLayoutApi::class)
@@ -163,7 +163,7 @@ internal fun FeedLinkCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp))
             .background(MaterialTheme.colorScheme.surface)
-            .clickable(onClickLabel = "Open link", onClick = onOpen)
+            .clickable(onClickLabel = "Open details", onClick = onDetails)
             .padding(start = 14.dp, top = 14.dp, bottom = 14.dp, end = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -215,10 +215,10 @@ internal fun FeedLinkCard(
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .clickable(role = Role.Button, onClick = onDetails),
+                .clickable(role = Role.Button, onClick = onOpen),
             contentAlignment = Alignment.Center,
         ) {
-            AppIcon(Icons.Outlined.Info, contentDescription = "Details", color = MaterialTheme.colorScheme.onSurface)
+            AppIcon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = "Open link", color = MaterialTheme.colorScheme.primary)
         }
     }
 }

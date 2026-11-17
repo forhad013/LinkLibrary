@@ -103,7 +103,8 @@ fun AppBarPill(
     Row(
         modifier = modifier
             .fillMaxHeight()
-            .clip(CircleShape)
+            .padding(end = 8.dp)
+            .clip(RoundedCornerShape(60))
             .background(container)
             .clickable(enabled = enabled, onClick = onClick)
             .padding(start = 8.dp, end = 8.dp)

@@ -170,7 +170,8 @@ internal fun LinkPreviewCard(
 internal fun CategoryField(
     selectedPath: String?,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    label: String = "Category (optional)",
 ) {
     Row(
         modifier = modifier
@@ -190,7 +191,7 @@ internal fun CategoryField(
         )
         Column(Modifier.weight(1f)) {
             Text(
-                "Category (optional)",
+                label,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
