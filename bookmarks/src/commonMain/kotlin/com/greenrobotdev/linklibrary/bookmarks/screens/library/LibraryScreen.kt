@@ -250,7 +250,10 @@ fun LibraryScreen(
                         )
                     }
                 }
-                item(key = "all-saves") { allSavesHeader(Modifier) }
+                // Sticky, so Sort and Filters stay reachable however far the list is scrolled
+                stickyHeader(key = "all-saves") {
+                    allSavesHeader(Modifier.background(MaterialTheme.colorScheme.background).padding(vertical = 8.dp))
+                }
                 // Sorted by date either way, so each section is one consecutive run
                 links.groupBy { feedSection(it.createdAt) }.forEach { (section, sectionLinks) ->
                     item(key = "section-$section") { FeedSectionHeader(section, Modifier.animateItem()) }
