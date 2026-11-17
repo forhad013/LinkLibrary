@@ -60,6 +60,10 @@ data class LibraryState(
     val newestFirst: Boolean = true,
 ) {
     val filteredLinks: List<Link> get() = filterFeed(this, filters)
+
+    /** Unopened, unarchived saves, newest first: the Feed's "Pick up where you left off" row. */
+    val unopenedLinks: List<Link>
+        get() = links.filter { !it.isOpened && !it.isArchived }.sortedByDescending { it.createdAt ?: Long.MIN_VALUE }
     fun categoryOf(link: Link): Category? = linkCategoryIds[link.id]?.let { id -> categories.firstOrNull { it.id == id } }
 }
 

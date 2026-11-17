@@ -209,6 +209,21 @@ fun LibraryScreen(
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 96.dp), // room for the FAB
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                // Discovery steps aside while searching or filtering, so it never mixes with narrowed results
+                val unopened = state.unopenedLinks
+                if (state.searchQuery.isBlank() && state.filters.activeCount == 0 && unopened.isNotEmpty()) {
+                    item(key = "pick-up") {
+                        PickUpStrip(
+                            links = unopened.take(5),
+                            unopenedCount = unopened.size,
+                            onOpen = { link ->
+                                runCatching { uriHandler.openUri(link.url) }
+                                viewModel.take(LibraryEvent.Opened(link.id))
+                            },
+                            modifier = Modifier.animateItem(),
+                        )
+                    }
+                }
                 item(key = "all-saves") { allSavesHeader(Modifier) }
                 // Sorted by date either way, so each section is one consecutive run
                 links.groupBy { feedSection(it.createdAt) }.forEach { (section, sectionLinks) ->
