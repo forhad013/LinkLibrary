@@ -23,6 +23,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.PlayArrow
@@ -451,5 +453,88 @@ private fun PickUpCard(link: Link, onOpen: () -> Unit, modifier: Modifier = Modi
                 overflow = TextOverflow.Ellipsis,
             )
         }
+    }
+}
+
+/**
+ * "You saved this 3 weeks ago": one forgotten save with Open, Archive and (when there are more)
+ * a button that shows another.
+ */
+@Composable
+internal fun ResurfaceCard(
+    link: Link,
+    label: String,
+    categoryPath: String?,
+    onOpen: () -> Unit,
+    onArchive: () -> Unit,
+    onShowAnother: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
+    val fg = MaterialTheme.colorScheme.onSecondaryContainer
+    val noPreview = link.title.isBlank() || link.title == link.url
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            AppIcon(Icons.Filled.History, contentDescription = null, color = fg, modifier = Modifier.size(18.dp))
+            Text(
+                label.uppercase(),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.ExtraBold,
+                color = fg,
+                modifier = Modifier.semantics { heading() },
+            )
+        }
+        Text(
+            if (noPreview) link.url else link.title,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.ExtraBold,
+            color = fg,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            listOfNotNull(hostOf(link.url), categoryPath).joinToString(" · "),
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = fg,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            CardAction("Open", MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.onSecondary, onOpen, Modifier.weight(1f))
+            CardAction("Archive", MaterialTheme.colorScheme.surface, fg, onArchive, Modifier.weight(1f))
+            if (onShowAnother != null) {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable(role = Role.Button, onClick = onShowAnother)
+                        .semantics { contentDescription = "Show another" },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AppIcon(Icons.Filled.Refresh, contentDescription = null, color = fg, modifier = Modifier.size(20.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CardAction(text: String, container: Color, content: Color, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .heightIn(min = 44.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(container)
+            .clickable(role = Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = content)
     }
 }

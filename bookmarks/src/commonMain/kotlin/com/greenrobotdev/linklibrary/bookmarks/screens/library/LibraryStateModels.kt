@@ -64,6 +64,15 @@ data class LibraryState(
     /** Unopened, unarchived saves, newest first: the Feed's "Pick up where you left off" row. */
     val unopenedLinks: List<Link>
         get() = links.filter { !it.isOpened && !it.isArchived }.sortedByDescending { it.createdAt ?: Long.MIN_VALUE }
+
+    /**
+     * Older unopened saves for the "You saved this…" card: past the pick-up row, saved a week or
+     * more ago, or undated (saved before dates were kept). Oldest first.
+     */
+    fun resurfaceCandidates(nowMs: Long): List<Link> =
+        unopenedLinks.drop(PICK_UP_COUNT)
+            .filter { it.createdAt == null || nowMs - it.createdAt >= 7 * DAY_MS }
+            .asReversed()
     fun categoryOf(link: Link): Category? = linkCategoryIds[link.id]?.let { id -> categories.firstOrNull { it.id == id } }
 }
 
@@ -85,6 +94,23 @@ fun SavedRange.startMs(nowMs: Long, zone: TimeZone = TimeZone.currentSystemDefau
         SavedRange.THIS_MONTH -> LocalDate(today.year, today.month, 1)
     }
     return start.atStartOfDayIn(zone).toEpochMilliseconds()
+}
+
+/** Cards in the Feed's "Pick up where you left off" row. */
+const val PICK_UP_COUNT = 5
+private const val DAY_MS = 24 * 60 * 60 * 1000L
+
+/** Heading of the resurfacing card: "You saved this 3 weeks ago", or a plain one when the date is unknown. */
+fun resurfaceLabel(createdAt: Long?, nowMs: Long): String {
+    if (createdAt == null || createdAt <= 0L) return "From your older saves"
+    val days = ((nowMs - createdAt) / DAY_MS).toInt()
+    fun ago(n: Int, unit: String) = "You saved this $n $unit${if (n == 1) "" else "s"} ago"
+    return when {
+        days < 14 -> ago(days, "day")
+        days < 60 -> ago(days / 7, "week")
+        days < 365 -> ago(days / 30, "month")
+        else -> "You saved this over a year ago"
+    }
 }
 
 /** Search + [filters], then sorted. Used for the Feed and for the sheet's live "Show N saves" count. */
@@ -135,4 +161,5 @@ sealed interface LibraryEvent {
     object ToggleSort : LibraryEvent
     /** Card tapped: the link is about to open in the browser. */
     data class Opened(val linkId: String) : LibraryEvent
+    data class Archive(val linkId: String) : LibraryEvent
 }

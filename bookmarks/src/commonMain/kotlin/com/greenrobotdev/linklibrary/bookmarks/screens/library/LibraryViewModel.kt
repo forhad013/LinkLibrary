@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.greenrobotdev.linklibrary.bookmarks.model.toCategory
 import com.greenrobotdev.linklibrary.bookmarks.model.toDomain
+import com.greenrobotdev.linklibrary.bookmarks.model.toEntity
 import com.greenrobotdev.linklibrary.bookmarks.model.toTag
 import com.greenrobotdev.linklibrary.database.repository.CategoryRepository
 import com.greenrobotdev.linklibrary.database.repository.LinkRepository
@@ -84,6 +85,12 @@ fun LibraryPresenter(
                 is LibraryEvent.RemoveTag -> state.copy(filters = state.filters.copy(tagIds = state.filters.tagIds - event.tagId))
                 LibraryEvent.ClearFilters -> state.copy(searchQuery = "", filters = FeedFilters())
                 LibraryEvent.ToggleSort -> state.copy(newestFirst = !state.newestFirst)
+                is LibraryEvent.Archive -> {
+                    // the links flow re-emits with isArchived = true, which hides it from the Feed
+                    state.links.firstOrNull { it.id == event.linkId }
+                        ?.let { linkRepository.updateLink(it.copy(isArchived = true).toEntity()).first() }
+                    state
+                }
                 is LibraryEvent.Opened -> {
                     // the links flow re-emits with isOpened = true; nothing to change here
                     linkRepository.markOpened(event.linkId).first()
