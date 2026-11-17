@@ -62,6 +62,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+            // Dark status bar icons on light theme, white icons on dark theme
+            LaunchedEffect(darkTheme) {
+                WindowCompat.getInsetsController(window, window.decorView)
+                    .isAppearanceLightStatusBars = !darkTheme
+            }
+
             CompositionLocalProvider {
                 LinkLibraryTheme(darkTheme = darkTheme) {
                     RootScreen(
