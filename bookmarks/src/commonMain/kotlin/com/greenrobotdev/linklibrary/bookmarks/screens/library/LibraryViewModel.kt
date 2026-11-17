@@ -91,6 +91,14 @@ fun LibraryPresenter(
                         ?.let { linkRepository.updateLink(it.copy(isArchived = true).toEntity()).first() }
                     state
                 }
+                is LibraryEvent.ToggleFavorite -> {
+                    linkRepository.toggleFavorite(event.linkId).first()
+                    state
+                }
+                is LibraryEvent.Restore -> {
+                    linkRepository.updateLink(event.link.toEntity()).first()
+                    state
+                }
                 is LibraryEvent.Opened -> {
                     // the links flow re-emits with isOpened = true; nothing to change here
                     linkRepository.markOpened(event.linkId).first()

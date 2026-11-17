@@ -36,6 +36,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.geometry.Size
@@ -644,4 +652,69 @@ private fun CardAction(text: String, container: Color, content: Color, onClick: 
     ) {
         Text(text, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = content)
     }
+}
+
+/**
+ * Feed card with swipe actions: left archives (the card leaves the list), right toggles favorite
+ * (the card snaps back). Archived links (shown via Filters) can't be swiped left again.
+ */
+@Composable
+internal fun SwipeableFeedCard(
+    link: Link,
+    onArchive: () -> Unit,
+    onToggleFavorite: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    val state = rememberSwipeToDismissBoxState()
+    val scope = rememberCoroutineScope()
+    // Archived but still listed (Filters include archived): bring the card back instead of leaving a gap
+    LaunchedEffect(link.isArchived) {
+        if (state.currentValue != SwipeToDismissBoxValue.Settled) state.reset()
+    }
+    SwipeToDismissBox(
+        state = state,
+        modifier = modifier.clip(RoundedCornerShape(24.dp)),
+        enableDismissFromEndToStart = !link.isArchived,
+        onDismiss = { direction ->
+            when (direction) {
+                SwipeToDismissBoxValue.EndToStart -> onArchive()
+                SwipeToDismissBoxValue.StartToEnd -> {
+                    onToggleFavorite()
+                    scope.launch { state.reset() } // the card stays in the list
+                }
+                SwipeToDismissBoxValue.Settled -> Unit
+            }
+        },
+        backgroundContent = {
+            val archive = state.dismissDirection == SwipeToDismissBoxValue.EndToStart
+            val favorite = state.dismissDirection == SwipeToDismissBoxValue.StartToEnd
+            val bg = when {
+                archive -> MaterialTheme.colorScheme.inverseSurface
+                favorite -> MaterialTheme.colorScheme.tertiaryContainer
+                else -> Color.Transparent
+            }
+            val fg = if (archive) MaterialTheme.colorScheme.inverseOnSurface else MaterialTheme.colorScheme.onTertiaryContainer
+            Row(
+                modifier = Modifier.fillMaxSize().background(bg).padding(horizontal = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, if (archive) Alignment.End else Alignment.Start),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (archive || favorite) {
+                    AppIcon(
+                        if (archive) Icons.Outlined.Archive else if (link.isFavorite) Icons.Outlined.StarOutline else Icons.Filled.Star,
+                        contentDescription = null,
+                        color = fg,
+                        modifier = Modifier.size(22.dp),
+                    )
+                    Text(
+                        if (archive) "Archive" else if (link.isFavorite) "Unfavorite" else "Favorite",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = fg,
+                    )
+                }
+            }
+        },
+    ) { content() }
 }

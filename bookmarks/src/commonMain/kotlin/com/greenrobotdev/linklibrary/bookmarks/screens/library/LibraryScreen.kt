@@ -63,6 +63,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.platform.LocalUriHandler
 import com.greenrobotdev.linklibrary.design.components.textfield.SearchField
 import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.collectAsState
@@ -135,143 +141,173 @@ fun LibraryScreen(
     var resurfaceIndex by rememberSaveable { mutableIntStateOf((nowMs / (24 * 60 * 60 * 1000L)).toInt()) }
     val pickedCategories = state.categories.filter { it.id in state.filters.categoryIds }
     val pickedTags = state.tags.filter { it.id in state.filters.tagIds }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-    ) {
-        // Fixed top: title, then search across the full width (it covers everything, not just the list)
+
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    // Runs a quick action on [link] and offers Undo, which writes the link back as it was
+    fun undoable(message: String, link: Link, event: LibraryEvent) {
+        viewModel.take(event)
+        scope.launch {
+            snackbar.currentSnackbarData?.dismiss()
+            val result = snackbar.showSnackbar(message, actionLabel = "Undo", duration = SnackbarDuration.Short)
+            if (result == SnackbarResult.ActionPerformed) viewModel.take(LibraryEvent.Restore(link))
+        }
+    }
+
+    Box(Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
         ) {
-            FeedHeader(opened = state.inboxOpened, total = state.inboxTotal)
-            SearchField(
-                query = state.searchQuery,
-                onQueryChange = { viewModel.take(LibraryEvent.SearchChanged(it)) },
-                placeholder = "Search everything you saved",
-                shape = CircleShape,
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-        HorizontalDivider(Modifier.padding(top = 12.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-        // Sort + Filters sit right above the list they change, with the picked chips under them
-        val allSavesHeader: @Composable (Modifier) -> Unit = { modifier ->
-            AllSavesHeader(
-                newestFirst = state.newestFirst,
-                onToggleSort = { viewModel.take(LibraryEvent.ToggleSort) },
-                activeFilters = state.filters.activeCount,
-                onFilters = { showFilters = true },
-                modifier = modifier,
-            ) {
-                // Only the picked categories and tags show here; everything else lives in the Filters sheet
-                if (pickedCategories.isNotEmpty() || pickedTags.isNotEmpty()) {
-                    // Wraps instead of scrolling: a tap on a scrolled row is eaten while the scroll/overscroll
-                    // settles, so chips at the far end could not be removed. Every chip stays on screen.
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        pickedCategories.forEach { category ->
-                            key("c-" + category.id) {
-                                SelectedFilterChip(
-                                    text = category.path(state.categories),
-                                    isTag = false,
-                                    onRemove = { viewModel.take(LibraryEvent.RemoveCategory(category.id)) },
-                                )
-                            }
-                        }
-                        pickedTags.forEach { tag ->
-                            key("t-" + tag.id) {
-                                SelectedFilterChip(
-                                    text = "#${tag.name}",
-                                    isTag = true,
-                                    onRemove = { viewModel.take(LibraryEvent.RemoveTag(tag.id)) },
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (links.isEmpty()) {
-            allSavesHeader(Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp))
-            EmptyState(
-                title = "Nothing here",
-                description = "No saved link matches these filters.",
-                icon = Icons.Default.Search,
-                actionLabel = "Clear filters",
-                onActionClick = { viewModel.take(LibraryEvent.ClearFilters) },
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-            )
-        } else {
-            AppLazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 96.dp), // room for the FAB
+            // Fixed top: title, then search across the full width (it covers everything, not just the list)
+            Column(
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                // Discovery steps aside while searching or filtering, so it never mixes with narrowed results
-                val unopened = state.unopenedLinks
-                val discover = state.searchQuery.isBlank() && state.filters.activeCount == 0
-                if (discover && unopened.isNotEmpty()) {
-                    item(key = "pick-up") {
-                        PickUpStrip(
-                            links = unopened.take(PICK_UP_COUNT),
-                            unopenedCount = unopened.size,
-                            onOpen = { link ->
-                                runCatching { uriHandler.openUri(link.url) }
-                                viewModel.take(LibraryEvent.Opened(link.id))
-                            },
-                            onMarkOpened = { link -> viewModel.take(LibraryEvent.Opened(link.id)) },
-                            modifier = Modifier.animateItem(),
-                        )
+                FeedHeader(opened = state.inboxOpened, total = state.inboxTotal)
+                SearchField(
+                    query = state.searchQuery,
+                    onQueryChange = { viewModel.take(LibraryEvent.SearchChanged(it)) },
+                    placeholder = "Search everything you saved",
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            HorizontalDivider(Modifier.padding(top = 12.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+
+            // Sort + Filters sit right above the list they change, with the picked chips under them
+            val allSavesHeader: @Composable (Modifier) -> Unit = { modifier ->
+                AllSavesHeader(
+                    newestFirst = state.newestFirst,
+                    onToggleSort = { viewModel.take(LibraryEvent.ToggleSort) },
+                    activeFilters = state.filters.activeCount,
+                    onFilters = { showFilters = true },
+                    modifier = modifier,
+                ) {
+                    // Only the picked categories and tags show here; everything else lives in the Filters sheet
+                    if (pickedCategories.isNotEmpty() || pickedTags.isNotEmpty()) {
+                        // Wraps instead of scrolling: a tap on a scrolled row is eaten while the scroll/overscroll
+                        // settles, so chips at the far end could not be removed. Every chip stays on screen.
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            pickedCategories.forEach { category ->
+                                key("c-" + category.id) {
+                                    SelectedFilterChip(
+                                        text = category.path(state.categories),
+                                        isTag = false,
+                                        onRemove = { viewModel.take(LibraryEvent.RemoveCategory(category.id)) },
+                                    )
+                                }
+                            }
+                            pickedTags.forEach { tag ->
+                                key("t-" + tag.id) {
+                                    SelectedFilterChip(
+                                        text = "#${tag.name}",
+                                        isTag = true,
+                                        onRemove = { viewModel.take(LibraryEvent.RemoveTag(tag.id)) },
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
-                if (discover && unopened.isEmpty() && state.inboxTotal > 0) {
-                    item(key = "caught-up") { AllCaughtUpCard(Modifier.animateItem()) }
-                }
-                val candidates = state.resurfaceCandidates(nowMs)
-                if (discover && candidates.isNotEmpty()) {
-                    val link = candidates[resurfaceIndex.mod(candidates.size)]
-                    item(key = "resurface") {
-                        ResurfaceCard(
-                            link = link,
-                            label = resurfaceLabel(link.createdAt, nowMs),
-                            categoryPath = state.categoryOf(link)?.path(state.categories),
-                            onOpen = {
-                                runCatching { uriHandler.openUri(link.url) }
-                                viewModel.take(LibraryEvent.Opened(link.id))
-                            },
-                            onArchive = { viewModel.take(LibraryEvent.Archive(link.id)) },
-                            onShowAnother = if (candidates.size > 1) ({ resurfaceIndex++ }) else null,
-                            modifier = Modifier.animateItem(),
-                        )
+            }
+
+            if (links.isEmpty()) {
+                allSavesHeader(Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp))
+                EmptyState(
+                    title = "Nothing here",
+                    description = "No saved link matches these filters.",
+                    icon = Icons.Default.Search,
+                    actionLabel = "Clear filters",
+                    onActionClick = { viewModel.take(LibraryEvent.ClearFilters) },
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                )
+            } else {
+                AppLazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 96.dp), // room for the FAB
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    // Discovery steps aside while searching or filtering, so it never mixes with narrowed results
+                    val unopened = state.unopenedLinks
+                    val discover = state.searchQuery.isBlank() && state.filters.activeCount == 0
+                    if (discover && unopened.isNotEmpty()) {
+                        item(key = "pick-up") {
+                            PickUpStrip(
+                                links = unopened.take(PICK_UP_COUNT),
+                                unopenedCount = unopened.size,
+                                onOpen = { link ->
+                                    runCatching { uriHandler.openUri(link.url) }
+                                    viewModel.take(LibraryEvent.Opened(link.id))
+                                },
+                                onMarkOpened = { link -> undoable("Marked as opened", link, LibraryEvent.Opened(link.id)) },
+                                modifier = Modifier.animateItem(),
+                            )
+                        }
                     }
-                }
-                // Sticky, so Sort and Filters stay reachable however far the list is scrolled
-                stickyHeader(key = "all-saves") {
-                    allSavesHeader(Modifier.background(MaterialTheme.colorScheme.background).padding(vertical = 8.dp))
-                }
-                // Sorted by date either way, so each section is one consecutive run
-                links.groupBy { feedSection(it.createdAt) }.forEach { (section, sectionLinks) ->
-                    item(key = "section-$section") { FeedSectionHeader(section, Modifier.animateItem()) }
-                    items(sectionLinks, key = { it.id }) { link ->
-                        FeedLinkCard(
-                            link = link,
-                            categoryPath = state.categoryOf(link)?.path(state.categories),
-                            onOpen = {
-                                runCatching { uriHandler.openUri(link.url) }
-                                viewModel.take(LibraryEvent.Opened(link.id))
-                            },
-                            onDetails = { onNavigateToDetail(link.id) },
-                        )
+                    if (discover && unopened.isEmpty() && state.inboxTotal > 0) {
+                        item(key = "caught-up") { AllCaughtUpCard(Modifier.animateItem()) }
+                    }
+                    val candidates = state.resurfaceCandidates(nowMs)
+                    if (discover && candidates.isNotEmpty()) {
+                        val link = candidates[resurfaceIndex.mod(candidates.size)]
+                        item(key = "resurface") {
+                            ResurfaceCard(
+                                link = link,
+                                label = resurfaceLabel(link.createdAt, nowMs),
+                                categoryPath = state.categoryOf(link)?.path(state.categories),
+                                onOpen = {
+                                    runCatching { uriHandler.openUri(link.url) }
+                                    viewModel.take(LibraryEvent.Opened(link.id))
+                                },
+                                onArchive = { undoable("Link archived", link, LibraryEvent.Archive(link.id)) },
+                                onShowAnother = if (candidates.size > 1) ({ resurfaceIndex++ }) else null,
+                                modifier = Modifier.animateItem(),
+                            )
+                        }
+                    }
+                    // Sticky, so Sort and Filters stay reachable however far the list is scrolled
+                    stickyHeader(key = "all-saves") {
+                        allSavesHeader(Modifier.background(MaterialTheme.colorScheme.background).padding(vertical = 8.dp))
+                    }
+                    // Sorted by date either way, so each section is one consecutive run
+                    links.groupBy { feedSection(it.createdAt) }.forEach { (section, sectionLinks) ->
+                        item(key = "section-$section") { FeedSectionHeader(section, Modifier.animateItem()) }
+                        items(sectionLinks, key = { it.id }) { link ->
+                            SwipeableFeedCard(
+                                link = link,
+                                onArchive = { undoable("Link archived", link, LibraryEvent.Archive(link.id)) },
+                                onToggleFavorite = {
+                                    undoable(
+                                        if (link.isFavorite) "Removed from favorites" else "Added to favorites",
+                                        link,
+                                        LibraryEvent.ToggleFavorite(link.id),
+                                    )
+                                },
+                                modifier = Modifier.animateItem(),
+                            ) {
+                                FeedLinkCard(
+                                    link = link,
+                                    categoryPath = state.categoryOf(link)?.path(state.categories),
+                                    onOpen = {
+                                        runCatching { uriHandler.openUri(link.url) }
+                                        viewModel.take(LibraryEvent.Opened(link.id))
+                                    },
+                                    onDetails = { onNavigateToDetail(link.id) },
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
+        // Above the Add link button
+        SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).padding(start = 16.dp, end = 16.dp, bottom = 88.dp))
     }
 }
 
