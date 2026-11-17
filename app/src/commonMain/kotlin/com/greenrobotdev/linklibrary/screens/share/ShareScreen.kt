@@ -1,8 +1,8 @@
 package com.greenrobotdev.linklibrary.screens.share
 
+import com.greenrobotdev.linklibrary.design.components.layout.AppLazyColumn
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -173,7 +173,7 @@ fun ShareDialog(
                     SharingPlatform.More
                 )
 
-                LazyColumn(
+                AppLazyColumn(
                     modifier = Modifier.height(200.dp)
                 ) {
                     items(platforms.chunked(2)) { rowPlatforms ->

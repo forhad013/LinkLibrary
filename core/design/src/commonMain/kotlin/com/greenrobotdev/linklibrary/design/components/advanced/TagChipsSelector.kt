@@ -1,5 +1,7 @@
 package com.greenrobotdev.linklibrary.design.components.advanced
 
+import com.greenrobotdev.linklibrary.design.components.layout.AppLazyRow
+import com.greenrobotdev.linklibrary.design.components.layout.AppLazyColumn
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -17,8 +19,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -164,7 +164,7 @@ fun TagChipsSelector(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            LazyColumn(
+            AppLazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -475,7 +475,7 @@ fun TagChipsSelectorInline(
 
     Column(modifier = modifier) {
         // Selected tags as chips
-        LazyRow(
+        AppLazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {

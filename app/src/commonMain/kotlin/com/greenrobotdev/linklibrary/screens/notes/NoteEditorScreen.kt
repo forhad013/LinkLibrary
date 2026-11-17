@@ -1,10 +1,10 @@
 package com.greenrobotdev.linklibrary.screens.notes
 
+import com.greenrobotdev.linklibrary.design.components.layout.AppLazyColumn
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -359,7 +359,7 @@ private fun LinkAttachmentDialog(
             if (availableLinks.isEmpty()) {
                 Text("No links available. Create some links first.")
             } else {
-                LazyColumn(
+                AppLazyColumn(
                     modifier = Modifier.height(200.dp)
                 ) {
                     items(availableLinks) { link ->

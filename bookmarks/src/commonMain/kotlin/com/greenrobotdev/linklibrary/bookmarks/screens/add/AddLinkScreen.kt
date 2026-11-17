@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add
 
+import com.greenrobotdev.linklibrary.design.components.layout.appVerticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -126,7 +126,7 @@ fun AddLinkView(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
+                .appVerticalScroll(rememberScrollState())
                 .padding(top = 20.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {

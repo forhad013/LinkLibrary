@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.components.form
 
+import com.greenrobotdev.linklibrary.design.components.layout.AppLazyRow
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -65,7 +66,7 @@ fun CategorySelectorRow(
     enabled: Boolean = true
 ) {
     // Simple row-based category selector as an alternative to dropdown
-    androidx.compose.foundation.lazy.LazyRow(
+    AppLazyRow(
         modifier = modifier,
         horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
     ) {

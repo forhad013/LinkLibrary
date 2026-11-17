@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add.components
 
+import com.greenrobotdev.linklibrary.design.components.layout.AppLazyRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -257,7 +257,7 @@ internal fun <T> ChipRow(
                 modifier = Modifier.padding(end = 10.dp),
             )
         }
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        AppLazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(items, key = key) { chip(it) }
         }
     }

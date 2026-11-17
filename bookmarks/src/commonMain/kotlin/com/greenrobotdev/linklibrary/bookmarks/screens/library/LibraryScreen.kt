@@ -1,5 +1,7 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.library
 
+import com.greenrobotdev.linklibrary.design.components.layout.appVerticalScroll
+import com.greenrobotdev.linklibrary.design.components.layout.AppLazyColumn
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -9,7 +11,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,10 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -210,7 +208,7 @@ fun LibraryScreen(
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
             )
         } else {
-            LazyColumn(
+            AppLazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 96.dp), // room for the FAB
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -472,7 +470,7 @@ fun FirstLaunchEmptyState(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .appVerticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp, vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
