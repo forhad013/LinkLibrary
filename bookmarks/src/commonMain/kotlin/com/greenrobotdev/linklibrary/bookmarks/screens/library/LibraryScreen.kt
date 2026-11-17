@@ -136,57 +136,65 @@ fun LibraryScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
     ) {
-        // Fixed top: header, then search + Filters
+        // Fixed top: title, then search across the full width (it covers everything, not just the list)
         Column(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            FeedHeader(newestFirst = state.newestFirst, onToggleSort = { viewModel.take(LibraryEvent.ToggleSort) })
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                SearchField(
-                    query = state.searchQuery,
-                    onQueryChange = { viewModel.take(LibraryEvent.SearchChanged(it)) },
-                    placeholder = "Search everything you saved",
-                    shape = CircleShape,
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    modifier = Modifier.weight(1f),
-                )
-                FiltersButton(activeCount = state.filters.activeCount, onClick = { showFilters = true })
-            }
-        }
-
-        // Only the picked categories and tags show here; everything else lives in the Filters sheet
-        if (pickedCategories.isNotEmpty() || pickedTags.isNotEmpty()) {
-            // Wraps instead of scrolling: a tap on a scrolled row is eaten while the scroll/overscroll
-            // settles, so chips at the far end could not be removed. Every chip stays on screen.
-            FlowRow(
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                pickedCategories.forEach { category ->
-                    key("c-" + category.id) {
-                        SelectedFilterChip(
-                            text = category.path(state.categories),
-                            isTag = false,
-                            onRemove = { viewModel.take(LibraryEvent.RemoveCategory(category.id)) },
-                        )
-                    }
-                }
-                pickedTags.forEach { tag ->
-                    key("t-" + tag.id) {
-                        SelectedFilterChip(
-                            text = "#${tag.name}",
-                            isTag = true,
-                            onRemove = { viewModel.take(LibraryEvent.RemoveTag(tag.id)) },
-                        )
-                    }
-                }
-            }
+            FeedHeader()
+            SearchField(
+                query = state.searchQuery,
+                onQueryChange = { viewModel.take(LibraryEvent.SearchChanged(it)) },
+                placeholder = "Search everything you saved",
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
         HorizontalDivider(Modifier.padding(top = 12.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
+        // Sort + Filters sit right above the list they change, with the picked chips under them
+        val allSavesHeader: @Composable (Modifier) -> Unit = { modifier ->
+            AllSavesHeader(
+                newestFirst = state.newestFirst,
+                onToggleSort = { viewModel.take(LibraryEvent.ToggleSort) },
+                activeFilters = state.filters.activeCount,
+                onFilters = { showFilters = true },
+                modifier = modifier,
+            ) {
+                // Only the picked categories and tags show here; everything else lives in the Filters sheet
+                if (pickedCategories.isNotEmpty() || pickedTags.isNotEmpty()) {
+                    // Wraps instead of scrolling: a tap on a scrolled row is eaten while the scroll/overscroll
+                    // settles, so chips at the far end could not be removed. Every chip stays on screen.
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        pickedCategories.forEach { category ->
+                            key("c-" + category.id) {
+                                SelectedFilterChip(
+                                    text = category.path(state.categories),
+                                    isTag = false,
+                                    onRemove = { viewModel.take(LibraryEvent.RemoveCategory(category.id)) },
+                                )
+                            }
+                        }
+                        pickedTags.forEach { tag ->
+                            key("t-" + tag.id) {
+                                SelectedFilterChip(
+                                    text = "#${tag.name}",
+                                    isTag = true,
+                                    onRemove = { viewModel.take(LibraryEvent.RemoveTag(tag.id)) },
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         if (links.isEmpty()) {
+            allSavesHeader(Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp))
             EmptyState(
                 title = "Nothing here",
                 description = "No saved link matches these filters.",
@@ -201,6 +209,7 @@ fun LibraryScreen(
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 96.dp), // room for the FAB
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                item(key = "all-saves") { allSavesHeader(Modifier) }
                 // Sorted by date either way, so each section is one consecutive run
                 links.groupBy { feedSection(it.createdAt) }.forEach { (section, sectionLinks) ->
                     item(key = "section-$section") { FeedSectionHeader(section, Modifier.animateItem()) }

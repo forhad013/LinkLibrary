@@ -55,40 +55,71 @@ import kotlin.time.ExperimentalTime
 
 // Feed pieces (design: Feed)
 
-/** "Lords of Links" / "Your saves" header with the Newest/Oldest sort pill. */
+/** "Lords of Links" / "Your saves" title at the top of the Feed. */
 @Composable
-internal fun FeedHeader(newestFirst: Boolean, onToggleSort: () -> Unit, modifier: Modifier = Modifier) {
-    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f)) {
-            Text(
-                "Lords of Links",
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text("Your saves", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.ExtraBold)
-        }
-        Row(
-            modifier = Modifier
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .clickable(role = Role.Button, onClickLabel = "Change sort order", onClick = onToggleSort)
-                .padding(horizontal = 16.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            AppIcon(Icons.AutoMirrored.Outlined.Sort, contentDescription = null, color = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(18.dp))
-            Text(
-                if (newestFirst) "Newest" else "Oldest",
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-        }
+internal fun FeedHeader(modifier: Modifier = Modifier) {
+    Column(modifier.fillMaxWidth()) {
+        Text(
+            "Lords of Links",
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text("Your saves", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.ExtraBold)
     }
 }
 
-/** "Filters" button beside search; filled with a count badge when any filter is active. */
+/**
+ * "All saves" row right above the list: Newest/Oldest and Filters sit next to what they change.
+ * [picked] is the row of chosen category/tag chips, shown under it.
+ */
+@Composable
+internal fun AllSavesHeader(
+    newestFirst: Boolean,
+    onToggleSort: () -> Unit,
+    activeFilters: Int,
+    onFilters: () -> Unit,
+    modifier: Modifier = Modifier,
+    picked: @Composable () -> Unit = {},
+) {
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                "All saves",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.weight(1f).padding(start = 4.dp).semantics { heading() },
+            )
+            SortButton(newestFirst, onToggleSort)
+            FiltersButton(activeCount = activeFilters, onClick = onFilters)
+        }
+        picked()
+    }
+}
+
+@Composable
+private fun SortButton(newestFirst: Boolean, onToggleSort: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .clickable(role = Role.Button, onClickLabel = "Change sort order", onClick = onToggleSort)
+            .heightIn(min = 44.dp)
+            .padding(horizontal = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        AppIcon(Icons.AutoMirrored.Outlined.Sort, contentDescription = null, color = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(18.dp))
+        Text(
+            if (newestFirst) "Newest" else "Oldest",
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+        )
+    }
+}
+
+/** "Filters" button in the All saves row; filled with a count badge when any filter is active. */
 @Composable
 internal fun FiltersButton(activeCount: Int, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val active = activeCount > 0
@@ -99,8 +130,8 @@ internal fun FiltersButton(activeCount: Int, onClick: () -> Unit, modifier: Modi
             .background(if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer)
             .clickable(role = Role.Button, onClickLabel = "Open filters", onClick = onClick)
             .semantics { contentDescription = if (active) "Filters, $activeCount active" else "Filters" }
-            .heightIn(min = 52.dp)
-            .padding(horizontal = 16.dp),
+            .heightIn(min = 44.dp)
+            .padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
