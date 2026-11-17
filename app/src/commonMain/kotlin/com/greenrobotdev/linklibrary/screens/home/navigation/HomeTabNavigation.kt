@@ -43,7 +43,7 @@ fun HomeTabNavigation(
                         initialUrl = route.initialUrl,
                         onBack = { tabNavigator.goBack() },
                         onAddTag = { /* Navigate to Library tab */ },
-                        onAddCollection = { /* Navigate to Library tab */ }
+                        onAddCategory = { /* Navigate to Library tab */ }
                     )
 
                     // Quick Search Screen

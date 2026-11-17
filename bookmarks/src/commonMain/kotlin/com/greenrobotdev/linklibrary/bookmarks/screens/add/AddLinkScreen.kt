@@ -54,7 +54,7 @@ fun AddLinkScreen(
     initialUrl: String?,
     onBack: () -> Unit,
     onAddTag: () -> Unit,
-    onAddCollection: () -> Unit
+    onAddCategory: () -> Unit
 ) {
     // Screen owns the ViewModel and state
     val viewModel: AddLinkViewModel = viewModel<AddLinkViewModel>(key = routeKey.toString()) { AddLinkViewModel(initialUrl) }
@@ -79,7 +79,7 @@ fun AddLinkScreen(
         state = state,
         onEvent = { viewModel.take(it) },
         onAddTag = onAddTag,
-        onAddCollection = onAddCollection,
+        onAddCategory = onAddCategory,
         onBack = onBack
     )
 }
@@ -90,7 +90,7 @@ fun AddLinkView(
     state: AddLinkState,
     onEvent: (AddLinkEvent) -> Unit,
     onAddTag: () -> Unit,
-    onAddCollection: () -> Unit,
+    onAddCategory: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -125,7 +125,7 @@ fun AddLinkView(
             onDueTimeChange = { onEvent(AddLinkEvent.SetDueTime(it)) },
             modifier = Modifier.padding(padding),
             onAddTag = onAddTag,
-            onAddCollection = onAddCollection
+            onAddCategory = onAddCategory
         )
     }
 }
@@ -147,7 +147,7 @@ fun AddLinkFormContent(
     onDueTimeChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     onAddTag: () -> Unit = {},
-    onAddCollection: () -> Unit = {}
+    onAddCategory: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -172,16 +172,16 @@ fun AddLinkFormContent(
 
         // Organization Section
         OrganizationSection(
-            availableCollections = state.availableCollections,
-            selectedCollections = state.selectedCollections.toList(),
+            availableCategories = state.availableCategories,
+            selectedCategoryIds = state.selectedCategoryIds.toList(),
             availableTags = state.availableTags,
             selectedTags = state.selectedTags.toList(),
-            onCollectionToggle = { onEvent(AddLinkEvent.ToggleCollection(it)) },
+            onCategoryToggle = { onEvent(AddLinkEvent.ToggleCategory(it)) },
             onTagToggle = { onEvent(AddLinkEvent.ToggleTag(it)) },
             onAddTag = onAddTag,
-            onAddCollection = onAddCollection,
+            onAddCategory = onAddCategory,
             isLoading = state.isLoading,
-            onClearAllCollections = { onEvent(AddLinkEvent.ClearAllCollections) }
+            onClearAllCategories = { onEvent(AddLinkEvent.ClearAllCategories) }
         )
 
         // Personal Notes Section

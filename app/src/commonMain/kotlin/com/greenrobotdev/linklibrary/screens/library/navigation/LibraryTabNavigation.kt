@@ -2,20 +2,18 @@ package com.greenrobotdev.linklibrary.screens.library.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.AddLinkScreen
-import com.greenrobotdev.linklibrary.bookmarks.screens.addCollection.AddCollectionScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.addCategory.AddCategoryScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen
-import com.greenrobotdev.linklibrary.bookmarks.screens.collections.CollectionsScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.categories.CategoriesScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.details.LinkDetailScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreenEnhanced
 import com.greenrobotdev.linklibrary.screens.notes.NoteEditorScreen
 import com.greenrobotdev.linklibrary.screens.root.TabNavigator
-import com.greenrobotdev.linklibrary.screens.root.rememberTabNavigationState
 import com.greenrobotdev.linklibrary.screens.root.toEntries
 
 /**
@@ -31,7 +29,7 @@ fun LibraryTabNavigation(
         entries = tabNavState.toEntries { route ->
             NavEntry(route) {
                 when (route) {
-                    // Base Library Screen
+                    // Base screen — the Feed (list + empty state)
                     is LibraryNavRoutes.LibraryBase -> LibraryScreen(
                         routeKey = route,
                         onNavigateToDetail = { linkId ->
@@ -40,14 +38,8 @@ fun LibraryTabNavigation(
                         onAddLink = { initialUrl ->
                             tabNavigator.navigateToNew(LibraryNavRoutes.AddLink(initialUrl))
                         },
-                        onAddCollection = {
-                            tabNavigator.navigate(LibraryNavRoutes.AddCollection)
-                        },
-                        onNavigateToCollections = {
-                            tabNavigator.navigate(LibraryNavRoutes.Collections)
-                        },
-                        onNavigateToTags = {
-                            tabNavigator.navigate(LibraryNavRoutes.Tags)
+                        onAddCategory = {
+                            tabNavigator.navigate(LibraryNavRoutes.AddCategory)
                         }
                     )
 
@@ -69,8 +61,8 @@ fun LibraryTabNavigation(
                         onAddTag = {
                             tabNavigator.navigate(LibraryNavRoutes.AddTag)
                         },
-                        onAddCollection = {
-                            tabNavigator.navigate(LibraryNavRoutes.AddCollection)
+                        onAddCategory = {
+                            tabNavigator.navigate(LibraryNavRoutes.AddCategory)
                         }
                     )
 
@@ -81,12 +73,12 @@ fun LibraryTabNavigation(
                         onBack = { tabNavigator.goBack() }
                     )
 
-                    // Collections Screen
-                    is LibraryNavRoutes.Collections -> CollectionsScreen(
+                    // Categories Screen
+                    is LibraryNavRoutes.Categories -> CategoriesScreen(
                         routeKey = route,
                         onBack = { tabNavigator.goBack() },
-                        onCreateCollection = {
-                            tabNavigator.navigate(LibraryNavRoutes.AddCollection)
+                        onCreateCategory = {
+                            tabNavigator.navigate(LibraryNavRoutes.AddCategory)
                         }
                     )
 
@@ -99,8 +91,8 @@ fun LibraryTabNavigation(
                         }
                     )
 
-                    // Add Collection Screen
-                    is LibraryNavRoutes.AddCollection -> AddCollectionScreen(
+                    // Add Category Screen
+                    is LibraryNavRoutes.AddCategory -> AddCategoryScreen(
                         routeKey = route,
                         onBack = { tabNavigator.goBack() }
                     )

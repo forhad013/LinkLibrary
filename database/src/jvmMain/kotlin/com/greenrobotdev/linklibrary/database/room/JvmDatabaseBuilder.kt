@@ -29,6 +29,7 @@ class JvmDatabaseBuilder(
             name = dbFile.absolutePath
         )
             .setDriver(BundledSQLiteDriver())
+            .fallbackToDestructiveMigration(dropAllTables = true) // shortcut: dev-only, no real migrations yet
     }
 
     companion object {

@@ -1,13 +1,8 @@
 package com.greenrobotdev.linklibrary.bookmarks.model
 
-import com.greenrobotdev.linklibrary.database.room.CollectionEntity
+import com.greenrobotdev.linklibrary.database.room.CategoryEntity
 import com.greenrobotdev.linklibrary.database.room.LinkEntity
 import com.greenrobotdev.linklibrary.database.room.TagEntity
-
-/**
- * Extension functions to convert between database entities and UI models
- * These are placed in the bookmarks module for better organization
- */
 
 // Link extensions
 fun Link.toEntity() = LinkEntity(
@@ -16,19 +11,27 @@ fun Link.toEntity() = LinkEntity(
     url = url,
     description = description,
     isFavorite = isFavorite,
+    isOpened = isOpened,
+    isArchived = isArchived,
+    type = type,
+    fetchedDescription = fetchedDescription,
     createdAt = createdAt,
     tags = tags
 )
 
-fun LinkEntity.toDomain() = Link(
+fun LinkEntity.toDomain(categoryName: String? = null) = Link(
     id = id,
     title = title,
     url = url,
     description = description,
     isFavorite = isFavorite,
+    isOpened = isOpened,
+    isArchived = isArchived,
+    type = type,
+    fetchedDescription = fetchedDescription,
     createdAt = createdAt,
-    tags = tags ?: emptyList(),
-    collections = collections ?: emptyList()
+    tags = tags,
+    categoryName = categoryName
 )
 
 // Tag extensions
@@ -49,19 +52,27 @@ fun Tag.toEntity() = TagEntity(
     updatedAt = System.currentTimeMillis()
 )
 
-// Collection extensions
-fun CollectionEntity.toCollection(count: Int = 0) = Collection(
+// Category extensions
+fun CategoryEntity.toCategory(count: Int = 0) = Category(
     id = id,
     name = name,
-    description = description,
+    parentId = parentId,
     count = count,
     iconType = iconType
 )
 
-fun Collection.toEntity() = CollectionEntity(
+fun com.greenrobotdev.linklibrary.database.room.CategoryWithCount.toCategory() = Category(
     id = id,
     name = name,
-    description = description,
+    parentId = parentId,
+    count = linkCount,
+    iconType = iconType
+)
+
+fun Category.toEntity() = CategoryEntity(
+    id = id,
+    name = name,
+    parentId = parentId,
     iconType = iconType,
     createdAt = System.currentTimeMillis(),
     updatedAt = System.currentTimeMillis()

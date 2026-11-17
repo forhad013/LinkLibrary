@@ -1,8 +1,8 @@
 package com.greenrobotdev.linklibrary.database.repository
 
-import com.greenrobotdev.linklibrary.database.room.DatabaseBuilder
-import com.greenrobotdev.linklibrary.database.room.LinkDatabase
+import com.greenrobotdev.linklibrary.database.room.LinkTagDao
 import com.greenrobotdev.linklibrary.database.room.LinkTagEntity
+import com.greenrobotdev.linklibrary.database.room.TagDao
 import com.greenrobotdev.linklibrary.database.room.TagEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -11,24 +11,10 @@ import kotlinx.coroutines.flow.map
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-/**
- * Room-based implementation of TagRepository for KMP following official Android pattern.
- *
- * This implementation works across all platforms using the DatabaseBuilder interface:
- * - Android: Uses AndroidDatabaseBuilder with optional SQLCipher encryption
- * - iOS/macOS: Can provide iOSDatabaseBuilder when needed
- * - JVM/Desktop: Can provide JvmDatabaseBuilder when needed
- *
- * @param databaseBuilder Platform-specific implementation of DatabaseBuilder interface
- */
 class RoomTagRepository(
-    private val databaseBuilder: DatabaseBuilder
+    private val tagDao: TagDao,
+    private val linkTagDao: LinkTagDao
 ) : TagRepository {
-
-    private val database: LinkDatabase = databaseBuilder.getDatabaseBuilder().build()
-
-    private val tagDao = database.tagDao()
-    private val linkTagDao = database.linkTagDao()
 
     override suspend fun getTags(): Flow<Result<List<TagEntity>>> {
         return tagDao.getAllTagsWithCounts()
@@ -117,12 +103,5 @@ class RoomTagRepository(
         } catch (e: Exception) {
             flow { emit(Result.failure(e)) }
         }
-    }
-
-    /**
-     * Close the database connection.
-     */
-    fun close() {
-        database.close()
     }
 }

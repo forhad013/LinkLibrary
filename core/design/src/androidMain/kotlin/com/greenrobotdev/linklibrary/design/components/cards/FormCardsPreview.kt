@@ -32,11 +32,7 @@ private fun DesignPreviewWrapper(
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colorScheme = if (darkTheme) {
-            DarkColorScheme
-        } else {
-            LightColorScheme
-        }
+        colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
     ) {
         Surface(
             color = MaterialTheme.colorScheme.background,

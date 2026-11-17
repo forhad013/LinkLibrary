@@ -3,17 +3,24 @@ package com.greenrobotdev.linklibrary.screens.organize.navigation
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
-import com.greenrobotdev.linklibrary.bookmarks.screens.addCollection.AddCollectionScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.addCategory.AddCategoryScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.addTag.AddTagScreen
-import com.greenrobotdev.linklibrary.bookmarks.screens.collections.CollectionsScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.categories.CategoriesScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.categoryPicker.CategoryPickerScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryTabScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.manage.ManageScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.tags.TagsScreenEnhanced
-import com.greenrobotdev.linklibrary.screens.organize.OrganizeScreen
+import com.greenrobotdev.linklibrary.database.repository.CategoryRepository
 import com.greenrobotdev.linklibrary.screens.root.TabNavigator
 import com.greenrobotdev.linklibrary.screens.root.rememberTabNavigationState
 import com.greenrobotdev.linklibrary.screens.root.toEntries
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import org.koin.mp.KoinPlatform.getKoin
 
 /**
  * Organize Tab Navigation - Manages all screens within the Organize tab
@@ -30,34 +37,52 @@ fun OrganizeTabNavigation() {
         entries = tabNavState.toEntries { route ->
             NavEntry(route) {
                 when (route) {
-                    // Base Organize Screen - Shows collections and tags overview
-                    is OrganizeNavRoutes.OrganizeBase -> OrganizeScreen(
-                        routeKey = route,
-                        onNavigateToCollections = {
-                            tabNavigator.navigate(OrganizeNavRoutes.CollectionDetail("all"))
+                    // Library tab base (design: library_categories_amp_tags)
+                    is OrganizeNavRoutes.OrganizeBase -> LibraryTabScreen(
+                        onManage = { tabNavigator.navigate(OrganizeNavRoutes.Manage) },
+                        onCreateCategory = {
+                            tabNavigator.navigate(OrganizeNavRoutes.CategoryEdit(null))
                         },
-                        onNavigateToTags = {
-                            tabNavigator.navigate(OrganizeNavRoutes.TagDetail("all"))
-                        },
-                        onCreateCollection = {
-                            tabNavigator.navigate(OrganizeNavRoutes.CollectionEdit(null))
-                        },
-                        onCreateTag = {
-                            tabNavigator.navigate(OrganizeNavRoutes.TagEdit(null))
+                        onCategoryClick = { categoryId ->
+                            tabNavigator.navigate(OrganizeNavRoutes.CategoryDetail(categoryId))
                         }
                     )
 
-                    // Collection Detail Screen
-                    is OrganizeNavRoutes.CollectionDetail -> CollectionsScreen(
+                    // Manage categories and tags
+                    is OrganizeNavRoutes.Manage -> ManageScreen(
+                        onBack = { tabNavigator.goBack() },
+                        onMoveCategory = { categoryId ->
+                            tabNavigator.navigate(OrganizeNavRoutes.MoveCategory(categoryId))
+                        }
+                    )
+
+                    // Move a category into a new parent (reuses the category picker)
+                    is OrganizeNavRoutes.MoveCategory -> {
+                        val scope = rememberCoroutineScope()
+                        CategoryPickerScreen(
+                            initialSelection = null,
+                            onDone = { newParentId ->
+                                scope.launch {
+                                    getKoin().get<CategoryRepository>()
+                                        .moveCategory(route.categoryId, newParentId).first()
+                                }
+                                tabNavigator.goBack()
+                            },
+                            onBack = { tabNavigator.goBack() }
+                        )
+                    }
+
+                    // Category Detail Screen
+                    is OrganizeNavRoutes.CategoryDetail -> CategoriesScreen(
                         routeKey = route,
                         onBack = { tabNavigator.goBack() },
-                        onCreateCollection = {
-                            tabNavigator.navigate(OrganizeNavRoutes.CollectionEdit(null))
+                        onCreateCategory = {
+                            tabNavigator.navigate(OrganizeNavRoutes.CategoryEdit(null))
                         }
                     )
 
-                    // Collection Edit Screen
-                    is OrganizeNavRoutes.CollectionEdit -> AddCollectionScreen(
+                    // Category Edit Screen
+                    is OrganizeNavRoutes.CategoryEdit -> AddCategoryScreen(
                         routeKey = route,
                         onBack = { tabNavigator.goBack() }
                     )
@@ -78,11 +103,11 @@ fun OrganizeTabNavigation() {
                     )
 
                     // Bulk Organize Screen
-                    is OrganizeNavRoutes.BulkOrganize -> CollectionsScreen(
+                    is OrganizeNavRoutes.BulkOrganize -> CategoriesScreen(
                         routeKey = route,
                         onBack = { tabNavigator.goBack() },
-                        onCreateCollection = {
-                            tabNavigator.navigate(OrganizeNavRoutes.CollectionEdit(null))
+                        onCreateCategory = {
+                            tabNavigator.navigate(OrganizeNavRoutes.CategoryEdit(null))
                         }
                     )
 

@@ -23,9 +23,9 @@ class RootNavigationState(
      */
     val tabs: List<RootScreens>
         get() = listOf(
+            RootScreens.FeedTab,
+            RootScreens.SearchTab,
             RootScreens.LibraryTab,
-            RootScreens.OrganizeTab,
-            RootScreens.HomeTab,
             RootScreens.SettingsTab
         )
 }
@@ -35,7 +35,7 @@ class RootNavigationState(
  */
 @Composable
 fun rememberRootNavigationState(
-    startTab: RootScreens = RootScreens.HomeTab
+    startTab: RootScreens = RootScreens.FeedTab
 ): RootNavigationState {
     val currentTab = remember { mutableStateOf(startTab) }
 

@@ -659,7 +659,7 @@ private fun SummaryCard(
  * matching the expressive Material 3 design specification with:
  * - Full-width primary "Open Link" button with deep expressive purple color
  * - "Add to Task" button with filled tonal style (light lilac)
- * - "Move to Collection" button with outlined style
+ * - "Move to Category" button with outlined style
  * - Icon-only actions (Share, Copy, Delete) separated by dividers
  */
 @Composable
@@ -752,9 +752,9 @@ private fun ActionButtonsCard(
                     }
                 }
 
-                // Move to Collection button - Expressive outlined button
+                // Move to Category button - Expressive outlined button
                 OutlinedButton(
-                    onClick = { /* TODO: Move to collection */ },
+                    onClick = { /* TODO: Move to category */ },
                     modifier = Modifier
                         .weight(1f)
                         .height(64.dp),
@@ -776,7 +776,7 @@ private fun ActionButtonsCard(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "Move to Collection",
+                            "Move to Category",
                             style = MaterialTheme.typography.labelSmall,
                             color = Color(0xFF7B5FA0) // Deep purple
                         )

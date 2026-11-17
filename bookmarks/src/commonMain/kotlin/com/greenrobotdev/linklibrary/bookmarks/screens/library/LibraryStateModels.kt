@@ -7,7 +7,8 @@ import kotlinx.serialization.Serializable
 data class LibraryState(
     val searchQuery: String = "",
     val links: List<Link> = emptyList(),
-    val filteredLinks: List<Link> = emptyList()
+    val filteredLinks: List<Link> = emptyList(),
+    val isLoading: Boolean = true
 )
 
 sealed interface LibraryEvent {

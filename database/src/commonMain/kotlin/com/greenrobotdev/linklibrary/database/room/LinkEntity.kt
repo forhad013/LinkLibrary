@@ -13,7 +13,10 @@ data class LinkEntity(
     val url: String,
     val description: String,
     val isFavorite: Boolean,
-    val createdAt: Long?, // Stored as epoch milliseconds
-    val tags: List<String> = emptyList(), // Stored as JSON string via TypeConverter
-    val collections: List<String> = emptyList() // Stored as JSON string via TypeConverter
+    val isOpened: Boolean = false,
+    val isArchived: Boolean = false,
+    val type: String = "other", // video | article | social | other
+    val fetchedDescription: String? = null, // read-only, auto-fetched from the page
+    val createdAt: Long? = null, // epoch milliseconds
+    val tags: List<String> = emptyList() // populated from link_tags at read time
 )

@@ -1,8 +1,9 @@
 package com.greenrobotdev.linklibrary.database.repository
 
-import com.greenrobotdev.linklibrary.database.room.DatabaseBuilder
-import com.greenrobotdev.linklibrary.database.room.LinkDatabase
+import com.greenrobotdev.linklibrary.database.room.CategoryDao
+import com.greenrobotdev.linklibrary.database.room.LinkDao
 import com.greenrobotdev.linklibrary.database.room.LinkEntity
+import com.greenrobotdev.linklibrary.database.room.TagDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -11,53 +12,27 @@ import kotlinx.coroutines.flow.map
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-/**
- * Room-based implementation of LinkRepository for KMP following official Android pattern.
- *
- * This implementation works across all platforms using the DatabaseBuilder interface:
- * - Android: Uses AndroidDatabaseBuilder with optional SQLCipher encryption
- * - iOS/macOS: Can provide iOSDatabaseBuilder when needed
- * - JVM/Desktop: Can provide JvmDatabaseBuilder when needed
- *
- * @param databaseBuilder Platform-specific implementation of DatabaseBuilder interface
- * @param tagRepository Repository for loading tags associated with links
- * @param collectionRepository Repository for loading collections associated with links
- */
 class RoomLinkRepository(
-    private val databaseBuilder: DatabaseBuilder,
-    private val tagRepository: TagRepository,
-    private val collectionRepository: CollectionRepository
+    private val linkDao: LinkDao,
+    private val tagDao: TagDao,
+    private val categoryDao: CategoryDao
 ) : LinkRepository {
 
-    private val database: LinkDatabase = databaseBuilder.getDatabaseBuilder().build()
+    override suspend fun getLinks(): Flow<Result<List<LinkEntity>>> =
+        linkDao.getAllLinks()
+            .map { Result.success(it) }
+            .catch { emit(Result.failure(it)) }
 
-    private val linkDao = database.linkDao()
-
-    override suspend fun getLinks(): Flow<Result<List<LinkEntity>>> {
-        return linkDao.getAllLinks()
-            .map { entities -> Result.success(entities) }
-            .catch { e -> emit(Result.failure(e)) }
-    }
-
-    override suspend fun getLinksWithTagsAndCollections(): Flow<Result<List<LinkEntity>>> {
+    override suspend fun getLinksWithTags(): Flow<Result<List<LinkEntity>>> {
         return flow {
             try {
                 linkDao.getAllLinks().collect { entities ->
-                    val entitiesWithTagsAndCollections = entities.map { entity ->
-                        // Load tags for this link
-                        val tagsResult = tagRepository.getTagsForLink(entity.id).first()
-                        val tagEntities = tagsResult.getOrElse { emptyList() }
-                        val tagNames = tagEntities.map { it.name }
-
-                        // Load collections for this link
-                        val collectionsResult = collectionRepository.getCollectionsForLink(entity.id).first()
-                        val collectionEntities = collectionsResult.getOrElse { emptyList() }
-                        val collectionNames = collectionEntities.map { it.name }
-
-                        // Create new entity with tags and collections populated
-                        entity.copy(tags = tagNames, collections = collectionNames)
+                    val enriched = entities.map { entity ->
+                        val tagNames = tagDao.getTagsForLink(entity.id).first()
+                            .map { it.name }
+                        entity.copy(tags = tagNames)
                     }
-                    emit(Result.success(entitiesWithTagsAndCollections))
+                    emit(Result.success(enriched))
                 }
             } catch (e: Exception) {
                 emit(Result.failure(e))
@@ -69,9 +44,8 @@ class RoomLinkRepository(
         return try {
             linkDao.toggleFavorite(linkId)
             val entity = linkDao.getLinkById(linkId)
-            entity?.let { linkEntity ->
-                flow { emit(Result.success(linkEntity)) }
-            } ?: flow { emit(Result.failure(Exception("Link not found"))) }
+            entity?.let { flow { emit(Result.success(it)) } }
+                ?: flow { emit(Result.failure(Exception("Link not found"))) }
         } catch (e: Exception) {
             flow { emit(Result.failure(e)) }
         }
@@ -80,13 +54,7 @@ class RoomLinkRepository(
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun addLink(link: LinkEntity): Flow<Result<LinkEntity>> {
         return try {
-            // Generate new ID if not provided
-            val linkToSave = if (link.id.isEmpty()) {
-                link.copy(id = Uuid.random().toString())
-            } else {
-                link
-            }
-
+            val linkToSave = if (link.id.isEmpty()) link.copy(id = Uuid.random().toString()) else link
             linkDao.insertLink(linkToSave)
             flow { emit(Result.success(linkToSave)) }
         } catch (e: Exception) {
@@ -97,20 +65,9 @@ class RoomLinkRepository(
     override suspend fun deleteLink(linkId: String): Flow<Result<Unit>> {
         return try {
             linkDao.deleteLinkById(linkId)
-            kotlinx.coroutines.flow.flow {
-                emit(Result.success(Unit))
-            }
+            flow { emit(Result.success(Unit)) }
         } catch (e: Exception) {
-            kotlinx.coroutines.flow.flow {
-                emit(Result.failure(e))
-            }
+            flow { emit(Result.failure(e)) }
         }
-    }
-
-    /**
-     * Close the database connection.
-     */
-    fun close() {
-        database.close()
     }
 }

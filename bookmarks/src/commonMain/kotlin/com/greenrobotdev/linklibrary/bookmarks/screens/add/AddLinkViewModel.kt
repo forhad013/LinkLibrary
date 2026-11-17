@@ -2,7 +2,7 @@ package com.greenrobotdev.linklibrary.bookmarks.screens.add
 
 import androidx.compose.runtime.Composable
 import com.greenrobotdev.linklibrary.bookmarks.service.MetadataFetchService
-import com.greenrobotdev.linklibrary.database.repository.CollectionRepository
+import com.greenrobotdev.linklibrary.database.repository.CategoryRepository
 import com.greenrobotdev.linklibrary.database.repository.LinkRepository
 import com.greenrobotdev.linklibrary.database.repository.TagRepository
 import com.greenrobotdev.linklibrary.utils.MoleculeViewModel
@@ -16,7 +16,7 @@ class AddLinkViewModel(
 
     private val linkRepository: LinkRepository by inject()
     private val tagRepository: TagRepository by inject()
-    private val collectionRepository: CollectionRepository by inject()
+    private val categoryRepository: CategoryRepository by inject()
     private val metadataFetchService: MetadataFetchService by inject()
 
     
@@ -27,7 +27,7 @@ class AddLinkViewModel(
             events = events,
             linkRepository = linkRepository,
             tagRepository = tagRepository,
-            collectionRepository = collectionRepository,
+            categoryRepository = categoryRepository,
             metadataFetchService = metadataFetchService,
             initialUrl = initialUrl
         )

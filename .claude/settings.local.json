@@ -49,7 +49,9 @@
       "Bash(timeout 120 ./gradlew assembleDebug)",
       "Bash(timeout 120 ./gradlew :core:design:compileKotlinMetadata)",
       "Bash(git -C \"/Volumes/Projects/KMP project/LinkLibrary\" diff HEAD)",
-      "Bash(timeout 120 ./gradlew :app:compileKotlinMetadata)"
+      "Bash(timeout 120 ./gradlew :app:compileKotlinMetadata)",
+      "Bash(pip3 install *)",
+      "Bash(python3 -m pip install --user pillow)"
     ]
   }
 }
