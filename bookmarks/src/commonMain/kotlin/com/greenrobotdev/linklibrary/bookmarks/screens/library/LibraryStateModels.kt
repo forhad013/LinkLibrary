@@ -61,6 +61,10 @@ data class LibraryState(
 ) {
     val filteredLinks: List<Link> get() = filterFeed(this, filters)
 
+    /** Saves in the inbox (not archived), and how many of them are opened: the header's progress ring. */
+    val inboxTotal: Int get() = links.count { !it.isArchived }
+    val inboxOpened: Int get() = links.count { !it.isArchived && it.isOpened }
+
     /** Unopened, unarchived saves, newest first: the Feed's "Pick up where you left off" row. */
     val unopenedLinks: List<Link>
         get() = links.filter { !it.isOpened && !it.isArchived }.sortedByDescending { it.createdAt ?: Long.MIN_VALUE }
