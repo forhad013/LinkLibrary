@@ -526,12 +526,12 @@ private fun PickUpCard(link: Link, onOpen: () -> Unit, onMarkOpened: () -> Unit,
             .clickable(role = Role.Button, onClickLabel = "Open link", onClick = onOpen),
     ) {
         Box(
-            modifier = Modifier.fillMaxWidth().height(110.dp).background(look.bg),
+            modifier = Modifier.fillMaxWidth().height(64.dp).background(look.bg),
             contentAlignment = Alignment.Center,
         ) {
-            AppIcon(look.icon, contentDescription = null, color = look.fg, modifier = Modifier.size(32.dp))
+            AppIcon(look.icon, contentDescription = null, color = look.fg, modifier = Modifier.size(28.dp))
         }
-        Column(Modifier.padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(Modifier.padding(start = 14.dp, end = 14.dp, top = 10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
                 meta,
                 style = MaterialTheme.typography.labelMedium,
@@ -545,7 +545,6 @@ private fun PickUpCard(link: Link, onOpen: () -> Unit, onMarkOpened: () -> Unit,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
-                minLines = 2, // cards in the row stay the same height
                 overflow = TextOverflow.Ellipsis,
             )
         }
