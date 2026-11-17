@@ -65,6 +65,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.platform.LocalUriHandler
 import com.greenrobotdev.linklibrary.design.components.textfield.SearchField
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -129,6 +131,10 @@ fun LibraryScreen(
     }
 
     val links = state.filteredLinks
+    @OptIn(ExperimentalTime::class)
+    val nowMs = remember { Clock.System.now().toEpochMilliseconds() }
+    // Starts on a different old save each day; "Show another" steps through the rest
+    var resurfaceIndex by rememberSaveable { mutableIntStateOf((nowMs / (24 * 60 * 60 * 1000L)).toInt()) }
     val pickedCategories = state.categories.filter { it.id in state.filters.categoryIds }
     val pickedTags = state.tags.filter { it.id in state.filters.tagIds }
     Column(
@@ -211,15 +217,34 @@ fun LibraryScreen(
             ) {
                 // Discovery steps aside while searching or filtering, so it never mixes with narrowed results
                 val unopened = state.unopenedLinks
-                if (state.searchQuery.isBlank() && state.filters.activeCount == 0 && unopened.isNotEmpty()) {
+                val discover = state.searchQuery.isBlank() && state.filters.activeCount == 0
+                if (discover && unopened.isNotEmpty()) {
                     item(key = "pick-up") {
                         PickUpStrip(
-                            links = unopened.take(5),
+                            links = unopened.take(PICK_UP_COUNT),
                             unopenedCount = unopened.size,
                             onOpen = { link ->
                                 runCatching { uriHandler.openUri(link.url) }
                                 viewModel.take(LibraryEvent.Opened(link.id))
                             },
+                            modifier = Modifier.animateItem(),
+                        )
+                    }
+                }
+                val candidates = state.resurfaceCandidates(nowMs)
+                if (discover && candidates.isNotEmpty()) {
+                    val link = candidates[resurfaceIndex.mod(candidates.size)]
+                    item(key = "resurface") {
+                        ResurfaceCard(
+                            link = link,
+                            label = resurfaceLabel(link.createdAt, nowMs),
+                            categoryPath = state.categoryOf(link)?.path(state.categories),
+                            onOpen = {
+                                runCatching { uriHandler.openUri(link.url) }
+                                viewModel.take(LibraryEvent.Opened(link.id))
+                            },
+                            onArchive = { viewModel.take(LibraryEvent.Archive(link.id)) },
+                            onShowAnother = if (candidates.size > 1) ({ resurfaceIndex++ }) else null,
                             modifier = Modifier.animateItem(),
                         )
                     }
