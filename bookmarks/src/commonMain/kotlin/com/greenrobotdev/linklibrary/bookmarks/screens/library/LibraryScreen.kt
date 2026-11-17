@@ -201,16 +201,20 @@ fun LibraryScreen(
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 96.dp), // room for the FAB
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                items(links, key = { it.id }) { link ->
-                    FeedLinkCard(
-                        link = link,
-                        categoryPath = state.categoryOf(link)?.path(state.categories),
-                        onOpen = {
-                            runCatching { uriHandler.openUri(link.url) }
-                            viewModel.take(LibraryEvent.Opened(link.id))
-                        },
-                        onDetails = { onNavigateToDetail(link.id) },
-                    )
+                // Sorted by date either way, so each section is one consecutive run
+                links.groupBy { feedSection(it.createdAt) }.forEach { (section, sectionLinks) ->
+                    item(key = "section-$section") { FeedSectionHeader(section, Modifier.animateItem()) }
+                    items(sectionLinks, key = { it.id }) { link ->
+                        FeedLinkCard(
+                            link = link,
+                            categoryPath = state.categoryOf(link)?.path(state.categories),
+                            onOpen = {
+                                runCatching { uriHandler.openUri(link.url) }
+                                viewModel.take(LibraryEvent.Opened(link.id))
+                            },
+                            onDetails = { onNavigateToDetail(link.id) },
+                        )
+                    }
                 }
             }
         }

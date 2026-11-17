@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -156,7 +157,8 @@ internal fun FeedLinkCard(
     val meta = buildList {
         add(if (noPreview) host else "$typeLabel · $host")
         if (noPreview) add("No preview yet")
-        savedAtLabel(link.createdAt)?.let(::add)
+        // The TODAY / YESTERDAY header already says the day, so those cards show only the time
+        savedAtLabel(link.createdAt, timeOnlyIfRecent = true)?.let(::add)
     }.joinToString(" · ")
 
     Row(
@@ -282,6 +284,7 @@ private fun MetaChip(text: String, bg: Color, fg: Color) {
  * When a link was saved, in the device's time zone:
  * "Just now" (under a minute), "Today, 14:32", "Yesterday, 09:15", "Monday, 18:04" (last 6 days),
  * "12 Nov, 18:04" (this year), "12 Nov 2025" (older). null when unknown.
+ * [timeOnlyIfRecent]: "14:32" instead of "Today, 14:32" / "Yesterday, 09:15", for lists that head those days.
  * shortcut: 24-hour clock and English names; switch to platform formatters if the app gets localized.
  */
 @OptIn(ExperimentalTime::class)
@@ -289,6 +292,7 @@ internal fun savedAtLabel(
     epochMs: Long?,
     nowMs: Long = Clock.System.now().toEpochMilliseconds(),
     zone: TimeZone = TimeZone.currentSystemDefault(),
+    timeOnlyIfRecent: Boolean = false,
 ): String? {
     if (epochMs == null || epochMs <= 0L) return null
     if (nowMs - epochMs in 0 until 60_000L) return "Just now"
@@ -299,10 +303,44 @@ internal fun savedAtLabel(
     val month = then.month.name.take(3).lowercase().replaceFirstChar { it.uppercaseChar() }
     val day = then.date.day
     return when {
+        daysAgo in 0..1 && timeOnlyIfRecent -> time
         daysAgo == 0 -> "Today, $time"
         daysAgo == 1 -> "Yesterday, $time"
         daysAgo in 2..6 -> "${then.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercaseChar() }}, $time"
         then.year == today.year -> "$day $month, $time"
         else -> "$day $month ${then.year}" // also covers future dates from a wrong clock
     }
+}
+
+/**
+ * Feed section a save falls under: "Today", "Yesterday", "This week" (2–6 days ago) or "Earlier".
+ * Undated saves go to "Earlier"; a future date from a wrong clock counts as "Today".
+ */
+@OptIn(ExperimentalTime::class)
+internal fun feedSection(
+    epochMs: Long?,
+    nowMs: Long = Clock.System.now().toEpochMilliseconds(),
+    zone: TimeZone = TimeZone.currentSystemDefault(),
+): String {
+    if (epochMs == null || epochMs <= 0L) return "Earlier"
+    val then = Instant.fromEpochMilliseconds(epochMs).toLocalDateTime(zone).date
+    val today = Instant.fromEpochMilliseconds(nowMs).toLocalDateTime(zone).date
+    return when (then.daysUntil(today)) {
+        in Int.MIN_VALUE..0 -> "Today"
+        1 -> "Yesterday"
+        in 2..6 -> "This week"
+        else -> "Earlier"
+    }
+}
+
+/** Section title above a run of saves in the Feed. */
+@Composable
+internal fun FeedSectionHeader(title: String, modifier: Modifier = Modifier) {
+    Text(
+        title.uppercase(),
+        style = MaterialTheme.typography.labelLarge,
+        fontWeight = FontWeight.ExtraBold,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = modifier.padding(start = 4.dp, top = 4.dp).semantics { heading() },
+    )
 }
