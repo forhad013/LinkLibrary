@@ -36,6 +36,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.foundation.Canvas
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -61,17 +69,99 @@ import kotlin.time.ExperimentalTime
 
 // Feed pieces (design: Feed)
 
-/** "Lords of Links" / "Your saves" title at the top of the Feed. */
+/** "Lords of Links" / "Your saves" title at the top of the Feed, with the inbox progress ring. */
 @Composable
-internal fun FeedHeader(modifier: Modifier = Modifier) {
-    Column(modifier.fillMaxWidth()) {
-        Text(
-            "Lords of Links",
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text("Your saves", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.ExtraBold)
+internal fun FeedHeader(opened: Int, total: Int, modifier: Modifier = Modifier) {
+    Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                "Lords of Links",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text("Your saves", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.ExtraBold)
+        }
+        if (total > 0) InboxProgress(opened, total)
+    }
+}
+
+/** Ring that fills as saves get opened: "9 left · 3 of 12 opened", then green "Done". */
+@Composable
+private fun InboxProgress(opened: Int, total: Int) {
+    val done = opened >= total
+    val fraction by animateFloatAsState(opened.toFloat() / total, label = "inbox progress")
+    val track = MaterialTheme.colorScheme.primaryContainer
+    val fill = if (done) LordsExtraColors.success else MaterialTheme.colorScheme.primary
+    Row(
+        modifier = Modifier
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(start = 6.dp, end = 14.dp, top = 6.dp, bottom = 6.dp)
+            .semantics(mergeDescendants = true) {
+                contentDescription = if (done) "All $total saves opened" else "${total - opened} unopened, $opened of $total opened"
+            },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Canvas(Modifier.size(40.dp)) {
+            val stroke = 5.dp.toPx()
+            val inset = stroke / 2
+            val arcSize = Size(size.width - stroke, size.height - stroke)
+            drawArc(track, 0f, 360f, false, Offset(inset, inset), arcSize, style = Stroke(stroke))
+            drawArc(fill, -90f, 360f * fraction, false, Offset(inset, inset), arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
+        }
+        Column {
+            Text(
+                if (done) "Done" else "${total - opened} left",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.ExtraBold,
+            )
+            Text(
+                if (done) "all opened" else "$opened of $total opened",
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+/** Shown in place of the pick-up row and resurfacing card once every save is opened. */
+@Composable
+internal fun AllCaughtUpCard(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(LordsExtraColors.successContainer)
+            .padding(horizontal = 18.dp, vertical = 20.dp)
+            .semantics(mergeDescendants = true) {},
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 12.dp, bottomEnd = 28.dp, bottomStart = 12.dp))
+                .background(LordsExtraColors.success),
+            contentAlignment = Alignment.Center,
+        ) {
+            AppIcon(Icons.Filled.Check, contentDescription = null, color = Color.White, modifier = Modifier.size(28.dp))
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                "All caught up",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.ExtraBold,
+                color = LordsExtraColors.onSuccessContainer,
+            )
+            Text(
+                "You opened everything you saved. New saves show up here.",
+                style = MaterialTheme.typography.bodySmall,
+                color = LordsExtraColors.onSuccessContainer,
+            )
+        }
     }
 }
 

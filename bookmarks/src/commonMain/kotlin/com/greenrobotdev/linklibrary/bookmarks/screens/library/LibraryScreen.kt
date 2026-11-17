@@ -145,7 +145,7 @@ fun LibraryScreen(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            FeedHeader()
+            FeedHeader(opened = state.inboxOpened, total = state.inboxTotal)
             SearchField(
                 query = state.searchQuery,
                 onQueryChange = { viewModel.take(LibraryEvent.SearchChanged(it)) },
@@ -228,6 +228,9 @@ fun LibraryScreen(
                             modifier = Modifier.animateItem(),
                         )
                     }
+                }
+                if (discover && unopened.isEmpty() && state.inboxTotal > 0) {
+                    item(key = "caught-up") { AllCaughtUpCard(Modifier.animateItem()) }
                 }
                 val candidates = state.resurfaceCandidates(nowMs)
                 if (discover && candidates.isNotEmpty()) {
