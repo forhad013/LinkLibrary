@@ -225,6 +225,7 @@ fun LibraryScreen(
                                 runCatching { uriHandler.openUri(link.url) }
                                 viewModel.take(LibraryEvent.Opened(link.id))
                             },
+                            onMarkOpened = { link -> viewModel.take(LibraryEvent.Opened(link.id)) },
                             modifier = Modifier.animateItem(),
                         )
                     }
