@@ -51,6 +51,7 @@ kotlin {
 
                 // Utils module (MoleculeViewModel and utilities)
                 implementation(project(":core:utils"))
+                implementation(libs.multiplatform.settings) // FeedFilterStore
 
                 // Database module (for repositories and entities)
                 implementation(project(":database"))
