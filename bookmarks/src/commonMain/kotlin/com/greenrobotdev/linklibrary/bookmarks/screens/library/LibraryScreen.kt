@@ -177,11 +177,9 @@ fun LibraryScreen(
             }
             HorizontalDivider(Modifier.padding(top = 12.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
-            // Sort + Filters sit right above the list they change, with the picked chips under them
+            // Filters sits right above the list it changes, with the picked chips under them
             val allSavesHeader: @Composable (Modifier) -> Unit = { modifier ->
                 AllSavesHeader(
-                    newestFirst = state.newestFirst,
-                    onToggleSort = { viewModel.take(LibraryEvent.ToggleSort) },
                     activeFilters = state.filters.activeCount,
                     onFilters = { showFilters = true },
                     modifier = modifier,
@@ -271,7 +269,7 @@ fun LibraryScreen(
                             )
                         }
                     }
-                    // Sticky, so Sort and Filters stay reachable however far the list is scrolled
+                    // Sticky, so Filters stays reachable however far the list is scrolled
                     stickyHeader(key = "all-saves") {
                         allSavesHeader(Modifier.background(MaterialTheme.colorScheme.background).padding(vertical = 8.dp))
                     }
