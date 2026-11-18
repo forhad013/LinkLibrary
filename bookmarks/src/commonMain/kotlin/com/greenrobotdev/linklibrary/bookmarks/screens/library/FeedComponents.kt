@@ -39,7 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.SwipeToDismissBox
@@ -629,14 +629,15 @@ private fun CardAction(text: String, container: Color, content: Color, onClick: 
 }
 
 /**
- * Feed card with swipe actions: left archives (the card leaves the list), right toggles favorite
- * (the card snaps back). Archived links (shown via Filters) can't be swiped left again.
+ * Feed card with swipe actions: right archives (the card leaves the list; Undo is offered by the
+ * caller), left asks to delete (the card snaps back while the caller confirms). Archived links
+ * (shown via Filters) can't be archived again.
  */
 @Composable
 internal fun SwipeableFeedCard(
     link: Link,
     onArchive: () -> Unit,
-    onToggleFavorite: () -> Unit,
+    onRequestDelete: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
@@ -649,40 +650,40 @@ internal fun SwipeableFeedCard(
     SwipeToDismissBox(
         state = state,
         modifier = modifier.clip(RoundedCornerShape(24.dp)),
-        enableDismissFromEndToStart = !link.isArchived,
+        enableDismissFromStartToEnd = !link.isArchived,
         onDismiss = { direction ->
             when (direction) {
-                SwipeToDismissBoxValue.EndToStart -> onArchive()
-                SwipeToDismissBoxValue.StartToEnd -> {
-                    onToggleFavorite()
-                    scope.launch { state.reset() } // the card stays in the list
+                SwipeToDismissBoxValue.StartToEnd -> onArchive()
+                SwipeToDismissBoxValue.EndToStart -> {
+                    onRequestDelete()
+                    scope.launch { state.reset() } // stays put until the delete is confirmed
                 }
                 SwipeToDismissBoxValue.Settled -> Unit
             }
         },
         backgroundContent = {
-            val archive = state.dismissDirection == SwipeToDismissBoxValue.EndToStart
-            val favorite = state.dismissDirection == SwipeToDismissBoxValue.StartToEnd
+            val archive = state.dismissDirection == SwipeToDismissBoxValue.StartToEnd
+            val delete = state.dismissDirection == SwipeToDismissBoxValue.EndToStart
             val bg = when {
                 archive -> MaterialTheme.colorScheme.inverseSurface
-                favorite -> MaterialTheme.colorScheme.tertiaryContainer
+                delete -> MaterialTheme.colorScheme.error
                 else -> Color.Transparent
             }
-            val fg = if (archive) MaterialTheme.colorScheme.inverseOnSurface else MaterialTheme.colorScheme.onTertiaryContainer
+            val fg = if (archive) MaterialTheme.colorScheme.inverseOnSurface else MaterialTheme.colorScheme.onError
             Row(
                 modifier = Modifier.fillMaxSize().background(bg).padding(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, if (archive) Alignment.End else Alignment.Start),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, if (delete) Alignment.End else Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (archive || favorite) {
+                if (archive || delete) {
                     AppIcon(
-                        if (archive) Icons.Outlined.Archive else if (link.isFavorite) Icons.Outlined.StarOutline else Icons.Filled.Star,
+                        if (archive) Icons.Outlined.Archive else Icons.Outlined.Delete,
                         contentDescription = null,
                         color = fg,
                         modifier = Modifier.size(22.dp),
                     )
                     Text(
-                        if (archive) "Archive" else if (link.isFavorite) "Unfavorite" else "Favorite",
+                        if (archive) "Archive" else "Delete",
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         color = fg,
