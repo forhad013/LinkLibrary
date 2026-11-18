@@ -14,6 +14,8 @@ data class Link(
     val type: String = "other", // video | article | social | other
     val fetchedDescription: String? = null,
     val createdAt: Long? = null,
+    /** Page preview image (og:image); null when the page has none or it wasn't fetched yet. */
+    val imageUrl: String? = null,
     val tags: List<String> = emptyList(),
     val categoryName: String? = null
 )

@@ -18,5 +18,6 @@ data class LinkEntity(
     val type: String = "other", // video | article | social | other
     val fetchedDescription: String? = null, // read-only, auto-fetched from the page
     val createdAt: Long? = null, // epoch milliseconds
+    val imageUrl: String? = null, // page preview image (og:image), fetched on save
     val tags: List<String> = emptyList() // populated from link_tags at read time
 )

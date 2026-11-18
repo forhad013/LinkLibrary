@@ -24,6 +24,10 @@ class AndroidDatabaseBuilder(
         return Room.databaseBuilder<LinkDatabase>(
             context = appContext,
             name = dbFile.absolutePath
-        ).fallbackToDestructiveMigration(dropAllTables = true) // shortcut: dev-only, no real migrations yet
+        )
+            // Real migrations keep saved links across schema changes; the destructive fallback only
+            // covers versions older than the first migration (dev builds before v4).
+            .addMigrations(*ALL_MIGRATIONS)
+            .fallbackToDestructiveMigration(dropAllTables = true)
     }
 }
