@@ -1,5 +1,13 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.library
 
+import com.greenrobotdev.linklibrary.design.motion.AppMotion
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.AnimatedContent
 import com.greenrobotdev.linklibrary.design.components.layout.appVerticalScroll
 import com.greenrobotdev.linklibrary.design.components.layout.AppLazyColumn
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -186,6 +194,9 @@ fun LibraryScreen(
         lastUnopened = unopenedCount
         lastLinkCount = state.links.size
     }
+    // Decided in this frame too, so the calm card never flashes before the celebration
+    val celebrateNow = !state.isLoading &&
+        celebrateCaughtUp(celebrate, lastUnopened, lastLinkCount, unopenedCount, state.links.size)
 
     // Scrolling the list collapses the title first; it comes back once the list is at the top
     val header = rememberCollapsingHeaderState()
@@ -201,7 +212,7 @@ fun LibraryScreen(
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                FeedHeader(opened = state.inboxOpened, total = state.inboxTotal, celebrate = celebrate, collapse = { header.fraction })
+                FeedHeader(opened = state.inboxOpened, total = state.inboxTotal, celebrate = celebrateNow, collapse = { header.fraction })
                 SearchField(
                     query = state.searchQuery,
                     onQueryChange = { viewModel.take(LibraryEvent.SearchChanged(it)) },
@@ -270,23 +281,46 @@ fun LibraryScreen(
                     // Discovery steps aside while searching or filtering, so it never mixes with narrowed results
                     val unopened = state.unopenedLinks
                     val discover = state.searchQuery.isBlank() && state.filters.activeCount == 0
-                    if (discover && unopened.isNotEmpty()) {
-                        item(key = "pick-up") {
-                            PickUpStrip(
-                                links = unopened.take(PICK_UP_COUNT),
-                                unopenedCount = unopened.size,
-                                onOpen = { link ->
-                                    runCatching { uriHandler.openUri(link.url) }
-                                    viewModel.take(LibraryEvent.Opened(link.id))
-                                },
-                                onMarkOpened = { link -> undoable("Marked as opened", link, LibraryEvent.Opened(link.id)) },
-                                modifier = Modifier.animateItem(),
-                            )
+                    // One slot that morphs between the pick-up row, the celebration and the calm card,
+                    // so clearing the last unopened save is a transition, not a cut
+                    if (discover && state.inboxTotal > 0) {
+                        val slot = when {
+                            unopened.isNotEmpty() -> TopSlot.PickUp
+                            celebrateNow -> TopSlot.CaughtUp
+                            else -> TopSlot.NothingNew
                         }
-                    }
-                    if (discover && unopened.isEmpty() && state.inboxTotal > 0) {
-                        if (celebrate) item(key = "caught-up") { AllCaughtUpCard(Modifier.animateItem()) }
-                        else item(key = "nothing-new") { NothingNewCard(Modifier.animateItem()) }
+                        item(key = "top-slot") {
+                            // Read here: motion specs come from the theme, transitionSpec isn't composable
+                            val fadeInSpec = AppMotion.effects<Float>()
+                            val fadeOutSpec = AppMotion.effectsFast<Float>()
+                            val scaleInSpec = AppMotion.spatial<Float>()
+                            val scaleOutSpec = AppMotion.spatialFast<Float>()
+                            val sizeSpec = AppMotion.spatial<androidx.compose.ui.unit.IntSize>()
+                            AnimatedContent(
+                                targetState = slot,
+                                transitionSpec = {
+                                    (fadeIn(fadeInSpec) + scaleIn(scaleInSpec, initialScale = 0.92f)) togetherWith
+                                        (fadeOut(fadeOutSpec) + scaleOut(scaleOutSpec, targetScale = 0.96f)) using
+                                        SizeTransform(clip = false) { _, _ -> sizeSpec }
+                                },
+                                modifier = Modifier.animateItem(),
+                                label = "feed top slot",
+                            ) { target ->
+                                when (target) {
+                                    TopSlot.PickUp -> PickUpStrip(
+                                        links = unopened.take(PICK_UP_COUNT),
+                                        unopenedCount = unopened.size,
+                                        onOpen = { link ->
+                                            runCatching { uriHandler.openUri(link.url) }
+                                            viewModel.take(LibraryEvent.Opened(link.id))
+                                        },
+                                        onMarkOpened = { link -> undoable("Marked as opened", link, LibraryEvent.Opened(link.id)) },
+                                    )
+                                    TopSlot.CaughtUp -> AllCaughtUpCard()
+                                    TopSlot.NothingNew -> NothingNewCard()
+                                }
+                            }
+                        }
                     }
                     val candidates = state.resurfaceCandidates(nowMs)
                     if (discover && candidates.isNotEmpty()) {
@@ -654,3 +688,5 @@ fun FirstLaunchEmptyState(
     }
 }
 
+/** What sits above the resurfacing card: the pick-up row, the celebration, or the calm card. */
+private enum class TopSlot { PickUp, CaughtUp, NothingNew }
