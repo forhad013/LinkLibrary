@@ -10,6 +10,7 @@ import com.greenrobotdev.linklibrary.bookmarks.model.toCategory
 import com.greenrobotdev.linklibrary.bookmarks.model.toDomain
 import com.greenrobotdev.linklibrary.bookmarks.model.toEntity
 import com.greenrobotdev.linklibrary.bookmarks.model.toTag
+import com.greenrobotdev.linklibrary.bookmarks.service.HttpStatusException
 import com.greenrobotdev.linklibrary.bookmarks.service.MetadataFetchService
 import com.greenrobotdev.linklibrary.database.repository.CategoryRepository
 import com.greenrobotdev.linklibrary.database.repository.LinkRepository
@@ -57,13 +58,14 @@ fun LibraryPresenter(
         }
     }
     // Preview images for links saved before they were kept: one page at a time, in the background.
-    // A failed fetch (offline, blocked) stays null and is retried next time.
+    // A network failure (offline, timeout) stays null and is retried next time.
     LaunchedEffect(Unit) {
         val missing = linkRepository.getLinks().first().getOrNull().orEmpty().filter { it.imageUrl == null }
         for (link in missing) {
-            metadataFetchService.fetchMetadata(link.url).first().onSuccess { metadata ->
-                linkRepository.setImageUrl(link.id, metadata.imageUrl.orEmpty()).first()
-            }
+            metadataFetchService.fetchMetadata(link.url).first()
+                .onSuccess { metadata -> linkRepository.setImageUrl(link.id, metadata.imageUrl.orEmpty()).first() }
+                // The site refuses us (Facebook answers 400): record "no image" instead of asking on every launch
+                .onFailure { if (it is HttpStatusException) linkRepository.setImageUrl(link.id, "").first() }
         }
     }
     LaunchedEffect(Unit) {
