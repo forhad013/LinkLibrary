@@ -197,7 +197,6 @@ fun CategoryDropdown(
                 (it.description?.contains(searchText, ignoreCase = true) ?: false)
             }
 
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -239,7 +238,6 @@ fun CategoryDropdown(
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-
 
                 // Category items
                 filteredCategories.forEach { category ->
@@ -436,86 +434,6 @@ private fun CreateCategoryDialog(
                         Text("Create")
                     }
                 }
-            }
-        }
-    }
-}
-
-/**
- * Compact version for limited spaces
- */
-@Composable
-fun CategorySelectorCompact(
-    categories: List<CategoryItem>,
-    selectedCategoryId: String?,
-    onCategorySelected: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val selectedCategory = categories.find { it.id == selectedCategoryId }
-
-    Box(modifier = modifier) {
-        Surface(
-            onClick = { if (enabled) expanded = true },
-            enabled = enabled,
-            shape = RoundedCornerShape(8.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                selectedCategory?.icon?.let { icon ->
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-
-                Text(
-                    text = selectedCategory?.name ?: "No category",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "Expand",
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
-
-        // Dropdown menu
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            categories.forEach { category ->
-                DropdownMenuItem(
-                    text = {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            category.icon?.let { icon ->
-                                Icon(
-                                    imageVector = icon,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                            Text(category.name)
-                        }
-                    },
-                    onClick = {
-                        onCategorySelected(category.id)
-                        expanded = false
-                    }
-                )
             }
         }
     }

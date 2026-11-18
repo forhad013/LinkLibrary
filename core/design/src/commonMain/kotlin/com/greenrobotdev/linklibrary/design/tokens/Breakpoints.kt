@@ -30,26 +30,3 @@ object BreakpointsTokens {
 @Composable
 expect fun rememberWindowSizeClass(): WindowSizeClass
 
-/**
- * Check if current window is in compact mode (mobile)
- */
-@Composable
-fun isCompactWindow(): Boolean {
-    return rememberWindowSizeClass() == WindowSizeClass.Compact
-}
-
-/**
- * Check if current window is in medium mode (tablet/foldable)
- */
-@Composable
-fun isMediumWindow(): Boolean {
-    return rememberWindowSizeClass() == WindowSizeClass.Medium
-}
-
-/**
- * Check if current window is in expanded mode (desktop)
- */
-@Composable
-fun isExpandedWindow(): Boolean {
-    return rememberWindowSizeClass() == WindowSizeClass.Expanded
-}

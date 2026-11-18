@@ -44,26 +44,3 @@ enum class ComponentSize {
     /** Prominent size with larger touch targets (typically 48dp height) */
     Large
 }
-
-/**
- * Component state for interactive elements
- *
- * Defines the possible interaction states for components, used for
- * consistent state management and visual feedback across the design system.
- */
-enum class ComponentState {
-    /** Default resting state */
-    Idle,
-
-    /** Component is currently being interacted with (hovered, pressed, etc.) */
-    Active,
-
-    /** Component is focused via keyboard or other input method */
-    Focused,
-
-    /** Component is disabled and not interactive */
-    Disabled,
-
-    /** Component is in an error state */
-    Error
-}

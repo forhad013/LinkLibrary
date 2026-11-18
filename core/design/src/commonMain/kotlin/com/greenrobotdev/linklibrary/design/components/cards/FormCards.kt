@@ -260,64 +260,6 @@ fun ToggleCard(
 }
 
 /**
- * CompactFormCard - More compact version of form card
- *
- * Same styling as FormCard but with reduced padding and spacing for
- * more compact layouts.
- */
-@Composable
-fun CompactFormCard(
-    modifier: Modifier = Modifier,
-    headerIcon: ImageVector? = null,
-    headerTitle: String? = null,
-    headerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
-    content: @Composable () -> Unit
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        ),
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Optional header section
-            if (headerIcon != null && headerTitle != null) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AppIcon(
-                        icon = headerIcon,
-                        backgroundColor = headerColor,
-                        variant = IconBackgroundVariant.Compact
-                    )
-
-                    Text(
-                        text = headerTitle,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-
-            // Card content
-            content()
-        }
-    }
-}
-
-/**
  * InputCard - Form card specifically designed for input fields
  *
  * A specialized form card optimized for containing input fields with
