@@ -24,7 +24,6 @@ class RootNavigationState(
     val tabs: List<RootScreens>
         get() = listOf(
             RootScreens.FeedTab,
-            RootScreens.SearchTab,
             RootScreens.LibraryTab,
             RootScreens.SettingsTab
         )
