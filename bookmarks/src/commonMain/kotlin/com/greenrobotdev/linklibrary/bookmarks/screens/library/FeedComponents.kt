@@ -35,6 +35,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import com.greenrobotdev.linklibrary.design.motion.rememberReducedMotion
+import com.greenrobotdev.linklibrary.design.motion.AppMotion
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.animateDpAsState
 import kotlin.math.roundToInt
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.platform.LocalDensity
@@ -67,7 +72,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -358,7 +362,7 @@ internal fun FeedLinkCard(
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        TypeThumb(type = if (noPreview) "none" else link.type, muted = link.isArchived, linkId = link.id)
+        TypeThumb(type = if (noPreview) "none" else link.type, opened = link.isOpened, muted = link.isArchived, linkId = link.id)
 
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -419,26 +423,40 @@ internal fun FeedLinkCard(
     }
 }
 
-/** Thumbnail shape, colors and icon per link type ("none" = no preview yet). */
-private data class TypeLook(val shape: Shape, val bg: Color, val fg: Color, val icon: ImageVector)
+/** Thumbnail colors and icon per link type ("none" = no preview yet). */
+private data class TypeLook(val bg: Color, val fg: Color, val icon: ImageVector)
 
 @Composable
 private fun typeLook(type: String): TypeLook = when (type) {
-    "video" -> TypeLook(RoundedCornerShape(18.dp), LordsExtraColors.mediaPlaceholder, MaterialTheme.colorScheme.secondary, Icons.Filled.PlayArrow)
-    "social" -> TypeLook(CircleShape, MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Icons.Outlined.ChatBubbleOutline)
-    "article" -> TypeLook(RoundedCornerShape(18.dp), MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer, Icons.AutoMirrored.Outlined.Article)
-    else -> TypeLook(RoundedCornerShape(18.dp), MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Filled.Link)
+    "video" -> TypeLook(LordsExtraColors.mediaPlaceholder, MaterialTheme.colorScheme.secondary, Icons.Filled.PlayArrow)
+    "social" -> TypeLook(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Icons.Outlined.ChatBubbleOutline)
+    "article" -> TypeLook(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer, Icons.AutoMirrored.Outlined.Article)
+    else -> TypeLook(MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Filled.Link)
 }
 
 @Composable
-private fun TypeThumb(type: String, muted: Boolean = false, linkId: String? = null) {
+private fun TypeThumb(type: String, opened: Boolean, muted: Boolean = false, linkId: String? = null) {
     val look = typeLook(type)
     // Archived: same shape and icon, neutral colors
     val bg = if (muted) MaterialTheme.colorScheme.surfaceContainerHigh else look.bg
     val fg = if (muted) MaterialTheme.colorScheme.onSurfaceVariant else look.fg
+    // Unopened saves are round; once opened the circle morphs into a rounded square (72dp: 36 = circle)
+    val reduced = rememberReducedMotion()
+    val corner by animateDpAsState(
+        targetValue = if (opened) 18.dp else 36.dp,
+        animationSpec = if (reduced) snap() else AppMotion.spatial(),
+        label = "thumb shape",
+    )
     Box(
         // Grows into the Link details badge when the card opens details
-        modifier = (if (linkId != null) Modifier.sharedThumb(linkId) else Modifier).size(72.dp).clip(look.shape).background(bg),
+        modifier = (if (linkId != null) Modifier.sharedThumb(linkId) else Modifier)
+            .size(72.dp)
+            // Corner read in the draw phase, so the morph doesn't recompose the card every frame
+            .graphicsLayer {
+                shape = RoundedCornerShape(corner)
+                clip = true
+            }
+            .background(bg),
         contentAlignment = Alignment.Center,
     ) {
         AppIcon(look.icon, contentDescription = null, color = fg)
