@@ -12,7 +12,6 @@ sealed class HomeNavRoutes : NavKey {
 
     // Quick actions
     data class QuickAdd(val initialUrl: String? = null) : HomeNavRoutes()
-    data object QuickSearch : HomeNavRoutes()
 
     // Activity and analytics
     data object Activity : HomeNavRoutes()

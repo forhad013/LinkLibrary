@@ -26,7 +26,6 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.FilterList
@@ -68,7 +67,6 @@ import com.greenrobotdev.linklibrary.bookmarks.model.Link
 import com.greenrobotdev.linklibrary.design.components.button.IconButton as DesignIconButton
 import com.greenrobotdev.linklibrary.design.components.card.ElevatedCard
 import com.greenrobotdev.linklibrary.design.components.progress.CircularProgress
-import com.greenrobotdev.linklibrary.design.components.textfield.OutlinedTextField
 import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
 import com.greenrobotdev.linklibrary.design.foundation.layout.HorizontalDivider
 import com.greenrobotdev.linklibrary.design.foundation.layout.MediumVerticalSpacer
@@ -112,23 +110,6 @@ private fun HomeView(
     var selectedSort by remember { mutableStateOf("Recent") }
 
     Scaffold(
-        topBar = {
-            // Modern search bar as top bar
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(16.dp)
-            ) {
-                OutlinedTextField(
-                    value = state.searchQuery,
-                    onValueChange = { /* TODO: Handle search */ },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = "Search links...",
-                    leadingIcon = Icons.Default.Search
-                )
-            }
-        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { onAddLink(null) },
