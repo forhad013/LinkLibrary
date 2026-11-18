@@ -16,6 +16,7 @@ fun Link.toEntity() = LinkEntity(
     type = type,
     fetchedDescription = fetchedDescription,
     createdAt = createdAt,
+    imageUrl = imageUrl,
     tags = tags
 )
 
@@ -30,6 +31,7 @@ fun LinkEntity.toDomain(categoryName: String? = null) = Link(
     type = type,
     fetchedDescription = fetchedDescription,
     createdAt = createdAt,
+    imageUrl = imageUrl,
     tags = tags,
     categoryName = categoryName
 )
