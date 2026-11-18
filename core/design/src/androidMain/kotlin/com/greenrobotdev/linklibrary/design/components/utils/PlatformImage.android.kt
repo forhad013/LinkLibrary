@@ -19,6 +19,9 @@ import coil.size.Size
 import kotlinx.coroutines.delay
 
 private const val RETRIES = 2
+// Image CDNs (Medium, Cloudflare) often refuse OkHttp's default user agent
+private const val BROWSER_USER_AGENT =
+    "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36"
 
 /**
  * Android implementation using Coil for async image loading
@@ -41,6 +44,7 @@ actual fun PlatformAsyncImage(
             // shortcut: decodes full size even for small thumbnails; pass a size per call site if long lists get heavy
             .size(Size.ORIGINAL)
             .crossfade(true)
+            .addHeader("User-Agent", BROWSER_USER_AGENT)
             // A new parameter makes Coil treat a retry as a new request
             .setParameter("attempt", attempt, memoryCacheKey = null)
             .build()
@@ -59,7 +63,15 @@ actual fun PlatformAsyncImage(
             contentDescription = contentDescription,
             modifier = Modifier.matchParentSize(),
             contentScale = ContentScale.Crop,
-            onState = { state = it },
+            onState = {
+                state = it
+                // Logcat: filter "LoL/Image" to see why an image is missing
+                when (it) {
+                    is AsyncImagePainter.State.Success -> println("LoL/Image loaded (try ${attempt + 1}) $model")
+                    is AsyncImagePainter.State.Error -> println("LoL/Image failed (try ${attempt + 1}) $model: ${it.result.throwable}")
+                    else -> Unit
+                }
+            },
         )
         when {
             state is AsyncImagePainter.State.Loading || (failed && attempt < RETRIES) -> loading?.invoke()
