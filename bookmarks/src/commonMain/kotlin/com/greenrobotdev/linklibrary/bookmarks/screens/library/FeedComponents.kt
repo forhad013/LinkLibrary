@@ -235,6 +235,12 @@ private fun InboxProgress(opened: Int, total: Int, celebrate: Boolean, modifier:
 /** The celebration, right after the user opened (or archived) the last unopened save. */
 @Composable
 internal fun AllCaughtUpCard(modifier: Modifier = Modifier) {
+    // The check badge pops in as the card arrives (instant with animations off)
+    val reduced = rememberReducedMotion()
+    val pop = remember { Animatable(if (reduced) 1f else 0.4f) }
+    LaunchedEffect(Unit) {
+        if (!reduced) pop.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow))
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -248,6 +254,7 @@ internal fun AllCaughtUpCard(modifier: Modifier = Modifier) {
         Box(
             modifier = Modifier
                 .size(56.dp)
+                .graphicsLayer { scaleX = pop.value; scaleY = pop.value }
                 .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 12.dp, bottomEnd = 28.dp, bottomStart = 12.dp))
                 .background(LordsExtraColors.success),
             contentAlignment = Alignment.Center,
