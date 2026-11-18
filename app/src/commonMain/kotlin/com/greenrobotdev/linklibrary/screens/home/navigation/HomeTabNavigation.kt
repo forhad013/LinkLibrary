@@ -44,15 +44,6 @@ fun HomeTabNavigation(
                         onBack = { tabNavigator.goBack() }
                     )
 
-                    // Quick Search Screen
-                    is HomeNavRoutes.QuickSearch -> HomeScreen(
-                        routeKey = route,
-                        onNavigateToDetail = { /* Search results navigation */ },
-                        onAddLink = { initialUrl ->
-                            tabNavigator.navigateToNew(HomeNavRoutes.QuickAdd(initialUrl))
-                        }
-                    )
-
                     // Activity Screen
                     is HomeNavRoutes.Activity -> HomeScreen(
                         routeKey = route,

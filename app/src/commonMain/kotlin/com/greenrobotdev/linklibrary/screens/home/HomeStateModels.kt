@@ -7,8 +7,7 @@ import kotlinx.serialization.Serializable
 data class HomeState(
     val isLoading: Boolean = false,
     val error: String? = null,
-    val links: List<Link>? = null,
-    val searchQuery: String = ""
+    val links: List<Link>? = null
 )
 
 sealed interface HomeEvent {
