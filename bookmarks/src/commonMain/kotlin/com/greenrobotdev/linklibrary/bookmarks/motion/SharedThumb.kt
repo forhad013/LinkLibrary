@@ -42,3 +42,19 @@ fun Modifier.sharedTitle(linkId: String): Modifier {
         )
     }
 }
+
+/**
+ * Library tile → list: a smart-list tile and the header of the list it opens share these bounds
+ * ("scope-<key>"), so the tile grows into the header. Outside a shared-transition host it does nothing.
+ */
+@Composable
+fun Modifier.sharedScope(scopeKey: String): Modifier {
+    val shared = LocalSharedTransitionScope.current ?: return this
+    val animated = LocalNavAnimatedContentScope.current
+    return with(shared) {
+        this@sharedScope.sharedBounds(
+            sharedContentState = rememberSharedContentState(key = "scope-$scopeKey"),
+            animatedVisibilityScope = animated,
+        )
+    }
+}
