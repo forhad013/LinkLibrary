@@ -1,5 +1,9 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.library
 
+import kotlinx.coroutines.delay
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.onSizeChanged
 import com.greenrobotdev.linklibrary.design.motion.AppMotion
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.scaleOut
@@ -184,6 +188,8 @@ fun LibraryScreen(
     // "All caught up" is a moment, not a state: celebrate only when unopened saves go from 1+ to 0
     // while the app is in use without links being deleted (opening, Mark as opened, archiving).
     // A restore or a later visit with nothing unopened gets the calm "Nothing new" instead.
+    // The celebration shows for a few seconds, then folds away for the rest of the session
+    var caughtUpDismissed by rememberSaveable { mutableStateOf(false) }
     var celebrate by rememberSaveable { mutableStateOf(false) }
     var lastUnopened by rememberSaveable { mutableStateOf(-1) }
     var lastLinkCount by rememberSaveable { mutableStateOf(-1) }
@@ -191,12 +197,17 @@ fun LibraryScreen(
     LaunchedEffect(state.isLoading, unopenedCount, state.links.size) {
         if (state.isLoading) return@LaunchedEffect
         celebrate = celebrateCaughtUp(celebrate, lastUnopened, lastLinkCount, unopenedCount, state.links.size)
+        if (unopenedCount > 0) caughtUpDismissed = false // a new unopened save resets the celebration
         lastUnopened = unopenedCount
         lastLinkCount = state.links.size
     }
     // Decided in this frame too, so the calm card never flashes before the celebration
     val celebrateNow = !state.isLoading &&
         celebrateCaughtUp(celebrate, lastUnopened, lastLinkCount, unopenedCount, state.links.size)
+    val showCelebration = celebrateNow && !caughtUpDismissed
+    // Height of the pick-up row, so the celebration replacing it keeps the same height (no jump)
+    var pickUpHeightPx by rememberSaveable { mutableIntStateOf(0) }
+    val density = LocalDensity.current
 
     // Scrolling the list collapses the title first; it comes back once the list is at the top
     val header = rememberCollapsingHeaderState()
@@ -212,7 +223,7 @@ fun LibraryScreen(
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                FeedHeader(opened = state.inboxOpened, total = state.inboxTotal, celebrate = celebrateNow, collapse = { header.fraction })
+                FeedHeader(opened = state.inboxOpened, total = state.inboxTotal, celebrate = showCelebration, collapse = { header.fraction })
                 SearchField(
                     query = state.searchQuery,
                     onQueryChange = { viewModel.take(LibraryEvent.SearchChanged(it)) },
@@ -286,7 +297,8 @@ fun LibraryScreen(
                     if (discover && state.inboxTotal > 0) {
                         val slot = when {
                             unopened.isNotEmpty() -> TopSlot.PickUp
-                            celebrateNow -> TopSlot.CaughtUp
+                            showCelebration -> TopSlot.CaughtUp
+                            caughtUpDismissed -> TopSlot.Hidden
                             else -> TopSlot.NothingNew
                         }
                         item(key = "top-slot") {
@@ -315,9 +327,18 @@ fun LibraryScreen(
                                             viewModel.take(LibraryEvent.Opened(link.id))
                                         },
                                         onMarkOpened = { link -> undoable("Marked as opened", link, LibraryEvent.Opened(link.id)) },
+                                        modifier = Modifier.onSizeChanged { pickUpHeightPx = it.height },
                                     )
-                                    TopSlot.CaughtUp -> AllCaughtUpCard()
+                                    TopSlot.CaughtUp -> {
+                                        LaunchedEffect(Unit) {
+                                            delay(CAUGHT_UP_SHOWN_MS)
+                                            caughtUpDismissed = true
+                                        }
+                                        AllCaughtUpCard(Modifier.heightIn(min = with(density) { pickUpHeightPx.toDp() }))
+                                    }
                                     TopSlot.NothingNew -> NothingNewCard()
+                                    // Collapses to nothing; the height change is animated by SizeTransform
+                                    TopSlot.Hidden -> Spacer(Modifier.fillMaxWidth())
                                 }
                             }
                         }
@@ -688,5 +709,8 @@ fun FirstLaunchEmptyState(
     }
 }
 
-/** What sits above the resurfacing card: the pick-up row, the celebration, or the calm card. */
-private enum class TopSlot { PickUp, CaughtUp, NothingNew }
+/** What sits above the resurfacing card: the pick-up row, the celebration, the calm card, or nothing. */
+private enum class TopSlot { PickUp, CaughtUp, NothingNew, Hidden }
+
+/** How long "All caught up" stays before folding away. */
+private const val CAUGHT_UP_SHOWN_MS = 5_000L
