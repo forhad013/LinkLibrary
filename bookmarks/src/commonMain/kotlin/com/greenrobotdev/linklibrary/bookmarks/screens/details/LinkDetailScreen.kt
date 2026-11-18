@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.details
 
+import com.greenrobotdev.linklibrary.bookmarks.motion.sharedThumb
 import com.greenrobotdev.linklibrary.design.components.layout.appVerticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -173,6 +174,7 @@ fun LinkDetailScreen(
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).imePadding()) {
         Column(Modifier.fillMaxSize().appVerticalScroll(rememberScrollState())) {
             Hero(
+                linkId = link.id,
                 type = link.type,
                 noPreview = link.title.isBlank() || link.title == link.url,
                 onBack = onBack,
@@ -300,7 +302,7 @@ fun LinkDetailScreen(
 
 /** Top band coloured by link type, with a large type badge, Back (left) and Share (right). */
 @Composable
-private fun Hero(type: String, noPreview: Boolean, onBack: () -> Unit, onShare: () -> Unit) {
+private fun Hero(linkId: String, type: String, noPreview: Boolean, onBack: () -> Unit, onShare: () -> Unit) {
     data class Look(val bg: Color, val badgeBg: Color, val badgeFg: Color, val icon: ImageVector)
     val look = when {
         noPreview -> Look(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Filled.Link)
@@ -319,7 +321,8 @@ private fun Hero(type: String, noPreview: Boolean, onBack: () -> Unit, onShare: 
             AppIcon(Icons.Outlined.Share, contentDescription = "Share", color = MaterialTheme.colorScheme.onSurface)
         }
         Box(
-            modifier = Modifier.align(Alignment.Center).size(88.dp).clip(RoundedCornerShape(24.dp)).background(look.badgeBg),
+            // The Feed card's thumbnail grows into this badge
+            modifier = Modifier.align(Alignment.Center).sharedThumb(linkId).size(88.dp).clip(RoundedCornerShape(24.dp)).background(look.badgeBg),
             contentAlignment = Alignment.Center,
         ) {
             AppIcon(look.icon, contentDescription = null, color = look.badgeFg, modifier = Modifier.size(40.dp))
