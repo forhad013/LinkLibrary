@@ -1,5 +1,8 @@
 package com.greenrobotdev.linklibrary.screens.root
 
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -76,6 +79,14 @@ fun RootScreen(
     // Step one of Add link is a modal sheet; Continue opens the existing full add-link screen
     var addLinkSheetUrl by remember { mutableStateOf<String?>(null) }
     val openAddLinkSheet = { url: String? -> addLinkSheetUrl = url ?: "" }
+
+    // Back at the root of Library or Settings goes to the Feed instead of leaving the app. Screens
+    // deeper in a tab (Navigation 3 uses this same back-event system) register later, so they pop first.
+    NavigationBackHandler(
+        state = rememberNavigationEventState(NavigationEventInfo.None),
+        isBackEnabled = rootNavigator.getCurrentTab() != RootScreens.FeedTab,
+        onBackCompleted = { rootNavigator.switchTab(RootScreens.FeedTab) },
+    )
 
     // Share sheet: open Add link on the Feed tab
     LaunchedEffect(sharedContent) {
