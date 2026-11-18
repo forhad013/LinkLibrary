@@ -1,7 +1,12 @@
 package com.greenrobotdev.linklibrary.screens.organize.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import com.greenrobotdev.linklibrary.bookmarks.screens.details.LinkDetailScreen
+import com.greenrobotdev.linklibrary.bookmarks.screens.saved.SavedListScreen
+import com.greenrobotdev.linklibrary.design.motion.LocalSharedTransitionScope
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
@@ -23,27 +28,45 @@ fun OrganizeTabNavigation() {
 
     val tabNavigator = remember { TabNavigator(tabNavState) }
 
-    NavDisplay(
-        entries = tabNavState.toEntries { route ->
-            NavEntry(route) {
-                when (route) {
-                    // Library tab base (design: library_categories_amp_tags)
-                    is OrganizeNavRoutes.OrganizeBase -> LibraryTabScreen(
-                        onManage = { tabNavigator.navigate(OrganizeNavRoutes.Manage) },
-                        // No category detail screen yet; a leaf category opens Manage
-                        onCategoryClick = { tabNavigator.navigate(OrganizeNavRoutes.Manage) }
-                    )
+    // Shared-element host: tiles grow into list headers, cards into Link details
+    SharedTransitionLayout {
+        CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+            NavDisplay(
+                entries = tabNavState.toEntries { route ->
+                    NavEntry(route) {
+                        when (route) {
+                            // Library tab base (design: library_categories_amp_tags)
+                            is OrganizeNavRoutes.OrganizeBase -> LibraryTabScreen(
+                                onManage = { tabNavigator.navigate(OrganizeNavRoutes.Manage) },
+                                onOpenScope = { tabNavigator.navigate(OrganizeNavRoutes.SavedList(it)) },
+                            )
 
-                    // Manage categories and tags
-                    is OrganizeNavRoutes.Manage -> ManageScreen(
-                        onBack = { tabNavigator.goBack() }
-                    )
+                            is OrganizeNavRoutes.SavedList -> SavedListScreen(
+                                scope = route.scope,
+                                onBack = { tabNavigator.goBack() },
+                                onOpenScope = { tabNavigator.navigate(OrganizeNavRoutes.SavedList(it)) },
+                                onOpenDetails = { tabNavigator.navigate(OrganizeNavRoutes.LinkDetail(it)) },
+                            )
 
-                    else -> error("Unknown organize route: $route")
-                }
-            }
-        },
-        onBack = { tabNavigator.goBack() },
-        modifier = Modifier.fillMaxSize()
-    )
+                            is OrganizeNavRoutes.LinkDetail -> LinkDetailScreen(
+                                routeKey = route,
+                                linkId = route.linkId,
+                                onBack = { tabNavigator.goBack() },
+                            )
+
+                            // Manage categories and tags
+                            is OrganizeNavRoutes.Manage -> ManageScreen(
+                                onBack = { tabNavigator.goBack() }
+                            )
+
+                            else -> error("Unknown organize route: $route")
+                        }
+                    }
+                },
+                sharedTransitionScope = this@SharedTransitionLayout,
+                onBack = { tabNavigator.goBack() },
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
 }

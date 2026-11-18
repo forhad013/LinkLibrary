@@ -1,5 +1,9 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.library
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import com.greenrobotdev.linklibrary.bookmarks.motion.sharedScope
+import com.greenrobotdev.linklibrary.bookmarks.screens.saved.SavedScope
 import com.greenrobotdev.linklibrary.design.components.layout.AppLazyColumn
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -48,7 +52,7 @@ import com.greenrobotdev.linklibrary.design.theme.LordsExtraColors
 @Composable
 fun LibraryTabScreen(
     onManage: () -> Unit,
-    onCategoryClick: (String) -> Unit,
+    onOpenScope: (SavedScope) -> Unit,
 ) {
     val viewModel: LibraryTabViewModel = viewModel { LibraryTabViewModel() }
     val state by viewModel.models.collectAsState()
@@ -89,34 +93,42 @@ fun LibraryTabScreen(
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                     SmartTile(
+                        SavedScope.Unopened,
                         "Unopened",
                         "${state.unopenedCount} links",
                         MaterialTheme.colorScheme.primary,
                         MaterialTheme.colorScheme.onPrimary,
-                        Modifier.weight(1f)
+                        Modifier.weight(1f),
+                        onOpenScope
                     )
                     SmartTile(
+                        SavedScope.Favorites,
                         "Favorites",
                         "${state.favoritesCount} links",
                         MaterialTheme.colorScheme.tertiaryContainer,
                         MaterialTheme.colorScheme.onTertiaryContainer,
-                        Modifier.weight(1f)
+                        Modifier.weight(1f),
+                        onOpenScope
                     )
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                     SmartTile(
+                        SavedScope.Archived,
                         "Archived",
                         "${state.archivedCount} links",
                         MaterialTheme.colorScheme.secondaryContainer,
                         MaterialTheme.colorScheme.onSecondaryContainer,
-                        Modifier.weight(1f)
+                        Modifier.weight(1f),
+                        onOpenScope
                     )
                     SmartTile(
+                        SavedScope.Uncategorized,
                         "Uncategorized",
                         "${state.uncategorizedCount} links",
                         LordsExtraColors.successContainer,
                         LordsExtraColors.onSuccessContainer,
-                        Modifier.weight(1f)
+                        Modifier.weight(1f),
+                        onOpenScope
                     )
                 }
             }
@@ -135,7 +147,7 @@ fun LibraryTabScreen(
                         .padding(vertical = 6.dp)
                 ) {
                     state.categories.filter { it.parentId == null }.forEach { category ->
-                        CategoryTreeRow(category, state.categories, onCategoryClick)
+                        CategoryTreeRow(category, state.categories, onOpen = { onOpenScope(SavedScope.InCategory(it)) })
                     }
                 }
             }
@@ -146,7 +158,7 @@ fun LibraryTabScreen(
             item { SectionLabel("Tags", Modifier.padding(top = 8.dp)) }
             items(state.tags.chunked(2)) { pair ->
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                    pair.forEach { tag -> TagTile("#${tag.name}", Modifier.weight(1f)) }
+                    pair.forEach { tag -> TagTile("#${tag.name}", Modifier.weight(1f)) { onOpenScope(SavedScope.WithTag(tag.name)) } }
                     if (pair.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
@@ -166,7 +178,7 @@ private fun SectionLabel(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun TagTile(text: String, modifier: Modifier = Modifier) {
+private fun TagTile(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Text(
         text,
         style = MaterialTheme.typography.bodyLarge,
@@ -177,22 +189,29 @@ private fun TagTile(text: String, modifier: Modifier = Modifier) {
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surface)
+            .clickable(onClickLabel = "Open $text", onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 14.dp)
     )
 }
 
 @Composable
 private fun SmartTile(
+    scope: SavedScope,
     label: String,
     countLabel: String,
     container: Color,
     content: Color,
     modifier: Modifier = Modifier,
+    onOpen: (SavedScope) -> Unit,
 ) {
     Column(
         modifier = modifier
             .height(84.dp)
-            .background(container, RoundedCornerShape(20.dp))
+            // Grows into the header of the list it opens
+            .sharedScope(scope.key)
+            .clip(RoundedCornerShape(20.dp))
+            .background(container)
+            .clickable(onClickLabel = "Open $label") { onOpen(scope) }
             .padding(14.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
@@ -205,7 +224,7 @@ private fun SmartTile(
 private fun CategoryTreeRow(
     category: Category,
     all: List<Category>,
-    onCategoryClick: (String) -> Unit,
+    onOpen: (String) -> Unit,
     depth: Int = 0,
 ) {
     val children = all.filter { it.parentId == category.id }
@@ -216,14 +235,17 @@ private fun CategoryTreeRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
-                .clickable {
-                    if (children.isNotEmpty()) expanded = !expanded else onCategoryClick(category.id)
-                }
-                .padding(start = (8 + depth * 20).dp, end = 20.dp),
+                // The row opens the category's saves; the chevron expands its subcategories
+                .clickable(onClickLabel = "Open ${category.name}") { onOpen(category.id) }
+                .padding(start = (2 + depth * 20).dp, end = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Chevron gutter: always reserved so leaf names line up with their siblings
-            Box(Modifier.width(36.dp), contentAlignment = Alignment.Center) {
+            Box(
+                Modifier.size(44.dp).clip(CircleShape)
+                    .then(if (children.isNotEmpty()) Modifier.clickable { expanded = !expanded } else Modifier),
+                contentAlignment = Alignment.Center,
+            ) {
                 if (children.isNotEmpty()) {
                     Icon(
                         if (expanded) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -248,7 +270,7 @@ private fun CategoryTreeRow(
             )
         }
         if (expanded) {
-            children.forEach { child -> CategoryTreeRow(child, all, onCategoryClick, depth + 1) }
+            children.forEach { child -> CategoryTreeRow(child, all, onOpen, depth + 1) }
         }
     }
 }
