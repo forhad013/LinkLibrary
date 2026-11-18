@@ -116,36 +116,3 @@ fun SelectionPill(
         }
     }
 }
-
-/**
- * AddPill - Specialized pill button for adding new items
- *
- * A convenience component for "Add New" actions with a plus icon.
- * Commonly used for adding new tags, collections, or similar items.
- *
- * @param onClick Callback when add pill is clicked
- * @param text Text to display (default: "New")
- * @param modifier Optional modifier for layout
- * @param enabled Whether pill is enabled for interaction
- * @param icon Optional icon to use instead of default Add icon
- */
-@Composable
-fun AddPill(
-    onClick: () -> Unit,
-    text: String = "New",
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    icon: ImageVector? = Icons.Default.Add
-) {
-    SelectionPill(
-        selected = false,
-        onClick = onClick,
-        text = text,
-        modifier = modifier,
-        enabled = enabled,
-        selectedIcon = null,
-        unselectedIcon = icon,
-        selectedColor = MaterialTheme.colorScheme.surface,
-        unselectedColor = MaterialTheme.colorScheme.surface
-    )
-}

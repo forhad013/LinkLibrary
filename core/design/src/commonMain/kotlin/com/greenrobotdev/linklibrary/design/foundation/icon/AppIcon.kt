@@ -60,24 +60,3 @@ sealed class IconSize(val dp: Dp) {
     object Large : IconSize(IconSizes.Large)
     object ExtraLarge : IconSize(IconSizes.ExtraLarge)
 }
-
-/**
- * Convenience overloads for commonly used icons
- */
-
-/** Error icon for validation states */
-@Composable
-fun ErrorIcon(
-    contentDescription: String? = "Error",
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.error,
-    size: IconSize = IconSize.Medium
-) {
-    AppIcon(
-        imageVector = Icons.Filled.Error,
-        contentDescription = contentDescription,
-        modifier = modifier,
-        color = color,
-        size = size
-    )
-}

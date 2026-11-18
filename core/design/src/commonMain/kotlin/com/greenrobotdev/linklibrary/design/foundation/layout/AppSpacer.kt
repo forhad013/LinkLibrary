@@ -36,12 +36,6 @@ fun AppSpacer(
  * Convenience composables for specific spacing sizes
  */
 
-/** Extra small vertical spacer (4dp) */
-@Composable
-fun TinyVerticalSpacer(modifier: Modifier = Modifier) {
-    AppSpacer(size = SpacingTokens.Tiny, horizontal = false, modifier = modifier)
-}
-
 /** Small vertical spacer (8dp) */
 @Composable
 fun SmallVerticalSpacer(modifier: Modifier = Modifier) {
@@ -54,20 +48,3 @@ fun MediumVerticalSpacer(modifier: Modifier = Modifier) {
     AppSpacer(size = SpacingTokens.Medium, horizontal = false, modifier = modifier)
 }
 
-/** Large vertical spacer (24dp) */
-@Composable
-fun LargeVerticalSpacer(modifier: Modifier = Modifier) {
-    AppSpacer(size = SpacingTokens.Large, horizontal = false, modifier = modifier)
-}
-
-/** Extra large vertical spacer (32dp) */
-@Composable
-fun ExtraLargeVerticalSpacer(modifier: Modifier = Modifier) {
-    AppSpacer(size = SpacingTokens.ExtraLarge, horizontal = false, modifier = modifier)
-}
-
-/** Horizontal spacer (8dp) */
-@Composable
-fun HorizontalSpacer(modifier: Modifier = Modifier) {
-    AppSpacer(size = SpacingTokens.ExtraSmall, horizontal = true, modifier = modifier)
-}
