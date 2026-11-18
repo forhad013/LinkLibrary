@@ -13,7 +13,6 @@ import com.greenrobotdev.linklibrary.bookmarks.screens.details.LinkDetailScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryScreen
 import com.greenrobotdev.linklibrary.screens.notes.NoteEditorScreen
 import com.greenrobotdev.linklibrary.screens.root.TabNavigator
-import com.greenrobotdev.linklibrary.screens.root.toEntries
 
 /**
  * Library Tab Navigation - Manages all screens within the Library tab
@@ -31,7 +30,8 @@ fun LibraryTabNavigation(
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this) {
             NavDisplay(
-                entries = tabNavState.toEntries { route ->
+                backStack = tabNavState.backStack,
+                entryProvider = { route ->
                     NavEntry(route) {
                         when (route) {
                             // Base screen — the Feed (list + empty state)
