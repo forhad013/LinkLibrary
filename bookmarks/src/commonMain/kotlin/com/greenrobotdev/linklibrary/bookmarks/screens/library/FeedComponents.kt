@@ -42,7 +42,8 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxDefaults
+import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -643,7 +644,11 @@ internal fun SwipeableFeedCard(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    val state = rememberSwipeToDismissBoxState()
+    // Plain remember, not rememberSwipeToDismissBoxState: that one is saveable, and the list keeps saved
+    // state per item key, so a card archived by a swipe came back from Undo still "swiped right", and
+    // SwipeToDismissBox archived it again. A fresh state per appearance always starts settled.
+    val threshold = SwipeToDismissBoxDefaults.positionalThreshold
+    val state = remember { SwipeToDismissBoxState(SwipeToDismissBoxValue.Settled, threshold) }
     val scope = rememberCoroutineScope()
     // SwipeToDismissBox re-runs onDismiss whenever this lambda changes while the card is still swiped
     // away, so it must stay the same instance: a new one on each recomposition (Undo causes one)
