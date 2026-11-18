@@ -36,11 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import com.greenrobotdev.linklibrary.design.motion.rememberReducedMotion
-import com.greenrobotdev.linklibrary.design.motion.AppMotion
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.animateDpAsState
 import kotlin.math.roundToInt
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.platform.LocalDensity
@@ -363,7 +359,7 @@ internal fun FeedLinkCard(
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        TypeThumb(type = if (noPreview) "none" else link.type, opened = link.isOpened, muted = link.isArchived, linkId = link.id, imageUrl = link.previewImage)
+        TypeThumb(type = if (noPreview) "none" else link.type, muted = link.isArchived, linkId = link.id, imageUrl = link.previewImage)
 
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -436,28 +432,16 @@ private fun typeLook(type: String): TypeLook = when (type) {
 }
 
 @Composable
-private fun TypeThumb(type: String, opened: Boolean, muted: Boolean = false, linkId: String? = null, imageUrl: String? = null) {
+private fun TypeThumb(type: String, muted: Boolean = false, linkId: String? = null, imageUrl: String? = null) {
     val look = typeLook(type)
     // Archived: same shape and icon, neutral colors
     val bg = if (muted) MaterialTheme.colorScheme.surfaceContainerHigh else look.bg
     val fg = if (muted) MaterialTheme.colorScheme.onSurfaceVariant else look.fg
-    // Unopened saves are round; once opened the circle morphs into a rounded square (72dp: 36 = circle).
-    // Preview images stay a rounded square: a circle crops their usually wide pictures too much.
-    val reduced = rememberReducedMotion()
-    val corner by animateDpAsState(
-        targetValue = if (opened || imageUrl != null) 18.dp else 36.dp,
-        animationSpec = if (reduced) snap() else AppMotion.spatial(),
-        label = "thumb shape",
-    )
     Box(
         // Grows into the Link details badge when the card opens details
         modifier = (if (linkId != null) Modifier.sharedThumb(linkId) else Modifier)
             .size(72.dp)
-            // Corner read in the draw phase, so the morph doesn't recompose the card every frame
-            .graphicsLayer {
-                shape = RoundedCornerShape(corner)
-                clip = true
-            }
+            .clip(RoundedCornerShape(18.dp))
             .background(bg),
         contentAlignment = Alignment.Center,
     ) {
