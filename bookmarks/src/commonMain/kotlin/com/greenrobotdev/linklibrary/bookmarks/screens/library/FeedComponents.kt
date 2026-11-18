@@ -441,10 +441,11 @@ private fun TypeThumb(type: String, opened: Boolean, muted: Boolean = false, lin
     // Archived: same shape and icon, neutral colors
     val bg = if (muted) MaterialTheme.colorScheme.surfaceContainerHigh else look.bg
     val fg = if (muted) MaterialTheme.colorScheme.onSurfaceVariant else look.fg
-    // Unopened saves are round; once opened the circle morphs into a rounded square (72dp: 36 = circle)
+    // Unopened saves are round; once opened the circle morphs into a rounded square (72dp: 36 = circle).
+    // Preview images stay a rounded square: a circle crops their usually wide pictures too much.
     val reduced = rememberReducedMotion()
     val corner by animateDpAsState(
-        targetValue = if (opened) 18.dp else 36.dp,
+        targetValue = if (opened || imageUrl != null) 18.dp else 36.dp,
         animationSpec = if (reduced) snap() else AppMotion.spatial(),
         label = "thumb shape",
     )

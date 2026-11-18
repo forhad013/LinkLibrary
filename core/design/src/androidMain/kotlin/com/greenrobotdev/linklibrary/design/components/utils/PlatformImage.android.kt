@@ -1,6 +1,8 @@
 package com.greenrobotdev.linklibrary.design.components.utils
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -61,7 +63,9 @@ actual fun PlatformAsyncImage(
         AsyncImage(
             model = request,
             contentDescription = contentDescription,
-            modifier = Modifier.matchParentSize(),
+            // Neutral backing once loaded: transparent logos otherwise show the tile's color through
+            modifier = Modifier.matchParentSize()
+                .then(if (state is AsyncImagePainter.State.Success) Modifier.background(MaterialTheme.colorScheme.surface) else Modifier),
             contentScale = ContentScale.Crop,
             onState = {
                 state = it
@@ -74,7 +78,9 @@ actual fun PlatformAsyncImage(
             },
         )
         when {
-            state is AsyncImagePainter.State.Loading || (failed && attempt < RETRIES) -> loading?.invoke()
+            // Empty = the request hasn't started yet; treat it like loading rather than an empty tile
+            state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Empty ||
+                (failed && attempt < RETRIES) -> loading?.invoke()
             failed -> failure?.invoke()
         }
     }
