@@ -6,6 +6,6 @@ import androidx.navigation3.runtime.NavKey
 sealed class SettingsNavRoutes : NavKey {
     data object SettingsBase : SettingsNavRoutes()
 
-    /** Developer component gallery; opened by long-pressing the version in About. */
-    data object ComponentDemo : SettingsNavRoutes()
+    /** Debug builds only: every reusable component of the design system. */
+    data object DesignCatalog : SettingsNavRoutes()
 }

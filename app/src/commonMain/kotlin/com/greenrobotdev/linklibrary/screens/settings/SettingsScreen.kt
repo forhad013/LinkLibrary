@@ -1,7 +1,10 @@
 package com.greenrobotdev.linklibrary.screens.settings
 
+import com.greenrobotdev.linklibrary.design.debug.DebugLog
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,13 +46,13 @@ import com.greenrobotdev.linklibrary.design.components.layout.appVerticalScroll
 import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
 
 /**
- * Settings: only what works today. Appearance (theme) and About. The version row hides the
- * developer component gallery behind a long-press.
+ * Settings: only what works today. Appearance, Your data, About; debug builds add Developer
+ * (the design catalog).
  */
 @Composable
 fun SettingsScreen(
     routeKey: NavKey,
-    onOpenComponentDemo: () -> Unit = {},
+    onOpenDesignCatalog: () -> Unit = {},
 ) {
     val viewModel: SettingsViewModel = viewModel(key = routeKey.toString()) { SettingsViewModel() }
     val state by viewModel.models.collectAsState()
@@ -105,7 +108,18 @@ fun SettingsScreen(
         }
 
         SectionContentCard(title = "About") {
-            AboutRow(version = rememberAppVersion(), onLongPress = onOpenComponentDemo)
+            AboutRow(version = rememberAppVersion())
+        }
+
+        // Debug builds only (the flag the app sets for debuggable builds)
+        if (DebugLog.enabled) {
+            SectionContentCard(title = "Developer") {
+                DeveloperRow(
+                    title = "Design catalog",
+                    subtitle = "Every reusable component, in light and dark",
+                    onClick = onOpenDesignCatalog,
+                )
+            }
         }
     }
 }
@@ -133,12 +147,9 @@ private fun ThemeSelector(selected: ThemeMode, onSelect: (ThemeMode) -> Unit) {
 }
 
 @Composable
-private fun AboutRow(version: String, onLongPress: () -> Unit) {
+private fun AboutRow(version: String) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .combinedClickable(onClick = {}, onLongClick = onLongPress, onLongClickLabel = "Open component gallery"),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -161,5 +172,30 @@ private fun AboutRow(version: String, onLongPress: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+}
+
+@Composable
+private fun DeveloperRow(title: String, subtitle: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClickLabel = "Open $title", onClick = onClick)
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Box(
+            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.tertiaryContainer),
+            contentAlignment = Alignment.Center,
+        ) {
+            AppIcon(Icons.Filled.Palette, contentDescription = null, color = MaterialTheme.colorScheme.onTertiaryContainer)
+        }
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        AppIcon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

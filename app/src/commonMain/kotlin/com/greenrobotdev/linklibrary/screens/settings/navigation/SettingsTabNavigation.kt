@@ -6,7 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
-import com.greenrobotdev.linklibrary.design.demo.ComponentDemoScreen
+import com.greenrobotdev.linklibrary.design.demo.DesignCatalogScreen
 import com.greenrobotdev.linklibrary.screens.root.TabNavigator
 import com.greenrobotdev.linklibrary.screens.root.rememberTabNavigationState
 import com.greenrobotdev.linklibrary.screens.root.toEntries
@@ -29,10 +29,10 @@ fun SettingsTabNavigation() {
                 when (route) {
                     is SettingsNavRoutes.SettingsBase -> SettingsScreen(
                         routeKey = route,
-                        onOpenComponentDemo = { tabNavigator.navigate(SettingsNavRoutes.ComponentDemo) },
+                        onOpenDesignCatalog = { tabNavigator.navigate(SettingsNavRoutes.DesignCatalog) },
                     )
 
-                    is SettingsNavRoutes.ComponentDemo -> ComponentDemoScreen(
+                    is SettingsNavRoutes.DesignCatalog -> DesignCatalogScreen(
                         onBack = { tabNavigator.goBack() }
                     )
 
