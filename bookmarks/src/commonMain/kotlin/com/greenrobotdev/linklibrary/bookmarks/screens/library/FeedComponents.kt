@@ -1,6 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.library
 
-import com.greenrobotdev.linklibrary.design.components.utils.PlatformAsyncImage
+import com.greenrobotdev.linklibrary.bookmarks.components.LinkPreviewImage
 import com.greenrobotdev.linklibrary.design.components.layout.AppLazyRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -460,11 +460,11 @@ private fun TypeThumb(type: String, opened: Boolean, muted: Boolean = false, lin
             .background(bg),
         contentAlignment = Alignment.Center,
     ) {
-        AppIcon(look.icon, contentDescription = null, color = fg)
-        // Preview image on top; while it loads or if it fails, the type icon underneath shows
-        if (imageUrl != null) {
-            PlatformAsyncImage(imageUrl, contentDescription = null, modifier = Modifier.matchParentSize().graphicsLayer { if (muted) alpha = 0.5f })
-        }
+        LinkPreviewImage(
+            imageUrl = imageUrl,
+            modifier = Modifier.matchParentSize().graphicsLayer { if (muted && imageUrl != null) alpha = 0.5f },
+            fallback = { AppIcon(look.icon, contentDescription = null, color = fg) },
+        )
     }
 }
 
@@ -615,8 +615,11 @@ private fun PickUpCard(link: Link, onOpen: () -> Unit, onMarkOpened: () -> Unit,
             modifier = Modifier.fillMaxWidth().height(64.dp).background(look.bg),
             contentAlignment = Alignment.Center,
         ) {
-            AppIcon(look.icon, contentDescription = null, color = look.fg, modifier = Modifier.size(28.dp))
-            link.previewImage?.let { PlatformAsyncImage(it, contentDescription = null, modifier = Modifier.matchParentSize()) }
+            LinkPreviewImage(
+                imageUrl = link.previewImage,
+                modifier = Modifier.matchParentSize(),
+                fallback = { AppIcon(look.icon, contentDescription = null, color = look.fg, modifier = Modifier.size(28.dp)) },
+            )
         }
         Column(Modifier.padding(start = 14.dp, end = 14.dp, top = 10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(

@@ -1,6 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.details
 
-import com.greenrobotdev.linklibrary.design.components.utils.PlatformAsyncImage
+import com.greenrobotdev.linklibrary.bookmarks.components.LinkPreviewImage
 import com.greenrobotdev.linklibrary.bookmarks.motion.sharedThumb
 import com.greenrobotdev.linklibrary.bookmarks.motion.sharedTitle
 import com.greenrobotdev.linklibrary.design.components.layout.appVerticalScroll
@@ -313,7 +313,28 @@ private fun Hero(linkId: String, imageUrl: String?, type: String, noPreview: Boo
         type == "social" -> Look(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.onSecondary, Icons.Outlined.ChatBubbleOutline)
         else -> Look(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary, Icons.AutoMirrored.Outlined.Article)
     }
-    Box(Modifier.fillMaxWidth().height(220.dp).background(look.bg)) {
+    // The big type badge: shown when there's no preview image, or it fails to load
+    val badge: @Composable (Modifier) -> Unit = { modifier ->
+        Box(
+            modifier = modifier.size(88.dp).clip(RoundedCornerShape(24.dp)).background(look.badgeBg),
+            contentAlignment = Alignment.Center,
+        ) {
+            AppIcon(look.icon, contentDescription = null, color = look.badgeFg, modifier = Modifier.size(40.dp))
+        }
+    }
+    // Type-colored background, behind the image while it loads and around the badge
+    Box(Modifier.fillMaxWidth().height(240.dp).background(look.bg)) {
+        if (imageUrl != null) {
+            // The preview fills the whole band; the Feed card's thumbnail grows into it
+            LinkPreviewImage(
+                imageUrl = imageUrl,
+                modifier = Modifier.sharedThumb(linkId).fillMaxSize(),
+                fallback = { badge(Modifier) },
+            )
+        } else {
+            // The Feed card's thumbnail grows into this badge
+            badge(Modifier.align(Alignment.Center).sharedThumb(linkId))
+        }
         BackButton(onBack, Modifier.padding(16.dp))
         Box(
             modifier = Modifier.align(Alignment.TopEnd).padding(16.dp).size(48.dp).clip(CircleShape)
@@ -322,15 +343,6 @@ private fun Hero(linkId: String, imageUrl: String?, type: String, noPreview: Boo
             contentAlignment = Alignment.Center,
         ) {
             AppIcon(Icons.Outlined.Share, contentDescription = "Share", color = MaterialTheme.colorScheme.onSurface)
-        }
-        Box(
-            // The Feed card's thumbnail grows into this badge
-            modifier = Modifier.align(Alignment.Center).sharedThumb(linkId).size(88.dp).clip(RoundedCornerShape(24.dp)).background(look.badgeBg),
-            contentAlignment = Alignment.Center,
-        ) {
-            AppIcon(look.icon, contentDescription = null, color = look.badgeFg, modifier = Modifier.size(40.dp))
-            // Preview image over the icon, as on the Feed card it grows from
-            imageUrl?.let { PlatformAsyncImage(it, contentDescription = null, modifier = Modifier.matchParentSize()) }
         }
     }
 }
