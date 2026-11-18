@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.details
 
+import androidx.compose.ui.layout.ContentScale
 import com.greenrobotdev.linklibrary.design.motion.AppMotion
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.runtime.derivedStateOf
@@ -271,7 +272,7 @@ fun LinkDetailScreen(
         }
         // Pinned under the status bar; see-through over the image, solid once the image scrolls away
         val density = LocalDensity.current
-        val pastHero by remember { derivedStateOf { scroll.value > with(density) { (HERO_HEIGHT - 56.dp).toPx() } } }
+        val pastHero by remember { derivedStateOf { scroll.value > with(density) { (HERO_HEIGHT - TOP_BAR_HEIGHT).toPx() } } }
         DetailTopBar(overHero = !pastHero, onBack = onBack, onShare = { share(link.title, link.url) })
 
         // Bottom action bar
@@ -333,10 +334,11 @@ private fun Hero(linkId: String, imageUrl: String?, type: String, noPreview: Boo
     // Type-colored background, behind the image while it loads and around the badge
     Box(Modifier.fillMaxWidth().height(HERO_HEIGHT).background(look.bg)) {
         if (imageUrl != null) {
-            // The preview fills the whole band; the Feed card's thumbnail grows into it
+            // The whole image, never cropped, below the pinned top bar; the Feed thumbnail grows into it
             LinkPreviewImage(
                 imageUrl = imageUrl,
-                modifier = Modifier.sharedThumb(linkId).fillMaxSize(),
+                modifier = Modifier.padding(top = TOP_BAR_HEIGHT).sharedThumb(linkId).fillMaxSize(),
+                contentScale = ContentScale.Fit,
                 fallback = { badge(Modifier) },
             )
         } else {
@@ -345,13 +347,15 @@ private fun Hero(linkId: String, imageUrl: String?, type: String, noPreview: Boo
         }
         // Soft shade at the top so the pinned bar's white icons read on any image or color
         Box(
-            Modifier.fillMaxWidth().height(96.dp)
+            Modifier.fillMaxWidth().height(TOP_BAR_HEIGHT)
                 .background(Brush.verticalGradient(listOf(MaterialTheme.colorScheme.scrim.copy(alpha = 0.45f), Color.Transparent))),
         )
     }
 }
 
-private val HERO_HEIGHT = 240.dp
+// Room for the pinned top bar plus a typical 1.91:1 preview image at phone width
+private val HERO_HEIGHT = 300.dp
+private val TOP_BAR_HEIGHT = 56.dp
 
 /** Back and Share, pinned at the top: white icons over the hero image, normal bar once scrolled past it. */
 @Composable

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import com.greenrobotdev.linklibrary.design.components.utils.PlatformAsyncImage
 import com.greenrobotdev.linklibrary.design.motion.shimmer
 
@@ -13,7 +14,12 @@ import com.greenrobotdev.linklibrary.design.motion.shimmer
  * failed load shows [fallback] (the type icon), and a shimmer shows while it downloads.
  */
 @Composable
-internal fun LinkPreviewImage(imageUrl: String?, modifier: Modifier, fallback: @Composable () -> Unit) {
+internal fun LinkPreviewImage(
+    imageUrl: String?,
+    modifier: Modifier,
+    contentScale: ContentScale = ContentScale.Crop,
+    fallback: @Composable () -> Unit,
+) {
     if (imageUrl == null) {
         Box(modifier, contentAlignment = Alignment.Center) { fallback() }
     } else {
@@ -23,6 +29,7 @@ internal fun LinkPreviewImage(imageUrl: String?, modifier: Modifier, fallback: @
             modifier = modifier,
             loading = { Box(Modifier.fillMaxSize().shimmer()) },
             failure = fallback,
+            contentScale = contentScale,
         )
     }
 }

@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 
 /**
  * JVM/Desktop implementation with placeholder for async image loading
@@ -23,6 +24,7 @@ actual fun PlatformAsyncImage(
     modifier: Modifier,
     loading: (@Composable () -> Unit)?,
     failure: (@Composable () -> Unit)?,
+    contentScale: ContentScale,
 ) {
     Box(
         modifier = modifier

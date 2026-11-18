@@ -2,6 +2,7 @@ package com.greenrobotdev.linklibrary.design.components.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 
 /**
  * Platform-specific async image loading. [loading] shows while the image downloads and [failure]
@@ -15,4 +16,6 @@ expect fun PlatformAsyncImage(
     modifier: Modifier = Modifier,
     loading: (@Composable () -> Unit)? = null,
     failure: (@Composable () -> Unit)? = null,
+    /** Crop fills the bounds (thumbnails); Fit shows the whole image (Link details). */
+    contentScale: ContentScale = ContentScale.Crop,
 )
