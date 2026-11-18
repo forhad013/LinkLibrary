@@ -57,7 +57,12 @@ fun LibraryTabNavigation(
                             is LibraryNavRoutes.AddLink -> AddLinkScreen(
                                 routeKey = route,
                                 initialUrl = route.initialUrl,
-                                onBack = { tabNavigator.goBack() }
+                                onBack = { tabNavigator.goBack() },
+                                // Already saved: swap this screen for that link's details
+                                onOpenDetails = { linkId ->
+                                    tabNavigator.goBack()
+                                    tabNavigator.navigate(LibraryNavRoutes.LinkDetail(linkId))
+                                },
                             )
 
                             // Note Editor Screen
