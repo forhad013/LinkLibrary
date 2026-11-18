@@ -20,7 +20,9 @@ import androidx.compose.ui.Modifier
 actual fun PlatformAsyncImage(
     model: String?,
     contentDescription: String?,
-    modifier: Modifier
+    modifier: Modifier,
+    loading: (@Composable () -> Unit)?,
+    failure: (@Composable () -> Unit)?,
 ) {
     Box(
         modifier = modifier
