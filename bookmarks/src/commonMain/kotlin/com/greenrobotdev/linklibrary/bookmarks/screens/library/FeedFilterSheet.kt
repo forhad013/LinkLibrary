@@ -88,6 +88,15 @@ fun FeedFilterSheet(
                 .padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(22.dp),
         ) {
+            FilterSection("Sort") {
+                Segmented(
+                    options = listOf(true, false),
+                    selected = draft.newestFirst,
+                    label = { if (it) "Newest first" else "Oldest first" },
+                    onSelect = { draft = draft.copy(newestFirst = it) },
+                )
+            }
+
             FilterSection("Show") {
                 Segmented(
                     options = OpenedFilter.entries,

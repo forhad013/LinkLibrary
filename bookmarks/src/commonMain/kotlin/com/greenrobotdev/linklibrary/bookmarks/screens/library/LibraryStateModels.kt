@@ -39,6 +39,8 @@ data class FeedFilters(
     val tagMatchAll: Boolean = false,
     val saved: SavedRange = SavedRange.ANY,
     val includeArchived: Boolean = false,
+    /** Sort order. Not a filter, so it doesn't count toward [activeCount] or hide the Feed's discovery rows. */
+    val newestFirst: Boolean = true,
 ) {
     /** For the Filters button badge: one per section that is set. */
     val activeCount: Int
@@ -57,7 +59,6 @@ data class LibraryState(
     val linkCategoryIds: Map<String, String> = emptyMap(),
     val searchQuery: String = "",
     val filters: FeedFilters = FeedFilters(),
-    val newestFirst: Boolean = true,
 ) {
     val filteredLinks: List<Link> get() = filterFeed(this, filters)
 
@@ -150,7 +151,7 @@ fun filterFeed(
         // Repo order is newest first (createdAt, then insertion order for undated links); the stable
         // sort keeps that tie-break, and Oldest is its exact reverse so undated links flip too.
         val newest = list.sortedByDescending { it.createdAt ?: Long.MIN_VALUE }
-        if (state.newestFirst) newest else newest.asReversed()
+        if (filters.newestFirst) newest else newest.asReversed()
     }
 }
 
@@ -162,7 +163,6 @@ sealed interface LibraryEvent {
     data class RemoveTag(val tagId: String) : LibraryEvent
     /** Reset search and every filter. */
     object ClearFilters : LibraryEvent
-    object ToggleSort : LibraryEvent
     /** Card tapped: the link is about to open in the browser. */
     data class Opened(val linkId: String) : LibraryEvent
     data class Archive(val linkId: String) : LibraryEvent

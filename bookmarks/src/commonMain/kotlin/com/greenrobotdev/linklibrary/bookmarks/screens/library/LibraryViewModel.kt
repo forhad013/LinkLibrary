@@ -84,7 +84,6 @@ fun LibraryPresenter(
                 is LibraryEvent.RemoveCategory -> state.copy(filters = state.filters.copy(categoryIds = state.filters.categoryIds - event.categoryId))
                 is LibraryEvent.RemoveTag -> state.copy(filters = state.filters.copy(tagIds = state.filters.tagIds - event.tagId))
                 LibraryEvent.ClearFilters -> state.copy(searchQuery = "", filters = FeedFilters())
-                LibraryEvent.ToggleSort -> state.copy(newestFirst = !state.newestFirst)
                 is LibraryEvent.Archive -> {
                     // the links flow re-emits with isArchived = true, which hides it from the Feed
                     state.links.firstOrNull { it.id == event.linkId }
