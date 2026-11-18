@@ -1,5 +1,7 @@
 package com.greenrobotdev.linklibrary.bookmarks.service
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import io.ktor.http.URLBuilder
 import io.ktor.http.takeFrom
 import io.ktor.client.HttpClient
@@ -67,7 +69,7 @@ class MetadataFetchService(private val httpClient: HttpClient) {
                 }
                 else -> {
                     println("❌ MetadataFetchService: HTTP error ${response.status.value}: ${response.status.description}")
-                    emit(Result.failure(Exception("HTTP ${response.status.value}: ${response.status.description}")))
+                    emit(Result.failure(HttpStatusException(response.status.value, response.status.description)))
                 }
             }
         } catch (e: kotlin.coroutines.cancellation.CancellationException) {
@@ -90,7 +92,7 @@ class MetadataFetchService(private val httpClient: HttpClient) {
             }
             emit(Result.failure(Exception(errorMessage)))
         }
-    }
+    }.flowOn(Dispatchers.Default) // reading and parsing a large page took the main thread, so fetches queued and the UI stuttered
 
     /**
      * Extracts metadata from HTML content
@@ -100,6 +102,7 @@ class MetadataFetchService(private val httpClient: HttpClient) {
         val title = extractTitle(html)
         val description = extractDescription(html)
         val imageUrl = extractImageUrl(html)?.let { makeAbsoluteUrl(it.replace("&amp;", "&"), url) }
+        println("LoL/Metadata $url -> title=${title.isNotBlank()} image=$imageUrl")
         val faviconUrl = extractFavicon(html, url)
 
         return LinkMetadata(
@@ -247,6 +250,9 @@ class MetadataFetchService(private val httpClient: HttpClient) {
 /**
  * Data class representing extracted metadata from a URL
  */
+
+/** The site answered but refused the page (4xx/5xx), unlike a network failure that may pass on retry. */
+class HttpStatusException(val status: Int, description: String) : Exception("HTTP $status: $description")
 
 @Serializable
 data class LinkMetadata(
