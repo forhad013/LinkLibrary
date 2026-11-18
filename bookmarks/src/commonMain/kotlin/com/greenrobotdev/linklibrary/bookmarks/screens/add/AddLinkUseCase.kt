@@ -169,7 +169,9 @@ fun AddLinkPresenter(
                 }
                 // Auto-fetch event handlers
                 is AddLinkEvent.FetchMetadata -> {
-                    if (state.url.isNotBlank() && !state.isFetching) {
+                    // The screen can ask more than once while it opens; one fetch per URL is enough
+                    val alreadyFetched = state.fetchedMetadata?.url == state.url
+                    if (state.url.isNotBlank() && !state.isFetching && !alreadyFetched) {
                         state = state.copy(isFetching = true, fetchError = null)
 
                         try {
