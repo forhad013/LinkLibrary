@@ -166,7 +166,7 @@ sealed interface LibraryEvent {
     /** Card tapped: the link is about to open in the browser. */
     data class Opened(val linkId: String) : LibraryEvent
     data class Archive(val linkId: String) : LibraryEvent
-    data class ToggleFavorite(val linkId: String) : LibraryEvent
+    data class Delete(val linkId: String) : LibraryEvent
     /** Undo: write back the link as it was before the last action. */
     data class Restore(val link: Link) : LibraryEvent
 }

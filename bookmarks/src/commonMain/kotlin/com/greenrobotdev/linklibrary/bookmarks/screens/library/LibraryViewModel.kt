@@ -90,8 +90,9 @@ fun LibraryPresenter(
                         ?.let { linkRepository.updateLink(it.copy(isArchived = true).toEntity()).first() }
                     state
                 }
-                is LibraryEvent.ToggleFavorite -> {
-                    linkRepository.toggleFavorite(event.linkId).first()
+                is LibraryEvent.Delete -> {
+                    // the links flow re-emits without it; tags and category rows go with it (FK cascade)
+                    linkRepository.deleteLink(event.linkId).first()
                     state
                 }
                 is LibraryEvent.Restore -> {

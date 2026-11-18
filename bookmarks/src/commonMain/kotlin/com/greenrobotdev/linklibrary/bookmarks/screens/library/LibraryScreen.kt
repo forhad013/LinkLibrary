@@ -63,6 +63,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.platform.LocalUriHandler
 import com.greenrobotdev.linklibrary.design.components.textfield.SearchField
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.material3.SnackbarResult
@@ -152,6 +154,22 @@ fun LibraryScreen(
             val result = snackbar.showSnackbar(message, actionLabel = "Undo", duration = SnackbarDuration.Short)
             if (result == SnackbarResult.ActionPerformed) viewModel.take(LibraryEvent.Restore(link))
         }
+    }
+
+    // Delete can't be undone, so the left swipe asks first
+    var pendingDelete by remember { mutableStateOf<Link?>(null) }
+    pendingDelete?.let { link ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            title = { Text("Delete this link?") },
+            text = { Text("It is removed with its note, tags and category. This can't be undone.") },
+            confirmButton = {
+                TextButton(onClick = { pendingDelete = null; viewModel.take(LibraryEvent.Delete(link.id)) }) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text("Cancel") } },
+        )
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -280,13 +298,7 @@ fun LibraryScreen(
                             SwipeableFeedCard(
                                 link = link,
                                 onArchive = { undoable("Link archived", link, LibraryEvent.Archive(link.id)) },
-                                onToggleFavorite = {
-                                    undoable(
-                                        if (link.isFavorite) "Removed from favorites" else "Added to favorites",
-                                        link,
-                                        LibraryEvent.ToggleFavorite(link.id),
-                                    )
-                                },
+                                onRequestDelete = { pendingDelete = link },
                                 modifier = Modifier.animateItem(),
                             ) {
                                 FeedLinkCard(
