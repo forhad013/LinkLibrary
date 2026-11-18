@@ -7,20 +7,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.greenrobotdev.linklibrary.utils.preferences.ThemePreferenceManager
-import com.greenrobotdev.linklibrary.bookmarks.export.bookmarksHtml
-import com.greenrobotdev.linklibrary.bookmarks.model.toCategory
-import com.greenrobotdev.linklibrary.bookmarks.model.toDomain
-import com.greenrobotdev.linklibrary.database.repository.CategoryRepository
-import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import com.greenrobotdev.linklibrary.bookmarks.backup.BackupReadException
+import com.greenrobotdev.linklibrary.bookmarks.backup.LinksBackupService
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 /** Settings presenter: the saved theme, and saving a new one. */
+@OptIn(ExperimentalTime::class)
 @Composable
 fun SettingsPresenter(
     events: Flow<SettingsEvent>,
-    linkRepository: LinkRepository,
-    categoryRepository: CategoryRepository,
+    backupService: LinksBackupService,
 ): SettingsState {
     val themePreferences = remember { ThemePreferenceManager() }
     var state by remember {
@@ -48,21 +46,40 @@ fun SettingsPresenter(
                     )
                     state = state.copy(themeMode = event.themeMode)
                 }
-                SettingsEvent.Export -> {
-                    val links = linkRepository.getLinksWithTags().first().getOrNull()
-                    val categories = categoryRepository.getCategories().first().getOrNull()
-                    val linkCategoryIds = categoryRepository.getLinkCategoryIds().first().getOrNull()
-                    state = if (links == null || categories == null || linkCategoryIds == null) {
-                        state.copy(exportMessage = "Couldn't read your links. Nothing was exported.")
-                    } else {
-                        val html = bookmarksHtml(links.map { it.toDomain() }, categories.map { it.toCategory() }, linkCategoryIds)
-                        state.copy(exportFile = ExportFile("lords-of-links-bookmarks.html", html, links.size), exportMessage = null)
-                    }
+                SettingsEvent.Backup, SettingsEvent.ExportForBrowsers -> {
+                    state = state.copy(isWorking = true, dataMessage = null)
+                    state = runCatching {
+                        if (event == SettingsEvent.Backup) backupService.backup(Clock.System.now().toEpochMilliseconds())
+                        else backupService.browserExport()
+                    }.fold(
+                        onSuccess = { state.copy(pendingFile = it, isWorking = false) },
+                        onFailure = { state.copy(isWorking = false, dataMessage = "Couldn't read your links. Nothing was saved.") },
+                    )
                 }
-                is SettingsEvent.ExportFinished -> state = state.copy(
-                    exportFile = null,
-                    exportMessage = if (event.saved) "Exported ${event.linkCount} links." else null,
+                is SettingsEvent.FileSaved -> state = state.copy(
+                    pendingFile = null,
+                    dataMessage = when {
+                        !event.saved -> null
+                        event.isBackup -> "Backed up ${event.linkCount} links."
+                        else -> "Exported ${event.linkCount} links for browsers."
+                    },
                 )
+                is SettingsEvent.Restore -> {
+                    val text = event.text ?: return@collect
+                    state = state.copy(isWorking = true, dataMessage = null)
+                    val message = runCatching { backupService.restore(text) }.fold(
+                        onSuccess = { r ->
+                            buildList {
+                                add(if (r.added == 1) "Added 1 link" else "Added ${r.added} links")
+                                if (r.skipped > 0) add("skipped ${r.skipped} already saved")
+                                if (r.categoriesCreated > 0) add("created ${r.categoriesCreated} categories")
+                                if (r.tagsCreated > 0) add("created ${r.tagsCreated} tags")
+                            }.joinToString(", ") + "."
+                        },
+                        onFailure = { (it as? BackupReadException)?.message ?: "Couldn't restore this backup. Nothing was changed." },
+                    )
+                    state = state.copy(isWorking = false, dataMessage = message)
+                }
             }
         }
     }
