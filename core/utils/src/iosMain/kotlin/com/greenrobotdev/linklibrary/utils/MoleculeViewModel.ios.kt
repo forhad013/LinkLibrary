@@ -8,7 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
@@ -27,12 +28,12 @@ actual abstract class MoleculeViewModel<Event, Model> {
     actual protected val moleculeScope: CoroutineScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     /**
-     * Event flow that buffers user events for processing by the presenter.
-     * Has capacity to handle simultaneous UI events while detecting backpressure issues.
+     * Buffers user events until the presenter collects them. A Channel, not a SharedFlow: a
+     * SharedFlow drops events sent before anyone collects, so an event a screen sends on first
+     * draw (Add link's FetchMetadata) was lost whenever the presenter started collecting late.
+     * Each presenter collects events once, which a Channel needs.
      */
-    private val events: MutableSharedFlow<Event> = MutableSharedFlow(
-        extraBufferCapacity = 20 // Large enough for simultaneous events, small enough to surface issues
-    )
+    private val events = Channel<Event>(capacity = 20) // small enough to surface backpressure bugs
 
     /**
      * StateFlow of models produced by the Molecule presenter.
@@ -43,7 +44,7 @@ actual abstract class MoleculeViewModel<Event, Model> {
      */
     actual val models: StateFlow<Model> by lazy {
         moleculeFlow(RecompositionMode.Immediate) {
-            models(events)
+            models(events.receiveAsFlow())
         }.stateIn(
             scope = moleculeScope,
             started = kotlinx.coroutines.flow.SharingStarted.Lazily,
@@ -61,7 +62,7 @@ actual abstract class MoleculeViewModel<Event, Model> {
      * @throws IllegalStateException if the event buffer is full (indicates backpressure issues)
      */
     actual open fun take(event: Event) {
-        if (!events.tryEmit(event)) {
+        if (events.trySend(event).isFailure) {
             error("Event buffer overflow. Events are being produced faster than they can be processed.")
         }
     }
