@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.library
 
+import com.greenrobotdev.linklibrary.design.components.utils.PlatformAsyncImage
 import com.greenrobotdev.linklibrary.design.components.layout.AppLazyRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -362,7 +363,7 @@ internal fun FeedLinkCard(
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        TypeThumb(type = if (noPreview) "none" else link.type, opened = link.isOpened, muted = link.isArchived, linkId = link.id)
+        TypeThumb(type = if (noPreview) "none" else link.type, opened = link.isOpened, muted = link.isArchived, linkId = link.id, imageUrl = link.imageUrl)
 
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -435,7 +436,7 @@ private fun typeLook(type: String): TypeLook = when (type) {
 }
 
 @Composable
-private fun TypeThumb(type: String, opened: Boolean, muted: Boolean = false, linkId: String? = null) {
+private fun TypeThumb(type: String, opened: Boolean, muted: Boolean = false, linkId: String? = null, imageUrl: String? = null) {
     val look = typeLook(type)
     // Archived: same shape and icon, neutral colors
     val bg = if (muted) MaterialTheme.colorScheme.surfaceContainerHigh else look.bg
@@ -460,6 +461,10 @@ private fun TypeThumb(type: String, opened: Boolean, muted: Boolean = false, lin
         contentAlignment = Alignment.Center,
     ) {
         AppIcon(look.icon, contentDescription = null, color = fg)
+        // Preview image on top; while it loads or if it fails, the type icon underneath shows
+        if (imageUrl != null) {
+            PlatformAsyncImage(imageUrl, contentDescription = null, modifier = Modifier.matchParentSize().graphicsLayer { if (muted) alpha = 0.5f })
+        }
     }
 }
 
@@ -611,6 +616,7 @@ private fun PickUpCard(link: Link, onOpen: () -> Unit, onMarkOpened: () -> Unit,
             contentAlignment = Alignment.Center,
         ) {
             AppIcon(look.icon, contentDescription = null, color = look.fg, modifier = Modifier.size(28.dp))
+            link.imageUrl?.let { PlatformAsyncImage(it, contentDescription = null, modifier = Modifier.matchParentSize()) }
         }
         Column(Modifier.padding(start = 14.dp, end = 14.dp, top = 10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(

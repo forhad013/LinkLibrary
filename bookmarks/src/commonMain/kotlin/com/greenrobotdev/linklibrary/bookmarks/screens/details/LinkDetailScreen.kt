@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.details
 
+import com.greenrobotdev.linklibrary.design.components.utils.PlatformAsyncImage
 import com.greenrobotdev.linklibrary.bookmarks.motion.sharedThumb
 import com.greenrobotdev.linklibrary.bookmarks.motion.sharedTitle
 import com.greenrobotdev.linklibrary.design.components.layout.appVerticalScroll
@@ -176,6 +177,7 @@ fun LinkDetailScreen(
         Column(Modifier.fillMaxSize().appVerticalScroll(rememberScrollState())) {
             Hero(
                 linkId = link.id,
+                imageUrl = link.imageUrl,
                 type = link.type,
                 noPreview = link.title.isBlank() || link.title == link.url,
                 onBack = onBack,
@@ -303,7 +305,7 @@ fun LinkDetailScreen(
 
 /** Top band coloured by link type, with a large type badge, Back (left) and Share (right). */
 @Composable
-private fun Hero(linkId: String, type: String, noPreview: Boolean, onBack: () -> Unit, onShare: () -> Unit) {
+private fun Hero(linkId: String, imageUrl: String?, type: String, noPreview: Boolean, onBack: () -> Unit, onShare: () -> Unit) {
     data class Look(val bg: Color, val badgeBg: Color, val badgeFg: Color, val icon: ImageVector)
     val look = when {
         noPreview -> Look(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Filled.Link)
@@ -327,6 +329,8 @@ private fun Hero(linkId: String, type: String, noPreview: Boolean, onBack: () ->
             contentAlignment = Alignment.Center,
         ) {
             AppIcon(look.icon, contentDescription = null, color = look.badgeFg, modifier = Modifier.size(40.dp))
+            // Preview image over the icon, as on the Feed card it grows from
+            imageUrl?.let { PlatformAsyncImage(it, contentDescription = null, modifier = Modifier.matchParentSize()) }
         }
     }
 }
