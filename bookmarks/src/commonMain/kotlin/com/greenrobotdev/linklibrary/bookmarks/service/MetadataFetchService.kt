@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.service
 
+import com.greenrobotdev.linklibrary.design.debug.DebugLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import io.ktor.http.URLBuilder
@@ -26,7 +27,7 @@ class MetadataFetchService(private val httpClient: HttpClient) {
      * Returns Flow<Result> to support coroutines and error handling
      */
     suspend fun fetchMetadata(url: String): Flow<Result<LinkMetadata>> = flow {
-        println("🔍 MetadataFetchService: Starting fetch for URL: $url")
+        DebugLog.d("Metadata") { "🔍 MetadataFetchService: Starting fetch for URL: $url" }
 
         if (url.isBlank()) {
             emit(Result.failure(IllegalArgumentException("URL cannot be blank")))
@@ -40,7 +41,7 @@ class MetadataFetchService(private val httpClient: HttpClient) {
         }
 
         try {
-            println("🌐 MetadataFetchService: Making HTTP request to $url")
+            DebugLog.d("Metadata") { "🌐 MetadataFetchService: Making HTTP request to $url" }
             val response: HttpResponse = httpClient.get(url) {
                 // Set user agent to avoid being blocked
                 header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
@@ -54,21 +55,21 @@ class MetadataFetchService(private val httpClient: HttpClient) {
 
             when (response.status) {
                 HttpStatusCode.OK, HttpStatusCode.MovedPermanently, HttpStatusCode.Found, HttpStatusCode.TemporaryRedirect, HttpStatusCode.PermanentRedirect -> {
-                    println("✅ MetadataFetchService: Got response ${response.status}")
+                    DebugLog.d("Metadata") { "✅ MetadataFetchService: Got response ${response.status}" }
                     val htmlContent = response.body<String>()
-                    println("📄 MetadataFetchService: Received ${htmlContent.length} characters")
+                    DebugLog.d("Metadata") { "📄 MetadataFetchService: Received ${htmlContent.length} characters" }
 
                     if (htmlContent.isNotBlank()) {
                         val metadata = extractMetadata(htmlContent, url)
-                        println("🎯 MetadataFetchService: Extracted title: ${metadata.title}")
+                        DebugLog.d("Metadata") { "🎯 MetadataFetchService: Extracted title: ${metadata.title}" }
                         emit(Result.success(metadata))
                     } else {
-                        println("⚠️ MetadataFetchService: Empty response from server")
+                        DebugLog.d("Metadata") { "⚠️ MetadataFetchService: Empty response from server" }
                         emit(Result.failure(Exception("Empty response from server")))
                     }
                 }
                 else -> {
-                    println("❌ MetadataFetchService: HTTP error ${response.status.value}: ${response.status.description}")
+                    DebugLog.d("Metadata") { "❌ MetadataFetchService: HTTP error ${response.status.value}: ${response.status.description}" }
                     emit(Result.failure(HttpStatusException(response.status.value, response.status.description)))
                 }
             }
@@ -76,7 +77,7 @@ class MetadataFetchService(private val httpClient: HttpClient) {
             // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
             throw e
         } catch (e: Exception) {
-            println("❌ MetadataFetchService: Exception - ${e::class.simpleName}: ${e.message}")
+            DebugLog.d("Metadata") { "❌ MetadataFetchService: Exception - ${e::class.simpleName}: ${e.message}" }
             e.printStackTrace()
 
             val errorMessage = when {
@@ -102,7 +103,7 @@ class MetadataFetchService(private val httpClient: HttpClient) {
         val title = extractTitle(html)
         val description = extractDescription(html)
         val imageUrl = extractImageUrl(html)?.let { makeAbsoluteUrl(it.replace("&amp;", "&"), url) }
-        println("LoL/Metadata $url -> title=${title.isNotBlank()} image=$imageUrl")
+        DebugLog.d("Metadata") { "$url -> title=${title.isNotBlank()} image=$imageUrl" }
         val faviconUrl = extractFavicon(html, url)
 
         return LinkMetadata(

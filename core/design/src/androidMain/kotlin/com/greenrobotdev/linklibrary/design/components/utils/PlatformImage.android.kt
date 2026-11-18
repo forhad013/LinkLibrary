@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.design.components.utils
 
+import com.greenrobotdev.linklibrary.design.debug.DebugLog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
@@ -87,11 +88,11 @@ actual fun PlatformAsyncImage(
             contentScale = contentScale,
             onState = {
                 state = it
-                // Logcat: filter "LoL/Image" to see why an image is missing
+                // Debug builds: filter logcat for "LoL/Image" to see why an image is missing
                 when (it) {
                     // from MEMORY_CACHE / DISK / NETWORK: shows whether the cache is doing its job
-                    is AsyncImagePainter.State.Success -> println("LoL/Image loaded from ${it.result.dataSource} (try ${attempt + 1}) $model")
-                    is AsyncImagePainter.State.Error -> println("LoL/Image failed (try ${attempt + 1}) $model: ${it.result.throwable}")
+                    is AsyncImagePainter.State.Success -> DebugLog.d("Image") { "loaded from ${it.result.dataSource} (try ${attempt + 1}) $model" }
+                    is AsyncImagePainter.State.Error -> DebugLog.d("Image") { "failed (try ${attempt + 1}) $model: ${it.result.throwable}" }
                     else -> Unit
                 }
             },
