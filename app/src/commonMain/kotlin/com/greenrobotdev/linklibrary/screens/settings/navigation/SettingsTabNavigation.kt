@@ -10,7 +10,6 @@ import androidx.navigation3.ui.NavDisplay
 import com.greenrobotdev.linklibrary.design.demo.DesignCatalogScreen
 import com.greenrobotdev.linklibrary.screens.root.TabNavigator
 import com.greenrobotdev.linklibrary.screens.root.rememberTabNavigationState
-import com.greenrobotdev.linklibrary.screens.root.toEntries
 import com.greenrobotdev.linklibrary.screens.settings.SettingsScreen
 
 /**
@@ -25,7 +24,8 @@ fun SettingsTabNavigation() {
     val tabNavigator = remember { TabNavigator(tabNavState) }
 
     NavDisplay(
-        entries = tabNavState.toEntries { route ->
+        backStack = tabNavState.backStack,
+                entryProvider = { route ->
             NavEntry(route) {
                 when (route) {
                     is SettingsNavRoutes.SettingsBase -> SettingsScreen(

@@ -15,7 +15,6 @@ import com.greenrobotdev.linklibrary.bookmarks.screens.library.LibraryTabScreen
 import com.greenrobotdev.linklibrary.bookmarks.screens.manage.ManageScreen
 import com.greenrobotdev.linklibrary.screens.root.TabNavigator
 import com.greenrobotdev.linklibrary.screens.root.rememberTabNavigationState
-import com.greenrobotdev.linklibrary.screens.root.toEntries
 
 /**
  * Organize Tab Navigation - Manages all screens within the Organize tab
@@ -32,7 +31,8 @@ fun OrganizeTabNavigation() {
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this) {
             NavDisplay(
-                entries = tabNavState.toEntries { route ->
+                backStack = tabNavState.backStack,
+                entryProvider = { route ->
                     NavEntry(route) {
                         when (route) {
                             // Library tab base (design: library_categories_amp_tags)
