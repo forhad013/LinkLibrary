@@ -177,7 +177,7 @@ fun LinkDetailScreen(
         Column(Modifier.fillMaxSize().appVerticalScroll(rememberScrollState())) {
             Hero(
                 linkId = link.id,
-                imageUrl = link.imageUrl,
+                imageUrl = link.previewImage,
                 type = link.type,
                 noPreview = link.title.isBlank() || link.title == link.url,
                 onBack = onBack,

@@ -10,6 +10,7 @@ import com.greenrobotdev.linklibrary.bookmarks.model.toCategory
 import com.greenrobotdev.linklibrary.bookmarks.model.toDomain
 import com.greenrobotdev.linklibrary.bookmarks.model.toEntity
 import com.greenrobotdev.linklibrary.bookmarks.model.toTag
+import com.greenrobotdev.linklibrary.bookmarks.service.MetadataFetchService
 import com.greenrobotdev.linklibrary.database.repository.CategoryRepository
 import com.greenrobotdev.linklibrary.database.repository.LinkRepository
 import com.greenrobotdev.linklibrary.database.repository.TagRepository
@@ -24,11 +25,12 @@ class LibraryViewModel : MoleculeViewModel<LibraryEvent, LibraryState>(), KoinCo
     private val linkRepository: LinkRepository by inject()
     private val categoryRepository: CategoryRepository by inject()
     private val tagRepository: TagRepository by inject()
+    private val metadataFetchService: MetadataFetchService by inject()
     private val filterStore = FeedFilterStore()
 
     @Composable
     override fun models(events: Flow<LibraryEvent>): LibraryState =
-        LibraryPresenter(events, linkRepository, categoryRepository, tagRepository, filterStore)
+        LibraryPresenter(events, linkRepository, categoryRepository, tagRepository, filterStore, metadataFetchService)
 
     override fun initialValue(): LibraryState = LibraryState()
 }
@@ -41,6 +43,7 @@ fun LibraryPresenter(
     categoryRepository: CategoryRepository,
     tagRepository: TagRepository,
     filterStore: FeedFilterStore,
+    metadataFetchService: MetadataFetchService,
 ): LibraryState {
     var state by remember { mutableStateOf(LibraryState(filters = filterStore.load())) }
 
@@ -51,6 +54,16 @@ fun LibraryPresenter(
         linkRepository.getLinksWithTags().collect { result ->
             result.onSuccess { entities -> state = state.copy(links = entities.map { it.toDomain() }, isLoading = false) }
                 .onFailure { state = state.copy(isLoading = false) }
+        }
+    }
+    // Preview images for links saved before they were kept: one page at a time, in the background.
+    // A failed fetch (offline, blocked) stays null and is retried next time.
+    LaunchedEffect(Unit) {
+        val missing = linkRepository.getLinks().first().getOrNull().orEmpty().filter { it.imageUrl == null }
+        for (link in missing) {
+            metadataFetchService.fetchMetadata(link.url).first().onSuccess { metadata ->
+                linkRepository.setImageUrl(link.id, metadata.imageUrl.orEmpty()).first()
+            }
         }
     }
     LaunchedEffect(Unit) {
