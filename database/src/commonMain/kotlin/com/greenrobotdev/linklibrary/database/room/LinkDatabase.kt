@@ -22,7 +22,7 @@ import androidx.room.RoomDatabaseConstructor
         LinkTagEntity::class,
         LinkCategoryEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 @ConstructedBy(LinkDatabaseConstructor::class)

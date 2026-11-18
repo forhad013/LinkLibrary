@@ -46,8 +46,8 @@ class MetadataFetchService(private val httpClient: HttpClient) {
                 header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
                 // Add more headers to look like a real browser
                 header("Accept-Language", "en-US,en;q=0.9")
-                header("Accept-Encoding", "gzip, deflate, br")
-                header("Connection", "keep-alive")
+                // No Accept-Encoding here: OkHttp only un-gzips responses when it adds that header
+                // itself. Setting it by hand left the HTML compressed, so no tag was ever found.
             }
 
             when (response.status) {
@@ -208,18 +208,14 @@ class MetadataFetchService(private val httpClient: HttpClient) {
     /**
      * Helper to extract meta tag content by attribute and value
      */
-    private fun extractMetaContent(html: String, attribute: String, value: String): String {
-        val pattern = Regex("<meta[^>]*$attribute\\s*=\\s*['\"]*$value['\"]*[^>]*content\\s*=\\s*['\"]([^'\"]*)['\"][^>]*>", RegexOption.IGNORE_CASE)
-        return pattern.find(html)?.groupValues?.get(1)?.trim() ?: ""
-    }
+    private fun extractMetaContent(html: String, attribute: String, value: String): String =
+        findTagAttribute(html, "meta", attribute, value, "content")
 
     /**
      * Helper to extract link href by rel attribute
      */
-    private fun extractLinkHref(html: String, rel: String): String {
-        val pattern = Regex("<link[^>]*rel\\s*=\\s*['\"]*$rel['\"]*[^>]*href\\s*=\\s*['\"]([^'\"]*)['\"][^>]*>", RegexOption.IGNORE_CASE)
-        return pattern.find(html)?.groupValues?.get(1)?.trim() ?: ""
-    }
+    private fun extractLinkHref(html: String, rel: String): String =
+        findTagAttribute(html, "link", "rel", rel, "href")
 
     /**
      * Converts relative URLs to absolute URLs

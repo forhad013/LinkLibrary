@@ -48,4 +48,30 @@ class MigrationTest {
             File(file.path + "-shm").delete()
         }
     }
+
+    @Test
+    fun v5NoImageMarkersAreClearedButRealImagesKept() = runTest {
+        val file = File.createTempFile("links", ".db").also { it.delete() }
+        try {
+            open(file).apply {
+                linkDao().insertLink(LinkEntity(id = "none", title = "a", url = "https://a.com", description = "", isFavorite = false, imageUrl = ""))
+                linkDao().insertLink(LinkEntity(id = "img", title = "b", url = "https://b.com", description = "", isFavorite = false, imageUrl = "https://b.com/i.png"))
+                close()
+            }
+            BundledSQLiteDriver().open(file.absolutePath).apply {
+                execSQL("PRAGMA user_version = 5")
+                close()
+            }
+
+            val db = open(file)
+            val byId = db.linkDao().getAllLinks().first().associateBy { it.id }
+            assertNull(byId.getValue("none").imageUrl)
+            assertEquals("https://b.com/i.png", byId.getValue("img").imageUrl)
+            db.close()
+        } finally {
+            file.delete()
+            File(file.path + "-wal").delete()
+            File(file.path + "-shm").delete()
+        }
+    }
 }
