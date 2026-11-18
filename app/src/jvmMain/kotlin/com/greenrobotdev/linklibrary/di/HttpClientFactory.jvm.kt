@@ -8,7 +8,7 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import java.util.concurrent.TimeUnit
+import java.time.Duration
 
 /**
  * JVM/Desktop-specific HTTP client implementation using Java engine
@@ -19,9 +19,8 @@ actual fun createHttpClient(): HttpClient {
         // Configure timeouts to prevent indefinite hangs
         engine {
             config {
-                connectTimeout(30, TimeUnit.SECONDS)
-                readTimeout(30, TimeUnit.SECONDS)
-                writeTimeout(30, TimeUnit.SECONDS)
+                connectTimeout(Duration.ofSeconds(30))
+                // The Java engine has no builder-level read/write timeout; requestTimeoutPlugin below covers it
             }
         }
 
