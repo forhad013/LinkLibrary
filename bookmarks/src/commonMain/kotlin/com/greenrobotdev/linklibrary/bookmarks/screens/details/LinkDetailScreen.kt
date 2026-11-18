@@ -1,5 +1,8 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.details
 
+import com.greenrobotdev.linklibrary.design.components.utils.PlatformAsyncImage
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.layout.ContentScale
 import com.greenrobotdev.linklibrary.design.motion.AppMotion
 import androidx.compose.ui.platform.LocalDensity
@@ -334,6 +337,18 @@ private fun Hero(linkId: String, imageUrl: String?, type: String, noPreview: Boo
     // Type-colored background, behind the image while it loads and around the badge
     Box(Modifier.fillMaxWidth().height(HERO_HEIGHT).background(look.bg)) {
         if (imageUrl != null) {
+            // Backdrop: the same image cropped, blurred and dimmed, so the band always matches the
+            // picture (a tall video thumbnail no longer floats in a flat block). Coil serves it from memory.
+            // shortcut: blur needs Android 12+; older phones get the dimmed crop without blur
+            val scrim = MaterialTheme.colorScheme.scrim
+            PlatformAsyncImage(
+                model = imageUrl,
+                contentDescription = null,
+                modifier = Modifier.matchParentSize().blur(40.dp).drawWithContent {
+                    drawContent()
+                    drawRect(scrim.copy(alpha = 0.35f))
+                },
+            )
             // The whole image, never cropped, below the pinned top bar; the Feed thumbnail grows into it
             LinkPreviewImage(
                 imageUrl = imageUrl,
