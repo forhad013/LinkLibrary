@@ -15,6 +15,7 @@ import com.greenrobotdev.linklibrary.bookmarks.model.toCategory
 import com.greenrobotdev.linklibrary.bookmarks.model.toEntity
 import com.greenrobotdev.linklibrary.bookmarks.model.Tag
 import com.greenrobotdev.linklibrary.bookmarks.model.toTag
+import com.greenrobotdev.linklibrary.bookmarks.domain.isSameLink
 import com.greenrobotdev.linklibrary.bookmarks.domain.isValidLink
 import com.greenrobotdev.linklibrary.bookmarks.domain.linkTypeOf
 import kotlinx.coroutines.flow.Flow
@@ -90,10 +91,18 @@ fun AddLinkPresenter(
         if (state.createdAt == null) state = state.copy(createdAt = Clock.System.now().toEpochMilliseconds())
     }
 
+    // The existing save of [url], if any: adding it again would only make a second copy
+    suspend fun existingSave(url: String): SavedDuplicate? =
+        linkRepository.getLinks().first().getOrNull()
+            ?.firstOrNull { isSameLink(it.url, url) }
+            ?.let { SavedDuplicate(it.id, it.title.ifBlank { it.url }, it.createdAt) }
+
     LaunchedEffect(Unit) {
         // "Link kept": store the link before handling any event, so Save/Discard always see savedLinkId
         val url = initialUrl?.trim().orEmpty()
-        if (state.savedLinkId == null && isValidLink(url)) {
+        val duplicate = if (isValidLink(url)) existingSave(url) else null
+        if (duplicate != null) state = state.copy(duplicate = duplicate)
+        if (duplicate == null && state.savedLinkId == null && isValidLink(url)) {
             stampCreatedAt()
             linkRepository.addLink(linkFromState(Uuid.random().toString())).first()
                 .onSuccess { state = state.copy(savedLinkId = it.id) }
@@ -118,7 +127,11 @@ fun AddLinkPresenter(
                 }
                 is AddLinkEvent.Submit -> {
                     // title may still be blank while fetching; linkFromState falls back to one from the URL
-                    if (state.url.isNotBlank() && !state.isLoading) {
+                    // A typed URL that's already saved: show that save instead of adding a copy
+                    val typedDuplicate = if (state.savedLinkId == null && state.url.isNotBlank()) existingSave(state.url) else null
+                    if (typedDuplicate != null) {
+                        state = state.copy(duplicate = typedDuplicate)
+                    } else if (state.url.isNotBlank() && !state.isLoading) {
                         state = state.copy(isLoading = true, error = null)
                         try {
                             stampCreatedAt()
@@ -171,7 +184,7 @@ fun AddLinkPresenter(
                 is AddLinkEvent.FetchMetadata -> {
                     // The screen can ask more than once while it opens; one fetch per URL is enough
                     val alreadyFetched = state.fetchedMetadata?.url == state.url
-                    if (state.url.isNotBlank() && !state.isFetching && !alreadyFetched) {
+                    if (state.url.isNotBlank() && !state.isFetching && !alreadyFetched && state.duplicate == null) {
                         state = state.copy(isFetching = true, fetchError = null)
 
                         try {

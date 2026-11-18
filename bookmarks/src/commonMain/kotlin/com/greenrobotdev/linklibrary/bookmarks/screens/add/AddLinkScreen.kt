@@ -1,5 +1,20 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add
 
+import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import com.greenrobotdev.linklibrary.bookmarks.screens.library.savedAtLabel
+import com.greenrobotdev.linklibrary.design.theme.ComponentStyle
+import com.greenrobotdev.linklibrary.design.components.button.StandardButton
+import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.OpenInFull
+import androidx.compose.material.icons.filled.BookmarkAdded
 import com.greenrobotdev.linklibrary.design.components.layout.appVerticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +72,7 @@ fun AddLinkScreen(
     routeKey: NavKey,
     initialUrl: String?,
     onBack: () -> Unit,
+    onOpenDetails: (linkId: String) -> Unit = {},
 ) {
     val viewModel: AddLinkViewModel = viewModel<AddLinkViewModel>(key = routeKey.toString()) { AddLinkViewModel(initialUrl) }
     val state by viewModel.models.collectAsState()
@@ -88,6 +104,11 @@ fun AddLinkScreen(
             initialChecked = state.selectedTags,
             onApplied = { viewModel.take(AddLinkEvent.SetTags(it)) },
         )
+    }
+
+    state.duplicate?.let { duplicate ->
+        AlreadySaved(duplicate, onClose = onBack, onView = { onOpenDetails(duplicate.linkId) })
+        return
     }
 
     AddLinkView(
@@ -210,3 +231,43 @@ fun AddLinkView(
 
 private fun shouldAutoFetch(state: AddLinkState): Boolean =
     state.url.isNotBlank() && state.url.startsWith("http") && !state.isFetching && state.title.isBlank()
+
+/** The URL is already saved: no copy is made; offer the existing save instead. */
+@Composable
+private fun AlreadySaved(duplicate: SavedDuplicate, onClose: () -> Unit, onView: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 20.dp, vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+    ) {
+        SaveHeader(onClose = onClose)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(24.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Box(
+                    modifier = Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AppIcon(Icons.Filled.BookmarkAdded, contentDescription = null, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                }
+                Text("Already in your library", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
+            }
+            Text(duplicate.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 3, overflow = TextOverflow.Ellipsis)
+            Text(
+                savedAtLabel(duplicate.createdAt)?.let { "Saved $it. Nothing new was added." } ?: "You saved this before. Nothing new was added.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        StandardButton(text = "View it", icon = Icons.Filled.OpenInFull, onClick = onView, modifier = Modifier.fillMaxWidth())
+        StandardButton(text = "Close", style = ComponentStyle.Outlined, onClick = onClose, modifier = Modifier.fillMaxWidth())
+    }
+}

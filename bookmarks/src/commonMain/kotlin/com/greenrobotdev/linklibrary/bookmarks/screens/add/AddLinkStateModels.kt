@@ -5,6 +5,10 @@ import com.greenrobotdev.linklibrary.bookmarks.model.Tag
 import com.greenrobotdev.linklibrary.bookmarks.service.LinkMetadata
 import kotlinx.serialization.Serializable
 
+/** The existing save of a URL being added again. */
+@Serializable
+data class SavedDuplicate(val linkId: String, val title: String, val createdAt: Long?)
+
 @Serializable
 data class AddLinkState(
     val isLoading: Boolean = false,
@@ -32,6 +36,8 @@ data class AddLinkState(
     val askForUrl: Boolean = false,
     /** Epoch ms fixed when the link is first stored; later updates keep it (Feed sorts by it). */
     val createdAt: Long? = null,
+    /** This URL is already saved: nothing new is stored and the screen offers that save instead. */
+    val duplicate: SavedDuplicate? = null,
     // Task-related fields
     val isTask: Boolean = false,
     val taskPriority: String = "Medium",
