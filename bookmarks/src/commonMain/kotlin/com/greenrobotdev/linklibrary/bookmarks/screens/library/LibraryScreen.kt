@@ -173,6 +173,20 @@ fun LibraryScreen(
         )
     }
 
+    // "All caught up" is a moment, not a state: celebrate only when unopened saves go from 1+ to 0
+    // while the app is in use without links being deleted (opening, Mark as opened, archiving).
+    // A restore or a later visit with nothing unopened gets the calm "Nothing new" instead.
+    var celebrate by rememberSaveable { mutableStateOf(false) }
+    var lastUnopened by rememberSaveable { mutableStateOf(-1) }
+    var lastLinkCount by rememberSaveable { mutableStateOf(-1) }
+    val unopenedCount = state.unopenedLinks.size
+    LaunchedEffect(state.isLoading, unopenedCount, state.links.size) {
+        if (state.isLoading) return@LaunchedEffect
+        celebrate = celebrateCaughtUp(celebrate, lastUnopened, lastLinkCount, unopenedCount, state.links.size)
+        lastUnopened = unopenedCount
+        lastLinkCount = state.links.size
+    }
+
     // Scrolling the list collapses the title first; it comes back once the list is at the top
     val header = rememberCollapsingHeaderState()
     Box(Modifier.fillMaxSize()) {
@@ -187,7 +201,7 @@ fun LibraryScreen(
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                FeedHeader(opened = state.inboxOpened, total = state.inboxTotal, collapse = { header.fraction })
+                FeedHeader(opened = state.inboxOpened, total = state.inboxTotal, celebrate = celebrate, collapse = { header.fraction })
                 SearchField(
                     query = state.searchQuery,
                     onQueryChange = { viewModel.take(LibraryEvent.SearchChanged(it)) },
@@ -271,7 +285,8 @@ fun LibraryScreen(
                         }
                     }
                     if (discover && unopened.isEmpty() && state.inboxTotal > 0) {
-                        item(key = "caught-up") { AllCaughtUpCard(Modifier.animateItem()) }
+                        if (celebrate) item(key = "caught-up") { AllCaughtUpCard(Modifier.animateItem()) }
+                        else item(key = "nothing-new") { NothingNewCard(Modifier.animateItem()) }
                     }
                     val candidates = state.resurfaceCandidates(nowMs)
                     if (discover && candidates.isNotEmpty()) {

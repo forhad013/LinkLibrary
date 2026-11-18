@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.library
 
+import androidx.compose.material.icons.filled.Inbox
 import com.greenrobotdev.linklibrary.design.motion.rememberReducedMotion
 import com.greenrobotdev.linklibrary.design.motion.AppMotion
 import kotlinx.coroutines.delay
@@ -159,7 +160,7 @@ private fun Modifier.scaleAway(scale: () -> Float, origin: TransformOrigin, fade
  * [collapse] goes 0 → 1, the overline fades out and the title and ring shrink.
  */
 @Composable
-internal fun FeedHeader(opened: Int, total: Int, modifier: Modifier = Modifier, collapse: () -> Float = { 0f }) {
+internal fun FeedHeader(opened: Int, total: Int, celebrate: Boolean, modifier: Modifier = Modifier, collapse: () -> Float = { 0f }) {
     Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text(
@@ -177,25 +178,33 @@ internal fun FeedHeader(opened: Int, total: Int, modifier: Modifier = Modifier, 
             )
         }
         if (total > 0) {
-            InboxProgress(opened, total, Modifier.scaleAway({ 1f - 0.25f * collapse() }, TransformOrigin(1f, 0.5f)))
+            InboxProgress(opened, total, celebrate, Modifier.scaleAway({ 1f - 0.25f * collapse() }, TransformOrigin(1f, 0.5f)))
         }
     }
 }
 
-/** Ring that fills as saves get opened: "9 left · 3 of 12 opened", then green "Done". */
+/**
+ * Ring that fills as saves get opened: "9 left · 3 of 12 opened". At zero it turns green "Done"
+ * only right after the user cleared the last one ([celebrate]); otherwise it's a calm gray
+ * "0 new · 19 opened" (e.g. after a restore, where everything was already opened).
+ */
 @Composable
-private fun InboxProgress(opened: Int, total: Int, modifier: Modifier = Modifier) {
+private fun InboxProgress(opened: Int, total: Int, celebrate: Boolean, modifier: Modifier = Modifier) {
     val done = opened >= total
     val fraction by animateFloatAsState(opened.toFloat() / total, label = "inbox progress")
     val track = MaterialTheme.colorScheme.primaryContainer
-    val fill = if (done) LordsExtraColors.success else MaterialTheme.colorScheme.primary
+    val fill = when {
+        done && celebrate -> LordsExtraColors.success
+        done -> MaterialTheme.colorScheme.outline
+        else -> MaterialTheme.colorScheme.primary
+    }
     Row(
         modifier = modifier
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.surface)
             .padding(start = 6.dp, end = 14.dp, top = 6.dp, bottom = 6.dp)
             .semantics(mergeDescendants = true) {
-                contentDescription = if (done) "All $total saves opened" else "${total - opened} unopened, $opened of $total opened"
+                contentDescription = if (done) "Nothing new, all $total saves opened" else "${total - opened} unopened, $opened of $total opened"
             },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -209,12 +218,12 @@ private fun InboxProgress(opened: Int, total: Int, modifier: Modifier = Modifier
         }
         Column {
             Text(
-                if (done) "Done" else "${total - opened} left",
+                when { done && celebrate -> "Done"; done -> "0 new"; else -> "${total - opened} left" },
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.ExtraBold,
             )
             Text(
-                if (done) "all opened" else "$opened of $total opened",
+                when { done && celebrate -> "all opened"; done -> "$total opened"; else -> "$opened of $total opened" },
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -223,7 +232,7 @@ private fun InboxProgress(opened: Int, total: Int, modifier: Modifier = Modifier
     }
 }
 
-/** Shown in place of the pick-up row and resurfacing card once every save is opened. */
+/** The celebration, right after the user opened (or archived) the last unopened save. */
 @Composable
 internal fun AllCaughtUpCard(modifier: Modifier = Modifier) {
     Row(
@@ -847,6 +856,36 @@ private fun MarkOpenedCheck(onMarked: () -> Unit, modifier: Modifier = Modifier)
             contentAlignment = Alignment.Center,
         ) {
             AppIcon(Icons.Filled.Check, contentDescription = null, color = tint, modifier = Modifier.size(18.dp))
+        }
+    }
+}
+
+/** Nothing unopened, but not just cleared (after a restore, or on a later visit): calm, no celebration. */
+@Composable
+internal fun NothingNewCard(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 18.dp, vertical = 18.dp)
+            .semantics(mergeDescendants = true) {},
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Box(
+            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(14.dp)).background(MaterialTheme.colorScheme.surfaceContainerHigh),
+            contentAlignment = Alignment.Center,
+        ) {
+            AppIcon(Icons.Filled.Inbox, contentDescription = null, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text("Nothing new waiting", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSurface)
+            Text(
+                "Everything here is opened. Share a link from any app, or tap + to save one.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

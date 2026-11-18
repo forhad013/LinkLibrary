@@ -170,3 +170,14 @@ sealed interface LibraryEvent {
     /** Undo: write back the link as it was before the last action. */
     data class Restore(val link: Link) : LibraryEvent
 }
+
+/**
+ * Whether the Feed shows "All caught up": only right after unopened saves went from 1+ to 0 with no
+ * link deleted (opening, Mark as opened and archiving count; deleting, restoring or simply opening
+ * the app with nothing unopened don't). Stays on until something new is unopened. -1 = no reading yet.
+ */
+fun celebrateCaughtUp(celebrating: Boolean, lastUnopened: Int, lastLinkCount: Int, unopened: Int, linkCount: Int): Boolean = when {
+    unopened > 0 -> false
+    lastUnopened > 0 && linkCount >= lastLinkCount -> true
+    else -> celebrating
+}
