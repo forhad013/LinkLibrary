@@ -14,6 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import android.content.Context
+import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
@@ -21,6 +23,19 @@ import coil.size.Size
 import kotlinx.coroutines.delay
 
 private const val RETRIES = 2
+
+/**
+ * One loader for the app (memory + disk cache). It ignores the server's cache headers: many image
+ * CDNs send no-cache or short lifetimes, which made every app start download previews again, and
+ * a page's preview image practically never changes.
+ */
+private var appImageLoader: ImageLoader? = null
+
+private fun imageLoader(context: Context): ImageLoader =
+    appImageLoader ?: ImageLoader.Builder(context.applicationContext)
+        .respectCacheHeaders(false)
+        .build()
+        .also { appImageLoader = it }
 // Image CDNs (Medium, Cloudflare) often refuse OkHttp's default user agent
 private const val BROWSER_USER_AGENT =
     "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36"
@@ -62,6 +77,7 @@ actual fun PlatformAsyncImage(
     Box(modifier, contentAlignment = Alignment.Center) {
         AsyncImage(
             model = request,
+            imageLoader = imageLoader(context),
             contentDescription = contentDescription,
             // Neutral backing once loaded: transparent logos otherwise show the tile's color through
             modifier = Modifier.matchParentSize()
@@ -71,7 +87,8 @@ actual fun PlatformAsyncImage(
                 state = it
                 // Logcat: filter "LoL/Image" to see why an image is missing
                 when (it) {
-                    is AsyncImagePainter.State.Success -> println("LoL/Image loaded (try ${attempt + 1}) $model")
+                    // from MEMORY_CACHE / DISK / NETWORK: shows whether the cache is doing its job
+                    is AsyncImagePainter.State.Success -> println("LoL/Image loaded from ${it.result.dataSource} (try ${attempt + 1}) $model")
                     is AsyncImagePainter.State.Error -> println("LoL/Image failed (try ${attempt + 1}) $model: ${it.result.throwable}")
                     else -> Unit
                 }
