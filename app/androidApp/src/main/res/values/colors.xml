@@ -5,4 +5,8 @@
 
     <!-- Launcher icon foreground color -->
     <color name="ic_launcher_foreground">#FFFFFF</color>
+
+    <!-- Matches Compose background (Color.kt) so the pre-Compose window and the
+         API 31+ system splash blend into the Feed without a flash -->
+    <color name="window_background">#F4F5FA</color>
 </resources>
