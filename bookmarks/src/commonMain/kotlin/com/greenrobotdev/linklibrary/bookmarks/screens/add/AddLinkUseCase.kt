@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add
 
+import com.greenrobotdev.linklibrary.design.debug.DebugLog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -158,7 +159,7 @@ fun AddLinkPresenter(
                                 }
                             } catch (e: Exception) {
                                 // Log error but don't fail the entire operation
-                                println("Error assigning tags/categoryNames: ${e.message}")
+                                DebugLog.d("AddLink") { "Error assigning tags/categoryNames: ${e.message}" }
                             }
 
                             // Set success flag after successful submission

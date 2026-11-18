@@ -83,7 +83,6 @@ fun CategoryDropdown(
     showLinkCounts: Boolean = true,
     enabled: Boolean = true
 ) {
-    println("whkq63 availableCategories $categories")
 
     var expanded by remember { mutableStateOf(false) }
     var showCreateDialog by remember { mutableStateOf(false) }
@@ -198,7 +197,6 @@ fun CategoryDropdown(
                 (it.description?.contains(searchText, ignoreCase = true) ?: false)
             }
 
-            println("whkq63 filteredCategories: $filteredCategories, size: ${filteredCategories.size}")
 
             Column(
                 modifier = Modifier
@@ -245,7 +243,6 @@ fun CategoryDropdown(
 
                 // Category items
                 filteredCategories.forEach { category ->
-                    println("whkq63 rendering category item: ${category.name}")
                     DropdownMenuItem(
                         text = {
                             Row(

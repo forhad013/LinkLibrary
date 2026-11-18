@@ -1,5 +1,7 @@
 package com.greenrobotdev.linklibrary.android
 
+import com.greenrobotdev.linklibrary.design.debug.DebugLog
+import android.content.pm.ApplicationInfo
 import android.app.Application
 import com.greenrobotdev.linklibrary.database.di.databaseModule
 import com.greenrobotdev.linklibrary.di.appModule
@@ -10,6 +12,8 @@ class Application : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // LoL/ logcat lines only in debuggable (debug) builds
+        DebugLog.enabled = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
 
         startKoin {
             androidContext(this@Application)

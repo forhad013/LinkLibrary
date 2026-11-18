@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.di
 
+import com.greenrobotdev.linklibrary.design.debug.DebugLog
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -40,7 +41,7 @@ actual fun createHttpClient(): HttpClient {
             level = LogLevel.INFO
             logger = object : Logger {
                 override fun log(message: String) {
-                    println("KTOR: $message")
+                    DebugLog.d("Ktor") { message }
                 }
             }
         }
