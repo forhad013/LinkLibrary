@@ -14,7 +14,7 @@ class SettingsViewModel : MoleculeViewModel<SettingsEvent, SettingsState>(), Koi
     
     @Composable
     override fun models(events: Flow<SettingsEvent>): SettingsState {
-        return SettingsPresenter(initialState = SettingsState(), events)
+        return SettingsPresenter(events)
     }
 
     

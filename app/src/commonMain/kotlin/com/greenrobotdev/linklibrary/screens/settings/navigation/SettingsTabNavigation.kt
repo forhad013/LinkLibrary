@@ -27,54 +27,13 @@ fun SettingsTabNavigation() {
         entries = tabNavState.toEntries { route ->
             NavEntry(route) {
                 when (route) {
-                    // Base Settings Screen
                     is SettingsNavRoutes.SettingsBase -> SettingsScreen(
                         routeKey = route,
-                        onNavigateToAI = { /* Navigate to AI assistant */ },
-                        onNavigateToComponentDemo = {
-                            tabNavigator.navigate(SettingsNavRoutes.About) // Using About for demo
-                        }
+                        onOpenComponentDemo = { tabNavigator.navigate(SettingsNavRoutes.ComponentDemo) },
                     )
 
-                    // Theme Settings Screen
-                    is SettingsNavRoutes.ThemeSettings -> SettingsScreen(
-                        routeKey = route,
-                        onNavigateToAI = { /* AI navigation */ },
-                        onNavigateToComponentDemo = {
-                            tabNavigator.navigate(SettingsNavRoutes.About)
-                        }
-                    )
-
-                    // Backup Settings Screen
-                    is SettingsNavRoutes.BackupSettings -> SettingsScreen(
-                        routeKey = route,
-                        onNavigateToAI = { /* AI navigation */ },
-                        onNavigateToComponentDemo = {
-                            tabNavigator.navigate(SettingsNavRoutes.About)
-                        }
-                    )
-
-                    // Account Settings Screen
-                    is SettingsNavRoutes.AccountSettings -> SettingsScreen(
-                        routeKey = route,
-                        onNavigateToAI = { /* AI navigation */ },
-                        onNavigateToComponentDemo = {
-                            tabNavigator.navigate(SettingsNavRoutes.About)
-                        }
-                    )
-
-                    // About Screen (used for Component Demo)
-                    is SettingsNavRoutes.About -> ComponentDemoScreen(
+                    is SettingsNavRoutes.ComponentDemo -> ComponentDemoScreen(
                         onBack = { tabNavigator.goBack() }
-                    )
-
-                    // Help Screen
-                    is SettingsNavRoutes.Help -> SettingsScreen(
-                        routeKey = route,
-                        onNavigateToAI = { /* AI navigation */ },
-                        onNavigateToComponentDemo = {
-                            tabNavigator.navigate(SettingsNavRoutes.About)
-                        }
                     )
 
                     else -> error("Unknown settings route: $route")
