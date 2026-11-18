@@ -1,5 +1,7 @@
 package com.greenrobotdev.linklibrary.bookmarks.service
 
+import io.ktor.http.URLBuilder
+import io.ktor.http.takeFrom
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.header
@@ -97,7 +99,7 @@ class MetadataFetchService(private val httpClient: HttpClient) {
     private fun extractMetadata(html: String, url: String): LinkMetadata {
         val title = extractTitle(html)
         val description = extractDescription(html)
-        val imageUrl = extractImageUrl(html)
+        val imageUrl = extractImageUrl(html)?.let { makeAbsoluteUrl(it.replace("&amp;", "&"), url) }
         val faviconUrl = extractFavicon(html, url)
 
         return LinkMetadata(
@@ -222,18 +224,9 @@ class MetadataFetchService(private val httpClient: HttpClient) {
     /**
      * Converts relative URLs to absolute URLs
      */
-    private fun makeAbsoluteUrl(url: String, baseUrl: String): String {
-        if (url.startsWith("http://") || url.startsWith("https://")) {
-            return url
-        }
-
-        val base = baseUrl.substringBeforeLast("/")
-        return when {
-            url.startsWith("//") -> "https:$url"
-            url.startsWith("/") -> base.substringBefore("/") + url
-            else -> "$base/$url"
-        }
-    }
+    /** Resolves [url] (absolute, "//host/..", "/path" or "path") against the page's [baseUrl]. */
+    private fun makeAbsoluteUrl(url: String, baseUrl: String): String =
+        runCatching { URLBuilder(baseUrl).takeFrom(url).buildString() }.getOrDefault(url)
 
     /**
      * Strips HTML tags from text
