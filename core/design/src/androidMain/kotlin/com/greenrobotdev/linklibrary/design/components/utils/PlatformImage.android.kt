@@ -50,6 +50,7 @@ actual fun PlatformAsyncImage(
     modifier: Modifier,
     loading: (@Composable () -> Unit)?,
     failure: (@Composable () -> Unit)?,
+    contentScale: ContentScale,
 ) {
     val context = LocalContext.current
     var state by remember(model) { mutableStateOf<AsyncImagePainter.State>(AsyncImagePainter.State.Empty) }
@@ -79,10 +80,11 @@ actual fun PlatformAsyncImage(
             model = request,
             imageLoader = imageLoader(context),
             contentDescription = contentDescription,
-            // Neutral backing once loaded: transparent logos otherwise show the tile's color through
+            // Neutral backing once a cropped image loads: transparent logos otherwise show the tile's
+            // color through. Fitted images keep the caller's background around them instead.
             modifier = Modifier.matchParentSize()
-                .then(if (state is AsyncImagePainter.State.Success) Modifier.background(MaterialTheme.colorScheme.surface) else Modifier),
-            contentScale = ContentScale.Crop,
+                .then(if (state is AsyncImagePainter.State.Success && contentScale == ContentScale.Crop) Modifier.background(MaterialTheme.colorScheme.surface) else Modifier),
+            contentScale = contentScale,
             onState = {
                 state = it
                 // Logcat: filter "LoL/Image" to see why an image is missing
