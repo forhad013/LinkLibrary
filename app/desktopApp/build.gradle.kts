@@ -73,24 +73,3 @@ compose.desktop {
         }
     }
 }
-
-// Task to run the desktop app
-tasks.register<JavaExec>("runDesktop") {
-    group = "application"
-    description = "Run the desktop application"
-
-    dependsOn(":app:desktopApp:jvmJar")
-
-    val jvmJar = tasks.getByName("jvmJar")
-    classpath(jvmJar.outputs.files)
-
-    // Set main class
-    systemProperty("mainClass", "com.greenrobotdev.linklibrary.desktop.MainKt")
-
-    // JVM args for Compose Desktop
-    jvmArgs(
-        "--add-opens", "java.desktop/sun.awt=Xinternal.reflection",
-        "--add-opens", "java.desktop/java.awt.peer=Xinternal.reflection",
-        "-Dapple.awt.application.appearance=system"
-    )
-}

@@ -6,6 +6,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.greenrobotdev.linklibrary.database.di.databaseModule
+import com.greenrobotdev.linklibrary.di.appModule
 import com.greenrobotdev.linklibrary.screens.root.RootScreen
 import org.koin.core.context.startKoin
 import kotlin.system.exitProcess
@@ -14,7 +15,8 @@ fun main() {
     // Initialize Koin for desktop
     startKoin {
         modules(
-            databaseModule,
+            appModule,       // HTTP client, metadata fetch service
+            databaseModule,  // Data repositories
         )
     }
 
