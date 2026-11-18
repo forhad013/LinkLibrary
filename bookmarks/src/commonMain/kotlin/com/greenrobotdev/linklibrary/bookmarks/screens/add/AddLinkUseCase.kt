@@ -83,7 +83,7 @@ fun AddLinkPresenter(
         type = linkTypeOf(state.url),
         fetchedDescription = state.fetchedMetadata?.description?.takeIf { it.isNotBlank() },
         createdAt = state.createdAt,
-        imageUrl = state.fetchedMetadata?.imageUrl,
+        imageUrl = state.fetchedMetadata?.let { it.imageUrl.orEmpty() }, // "": fetched, no image
     ).toEntity()
 
     fun stampCreatedAt() {

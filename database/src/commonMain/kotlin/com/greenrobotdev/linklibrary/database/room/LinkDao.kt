@@ -32,6 +32,10 @@ interface LinkDao {
     @Query("UPDATE links SET isOpened = 1 WHERE id = :linkId")
     suspend fun markOpened(linkId: String): Int
 
+    /** Only this column, so a background preview fetch never overwrites the user's own edits. */
+    @Query("UPDATE links SET imageUrl = :imageUrl WHERE id = :linkId")
+    suspend fun setImageUrl(linkId: String, imageUrl: String): Int
+
     @Query("UPDATE links SET isFavorite = NOT isFavorite WHERE id = :linkId")
     suspend fun toggleFavorite(linkId: String): Int
 

@@ -89,6 +89,15 @@ class RoomLinkRepository(
         }
     }
 
+    override suspend fun setImageUrl(linkId: String, imageUrl: String): Flow<Result<Unit>> {
+        return try {
+            linkDao.setImageUrl(linkId, imageUrl)
+            flow { emit(Result.success(Unit)) }
+        } catch (e: Exception) {
+            flow { emit(Result.failure(e)) }
+        }
+    }
+
     override suspend fun deleteLink(linkId: String): Flow<Result<Unit>> {
         return try {
             linkDao.deleteLinkById(linkId)

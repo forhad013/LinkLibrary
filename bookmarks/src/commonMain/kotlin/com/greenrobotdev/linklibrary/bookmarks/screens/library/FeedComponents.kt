@@ -363,7 +363,7 @@ internal fun FeedLinkCard(
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        TypeThumb(type = if (noPreview) "none" else link.type, opened = link.isOpened, muted = link.isArchived, linkId = link.id, imageUrl = link.imageUrl)
+        TypeThumb(type = if (noPreview) "none" else link.type, opened = link.isOpened, muted = link.isArchived, linkId = link.id, imageUrl = link.previewImage)
 
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -616,7 +616,7 @@ private fun PickUpCard(link: Link, onOpen: () -> Unit, onMarkOpened: () -> Unit,
             contentAlignment = Alignment.Center,
         ) {
             AppIcon(look.icon, contentDescription = null, color = look.fg, modifier = Modifier.size(28.dp))
-            link.imageUrl?.let { PlatformAsyncImage(it, contentDescription = null, modifier = Modifier.matchParentSize()) }
+            link.previewImage?.let { PlatformAsyncImage(it, contentDescription = null, modifier = Modifier.matchParentSize()) }
         }
         Column(Modifier.padding(start = 14.dp, end = 14.dp, top = 10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
