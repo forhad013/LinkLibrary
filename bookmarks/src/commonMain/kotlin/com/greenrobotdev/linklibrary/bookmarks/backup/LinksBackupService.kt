@@ -83,7 +83,9 @@ class LinksBackupService(
                     id = "", title = link.title, url = link.url, description = link.description,
                     isFavorite = link.isFavorite, isOpened = link.isOpened, isArchived = link.isArchived,
                     type = link.type, fetchedDescription = link.fetchedDescription,
-                    createdAt = link.createdAt, imageUrl = link.imageUrl,
+                    // 0 = date unknown (the app shows no time and files it under Earlier); null would
+                    // let addLink stamp "now", moving an old undated link to the top of Today
+                    createdAt = link.createdAt ?: 0L, imageUrl = link.imageUrl,
                 ),
             ).first().getOrNull() ?: return@forEach
             added++
