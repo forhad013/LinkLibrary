@@ -1,5 +1,10 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.details
 
+import com.greenrobotdev.linklibrary.design.motion.AppMotion
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.animation.animateColorAsState
 import com.greenrobotdev.linklibrary.bookmarks.components.LinkPreviewImage
 import com.greenrobotdev.linklibrary.bookmarks.motion.sharedThumb
 import com.greenrobotdev.linklibrary.bookmarks.motion.sharedTitle
@@ -173,15 +178,14 @@ fun LinkDetailScreen(
         )
     }
 
+    val scroll = rememberScrollState()
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).imePadding()) {
-        Column(Modifier.fillMaxSize().appVerticalScroll(rememberScrollState())) {
+        Column(Modifier.fillMaxSize().appVerticalScroll(scroll)) {
             Hero(
                 linkId = link.id,
                 imageUrl = link.previewImage,
                 type = link.type,
                 noPreview = link.title.isBlank() || link.title == link.url,
-                onBack = onBack,
-                onShare = { share(link.title, link.url) },
             )
 
             Column(
@@ -265,6 +269,10 @@ fun LinkDetailScreen(
                 Spacer(Modifier.height(96.dp)) // keeps the last card clear of the action bar
             }
         }
+        // Pinned under the status bar; see-through over the image, solid once the image scrolls away
+        val density = LocalDensity.current
+        val pastHero by remember { derivedStateOf { scroll.value > with(density) { (HERO_HEIGHT - 56.dp).toPx() } } }
+        DetailTopBar(overHero = !pastHero, onBack = onBack, onShare = { share(link.title, link.url) })
 
         // Bottom action bar
         Box(Modifier.align(Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 16.dp)) {
@@ -305,7 +313,7 @@ fun LinkDetailScreen(
 
 /** Top band coloured by link type, with a large type badge, Back (left) and Share (right). */
 @Composable
-private fun Hero(linkId: String, imageUrl: String?, type: String, noPreview: Boolean, onBack: () -> Unit, onShare: () -> Unit) {
+private fun Hero(linkId: String, imageUrl: String?, type: String, noPreview: Boolean) {
     data class Look(val bg: Color, val badgeBg: Color, val badgeFg: Color, val icon: ImageVector)
     val look = when {
         noPreview -> Look(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Filled.Link)
@@ -323,7 +331,7 @@ private fun Hero(linkId: String, imageUrl: String?, type: String, noPreview: Boo
         }
     }
     // Type-colored background, behind the image while it loads and around the badge
-    Box(Modifier.fillMaxWidth().height(240.dp).background(look.bg)) {
+    Box(Modifier.fillMaxWidth().height(HERO_HEIGHT).background(look.bg)) {
         if (imageUrl != null) {
             // The preview fills the whole band; the Feed card's thumbnail grows into it
             LinkPreviewImage(
@@ -335,15 +343,43 @@ private fun Hero(linkId: String, imageUrl: String?, type: String, noPreview: Boo
             // The Feed card's thumbnail grows into this badge
             badge(Modifier.align(Alignment.Center).sharedThumb(linkId))
         }
-        BackButton(onBack, Modifier.padding(16.dp))
+        // Soft shade at the top so the pinned bar's white icons read on any image or color
         Box(
-            modifier = Modifier.align(Alignment.TopEnd).padding(16.dp).size(48.dp).clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surface)
-                .clickable(role = Role.Button, onClickLabel = "Share link", onClick = onShare),
-            contentAlignment = Alignment.Center,
-        ) {
-            AppIcon(Icons.Outlined.Share, contentDescription = "Share", color = MaterialTheme.colorScheme.onSurface)
-        }
+            Modifier.fillMaxWidth().height(96.dp)
+                .background(Brush.verticalGradient(listOf(MaterialTheme.colorScheme.scrim.copy(alpha = 0.45f), Color.Transparent))),
+        )
+    }
+}
+
+private val HERO_HEIGHT = 240.dp
+
+/** Back and Share, pinned at the top: white icons over the hero image, normal bar once scrolled past it. */
+@Composable
+private fun DetailTopBar(overHero: Boolean, onBack: () -> Unit, onShare: () -> Unit) {
+    val background by animateColorAsState(
+        if (overHero) Color.Transparent else MaterialTheme.colorScheme.surface, AppMotion.effects(), label = "detail bar background",
+    )
+    // White over the shaded image (not a theme color: it sits on photos, in both themes)
+    val content by animateColorAsState(
+        if (overHero) Color.White else MaterialTheme.colorScheme.onSurface, AppMotion.effects(), label = "detail bar icons",
+    )
+    Row(
+        modifier = Modifier.fillMaxWidth().background(background).padding(horizontal = 4.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        BarIcon(Icons.AutoMirrored.Filled.ArrowBack, "Back", content, onBack)
+        BarIcon(Icons.Outlined.Share, "Share", content, onShare)
+    }
+}
+
+@Composable
+private fun BarIcon(icon: ImageVector, label: String, color: Color, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier.size(48.dp).clip(CircleShape).clickable(role = Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        AppIcon(icon, contentDescription = label, color = color)
     }
 }
 
