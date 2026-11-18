@@ -1,5 +1,8 @@
 package com.greenrobotdev.linklibrary.screens.settings
 
+import com.greenrobotdev.linklibrary.design.theme.ComponentStyle
+import com.greenrobotdev.linklibrary.design.components.button.TextButton
+import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.School
 import com.greenrobotdev.linklibrary.design.debug.DebugLog
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -59,13 +62,18 @@ fun SettingsScreen(
     val viewModel: SettingsViewModel = viewModel(key = routeKey.toString()) { SettingsViewModel() }
     val state by viewModel.models.collectAsState()
 
-    // Export: the presenter builds the file, the screen hands it to the system "save to" picker
-    val saveFile = rememberTextFileSaver("text/html") { saved ->
-        viewModel.take(SettingsEvent.ExportFinished(saved, state.exportFile?.linkCount ?: 0))
+    // Backup / export: the presenter builds the file, the screen hands it to the system "save to" picker
+    val pending = state.pendingFile
+    val onSaved: (Boolean) -> Unit = { saved ->
+        viewModel.take(SettingsEvent.FileSaved(saved, pending?.linkCount ?: 0, isBackup = pending?.mimeType == "application/json"))
     }
-    LaunchedEffect(state.exportFile) {
-        state.exportFile?.let { saveFile(it.fileName, it.html) }
+    val saveJson = rememberTextFileSaver("application/json", onSaved)
+    val saveHtml = rememberTextFileSaver("text/html", onSaved)
+    LaunchedEffect(pending) {
+        pending?.let { (if (it.mimeType == "application/json") saveJson else saveHtml)(it.fileName, it.content) }
     }
+    // Restore: the user picks a backup file; the presenter merges it
+    val openBackup = rememberTextFileOpener { text -> viewModel.take(SettingsEvent.Restore(text)) }
 
     Column(
         modifier = Modifier
@@ -92,19 +100,33 @@ fun SettingsScreen(
         SectionContentCard(title = "Your data") {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
-                    "Your links are stored only on this phone. Export them as a bookmarks file you can " +
-                        "keep as a backup or import into a browser or another app.",
+                    "Your links are stored only on this phone. Back them up to a file you keep, and restore " +
+                        "them on this or another phone. Restoring adds what's missing and never removes anything.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 StandardButton(
-                    text = "Export links",
+                    text = "Back up links",
                     icon = Icons.Filled.FileDownload,
-                    onClick = { viewModel.take(SettingsEvent.Export) },
+                    enabled = !state.isWorking,
+                    onClick = { viewModel.take(SettingsEvent.Backup) },
                     modifier = Modifier.fillMaxWidth(),
                 )
-                state.exportMessage?.let {
-                    Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                StandardButton(
+                    text = "Restore from backup",
+                    icon = Icons.Filled.Restore,
+                    style = ComponentStyle.Outlined,
+                    enabled = !state.isWorking,
+                    onClick = openBackup,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                TextButton(
+                    onClick = { viewModel.take(SettingsEvent.ExportForBrowsers) },
+                    text = "Export for browsers (bookmarks file)",
+                    enabled = !state.isWorking,
+                )
+                state.dataMessage?.let {
+                    Text(it, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
                 }
             }
         }
