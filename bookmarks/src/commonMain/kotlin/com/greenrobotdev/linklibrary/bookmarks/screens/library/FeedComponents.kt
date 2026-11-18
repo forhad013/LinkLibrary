@@ -1,5 +1,15 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.library
 
+import com.greenrobotdev.linklibrary.design.motion.rememberReducedMotion
+import com.greenrobotdev.linklibrary.design.motion.AppMotion
+import kotlinx.coroutines.delay
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.animateColorAsState
 import com.greenrobotdev.linklibrary.bookmarks.components.LinkPreviewImage
 import com.greenrobotdev.linklibrary.design.components.layout.AppLazyRow
 import androidx.compose.foundation.background
@@ -605,23 +615,7 @@ private fun PickUpCard(link: Link, onOpen: () -> Unit, onMarkOpened: () -> Unit,
                 modifier = Modifier.matchParentSize(),
                 fallback = { AppIcon(look.icon, contentDescription = null, color = look.fg, modifier = Modifier.size(28.dp)) },
             )
-            // Mark as opened: a small check in the picture's corner (48dp touch target, 36dp circle)
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .clickable(role = Role.Button, onClickLabel = "Mark as opened", onClick = onMarkOpened)
-                    .semantics { contentDescription = "Mark as opened" },
-                contentAlignment = Alignment.Center,
-            ) {
-                Box(
-                    modifier = Modifier.size(32.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    AppIcon(Icons.Filled.Check, contentDescription = null, color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
-                }
-            }
+            MarkOpenedCheck(onMarked = onMarkOpened, modifier = Modifier.align(Alignment.TopEnd))
         }
         Column(Modifier.padding(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
@@ -803,4 +797,56 @@ internal fun SwipeableFeedCard(
             }
         },
     ) { content() }
+}
+
+/**
+ * The pick-up card's "Mark as opened" check: gray while unopened. A tap fills it with the brand
+ * color, the check pops (a bouncy spring) with a haptic, and only then [onMarked] runs, so the card
+ * leaves after the user has seen it land. With animations off it changes at once.
+ */
+@Composable
+private fun MarkOpenedCheck(onMarked: () -> Unit, modifier: Modifier = Modifier) {
+    var done by remember { mutableStateOf(false) }
+    val reduced = rememberReducedMotion()
+    val haptics = LocalHapticFeedback.current
+    val marked by rememberUpdatedState(onMarked)
+    val fill by animateColorAsState(
+        if (done) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+        AppMotion.effectsFast(), label = "check fill",
+    )
+    val tint by animateColorAsState(
+        if (done) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+        AppMotion.effectsFast(), label = "check tint",
+    )
+    val pop = remember { Animatable(1f) }
+    LaunchedEffect(done) {
+        if (!done) return@LaunchedEffect
+        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+        if (!reduced) {
+            // Hero moment, so a bouncy spring rather than the calm motion-scheme default
+            pop.animateTo(1.35f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium))
+            pop.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium))
+            delay(150)
+        }
+        marked()
+    }
+    Box(
+        modifier = modifier
+            .size(48.dp)
+            .clip(CircleShape)
+            .clickable(enabled = !done, role = Role.Button, onClickLabel = "Mark as opened") { done = true }
+            .semantics { contentDescription = if (done) "Marked as opened" else "Mark as opened" },
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .graphicsLayer { scaleX = pop.value; scaleY = pop.value }
+                .clip(CircleShape)
+                .background(fill),
+            contentAlignment = Alignment.Center,
+        ) {
+            AppIcon(Icons.Filled.Check, contentDescription = null, color = tint, modifier = Modifier.size(18.dp))
+        }
+    }
 }
