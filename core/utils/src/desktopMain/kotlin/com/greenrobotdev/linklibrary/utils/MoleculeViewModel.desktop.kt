@@ -1,11 +1,11 @@
 package com.greenrobotdev.linklibrary.utils
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import app.cash.molecule.RecompositionMode
 import app.cash.molecule.moleculeFlow
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -13,21 +13,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
 /**
- * Desktop-specific actual implementation of MoleculeViewModel.
- * Uses custom lifecycle management instead of AndroidX ViewModel for desktop compatibility.
+ * Desktop/JVM actual implementation of MoleculeViewModel. Same as Android's: a multiplatform
+ * AndroidX ViewModel, so `viewModel { }` in shared screens compiles and works on JVM too.
  */
-actual abstract class MoleculeViewModel<Event, Model> {
-
-    /**
-     * Job for managing coroutine lifecycle on desktop.
-     */
-    private val viewModelJob = SupervisorJob()
+actual abstract class MoleculeViewModel<Event, Model> : ViewModel() {
 
     /**
      * Scope for Molecule composition and state management.
-     * Custom scope for desktop targets with proper lifecycle management.
+     * Uses the ViewModel's scope for proper lifecycle management.
      */
-    actual protected val moleculeScope: CoroutineScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    actual protected val moleculeScope: CoroutineScope = viewModelScope
 
     /**
      * Buffers user events until the presenter collects them. A Channel, not a SharedFlow: a
@@ -91,15 +86,17 @@ actual abstract class MoleculeViewModel<Event, Model> {
      * @return The initial model value
      */
     actual protected open fun initialValue(): Model {
+        // Default implementation - subclasses should override this
         // to provide the actual initial state
         error("initialValue() must be overridden in subclasses")
     }
 
     /**
      * Cleanup method to be called when the ViewModel is no longer needed.
-     * Desktop implementation uses custom coroutine job cancellation.
+     * Inherited from the multiplatform AndroidX ViewModel.
      */
-    actual protected open fun onCleared() {
-        viewModelJob.cancel()
+    actual override fun onCleared() {
+        // AndroidX ViewModel handles cleanup automatically
+        super.onCleared()
     }
 }

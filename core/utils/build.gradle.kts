@@ -58,7 +58,8 @@ kotlin {
 
         val desktopMain by getting {
             dependencies {
-                // Desktop uses custom ViewModel implementation instead of AndroidX Lifecycle
+                // Multiplatform ViewModel, so screens' viewModel { } works on desktop/JVM like on Android
+                api("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:${libs.versions.lifecycle.viewmodel.navigation3.get()}")
                 // Molecule Runtime for Desktop
                 implementation(libs.molecule.runtime)
             }
