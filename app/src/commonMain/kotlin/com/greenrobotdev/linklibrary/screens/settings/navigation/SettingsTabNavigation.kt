@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.screens.settings.navigation
 
+import com.greenrobotdev.linklibrary.screens.welcome.WelcomeTourScreen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -30,6 +31,11 @@ fun SettingsTabNavigation() {
                     is SettingsNavRoutes.SettingsBase -> SettingsScreen(
                         routeKey = route,
                         onOpenDesignCatalog = { tabNavigator.navigate(SettingsNavRoutes.DesignCatalog) },
+                        onOpenTour = { tabNavigator.navigate(SettingsNavRoutes.WelcomeTour) },
+                    )
+
+                    is SettingsNavRoutes.WelcomeTour -> WelcomeTourScreen(
+                        onDone = { tabNavigator.goBack() }
                     )
 
                     is SettingsNavRoutes.DesignCatalog -> DesignCatalogScreen(

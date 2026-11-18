@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.screens.settings
 
+import androidx.compose.material.icons.filled.School
 import com.greenrobotdev.linklibrary.design.debug.DebugLog
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Palette
@@ -46,13 +47,14 @@ import com.greenrobotdev.linklibrary.design.components.layout.appVerticalScroll
 import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
 
 /**
- * Settings: only what works today. Appearance, Your data, About; debug builds add Developer
- * (the design catalog).
+ * Settings: only what works today. Appearance, Your data, About (opens the welcome tour, as does
+ * How it works); debug builds add Developer (the design catalog).
  */
 @Composable
 fun SettingsScreen(
     routeKey: NavKey,
     onOpenDesignCatalog: () -> Unit = {},
+    onOpenTour: () -> Unit = {},
 ) {
     val viewModel: SettingsViewModel = viewModel(key = routeKey.toString()) { SettingsViewModel() }
     val state by viewModel.models.collectAsState()
@@ -108,13 +110,23 @@ fun SettingsScreen(
         }
 
         SectionContentCard(title = "About") {
-            AboutRow(version = rememberAppVersion())
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                // Tapping About opens the tour too
+                AboutRow(version = rememberAppVersion(), onClick = onOpenTour)
+                NavRow(
+                    icon = Icons.Filled.School,
+                    title = "How it works",
+                    subtitle = "A quick tour of saving, the Feed and organizing",
+                    onClick = onOpenTour,
+                )
+            }
         }
 
         // Debug builds only (the flag the app sets for debuggable builds)
         if (DebugLog.enabled) {
             SectionContentCard(title = "Developer") {
-                DeveloperRow(
+                NavRow(
+                    icon = Icons.Filled.Palette,
                     title = "Design catalog",
                     subtitle = "Every reusable component, in light and dark",
                     onClick = onOpenDesignCatalog,
@@ -147,9 +159,12 @@ private fun ThemeSelector(selected: ThemeMode, onSelect: (ThemeMode) -> Unit) {
 }
 
 @Composable
-private fun AboutRow(version: String) {
+private fun AboutRow(version: String, onClick: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClickLabel = "Open the welcome tour", onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -176,7 +191,7 @@ private fun AboutRow(version: String) {
 }
 
 @Composable
-private fun DeveloperRow(title: String, subtitle: String, onClick: () -> Unit) {
+private fun NavRow(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -190,7 +205,7 @@ private fun DeveloperRow(title: String, subtitle: String, onClick: () -> Unit) {
             modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.tertiaryContainer),
             contentAlignment = Alignment.Center,
         ) {
-            AppIcon(Icons.Filled.Palette, contentDescription = null, color = MaterialTheme.colorScheme.onTertiaryContainer)
+            AppIcon(icon, contentDescription = null, color = MaterialTheme.colorScheme.onTertiaryContainer)
         }
         Column(Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
