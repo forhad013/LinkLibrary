@@ -6,6 +6,9 @@ import androidx.navigation3.runtime.NavKey
 sealed class SettingsNavRoutes : NavKey {
     data object SettingsBase : SettingsNavRoutes()
 
+    /** "How it works": the welcome tour, from About or its own row. */
+    data object WelcomeTour : SettingsNavRoutes()
+
     /** Debug builds only: every reusable component of the design system. */
     data object DesignCatalog : SettingsNavRoutes()
 }
