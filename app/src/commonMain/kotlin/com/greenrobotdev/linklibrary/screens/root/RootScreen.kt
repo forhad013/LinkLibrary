@@ -1,5 +1,8 @@
 package com.greenrobotdev.linklibrary.screens.root
 
+import androidx.compose.runtime.saveable.rememberSaveable
+import com.greenrobotdev.linklibrary.utils.preferences.WelcomeTourPreference
+import com.greenrobotdev.linklibrary.screens.welcome.WelcomeTourScreen
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
@@ -69,6 +72,18 @@ fun RootScreen(
 ) {
     val rootNavigationState = rememberRootNavigationState()
     val rootNavigator = remember { RootNavigator(rootNavigationState) }
+
+    // First launch after install: the welcome tour, once. Opening the app by sharing a link saves
+    // that first; the tour then waits for the next launch.
+    val tourPreference = remember { WelcomeTourPreference() }
+    var showTour by rememberSaveable { mutableStateOf(!tourPreference.seen && sharedContent == null) }
+    if (showTour) {
+        WelcomeTourScreen(onDone = {
+            tourPreference.markSeen()
+            showTour = false
+        })
+        return
+    }
 
     // Feed tab reuses the Library tab's navigation (Add link, details, notes)
     val feedTabNavState = rememberTabNavigationState(
