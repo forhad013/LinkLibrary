@@ -1,7 +1,10 @@
 package com.greenrobotdev.linklibrary.screens.library.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import com.greenrobotdev.linklibrary.design.motion.LocalSharedTransitionScope
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
@@ -24,48 +27,54 @@ fun LibraryTabNavigation(
 ) {
     val tabNavState = tabNavigator.state
 
-    NavDisplay(
-        entries = tabNavState.toEntries { route ->
-            NavEntry(route) {
-                when (route) {
-                    // Base screen — the Feed (list + empty state)
-                    is LibraryNavRoutes.LibraryBase -> LibraryScreen(
-                        routeKey = route,
-                        onNavigateToDetail = { linkId ->
-                            tabNavigator.navigate(LibraryNavRoutes.LinkDetail(linkId))
-                        },
-                        onAddLink = onAddLink
-                    )
+    // Shared-element host: lets a Feed card's thumbnail grow into the Link details badge
+    SharedTransitionLayout {
+        CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+            NavDisplay(
+                entries = tabNavState.toEntries { route ->
+                    NavEntry(route) {
+                        when (route) {
+                            // Base screen — the Feed (list + empty state)
+                            is LibraryNavRoutes.LibraryBase -> LibraryScreen(
+                                routeKey = route,
+                                onNavigateToDetail = { linkId ->
+                                    tabNavigator.navigate(LibraryNavRoutes.LinkDetail(linkId))
+                                },
+                                onAddLink = onAddLink
+                            )
 
-                    // Link Detail Screen
-                    is LibraryNavRoutes.LinkDetail -> LinkDetailScreen(
-                        routeKey = route,
-                        linkId = route.linkId,
-                        onBack = { tabNavigator.goBack() },
-                        onNavigateToNoteEditor = { linkId ->
-                            tabNavigator.navigate(LibraryNavRoutes.NoteEditor(null))
+                            // Link Detail Screen
+                            is LibraryNavRoutes.LinkDetail -> LinkDetailScreen(
+                                routeKey = route,
+                                linkId = route.linkId,
+                                onBack = { tabNavigator.goBack() },
+                                onNavigateToNoteEditor = { linkId ->
+                                    tabNavigator.navigate(LibraryNavRoutes.NoteEditor(null))
+                                }
+                            )
+
+                            // Add Link Screen
+                            is LibraryNavRoutes.AddLink -> AddLinkScreen(
+                                routeKey = route,
+                                initialUrl = route.initialUrl,
+                                onBack = { tabNavigator.goBack() }
+                            )
+
+                            // Note Editor Screen
+                            is LibraryNavRoutes.NoteEditor -> NoteEditorScreen(
+                                routeKey = route,
+                                noteId = route.noteId,
+                                onBack = { tabNavigator.goBack() }
+                            )
+
+                            else -> error("Unknown library route: $route")
                         }
-                    )
-
-                    // Add Link Screen
-                    is LibraryNavRoutes.AddLink -> AddLinkScreen(
-                        routeKey = route,
-                        initialUrl = route.initialUrl,
-                        onBack = { tabNavigator.goBack() }
-                    )
-
-                    // Note Editor Screen
-                    is LibraryNavRoutes.NoteEditor -> NoteEditorScreen(
-                        routeKey = route,
-                        noteId = route.noteId,
-                        onBack = { tabNavigator.goBack() }
-                    )
-
-                    else -> error("Unknown library route: $route")
-                }
-            }
-        },
-        onBack = { tabNavigator.goBack() },
-        modifier = Modifier.fillMaxSize()
-    )
+                    }
+                },
+                sharedTransitionScope = this@SharedTransitionLayout,
+                onBack = { tabNavigator.goBack() },
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
 }

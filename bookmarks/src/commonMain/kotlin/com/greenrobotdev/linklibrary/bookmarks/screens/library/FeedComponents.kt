@@ -78,6 +78,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.bookmarks.domain.hostOf
 import com.greenrobotdev.linklibrary.bookmarks.model.Link
+import com.greenrobotdev.linklibrary.bookmarks.motion.sharedThumb
 import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
 import com.greenrobotdev.linklibrary.design.theme.LordsExtraColors
 import kotlinx.datetime.TimeZone
@@ -356,7 +357,7 @@ internal fun FeedLinkCard(
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        TypeThumb(type = if (noPreview) "none" else link.type, muted = link.isArchived)
+        TypeThumb(type = if (noPreview) "none" else link.type, muted = link.isArchived, linkId = link.id)
 
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -427,13 +428,14 @@ private fun typeLook(type: String): TypeLook = when (type) {
 }
 
 @Composable
-private fun TypeThumb(type: String, muted: Boolean = false) {
+private fun TypeThumb(type: String, muted: Boolean = false, linkId: String? = null) {
     val look = typeLook(type)
     // Archived: same shape and icon, neutral colors
     val bg = if (muted) MaterialTheme.colorScheme.surfaceContainerHigh else look.bg
     val fg = if (muted) MaterialTheme.colorScheme.onSurfaceVariant else look.fg
     Box(
-        modifier = Modifier.size(72.dp).clip(look.shape).background(bg),
+        // Grows into the Link details badge when the card opens details
+        modifier = (if (linkId != null) Modifier.sharedThumb(linkId) else Modifier).size(72.dp).clip(look.shape).background(bg),
         contentAlignment = Alignment.Center,
     ) {
         AppIcon(look.icon, contentDescription = null, color = fg)
