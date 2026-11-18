@@ -1,6 +1,7 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.details
 
 import com.greenrobotdev.linklibrary.bookmarks.motion.sharedThumb
+import com.greenrobotdev.linklibrary.bookmarks.motion.sharedTitle
 import com.greenrobotdev.linklibrary.design.components.layout.appVerticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -399,11 +400,13 @@ private fun TitleBlock(link: Link, onRename: (String) -> Unit) {
             }
         } else {
             Row(verticalAlignment = Alignment.Top) {
+                val hasTitle = shown != link.url
                 Text(
                     shown,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Black,
-                    modifier = Modifier.weight(1f).padding(top = 4.dp),
+                    // The Feed card's title moves up into this one
+                    modifier = Modifier.weight(1f).then(if (hasTitle) Modifier.sharedTitle(link.id) else Modifier).padding(top = 4.dp),
                 )
                 Box(
                     modifier = Modifier.size(48.dp).clip(CircleShape).clickable(role = Role.Button, onClick = { editing = true }),

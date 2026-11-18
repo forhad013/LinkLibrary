@@ -1,7 +1,10 @@
 package com.greenrobotdev.linklibrary.bookmarks.motion
 
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.greenrobotdev.linklibrary.design.motion.LocalSharedTransitionScope
 
@@ -18,6 +21,24 @@ fun Modifier.sharedThumb(linkId: String): Modifier {
         this@sharedThumb.sharedBounds(
             sharedContentState = rememberSharedContentState(key = "thumb-$linkId"),
             animatedVisibilityScope = animated,
+        )
+    }
+}
+
+/**
+ * Card → detail: the link's title on the Feed card and the big title on Link details share these
+ * bounds ("title-<id>"). The text is scaled, not re-laid out, between the two sizes, so its line
+ * breaks don't jump mid-transition. Only for real titles: a save without one shows its URL instead.
+ */
+@Composable
+fun Modifier.sharedTitle(linkId: String): Modifier {
+    val shared = LocalSharedTransitionScope.current ?: return this
+    val animated = LocalNavAnimatedContentScope.current
+    return with(shared) {
+        this@sharedTitle.sharedBounds(
+            sharedContentState = rememberSharedContentState(key = "title-$linkId"),
+            animatedVisibilityScope = animated,
+            resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(ContentScale.FillWidth, Alignment.CenterStart),
         )
     }
 }

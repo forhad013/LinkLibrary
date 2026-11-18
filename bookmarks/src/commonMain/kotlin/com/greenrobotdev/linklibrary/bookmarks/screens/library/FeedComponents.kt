@@ -79,6 +79,7 @@ import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.bookmarks.domain.hostOf
 import com.greenrobotdev.linklibrary.bookmarks.model.Link
 import com.greenrobotdev.linklibrary.bookmarks.motion.sharedThumb
+import com.greenrobotdev.linklibrary.bookmarks.motion.sharedTitle
 import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
 import com.greenrobotdev.linklibrary.design.theme.LordsExtraColors
 import kotlinx.datetime.TimeZone
@@ -387,6 +388,8 @@ internal fun FeedLinkCard(
                 color = if (link.isArchived) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
+                // Moves into the Link details title (real titles only; the URL fallback differs there)
+                modifier = if (noPreview) Modifier else Modifier.sharedTitle(link.id),
             )
             if (categoryPath != null || link.tags.isNotEmpty()) {
                 FlowRow(
