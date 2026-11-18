@@ -152,6 +152,7 @@ fun AddLinkView(
                     title = state.title,
                     description = state.fetchedMetadata?.description,
                     isFetching = state.isFetching,
+                    imageUrl = state.fetchedMetadata?.imageUrl?.takeIf { it.isNotBlank() },
                 )
             }
 

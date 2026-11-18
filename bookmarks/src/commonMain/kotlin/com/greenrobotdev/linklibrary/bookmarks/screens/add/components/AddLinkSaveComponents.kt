@@ -1,5 +1,6 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.add.components
 
+import com.greenrobotdev.linklibrary.bookmarks.components.LinkPreviewImage
 import com.greenrobotdev.linklibrary.design.components.layout.AppLazyRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -108,6 +109,7 @@ internal fun LinkPreviewCard(
     description: String?,
     isFetching: Boolean,
     modifier: Modifier = Modifier,
+    imageUrl: String? = null,
 ) {
     Row(
         modifier = modifier
@@ -118,25 +120,26 @@ internal fun LinkPreviewCard(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // shortcut: type icon on the media placeholder, not the page image (bookmarks has no image loader); load imageUrl if the design needs real thumbnails
-        Box(
+        // The page's preview image; the type icon while there's none or if it fails
+        LinkPreviewImage(
+            imageUrl = imageUrl,
             modifier = Modifier
                 .size(64.dp)
                 .clip(RoundedCornerShape(14.dp))
                 .background(LordsExtraColors.mediaPlaceholder),
-            contentAlignment = Alignment.Center,
-        ) {
-            AppIcon(
-                imageVector = when (type) {
-                    "video" -> Icons.Filled.PlayArrow
-                    "social" -> Icons.Filled.Forum
-                    "article" -> Icons.AutoMirrored.Filled.Article
-                    else -> Icons.Filled.Language
-                },
-                contentDescription = null,
-                color = MaterialTheme.colorScheme.secondary,
-            )
-        }
+            fallback = {
+                AppIcon(
+                    imageVector = when (type) {
+                        "video" -> Icons.Filled.PlayArrow
+                        "social" -> Icons.Filled.Forum
+                        "article" -> Icons.AutoMirrored.Filled.Article
+                        else -> Icons.Filled.Language
+                    },
+                    contentDescription = null,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+            },
+        )
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
                 "${type.replaceFirstChar { it.uppercaseChar() }} · $host",
