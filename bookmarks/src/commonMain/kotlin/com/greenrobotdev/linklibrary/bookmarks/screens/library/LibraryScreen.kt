@@ -63,6 +63,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.platform.LocalUriHandler
 import com.greenrobotdev.linklibrary.design.components.textfield.SearchField
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.AlertDialog
 import kotlinx.coroutines.launch
@@ -172,18 +173,21 @@ fun LibraryScreen(
         )
     }
 
+    // Scrolling the list collapses the title first; it comes back once the list is at the top
+    val header = rememberCollapsingHeaderState()
     Box(Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
+                .background(MaterialTheme.colorScheme.background)
+                .nestedScroll(header.nestedScroll),
         ) {
             // Fixed top: title, then search across the full width (it covers everything, not just the list)
             Column(
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                FeedHeader(opened = state.inboxOpened, total = state.inboxTotal)
+                FeedHeader(opened = state.inboxOpened, total = state.inboxTotal, collapse = { header.fraction })
                 SearchField(
                     query = state.searchQuery,
                     onQueryChange = { viewModel.take(LibraryEvent.SearchChanged(it)) },
