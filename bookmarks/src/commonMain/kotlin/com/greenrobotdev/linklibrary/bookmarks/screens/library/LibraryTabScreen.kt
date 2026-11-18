@@ -1,5 +1,10 @@
 package com.greenrobotdev.linklibrary.bookmarks.screens.library
 
+import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
+import com.greenrobotdev.linklibrary.design.components.button.DashedPillButton
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.filled.Tag
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import com.greenrobotdev.linklibrary.bookmarks.motion.sharedScope
@@ -136,7 +141,18 @@ fun LibraryTabScreen(
 
         item { SectionLabel("Categories", Modifier.padding(top = 8.dp)) }
 
-        // Category tree card
+        // Category tree card, or how to make the first category
+        if (state.categories.isEmpty()) {
+            item {
+                LibraryEmptyHint(
+                    icon = Icons.Filled.FolderOpen,
+                    title = "No categories yet",
+                    message = "Group links by topic, like Dev › Android. Create your first category in Manage, or while saving a link.",
+                    actionLabel = "Add a category",
+                    onAction = onManage,
+                )
+            }
+        }
         if (state.categories.isNotEmpty()) {
             item {
                 Column(
@@ -153,9 +169,20 @@ fun LibraryTabScreen(
             }
         }
 
-        // Tags — two-column grid of white pills
+        // Tags — two-column grid of white pills, or how to make the first tag
+        item { SectionLabel("Tags", Modifier.padding(top = 8.dp)) }
+        if (state.tags.isEmpty()) {
+            item {
+                LibraryEmptyHint(
+                    icon = Icons.Filled.Tag,
+                    title = "No tags yet",
+                    message = "Tags are quick labels like #kotlin or #recipes. Add them in Manage, or while saving a link.",
+                    actionLabel = "Add a tag",
+                    onAction = onManage,
+                )
+            }
+        }
         if (state.tags.isNotEmpty()) {
-            item { SectionLabel("Tags", Modifier.padding(top = 8.dp)) }
             items(state.tags.chunked(2)) { pair ->
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                     pair.forEach { tag -> TagTile("#${tag.name}", Modifier.weight(1f)) { onOpenScope(SavedScope.WithTag(tag.name)) } }
@@ -272,5 +299,32 @@ private fun CategoryTreeRow(
         if (expanded) {
             children.forEach { child -> CategoryTreeRow(child, all, onOpen, depth + 1) }
         }
+    }
+}
+
+/** An empty Library section: what it's for, and a way to start it (Manage). */
+@Composable
+private fun LibraryEmptyHint(icon: ImageVector, title: String, message: String, actionLabel: String, onAction: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier.size(48.dp).clip(RoundedCornerShape(14.dp)).background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center,
+            ) {
+                AppIcon(icon, contentDescription = null, color = MaterialTheme.colorScheme.onPrimaryContainer)
+            }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSurface)
+                Text(message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        DashedPillButton(text = actionLabel, onClick = onAction)
     }
 }
