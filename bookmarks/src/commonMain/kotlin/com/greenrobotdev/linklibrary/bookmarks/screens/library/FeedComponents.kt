@@ -597,7 +597,7 @@ private fun PickUpCard(link: Link, onOpen: () -> Unit, onMarkOpened: () -> Unit,
             .clickable(role = Role.Button, onClickLabel = "Open link", onClick = onOpen),
     ) {
         Box(
-            modifier = Modifier.fillMaxWidth().height(64.dp).background(look.bg),
+            modifier = Modifier.fillMaxWidth().height(96.dp).background(look.bg),
             contentAlignment = Alignment.Center,
         ) {
             LinkPreviewImage(
@@ -605,8 +605,25 @@ private fun PickUpCard(link: Link, onOpen: () -> Unit, onMarkOpened: () -> Unit,
                 modifier = Modifier.matchParentSize(),
                 fallback = { AppIcon(look.icon, contentDescription = null, color = look.fg, modifier = Modifier.size(28.dp)) },
             )
+            // Mark as opened: a small check in the picture's corner (48dp touch target, 36dp circle)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .clickable(role = Role.Button, onClickLabel = "Mark as opened", onClick = onMarkOpened)
+                    .semantics { contentDescription = "Mark as opened" },
+                contentAlignment = Alignment.Center,
+            ) {
+                Box(
+                    modifier = Modifier.size(32.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AppIcon(Icons.Filled.Check, contentDescription = null, color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+                }
+            }
         }
-        Column(Modifier.padding(start = 14.dp, end = 14.dp, top = 10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Column(Modifier.padding(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
                 meta,
                 style = MaterialTheme.typography.labelMedium,
@@ -620,20 +637,9 @@ private fun PickUpCard(link: Link, onOpen: () -> Unit, onMarkOpened: () -> Unit,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
+                minLines = 2, // cards in the row line up
                 overflow = TextOverflow.Ellipsis,
             )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(role = Role.Button, onClick = onMarkOpened)
-                .heightIn(min = 44.dp)
-                .padding(horizontal = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            AppIcon(Icons.Filled.Check, contentDescription = null, color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
-            Text("Mark as opened", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
         }
     }
 }
