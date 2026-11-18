@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.RssFeed
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -30,7 +29,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.greenrobotdev.linklibrary.bookmarks.model.SharedContent
 import com.greenrobotdev.linklibrary.bookmarks.screens.add.sheet.AddLinkSheet
-import com.greenrobotdev.linklibrary.design.components.emptystate.EmptyState
 import com.greenrobotdev.linklibrary.screens.library.navigation.LibraryNavRoutes
 import com.greenrobotdev.linklibrary.screens.library.navigation.LibraryTabNavigation
 import com.greenrobotdev.linklibrary.screens.organize.navigation.OrganizeTabNavigation
@@ -43,7 +41,6 @@ private val config = SavedStateConfiguration {
     serializersModule = SerializersModule {
         polymorphic(RootScreens::class) {
             subclass(RootScreens.FeedTab::class, serializer<RootScreens.FeedTab>())
-            subclass(RootScreens.SearchTab::class, serializer<RootScreens.SearchTab>())
             subclass(RootScreens.LibraryTab::class, serializer<RootScreens.LibraryTab>())
             subclass(RootScreens.SettingsTab::class, serializer<RootScreens.SettingsTab>())
         }
@@ -58,7 +55,6 @@ data class TabDefinition(
 
 val APP_TABS = listOf(
     TabDefinition(RootScreens.FeedTab, Icons.Filled.RssFeed, "Feed"),
-    TabDefinition(RootScreens.SearchTab, Icons.Filled.Search, "Search"),
     TabDefinition(RootScreens.LibraryTab, Icons.Filled.MenuBook, "Library"),
     TabDefinition(RootScreens.SettingsTab, Icons.Filled.Settings, "Settings")
 )
@@ -138,10 +134,6 @@ fun RootScreen(
                 RootScreens.FeedTab -> LibraryTabNavigation(
                     tabNavigator = feedTabNavigator,
                     onAddLink = openAddLinkSheet,
-                )
-                RootScreens.SearchTab -> EmptyState(
-                    title = "Search",
-                    description = "Search is coming soon."
                 )
                 RootScreens.LibraryTab -> OrganizeTabNavigation()
                 RootScreens.SettingsTab -> SettingsTabNavigation()

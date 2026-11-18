@@ -13,10 +13,6 @@ sealed class RootScreens : NavKey {
     @Serializable
     data object FeedTab : RootScreens()
 
-    // Search Tab - placeholder until GRE-19
-    @Serializable
-    data object SearchTab : RootScreens()
-
     // Library Tab - categories and tags (until GRE-46)
     @Serializable
     data object LibraryTab : RootScreens()
