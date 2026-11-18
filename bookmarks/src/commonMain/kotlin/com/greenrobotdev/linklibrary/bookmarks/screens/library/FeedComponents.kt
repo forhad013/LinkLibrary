@@ -35,6 +35,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
@@ -643,7 +645,24 @@ internal fun SwipeableFeedCard(
 ) {
     val state = rememberSwipeToDismissBoxState()
     val scope = rememberCoroutineScope()
-    // Archived but still listed (Filters include archived): bring the card back instead of leaving a gap
+    // SwipeToDismissBox re-runs onDismiss whenever this lambda changes while the card is still swiped
+    // away, so it must stay the same instance: a new one on each recomposition (Undo causes one)
+    // archived the link again and again.
+    val archive by rememberUpdatedState(onArchive)
+    val requestDelete by rememberUpdatedState(onRequestDelete)
+    val onDismiss: (SwipeToDismissBoxValue) -> Unit = remember(state, scope) {
+        { direction ->
+            when (direction) {
+                SwipeToDismissBoxValue.StartToEnd -> archive()
+                SwipeToDismissBoxValue.EndToStart -> {
+                    requestDelete()
+                    scope.launch { state.reset() } // stays put until the delete is confirmed
+                }
+                SwipeToDismissBoxValue.Settled -> Unit
+            }
+        }
+    }
+    // Archived but still listed (Filters include archived, or Undo while it was leaving): bring it back
     LaunchedEffect(link.isArchived) {
         if (state.currentValue != SwipeToDismissBoxValue.Settled) state.reset()
     }
@@ -651,16 +670,7 @@ internal fun SwipeableFeedCard(
         state = state,
         modifier = modifier.clip(RoundedCornerShape(24.dp)),
         enableDismissFromStartToEnd = !link.isArchived,
-        onDismiss = { direction ->
-            when (direction) {
-                SwipeToDismissBoxValue.StartToEnd -> onArchive()
-                SwipeToDismissBoxValue.EndToStart -> {
-                    onRequestDelete()
-                    scope.launch { state.reset() } // stays put until the delete is confirmed
-                }
-                SwipeToDismissBoxValue.Settled -> Unit
-            }
-        },
+        onDismiss = onDismiss,
         backgroundContent = {
             val archive = state.dismissDirection == SwipeToDismissBoxValue.StartToEnd
             val delete = state.dismissDirection == SwipeToDismissBoxValue.EndToStart
