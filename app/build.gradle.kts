@@ -75,6 +75,8 @@ kotlin {
                 implementation(libs.molecule.runtime)
                 // Coil for image loading (Android only)
                 implementation(libs.coil.compose)
+                // Save-to-file picker for Settings → Export
+                implementation(libs.androidx.activity.compose)
             }
         }
 

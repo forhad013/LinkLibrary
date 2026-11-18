@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.BrightnessAuto
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
@@ -23,6 +24,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -35,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
+import com.greenrobotdev.linklibrary.design.components.button.StandardButton
 import com.greenrobotdev.linklibrary.design.components.cards.SectionContentCard
 import com.greenrobotdev.linklibrary.design.components.layout.appVerticalScroll
 import com.greenrobotdev.linklibrary.design.foundation.icon.AppIcon
@@ -50,6 +53,14 @@ fun SettingsScreen(
 ) {
     val viewModel: SettingsViewModel = viewModel(key = routeKey.toString()) { SettingsViewModel() }
     val state by viewModel.models.collectAsState()
+
+    // Export: the presenter builds the file, the screen hands it to the system "save to" picker
+    val saveFile = rememberTextFileSaver("text/html") { saved ->
+        viewModel.take(SettingsEvent.ExportFinished(saved, state.exportFile?.linkCount ?: 0))
+    }
+    LaunchedEffect(state.exportFile) {
+        state.exportFile?.let { saveFile(it.fileName, it.html) }
+    }
 
     Column(
         modifier = Modifier
@@ -70,6 +81,26 @@ fun SettingsScreen(
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text("Theme", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                 ThemeSelector(state.themeMode) { viewModel.take(SettingsEvent.SetThemeMode(it)) }
+            }
+        }
+
+        SectionContentCard(title = "Your data") {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    "Your links are stored only on this phone. Export them as a bookmarks file you can " +
+                        "keep as a backup or import into a browser or another app.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                StandardButton(
+                    text = "Export links",
+                    icon = Icons.Filled.FileDownload,
+                    onClick = { viewModel.take(SettingsEvent.Export) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                state.exportMessage?.let {
+                    Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
         }
 
