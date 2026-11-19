@@ -10,7 +10,7 @@ This format is designed to be parsed by Claude Code and directly translated into
 # Screen Metadata
 metadata:
   name: "LinkDetailsScreen"
-  package: "com.greenrobotdev.linklibrary.screens.details"
+  package: "com.greenrobotdev.lordofthelinks.screens.details"
   file: "LinkDetailScreen.kt"
   description: "Displays comprehensive information about a saved link"
 
@@ -19,7 +19,7 @@ imports:
   - "androidx.compose.foundation.layout.*"
   - "androidx.compose.material3.*"
   - "androidx.compose.runtime.*"
-  - "com.greenrobotdev.linklibrary.model.Link"
+  - "com.greenrobotdev.lordofthelinks.model.Link"
 
 # Screen Function Signature
 function:
@@ -362,7 +362,7 @@ icon_examples:
 state_management:
   viewmodel:
     name: "LinkDetailViewModel"
-    package: "com.greenrobotdev.linklibrary.screens.details"
+    package: "com.greenrobotdev.lordofthelinks.screens.details"
     state:
       name: "LinkDetailState"
       properties:
@@ -408,13 +408,13 @@ navigation:
 
 ```yaml
 screen_name: "SimpleLinkDetailCard"
-package: "com.greenrobotdev.linklibrary.components"
+package: "com.greenrobotdev.lordofthelinks.components"
 
 imports:
   - "androidx.compose.foundation.layout.*"
   - "androidx.compose.material3.*"
   - "androidx.compose.runtime.*"
-  - "com.greenrobotdev.linklibrary.model.Link"
+  - "com.greenrobotdev.lordofthelinks.model.Link"
 
 function:
   name: "LinkDetailCard"

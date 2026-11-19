@@ -6,7 +6,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.greenrobotdev.linklibrary.design"
+        namespace = "com.greenrobotdev.lordofthelinks.design"
         compileSdk = 37
         androidResources { enable = true } // required for Compose resources on the KMP Android library plugin
     }
@@ -54,5 +54,5 @@ kotlin {
 }
 
 compose.resources {
-    packageOfResClass = "com.greenrobotdev.linklibrary.design.resources"
+    packageOfResClass = "com.greenrobotdev.lordofthelinks.design.resources"
 }

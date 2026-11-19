@@ -96,7 +96,7 @@ class {{VIEWMODEL_CLASS_NAME}}(
 
 ### 1. Replace Placeholders
 
-- `{{PACKAGE}}`: Screen package (e.g., `com.greenrobotdev.linklibrary.screens.home`)
+- `{{PACKAGE}}`: Screen package (e.g., `com.greenrobotdev.lordofthelinks.screens.home`)
 - `{{FEATURE_NAME}}`: Feature name (e.g., "Home", "Link Detail")
 - `{{VIEWMODEL_CLASS_NAME}}`: ViewModel class (e.g., `HomeViewModel`)
 - `{{STATE_CLASS_NAME}}`: State class (e.g., `HomeState`)
@@ -229,13 +229,13 @@ fun onToggleFavorite(id: String) { viewModelScope.launch { eventsFlow.emit(LinkD
 
 #### Example 1: HomeViewModel (List Screen)
 ```kotlin
-package com.greenrobotdev.linklibrary.screens.home
+package com.greenrobotdev.lordofthelinks.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.cash.molecule.RecompositionMode
 import app.cash.molecule.moleculeFlow
-import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -263,13 +263,13 @@ class HomeViewModel : ViewModel(), KoinComponent {
 
 #### Example 2: AddLinkViewModel (Form Screen with Parameters)
 ```kotlin
-package com.greenrobotdev.linklibrary.screens.add
+package com.greenrobotdev.lordofthelinks.screens.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.cash.molecule.RecompositionMode
 import app.cash.molecule.moleculeFlow
-import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -300,13 +300,13 @@ class AddLinkViewModel(
 
 #### Example 3: LinkDetailViewModel (Detail Screen with ID)
 ```kotlin
-package com.greenrobotdev.linklibrary.screens.detail
+package com.greenrobotdev.lordofthelinks.screens.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.cash.molecule.RecompositionMode
 import app.cash.molecule.moleculeFlow
-import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted

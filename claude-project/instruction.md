@@ -44,6 +44,6 @@ Lords of Links is a professional link/content management app aiming to be a bett
 - When suggesting dependencies or libraries, prefer well-maintained KMP-compatible ones
 
 ### What NOT to do
-- Don't suggest renaming the app or changing the package ID — it's locked in for Play Store / CI reasons
+- Don't suggest renaming the app or changing the package ID again: it moved to `com.greenrobotdev.lordofthelinks.android` on 2026-11-20 (owner decision) and is now locked for Play Store / CI reasons
 - Don't propose fully automated production deploys — manual gates are intentional
 - Don't pull wasmJs web or Chrome extension work into milestone 1. They belong to milestone 2 (Phase 2), after accounts and sync.

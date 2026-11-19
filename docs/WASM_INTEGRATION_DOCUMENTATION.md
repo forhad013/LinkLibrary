@@ -19,7 +19,7 @@ This document covers the WASM (WebAssembly) implementation and Chrome extension 
 
 **Files Created:**
 ```
-app/src/wasmMain/kotlin/com/greenrobotdev/linklibrary/
+app/src/wasmMain/kotlin/com/greenrobotdev/lordofthelinks/
 ├── WasmApp.kt                      # Main CanvasBasedWindow entry point
 ├── MinimalWasmTest.kt             # Simple test application
 ├── config/
@@ -142,7 +142,7 @@ data class SimpleLink(
 
 **Approach 2: Create WASM-Specific State Models**
 ```
-wasmMain/kotlin/com/greenrobotdev/linklibrary/screens/
+wasmMain/kotlin/com/greenrobotdev/lordofthelinks/screens/
 ├── home/
 │   ├── HomeStateModels.kt        # WASM-specific (no serialization)
 │   ├── HomeViewModel.kt

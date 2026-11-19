@@ -142,7 +142,7 @@
 ### Phase 1: High Priority (Core Functionality)
 
 #### 1.1 Update Add Link Screen ⭐⭐⭐ **HIGHEST PRIORITY**
-**File:** `app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/add/AddLinkScreen.kt`
+**File:** `app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/add/AddLinkScreen.kt`
 **Design:** `save_link_to_app.html`
 
 **Actions:**
@@ -166,7 +166,7 @@
 ### Phase 2: Enhanced Features
 
 #### 2.1 Update Tags Management Screen ⭐⭐ **HIGH PRIORITY**
-**File:** `app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/tags/TagsScreen.kt`
+**File:** `app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/tags/TagsScreen.kt`
 **Design:** `tags.html`
 
 **Actions:**
@@ -190,7 +190,7 @@
 ---
 
 #### 2.2 Update Library Screen ⭐⭐ **MEDIUM PRIORITY**
-**File:** `app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/library/LibraryScreen.kt`
+**File:** `app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/library/LibraryScreen.kt`
 **Design:** `library.html`
 
 **Actions:**
@@ -212,7 +212,7 @@
 ---
 
 #### 2.3 Update Link Details Screen ⭐ **MEDIUM PRIORITY**
-**File:** `app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/details/LinkDetailScreen.kt`
+**File:** `app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/details/LinkDetailScreen.kt`
 **Design:** `link_details.html`
 
 **Actions:**
@@ -247,7 +247,7 @@
 
 ### Reusable Component Structure
 ```
-commonMain/kotlin/com/greenrobotdev/linklibrary/components/
+commonMain/kotlin/com/greenrobotdev/lordofthelinks/components/
 ├── form/
 │   ├── AutoFetchButton.kt
 │   ├── TagChipsSelector.kt

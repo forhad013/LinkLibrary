@@ -55,7 +55,6 @@ LinkLibrary/
 │   └── build.gradle.kts
 ├── database/                     # KMP database module (Room)
 ├── konsistTest/                 # Architecture tests (commented out)
-├── wasm-test/                   # WASM prototype module
 ├── chrome-extension/            # Chrome extension (100% complete)
 ├── build-logic/                 # Convention plugins (NEW)
 └── build.gradle.kts             # Root build file
@@ -274,7 +273,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             extensions.configure<ApplicationExtension> {
                 compileSdk = 36
                 defaultConfig {
-                    applicationId = "com.greenrobotdev.linklibrary"
+                    applicationId = "com.greenrobotdev.lordofthelinks"
                     minSdk = 28
                     targetSdk = 36
                 }
@@ -506,7 +505,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.greenrobotdev.linklibrary"
+    namespace = "com.greenrobotdev.lordofthelinks"
     compileSdk = 36
     defaultConfig {
         minSdk = 28
@@ -1059,7 +1058,7 @@ compileSdk = 36
 minSdk = 28
 targetSdk = 36
 
-namespace = "com.greenrobotdev.linklibrary.*"
+namespace = "com.greenrobotdev.lordofthelinks.*"
 
 JavaVersion.VERSION_17
 ```

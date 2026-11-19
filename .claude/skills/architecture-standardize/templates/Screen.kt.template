@@ -55,7 +55,7 @@ fun {{SCREEN_FUNCTION_NAME}}(
 
 ### 1. Replace Placeholders
 
-- `{{PACKAGE}}`: Screen package (e.g., `com.greenrobotdev.linklibrary.screens.home`)
+- `{{PACKAGE}}`: Screen package (e.g., `com.greenrobotdev.lordofthelinks.screens.home`)
 - `{{FEATURE_NAME}}`: Feature name (e.g., "Home", "Link Detail")
 - `{{SCREEN_FUNCTION_NAME}}`: Screen function (e.g., `HomeScreen`)
 - `{{VIEWMODEL_CLASS_NAME}}`: ViewModel class (e.g., `HomeViewModel`)
@@ -192,7 +192,7 @@ private fun HomeView(
 
 #### Example 1: HomeScreen (List Screen)
 ```kotlin
-package com.greenrobotdev.linklibrary.screens.home
+package com.greenrobotdev.lordofthelinks.screens.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -256,7 +256,7 @@ private fun HomeView(
 
 #### Example 2: AddLinkScreen (Form Screen with Auto-Navigation)
 ```kotlin
-package com.greenrobotdev.linklibrary.screens.add
+package com.greenrobotdev.lordofthelinks.screens.add
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -322,7 +322,7 @@ private fun AddLinkForm(
 
 #### Example 3: LinkDetailScreen (Detail Screen with ID)
 ```kotlin
-package com.greenrobotdev.linklibrary.screens.detail
+package com.greenrobotdev.lordofthelinks.screens.detail
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

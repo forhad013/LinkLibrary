@@ -181,18 +181,18 @@ AppCircularProgressSmall(modifier = Modifier.size(12.dp))  // Line 365
 ## Files to Modify
 
 ### Primary File
-`/Volumes/Projects/KMP project/LinkLibrary/bookmarks/src/commonMain/kotlin/com/greenrobotdev/linklibrary/bookmarks/screens/add/components/AddLinkComponents.kt`
+`/Volumes/Projects/KMP project/LinkLibrary/bookmarks/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/bookmarks/screens/add/components/AddLinkComponents.kt`
 
 ### Imports to Add
 ```kotlin
-import com.greenrobotdev.linklibrary.design.components.textfield.AppTextFieldEnhanced
-import com.greenrobotdev.linklibrary.design.components.textfield.AppTextFieldWithCharacterLimit
-import com.greenrobotdev.linklibrary.design.components.progress.AppCircularProgressSmall
+import com.greenrobotdev.lordofthelinks.design.components.textfield.AppTextFieldEnhanced
+import com.greenrobotdev.lordofthelinks.design.components.textfield.AppTextFieldWithCharacterLimit
+import com.greenrobotdev.lordofthelinks.design.components.progress.AppCircularProgressSmall
 ```
 
 ### Dependencies
 All replacement components already exist in:
-`/Volumes/Projects/KMP project/LinkLibrary/core/design/src/commonMain/kotlin/com/greenrobotdev/linklibrary/design/components/`
+`/Volumes/Projects/KMP project/LinkLibrary/core/design/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/design/components/`
 
 ## Testing Strategy
 

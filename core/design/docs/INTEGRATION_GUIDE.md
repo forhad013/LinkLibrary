@@ -25,7 +25,7 @@ dependencies {
 Wrap your app with the design system theme:
 
 ```kotlin
-import com.greenrobotdev.linklibrary.design.theme.DesignSystemTheme
+import com.greenrobotdev.lordofthelinks.design.theme.DesignSystemTheme
 
 @Composable
 fun MyApp() {
@@ -44,7 +44,7 @@ fun MyApp() {
 Start using design system components:
 
 ```kotlin
-import com.greenrobotdev.linklibrary.design.components.*
+import com.greenrobotdev.lordofthelinks.design.components.*
 
 @Composable
 fun MyScreen() {
@@ -474,7 +474,7 @@ DesignSystemTheme {
 **Solution**: Add the correct import:
 
 ```kotlin
-import com.greenrobotdev.linklibrary.design.components.*
+import com.greenrobotdev.lordofthelinks.design.components.*
 ```
 
 #### Type Mismatches

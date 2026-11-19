@@ -7,7 +7,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.greenrobotdev.linklibrary.bookmarks"
+        namespace = "com.greenrobotdev.lordofthelinks.bookmarks"
         compileSdk = 37
     }
 

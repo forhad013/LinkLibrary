@@ -8,6 +8,6 @@
 
 ## Key patterns
 - Repos return `Flow<Result<T>>`; use reactive `.collect {}` for data that updates during interaction, `.first()` only for one-shot reads
-- `database` module must not depend on `app` models — use extension functions in `app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/model/` for entity↔domain conversion
+- `database` module must not depend on `app` models — use extension functions in `app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/model/` for entity↔domain conversion
 - Tags/collections live in relationship tables (`LinkTagEntity`), not JSON fields — use `getLinksWithTags()`
 - Navigation: `Navigator.navigateToNew(route)` removes same-type route before adding (fixes FAB reuse)

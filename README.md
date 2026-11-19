@@ -34,8 +34,8 @@ Extension Features:
 📁 Files Created
 
 WASM Target:
-- app/src/wasmMain/kotlin/com/greenrobotdev/linklibrary/WasmApp.kt
-- app/src/wasmMain/kotlin/com/greenrobotdev/linklibrary/config/StitchConfig.wasm.kt
+- app/src/wasmMain/kotlin/com/greenrobotdev/lordofthelinks/WasmApp.kt
+- app/src/wasmMain/kotlin/com/greenrobotdev/lordofthelinks/config/StitchConfig.wasm.kt
 
 Chrome Extension:
 - chrome-extension/manifest.json

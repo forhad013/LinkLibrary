@@ -6,10 +6,10 @@ plugins {
 }
 
 android {
-    namespace = "com.greenrobotdev.linklibrary.android"
+    namespace = "com.greenrobotdev.lordofthelinks.android"
     compileSdk = 37
     defaultConfig {
-        applicationId = "com.greenrobotdev.linklibrary.android"
+        applicationId = "com.greenrobotdev.lordofthelinks.android"
         minSdk = 28
         targetSdk = 35
         versionCode = 1

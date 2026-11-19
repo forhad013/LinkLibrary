@@ -39,7 +39,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "com.greenrobotdev.linklibrary.desktop.MainKt"
+        mainClass = "com.greenrobotdev.lordofthelinks.desktop.MainKt"
 
         nativeDistributions {
             targetFormats = setOf(
@@ -55,7 +55,7 @@ compose.desktop {
             vendor = "Green Robot Dev"
 
             macOS {
-                bundleID = "com.greenrobotdev.linklibrary.desktop"
+                bundleID = "com.greenrobotdev.lordofthelinks.desktop"
                 // iconFile = project.file("src/jvmMain/resources/icon.icns")
             }
 

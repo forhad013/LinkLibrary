@@ -401,7 +401,7 @@ fun calculateScore(screenName: String): ArchitectureScore {
 #!/bin/bash
 
 # Find all screen directories
-for screen_dir in app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/*/; do
+for screen_dir in app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/*/; do
     screen_name=$(basename "$screen_dir")
 
     echo "Checking $screen_name..."
@@ -452,7 +452,7 @@ echo "Checking for architecture violations..."
 
 # Check for 'var' in StateModels
 echo "Checking for mutable state in StateModels..."
-for file in app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/*/*StateModels.kt; do
+for file in app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/*/*StateModels.kt; do
     if grep -q "var " "$file"; then
         echo "  ✗ $file contains mutable state"
     fi
@@ -460,7 +460,7 @@ done
 
 # Check for Android dependencies in UseCase
 echo "Checking for Android dependencies in UseCase..."
-for file in app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/*/*UseCase.kt; do
+for file in app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/*/*UseCase.kt; do
     if grep -q "import androidx.compose.ui" "$file"; then
         echo "  ✗ $file has UI dependencies"
     fi
@@ -471,7 +471,7 @@ done
 
 # Check for missing KoinComponent in ViewModel
 echo "Checking for KoinComponent in ViewModels..."
-for file in app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/*/*ViewModel.kt; do
+for file in app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/*/*ViewModel.kt; do
     if ! grep -q "KoinComponent" "$file"; then
         echo "  ✗ $file missing KoinComponent"
     fi
@@ -479,7 +479,7 @@ done
 
 # Check for moleculeFlow usage
 echo "Checking for Molecule usage..."
-for file in app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/*/*ViewModel.kt; do
+for file in app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/*/*ViewModel.kt; do
     if ! grep -q "moleculeFlow" "$file"; then
         echo "  ✗ $file missing moleculeFlow"
     fi
@@ -487,7 +487,7 @@ done
 
 # Check for collectAsState in Screen
 echo "Checking for collectAsState in Screens..."
-for file in app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/*/*Screen.kt; do
+for file in app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/*/*Screen.kt; do
     if ! grep -q "collectAsState" "$file"; then
         echo "  ✗ $file missing collectAsState"
     fi

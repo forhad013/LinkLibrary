@@ -1,6 +1,6 @@
-# New UI — Linear Tickets (from `design/Lords of Links UI.html`)
+# New UI — Linear Tickets (design screenshots in `design/screens/`)
 
-Source: new Pocket-style design (10 screens, extracted to `design/extracted/*.html`).
+Source: new Pocket-style design (10 screens, screenshots in `design/screens/`).
 Biggest structural change: **collections → nested categories (max 5 levels)**, plus new per-link state: `opened`, `favorite`, `archived`, `type` (video/article/social), auto-fetched description.
 
 Suggested order: #1 (model) first, then feed/search/details, then polish screens.

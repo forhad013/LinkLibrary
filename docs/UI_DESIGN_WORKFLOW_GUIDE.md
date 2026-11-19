@@ -38,11 +38,11 @@ Here's a UI specification for a Link Details Screen in my Link Library app.
 Please implement this in Jetpack Compose following the existing app architecture.
 
 Key context:
-- Package: com.greenrobotdev.linklibrary.screens.details
+- Package: com.greenrobotdev.lordofthelinks.screens.details
 - Follow existing MVVM+UseCase pattern
 - Use Material 3 theming
 - Integrate with existing navigation system
-- Link model is already defined in com.greenrobotdev.linklibrary.model
+- Link model is already defined in com.greenrobotdev.lordofthelinks.model
 ```
 
 ### Step 5: Claude Code Generates Implementation

@@ -97,19 +97,19 @@ Screen.kt (Reactive UI Update)
 ### Compliant Screens (90%+ Architecture Score)
 
 **HomeScreen** ✓
-- File: `/app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/home/`
+- File: `/app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/home/`
 - Components: HomeStateModels, HomeUseCase, HomeViewModel, HomeScreen
 - Status: Fully compliant
 - Features: List display, pull-to-refresh, favorite toggling
 
 **AddLinkScreen** ✓
-- File: `/app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/add/`
+- File: `/app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/add/`
 - Components: AddLinkStateModels, AddLinkUseCase, AddLinkViewModel, AddLinkScreen
 - Status: Fully compliant
 - Features: Form validation, URL parsing, AI integration
 
 **LibraryScreen** ✓
-- File: `/app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/library/`
+- File: `/app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/library/`
 - Components: LibraryStateModels, LibraryUseCase, LibraryViewModel, LibraryScreen
 - Status: Fully compliant
 - Features: Search, filter, collections

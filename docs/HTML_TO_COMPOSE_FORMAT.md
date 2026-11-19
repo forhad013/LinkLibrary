@@ -150,7 +150,7 @@ HTML is actually **excellent** for UI specifications because:
 
 <!-- Screen Metadata -->
 <meta name="screen-name" content="LinkDetailsScreen">
-<meta name="package" content="com.greenrobotdev.linklibrary.screens.details">
+<meta name="package" content="com.greenrobotdev.lordofthelinks.screens.details">
 <meta name="function" content="LinkDetailScreen">
 <meta name="description" content="Displays comprehensive information about a saved link">
 

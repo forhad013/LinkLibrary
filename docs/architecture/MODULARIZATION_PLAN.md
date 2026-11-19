@@ -49,7 +49,7 @@
 ```
 LinkLibrary/
 ├── app/
-│   ├── src/commonMain/kotlin/com/greenrobotdev/linklibrary/
+│   ├── src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/
 │   │   ├── screens/          # All screens (home, add, library, etc.)
 │   │   ├── components/       # Shared UI components
 │   │   ├── model/           # Domain models
@@ -313,7 +313,7 @@ graph TD
 #### File Structure
 ```
 :core:design/
-├── src/commonMain/kotlin/com/greenrobotdev/linklibrary/core/design/
+├── src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/core/design/
 │   ├── theme/
 │   │   ├── Color.kt              # ColorScheme definitions
 │   │   ├── Typography.kt          # Typography scale
@@ -452,7 +452,7 @@ fun AppScaffold(
 #### File Structure
 ```
 :core:navigation/
-├── src/commonMain/kotlin/com/greenrobotdev/linklibrary/core/navigation/
+├── src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/core/navigation/
 │   ├── NavigationState.kt        # Navigation state management
 │   ├── Navigator.kt             # Navigation controller
 │   ├── NavKeys.kt                # Route definitions
@@ -523,7 +523,7 @@ class Navigator(
 #### File Structure
 ```
 :core:data/
-├── src/commonMain/kotlin/com/greenrobotdev/linklibrary/core/data/
+├── src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/core/data/
 │   ├── repository/
 │   │   ├── Repository.kt         # Base repository interface
 │   │   └── PaginatedRepository.kt
@@ -550,7 +550,7 @@ class Navigator(
 #### Structure
 ```
 :bookmarks/
-├── src/commonMain/kotlin/com/greenrobotdev/linklibrary/bookmarks/
+├── src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/bookmarks/
 │   ├── data/
 │   │   ├── repository/
 │   │   │   └── BookmarkRepository.kt
@@ -652,7 +652,7 @@ val bookmarkModule = module {
 #### Structure (similar to :bookmarks)
 ```
 :collections/
-├── src/commonMain/kotlin/com/greenrobotdev/linklibrary/collections/
+├── src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/collections/
 │   ├── data/
 │   │   ├── repository/
 │   │   │   └── CollectionRepository.kt
@@ -686,7 +686,7 @@ val bookmarkModule = module {
 #### Structure
 ```
 :tags/
-├── src/commonMain/kotlin/com/greenrobotdev/linklibrary/tags/
+├── src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/tags/
 │   ├── data/
 │   │   ├── repository/
 │   │   │   └── TagRepository.kt
@@ -720,7 +720,7 @@ val bookmarkModule = module {
 #### Structure
 ```
 :home/
-├── src/commonMain/kotlin/com/greenrobotdev/linklibrary/home/
+├── src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/home/
 │   ├── presentation/
 │   │   ├── HomeScreen.kt          # Already Material 3 updated
 │   │   └── HomeViewModel.kt
@@ -748,7 +748,7 @@ val bookmarkModule = module {
 #### Structure
 ```
 :deeplink/
-├── src/commonMain/kotlin/com/greenrobotdev/linklibrary/deeplink/
+├── src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/deeplink/
 │   ├── handler/
 │   │   ├── DeepLinkHandler.kt    # Main deeplink coordinator
 │   │   └── ExternalLinkHandler.kt  # Process external URLs
@@ -761,7 +761,7 @@ val bookmarkModule = module {
 │   └── parser/
 │       └── UrlParser.kt          # Parse URL metadata
 │
-├── src/androidMain/kotlin/com/greenrobotdev/linklibrary/deeplink/
+├── src/androidMain/kotlin/com/greenrobotdev/lordofthelinks/deeplink/
 │   ├── intent/
 │   │   └── DeepLinkIntentReceiver.kt  # Handle Android intents
 │   └── manifest/
@@ -922,7 +922,7 @@ linklibrary://share?url={url}&title={title}
 #### Structure
 ```
 :notifications/
-├── src/commonMain/kotlin/com/greenrobotdev/linklibrary/notifications/
+├── src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/notifications/
 │   ├── handler/
 │   │   └── NotificationActionHandler.kt  # Process notification actions
 │   ├── model/
@@ -931,7 +931,7 @@ linklibrary://share?url={url}&title={title}
 │   └── navigation/
 │       └── NotificationNavigation.kt   # Route actions to screens
 │
-├── src/androidMain/kotlin/com/greenrobotdev/linklibrary/notifications/
+├── src/androidMain/kotlin/com/greenrobotdev/lordofthelinks/notifications/
 │   ├── receiver/
 │   │   └── NotificationActionReceiver.kt  # BroadcastReceiver for actions
 │   └── service/
@@ -1054,7 +1054,7 @@ fun showLinkNotification(context: Context, link: Link) {
 
 fun createFavoriteActionIntent(context: Context, linkId: String): Intent {
     return Intent(context, NotificationActionReceiver::class.java).apply {
-        action = "com.greenrobotdev.linklibrary.FAVORITE"
+        action = "com.greenrobotdev.lordofthelinks.FAVORITE"
         putExtra("action", NotificationAction.ToggleFavorite(linkId))
     }
 }
@@ -1218,7 +1218,7 @@ kotlin {
 
 ### App-Level DI
 
-**File:** `app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/AppModules.kt`
+**File:** `app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/AppModules.kt`
 
 ```kotlin
 val appModules: List<Module> = listOf(
@@ -1251,7 +1251,7 @@ fun Application.initKoin() {
 
 ### Feature Module DI
 
-**File:** `bookmarks/src/commonMain/kotlin/com/greenrobotdev/linklibrary/bookmarks/di/BookmarkModule.kt`
+**File:** `bookmarks/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/bookmarks/di/BookmarkModule.kt`
 
 ```kotlin
 val bookmarkModule = module {
@@ -1286,7 +1286,7 @@ val bookmarkModule = module {
 
 ### App Navigation Setup
 
-**File:** `app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/AppNavigation.kt`
+**File:** `app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/AppNavigation.kt`
 
 ```kotlin
 @Composable

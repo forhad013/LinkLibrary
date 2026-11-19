@@ -76,7 +76,7 @@ fun {{USECASE_FUNCTION_NAME}}(
 
 ### 1. Replace Placeholders
 
-- `{{PACKAGE}}`: Screen package (e.g., `com.greenrobotdev.linklibrary.screens.home`)
+- `{{PACKAGE}}`: Screen package (e.g., `com.greenrobotdev.lordofthelinks.screens.home`)
 - `{{FEATURE_NAME}}`: Feature name (e.g., "Home", "Link Detail")
 - `{{STATE_CLASS_NAME}}`: State class (e.g., `HomeState`)
 - `{{EVENT_CLASS_NAME}}`: Event interface (e.g., `HomeEvent`)
@@ -278,7 +278,7 @@ return HomeState(
 
 #### Example 1: HomeUseCase (List Screen)
 ```kotlin
-package com.greenrobotdev.linklibrary.screens.home
+package com.greenrobotdev.lordofthelinks.screens.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -286,8 +286,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.linklibrary.database.repository.LinkRepository
-import com.greenrobotdev.linklibrary.model.toDomain
+import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
+import com.greenrobotdev.lordofthelinks.model.toDomain
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -354,7 +354,7 @@ fun HomeUseCase(
 
 #### Example 2: AddLinkUseCase (Form Screen)
 ```kotlin
-package com.greenrobotdev.linklibrary.screens.add
+package com.greenrobotdev.lordofthelinks.screens.add
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -362,7 +362,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.linklibrary.database.repository.LinkRepository
+import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
 import kotlinx.coroutines.flow.Flow
 
 @Composable
