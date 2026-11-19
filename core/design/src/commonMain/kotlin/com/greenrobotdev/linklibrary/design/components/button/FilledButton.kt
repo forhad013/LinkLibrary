@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.greenrobotdev.linklibrary.design.theme.ComponentSize
@@ -136,7 +137,9 @@ fun StandardButton(
     trailingContent: (@Composable () -> Unit)? = null,
     colors: ComponentColors? = null,
     isLoading: Boolean = false,
-    loadingText: String? = null
+    loadingText: String? = null,
+    // Overrides the size-based label style (e.g. hero buttons per design mock)
+    textStyleOverride: TextStyle? = null
 ) {
     // Interaction source for expressive animations
     val interactionSource = remember { MutableInteractionSource() }
@@ -175,7 +178,7 @@ fun StandardButton(
         ComponentSize.Large -> 16.dp
     }
 
-    val textStyle = when (size) {
+    val textStyle = textStyleOverride ?: when (size) {
         ComponentSize.Small -> MaterialTheme.typography.labelSmall
         ComponentSize.Medium -> MaterialTheme.typography.labelLarge
         ComponentSize.Large -> MaterialTheme.typography.labelLarge
