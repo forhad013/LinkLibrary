@@ -19,7 +19,7 @@ imports:
   - "androidx.compose.foundation.layout.*"
   - "androidx.compose.material3.*"
   - "androidx.compose.runtime.*"
-  - "com.greenrobotdev.lordofthelinks.model.Link"
+  - "com.greenrobotdev.lordofthelinks.bookmarks.model.Link"
 
 # Screen Function Signature
 function:
@@ -414,7 +414,7 @@ imports:
   - "androidx.compose.foundation.layout.*"
   - "androidx.compose.material3.*"
   - "androidx.compose.runtime.*"
-  - "com.greenrobotdev.lordofthelinks.model.Link"
+  - "com.greenrobotdev.lordofthelinks.bookmarks.model.Link"
 
 function:
   name: "LinkDetailCard"

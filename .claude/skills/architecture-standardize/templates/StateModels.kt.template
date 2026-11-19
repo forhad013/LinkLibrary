@@ -156,7 +156,7 @@ data class LinkDetailState(
 ```kotlin
 package com.greenrobotdev.lordofthelinks.screens.home
 
-import com.greenrobotdev.lordofthelinks.model.Link
+import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -205,7 +205,7 @@ sealed interface AddLinkEvent {
 ```kotlin
 package com.greenrobotdev.lordofthelinks.screens.detail
 
-import com.greenrobotdev.lordofthelinks.model.Link
+import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
 import kotlinx.serialization.Serializable
 
 @Serializable
