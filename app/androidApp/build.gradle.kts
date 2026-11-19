@@ -12,8 +12,8 @@ android {
         applicationId = "com.greenrobotdev.lordofthelinks.android"
         minSdk = 28
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = providers.gradleProperty("app.versionCode").get().toInt()
+        versionName = providers.gradleProperty("app.versionName").get()
     }
     buildFeatures {
         compose = true

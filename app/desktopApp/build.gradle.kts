@@ -49,7 +49,7 @@ compose.desktop {
                 org.jetbrains.compose.desktop.application.dsl.TargetFormat.Rpm
             )
 
-            packageVersion = "1.0.0"
+            packageVersion = providers.gradleProperty("app.versionName").get()
             description = "Link Library - Manage your bookmarks"
             copyright = "© 2025 Green Robot Dev. All rights reserved."
             vendor = "Green Robot Dev"
