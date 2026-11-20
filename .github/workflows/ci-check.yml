@@ -1,7 +1,7 @@
 name: CI Check
 
 # Runs on every pull request: does it compile, do the tests pass.
-# Coverage report is uploaded as an artifact; lint and static analysis come later.
+# detekt findings annotate the PR; coverage and detekt reports are uploaded as artifacts.
 
 on:
   pull_request:
@@ -15,6 +15,9 @@ jobs:
   check:
     name: Compile & test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # detekt findings as inline PR annotations (code scanning)
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,6 +31,28 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      # Fails on findings not in detekt-baseline.xml; the steps below still upload the report
+      - name: Static analysis (detekt)
+        run: ./gradlew detekt
+
+      - name: Annotate PR with detekt findings
+        if: ${{ !cancelled() }}
+        # Needs GitHub code scanning (public repo or Advanced Security); fork PRs can't write it either
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: build/reports/detekt/detekt.sarif
+          category: detekt
+
+      - name: Upload detekt report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: detekt-report
+          path: build/reports/detekt
+          retention-days: 14
+          if-no-files-found: ignore
 
       - name: Unit tests
         run: ./gradlew :app:jvmTest :bookmarks:jvmTest :database:jvmTest

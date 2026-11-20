@@ -1,0 +1,193 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:AddLinkUseCase.kt:state.url.isNotBlank() &amp;&amp; !state.isFetching &amp;&amp; !alreadyFetched &amp;&amp; state.duplicate == null</ID>
+    <ID>CyclomaticComplexMethod:AddLinkUseCase.kt:@OptIn(ExperimentalUuidApi::class, ExperimentalTime::class) @Composable fun AddLinkPresenter: AddLinkState</ID>
+    <ID>CyclomaticComplexMethod:AppSlider.kt:@Composable fun AppSlider</ID>
+    <ID>CyclomaticComplexMethod:AppTextFieldAdvanced.kt:@Composable fun AppTextFieldEnhanced</ID>
+    <ID>CyclomaticComplexMethod:AutoFetchButton.kt:@Composable fun AutoFetchButton</ID>
+    <ID>CyclomaticComplexMethod:BentoGrid.kt:@Composable fun &lt;T&gt; BentoGrid</ID>
+    <ID>CyclomaticComplexMethod:CategoryDropdown.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable fun CategoryDropdown</ID>
+    <ID>CyclomaticComplexMethod:CategoryPickerContent.kt:@Composable internal fun CategoryPickerContent</ID>
+    <ID>CyclomaticComplexMethod:CategoryPickerPresenter.kt:@Composable fun CategoryPickerPresenter: CategoryPickerState</ID>
+    <ID>CyclomaticComplexMethod:CategoryPickerRows.kt:@Composable internal fun SelectableRow</ID>
+    <ID>CyclomaticComplexMethod:FeedComponents.kt:@OptIn(ExperimentalLayoutApi::class) @Composable internal fun FeedLinkCard</ID>
+    <ID>CyclomaticComplexMethod:FeedFilterSheet.kt:@OptIn(ExperimentalLayoutApi::class) @Composable fun FeedFilterSheet</ID>
+    <ID>CyclomaticComplexMethod:FilledButton.kt:@OptIn(ExperimentalMaterial3ExpressiveApi::class) @Composable fun StandardButton</ID>
+    <ID>CyclomaticComplexMethod:FormCards.kt:@Composable fun ToggleCard</ID>
+    <ID>CyclomaticComplexMethod:IconButton.kt:@Composable fun IconButton</ID>
+    <ID>CyclomaticComplexMethod:LibraryScreen.kt:@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class) @Composable fun LibraryScreen</ID>
+    <ID>CyclomaticComplexMethod:LibraryStateModels.kt:@OptIn(ExperimentalTime::class) fun filterFeed: List&lt;Link&gt;</ID>
+    <ID>CyclomaticComplexMethod:LinkCard.kt:@Composable fun LinkCard</ID>
+    <ID>CyclomaticComplexMethod:LinkDetailScreen.kt:@OptIn(ExperimentalLayoutApi::class) @Composable fun LinkDetailScreen</ID>
+    <ID>CyclomaticComplexMethod:LinkDetailUseCase.kt:@Composable fun LinkDetailPresenter: LinkDetailState</ID>
+    <ID>CyclomaticComplexMethod:LinksBackup.kt:fun planImport: ImportPlan</ID>
+    <ID>CyclomaticComplexMethod:SettingsUseCase.kt:@OptIn(ExperimentalTime::class) @Composable fun SettingsPresenter: SettingsState</ID>
+    <ID>CyclomaticComplexMethod:TagCard.kt:@Composable fun TagCard</ID>
+    <ID>CyclomaticComplexMethod:TagChipsSelector.kt:@Composable private fun AvailableTagChip</ID>
+    <ID>CyclomaticComplexMethod:TagPickerContent.kt:@Composable internal fun TagPickerContent</ID>
+    <ID>CyclomaticComplexMethod:TagPickerPresenter.kt:@Composable fun TagPickerPresenter: TagPickerState</ID>
+    <ID>CyclomaticComplexMethod:TextButton.kt:@OptIn(ExperimentalMaterial3ExpressiveApi::class) @Composable fun TextButton</ID>
+    <ID>CyclomaticComplexMethod:ValidatedInput.kt:@Composable fun ValidatedInput</ID>
+    <ID>CyclomaticComplexMethod:WasmRootScreen.kt:@Composable fun RootScreen</ID>
+    <ID>EmptyElseBlock:LinkDetailScreen.kt:if (draft.isNotBlank()) onRename(draft)</ID>
+    <ID>EmptyFunctionBlock:SettingsFactory.wasmJs.kt:SettingsFactory.&lt;no name provided&gt;${}</ID>
+    <ID>ForbiddenComment:AndroidDatabaseBuilder.kt:AndroidDatabaseBuilder$* Android-specific database builder implementation. * * TODO: Add SQLCipher encryption for Android using Android Keystore. * This requires custom SQLiteDriver implementation for Room KMP.</ID>
+    <ID>ForbiddenComment:HomeScreen.kt:/* TODO: Filter by recent */</ID>
+    <ID>ForbiddenComment:HomeScreen.kt:/* TODO: Navigate to categoryNames */</ID>
+    <ID>ForbiddenComment:HomeScreen.kt:/* TODO: Navigate to settings */</ID>
+    <ID>ForbiddenComment:HomeScreen.kt:/* TODO: Navigate to tag */</ID>
+    <ID>ForbiddenComment:HomeScreen.kt:/* TODO: Navigate to tags */</ID>
+    <ID>MatchingDeclarationName:AppScaffold.kt:FabPosition</ID>
+    <ID>MatchingDeclarationName:BulkOperationsBar.kt:BulkAction</ID>
+    <ID>MatchingDeclarationName:CategoryDropdown.kt:CategoryItem</ID>
+    <ID>MatchingDeclarationName:CategoryPickerContent.kt:PickerItem</ID>
+    <ID>MatchingDeclarationName:CategoryTree.kt:TreeRow</ID>
+    <ID>MatchingDeclarationName:ExpressiveMotion.kt:SpringPhysics</ID>
+    <ID>MatchingDeclarationName:FeedComponents.kt:CollapsingHeaderState</ID>
+    <ID>MatchingDeclarationName:FilledButton.kt:ComponentColors</ID>
+    <ID>MatchingDeclarationName:MoleculeViewModel.desktop.kt:MoleculeViewModel&lt;Event, Model&gt; : ViewModel</ID>
+    <ID>MatchingDeclarationName:SavedListScreen.kt:ScopeLook</ID>
+    <ID>MatchingDeclarationName:SettingsFactory.desktop.kt:SettingsFactory</ID>
+    <ID>MatchingDeclarationName:SettingsFactory.wasmJs.kt:SettingsFactory</ID>
+    <ID>MatchingDeclarationName:ShimmerEffect.kt:ShimmerDefaults</ID>
+    <ID>MatchingDeclarationName:Spacing.kt:SpacingTokens</ID>
+    <ID>MatchingDeclarationName:TagCard.kt:TagCardData</ID>
+    <ID>MatchingDeclarationName:TagChipsSelector.kt:TagChip</ID>
+    <ID>MatchingDeclarationName:ValidatedInput.kt:ValidationResult</ID>
+    <ID>MaxLineLength:AppSlider.kt:inactiveTickColor = if (enabled) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)</ID>
+    <ID>MaxLineLength:AppSlider.kt:inactiveTrackColor = if (enabled) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)</ID>
+    <ID>MaxLineLength:CategoryPickerContent.kt:AppBarAction(Icons.Filled.Delete, "Remove", { onEvent(CategoryPickerEvent.Remove) }, enabled = selected != null, isError = true, modifier = spread)</ID>
+    <ID>MaxLineLength:DesignCatalogScreen.kt:ContentCard(headerIcon = Icons.Filled.Notifications, headerTitle = "Reminder") { Text("Read this tonight", color = MaterialTheme.colorScheme.onSurface) }</ID>
+    <ID>MaxLineLength:DesignCatalogScreen.kt:EmptyState(icon = Icons.Filled.Bookmark, title = "Nothing here", description = "No saved link matches these filters.", actionLabel = "Clear filters", onActionClick = {})</ID>
+    <ID>MaxLineLength:DesignCatalogScreen.kt:Specimen</ID>
+    <ID>MaxLineLength:DesignCatalogScreen.kt:Text(name, style = MaterialTheme.typography.labelSmall, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(104.dp))</ID>
+    <ID>MaxLineLength:DesignCatalogScreen.kt:modifier = Modifier.clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.primaryContainer).padding(horizontal = 14.dp, vertical = 10.dp)</ID>
+    <ID>MaxLineLength:FeedComponents.kt:Text("Archived", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)</ID>
+    <ID>MaxLineLength:FeedComponents.kt:Text("Nothing new waiting", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSurface)</ID>
+    <ID>MaxLineLength:LibraryViewModel.kt:state = state.copy(categories = categories, filters = state.filters.copy(categoryIds = state.filters.categoryIds.filterTo(mutableSetOf()) { id -&gt; categories.any { it.id == id } }))</ID>
+    <ID>MaxLineLength:LibraryViewModel.kt:state = state.copy(tags = tags, filters = state.filters.copy(tagIds = state.filters.tagIds.filterTo(mutableSetOf()) { id -&gt; tags.any { it.id == id } }))</ID>
+    <ID>MaxLineLength:LinkDetailScreen.kt:else -&gt; Look(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary, Icons.AutoMirrored.Outlined.Article)</ID>
+    <ID>MaxLineLength:LinkDetailScreen.kt:noPreview -&gt; Look(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Filled.Link)</ID>
+    <ID>MaxLineLength:LinkDetailScreen.kt:type == "social" -&gt; Look(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.onSecondary, Icons.Outlined.ChatBubbleOutline)</ID>
+    <ID>MaxLineLength:LinkDetailScreen.kt:type == "video" -&gt; Look(LordsExtraColors.mediaPlaceholder, MaterialTheme.colorScheme.tertiary, MaterialTheme.colorScheme.onTertiary, Icons.Filled.PlayArrow)</ID>
+    <ID>MaxLineLength:LinkType.kt:private val socialHosts = listOf("twitter.com", "x.com", "instagram.com", "facebook.com", "threads.net", "reddit.com", "linkedin.com", "mastodon.social", "bsky.app")</ID>
+    <ID>MaxLineLength:MetadataFetchService.kt:MetadataFetchService$HttpStatusCode.OK</ID>
+    <ID>MaxLineLength:MigrationTest.kt:MigrationTest$linkDao().insertLink(LinkEntity(id = "img", title = "b", url = "https://b.com", description = "", isFavorite = false, imageUrl = "https://b.com/i.png"))</ID>
+    <ID>MaxLineLength:PlatformImage.android.kt:.</ID>
+    <ID>MaxLineLength:WelcomeTourScreen.kt:SwipedCard((-96).dp, MaterialTheme.colorScheme.error, MaterialTheme.colorScheme.onError, Icons.Filled.Delete, "Delete", MaterialTheme.colorScheme.secondaryContainer)</ID>
+    <ID>MaxLineLength:WelcomeTourScreen.kt:SwipedCard(96.dp, MaterialTheme.colorScheme.inverseSurface, MaterialTheme.colorScheme.inverseOnSurface, Icons.Filled.Archive, "Archive", MaterialTheme.colorScheme.primaryContainer)</ID>
+    <ID>MaxLineLength:WelcomeTourScreen.kt:Text("Export a backup anytime: Settings → Your data", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = LordsExtraColors.onSuccessContainer)</ID>
+    <ID>MaxLineLength:WelcomeTourScreen.kt:Text("Link kept. Details are optional.", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = LordsExtraColors.onSuccessContainer)</ID>
+    <ID>MaxLineLength:WelcomeTourScreen.kt:Text("Swipe left: delete ←", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)</ID>
+    <ID>MaxLineLength:WelcomeTourScreen.kt:Text("→ Swipe right: archive", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)</ID>
+    <ID>MaxLineLength:WelcomeTourScreen.kt:modifier = Modifier.clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.surface).padding(horizontal = 12.dp, vertical = 6.dp)</ID>
+    <ID>ModifierOrder:MoleculeViewModel.android.kt:MoleculeViewModel$@Composable actual protected abstract</ID>
+    <ID>ModifierOrder:MoleculeViewModel.android.kt:MoleculeViewModel$actual protected</ID>
+    <ID>ModifierOrder:MoleculeViewModel.android.kt:MoleculeViewModel$actual protected open</ID>
+    <ID>ModifierOrder:MoleculeViewModel.desktop.kt:MoleculeViewModel$@Composable actual protected abstract</ID>
+    <ID>ModifierOrder:MoleculeViewModel.desktop.kt:MoleculeViewModel$actual protected</ID>
+    <ID>ModifierOrder:MoleculeViewModel.desktop.kt:MoleculeViewModel$actual protected open</ID>
+    <ID>ModifierOrder:MoleculeViewModel.ios.kt:MoleculeViewModel$@Composable actual protected abstract</ID>
+    <ID>ModifierOrder:MoleculeViewModel.ios.kt:MoleculeViewModel$actual protected</ID>
+    <ID>ModifierOrder:MoleculeViewModel.ios.kt:MoleculeViewModel$actual protected open</ID>
+    <ID>NewLineAtEndOfFile:AppButton.kt:com.greenrobotdev.lordofthelinks.design.components.button.AppButton.kt</ID>
+    <ID>NewLineAtEndOfFile:AppCheckbox.kt:com.greenrobotdev.lordofthelinks.design.components.selection.AppCheckbox.kt</ID>
+    <ID>NewLineAtEndOfFile:AppDivider.kt:com.greenrobotdev.lordofthelinks.design.foundation.layout.AppDivider.kt</ID>
+    <ID>NewLineAtEndOfFile:AppRadio.kt:com.greenrobotdev.lordofthelinks.design.components.selection.AppRadio.kt</ID>
+    <ID>NewLineAtEndOfFile:AppText.kt:com.greenrobotdev.lordofthelinks.design.foundation.text.AppText.kt</ID>
+    <ID>NewLineAtEndOfFile:AppTextField.kt:com.greenrobotdev.lordofthelinks.design.components.textfield.AppTextField.kt</ID>
+    <ID>NewLineAtEndOfFile:AppTextFieldAdvanced.kt:com.greenrobotdev.lordofthelinks.design.components.textfield.AppTextFieldAdvanced.kt</ID>
+    <ID>NewLineAtEndOfFile:AppTopBar.kt:com.greenrobotdev.lordofthelinks.design.components.appbar.AppTopBar.kt</ID>
+    <ID>NewLineAtEndOfFile:FilledButton.kt:com.greenrobotdev.lordofthelinks.design.components.button.FilledButton.kt</ID>
+    <ID>NewLineAtEndOfFile:FormCards.kt:com.greenrobotdev.lordofthelinks.design.components.cards.FormCards.kt</ID>
+    <ID>NewLineAtEndOfFile:HomeNavRoutes.kt:com.greenrobotdev.lordofthelinks.screens.home.navigation.HomeNavRoutes.kt</ID>
+    <ID>NewLineAtEndOfFile:HomeTabNavigation.kt:com.greenrobotdev.lordofthelinks.screens.home.navigation.HomeTabNavigation.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpClientFactory.android.kt:com.greenrobotdev.lordofthelinks.di.HttpClientFactory.android.kt</ID>
+    <ID>NewLineAtEndOfFile:LibraryNavRoutes.kt:com.greenrobotdev.lordofthelinks.screens.library.navigation.LibraryNavRoutes.kt</ID>
+    <ID>NewLineAtEndOfFile:LibraryTabNavigation.kt:com.greenrobotdev.lordofthelinks.screens.library.navigation.LibraryTabNavigation.kt</ID>
+    <ID>NewLineAtEndOfFile:LinkCard.kt:com.greenrobotdev.lordofthelinks.design.components.cards.LinkCard.kt</ID>
+    <ID>NewLineAtEndOfFile:LinkTagDao.kt:com.greenrobotdev.lordofthelinks.database.room.LinkTagDao.kt</ID>
+    <ID>NewLineAtEndOfFile:LinkTagEntity.kt:com.greenrobotdev.lordofthelinks.database.room.LinkTagEntity.kt</ID>
+    <ID>NewLineAtEndOfFile:MinimalWasmTest.kt:com.greenrobotdev.lordofthelinks.MinimalWasmTest.kt</ID>
+    <ID>NewLineAtEndOfFile:ModifierExt.kt:com.greenrobotdev.lordofthelinks.design.extensions.ModifierExt.kt</ID>
+    <ID>NewLineAtEndOfFile:OrganizeNavRoutes.kt:com.greenrobotdev.lordofthelinks.screens.organize.navigation.OrganizeNavRoutes.kt</ID>
+    <ID>NewLineAtEndOfFile:OrganizeScreen.kt:com.greenrobotdev.lordofthelinks.screens.organize.OrganizeScreen.kt</ID>
+    <ID>NewLineAtEndOfFile:OutlinedTextField.kt:com.greenrobotdev.lordofthelinks.design.components.textfield.OutlinedTextField.kt</ID>
+    <ID>NewLineAtEndOfFile:RoomTagRepository.kt:com.greenrobotdev.lordofthelinks.database.repository.RoomTagRepository.kt</ID>
+    <ID>NewLineAtEndOfFile:RootNavigationState.kt:com.greenrobotdev.lordofthelinks.screens.root.RootNavigationState.kt</ID>
+    <ID>NewLineAtEndOfFile:SettingsFactory.android.kt:com.greenrobotdev.lordofthelinks.utils.settings.SettingsFactory.android.kt</ID>
+    <ID>NewLineAtEndOfFile:SettingsFactory.desktop.kt:com.greenrobotdev.lordofthelinks.utils.settings.SettingsFactory.desktop.kt</ID>
+    <ID>NewLineAtEndOfFile:SettingsFactory.ios.kt:com.greenrobotdev.lordofthelinks.utils.settings.SettingsFactory.ios.kt</ID>
+    <ID>NewLineAtEndOfFile:SettingsFactory.kt:com.greenrobotdev.lordofthelinks.utils.settings.SettingsFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:SettingsTabNavigation.kt:com.greenrobotdev.lordofthelinks.screens.settings.navigation.SettingsTabNavigation.kt</ID>
+    <ID>NewLineAtEndOfFile:TabNavigationState.kt:com.greenrobotdev.lordofthelinks.screens.root.TabNavigationState.kt</ID>
+    <ID>NewLineAtEndOfFile:TagCategorySelectorComponents.kt:com.greenrobotdev.lordofthelinks.bookmarks.screens.add.TagCategorySelectorComponents.kt</ID>
+    <ID>NewLineAtEndOfFile:TagDao.kt:com.greenrobotdev.lordofthelinks.database.room.TagDao.kt</ID>
+    <ID>NewLineAtEndOfFile:TagEntity.kt:com.greenrobotdev.lordofthelinks.database.room.TagEntity.kt</ID>
+    <ID>NewLineAtEndOfFile:ThemePreferenceManager.kt:com.greenrobotdev.lordofthelinks.utils.preferences.ThemePreferenceManager.kt</ID>
+    <ID>NewLineAtEndOfFile:ViewModel.kt:.ViewModel.kt</ID>
+    <ID>NewLineAtEndOfFile:WasmApp.kt:com.greenrobotdev.lordofthelinks.WasmApp.kt</ID>
+    <ID>NewLineAtEndOfFile:WasmRootScreen.kt:com.greenrobotdev.lordofthelinks.screens.root.WasmRootScreen.kt</ID>
+    <ID>PrintStackTrace:MetadataFetchService.kt:MetadataFetchService$e</ID>
+    <ID>ReturnCount:CategoryTree.kt:fun validateCategoryName: String?</ID>
+    <ID>ReturnCount:FeedComponents.kt:@OptIn(ExperimentalTime::class) internal fun savedAtLabel: String?</ID>
+    <ID>ReturnCount:MainActivity.kt:MainActivity$private fun extractUrlFromText: String?</ID>
+    <ID>ReturnCount:MetadataFetchService.kt:MetadataFetchService$private fun extractDescription: String</ID>
+    <ID>ReturnCount:MetadataFetchService.kt:MetadataFetchService$private fun extractFavicon: String?</ID>
+    <ID>ReturnCount:MetadataFetchService.kt:MetadataFetchService$private fun extractImageUrl: String?</ID>
+    <ID>ReturnCount:MetadataFetchService.kt:MetadataFetchService$private fun extractSiteName: String?</ID>
+    <ID>ReturnCount:MetadataFetchService.kt:MetadataFetchService$private fun extractTitle: String</ID>
+    <ID>ReturnCount:TagPickerPresenter.kt:private suspend fun rename: Update</ID>
+    <ID>ReturnCount:TagPickerStateModels.kt:fun validateTagName: String?</ID>
+    <ID>SwallowedException:AddLinkUseCase.kt:e: Exception</ID>
+    <ID>SwallowedException:Converters.kt:Converters$e: Exception</ID>
+    <ID>SwallowedException:MetadataFetchService.kt:MetadataFetchService$e: Exception</ID>
+    <ID>ThrowsCount:CategoryDao.kt:CategoryDao$@Transaction suspend fun moveCategory</ID>
+    <ID>TooGenericExceptionCaught:AddLinkUseCase.kt:e: Exception</ID>
+    <ID>TooGenericExceptionCaught:Converters.kt:Converters$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:MetadataFetchService.kt:MetadataFetchService$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:RoomCategoryRepository.kt:RoomCategoryRepository$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:RoomLinkRepository.kt:RoomLinkRepository$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:RoomTagRepository.kt:RoomTagRepository$e: Exception</ID>
+    <ID>TooGenericExceptionThrown:CategoryDao.kt:CategoryDao$throw Exception("Cannot move a category under its own descendant")</ID>
+    <ID>TooGenericExceptionThrown:CategoryDao.kt:CategoryDao$throw Exception("Cannot move a category under itself")</ID>
+    <ID>TooGenericExceptionThrown:CategoryDao.kt:CategoryDao$throw Exception("Category has subcategories. Move or remove subcategories first.")</ID>
+    <ID>TooGenericExceptionThrown:CategoryDao.kt:CategoryDao$throw Exception("Category not found: $categoryId")</ID>
+    <ID>TooManyFunctions:AddLinkSaveComponents.kt:com.greenrobotdev.lordofthelinks.bookmarks.screens.add.components.AddLinkSaveComponents.kt</ID>
+    <ID>TooManyFunctions:CategoryDao.kt:CategoryDao</ID>
+    <ID>TooManyFunctions:CategoryRepository.kt:CategoryRepository</ID>
+    <ID>TooManyFunctions:DesignCatalogScreen.kt:com.greenrobotdev.lordofthelinks.design.demo.DesignCatalogScreen.kt</ID>
+    <ID>TooManyFunctions:FeedComponents.kt:com.greenrobotdev.lordofthelinks.bookmarks.screens.library.FeedComponents.kt</ID>
+    <ID>TooManyFunctions:MetadataFetchService.kt:MetadataFetchService</ID>
+    <ID>TooManyFunctions:RoomCategoryRepository.kt:RoomCategoryRepository : CategoryRepository</ID>
+    <ID>TooManyFunctions:SettingsFactory.wasmJs.kt:SettingsFactory$&lt;no name provided&gt; : Settings</ID>
+    <ID>UnusedParameter:AutoFetchButton.kt:scale: Float</ID>
+    <ID>UnusedParameter:CategoryPickerContent.kt:onBack: () -&gt; Unit</ID>
+    <ID>UnusedParameter:FormCards.kt:headerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary</ID>
+    <ID>UnusedParameter:LibraryScreen.kt:onNavigateToCategories: () -&gt; Unit = {}</ID>
+    <ID>UnusedParameter:LibraryScreen.kt:onNavigateToTags: () -&gt; Unit = {}</ID>
+    <ID>UnusedParameter:LinkCard.kt:tags: List&lt;String&gt; = emptyList()</ID>
+    <ID>UnusedParameter:MaterialExpressiveTheme.kt:modifier: Modifier = Modifier</ID>
+    <ID>UnusedParameter:NoteEditorScreen.kt:linkId: String</ID>
+    <ID>UnusedParameter:OrganizeScreen.kt:routeKey: NavKey</ID>
+    <ID>UnusedParameter:SavedListScreen.kt:look: ScopeLook</ID>
+    <ID>UnusedParameter:WasmRootScreen.kt:onSharedContentHandled: () -&gt; Unit = {}</ID>
+    <ID>UnusedParameter:WasmRootScreen.kt:sharedContent: SharedContent? = null</ID>
+    <ID>WildcardImport:AutoFetchButton.kt:import androidx.compose.animation.core.*</ID>
+    <ID>WildcardImport:AutoFetchButton.kt:import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:AutoFetchButton.kt:import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:AutoFetchButton.kt:import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:NoteEditorScreen.kt:import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:NoteEditorScreen.kt:import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:NoteEditorScreen.kt:import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:ShareScreen.kt:import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:ShareScreen.kt:import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:ShareScreen.kt:import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:ValidatedInput.kt:import androidx.compose.animation.core.*</ID>
+    <ID>WildcardImport:ValidatedInput.kt:import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:ValidatedInput.kt:import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:ValidatedInput.kt:import androidx.compose.runtime.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

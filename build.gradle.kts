@@ -13,6 +13,8 @@ plugins {
     alias(libs.plugins.ksp).apply(false)
     // Code coverage: the root report merges the modules listed in dependencies { kover(...) }
     alias(libs.plugins.kover)
+    // Static analysis over every module from here: ./gradlew detekt
+    alias(libs.plugins.detekt)
 
 }
 repositories {
@@ -37,4 +39,18 @@ dependencies {
     kover(project(":app"))
     kover(project(":bookmarks"))
     kover(project(":database"))
+}
+
+// One detekt run over all modules' Kotlin sources (no type resolution, so no per-module setup).
+// Findings already in the code live in detekt-baseline.xml; only new ones fail the build.
+detekt {
+    source.setFrom(
+        fileTree(rootDir) {
+            include("**/src/**/*.kt")
+            exclude("**/build/**", ".claude/**", "build-logic/**", "konsistTest/**")
+        }
+    )
+    config.setFrom("detekt.yml")
+    buildUponDefaultConfig = true
+    baseline = file("detekt-baseline.xml")
 }

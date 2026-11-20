@@ -1,6 +1,7 @@
 [versions]
 agp = "9.1.0"
 kover = "0.9.11"
+detekt = "2.0.0-alpha.6"
 koin = "4.0.0"
 koinsistCore = "0.17.3"
 kotestRunnerJunit5 = "5.9.1"
@@ -103,6 +104,7 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 androidx-room = { id = "androidx.room", version.ref = "room" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
 molecule = { id = "app.cash.molecule", version.ref = "molecule" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 
