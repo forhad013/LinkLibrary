@@ -6,12 +6,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Category
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Tag
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toCategory
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toTag
-import com.greenrobotdev.lordofthelinks.database.repository.CategoryRepository
-import com.greenrobotdev.lordofthelinks.database.repository.TagRepository
+import com.greenrobotdev.lordofthelinks.model.Category
+import com.greenrobotdev.lordofthelinks.model.Tag
+import com.greenrobotdev.lordofthelinks.model.repository.CategoryRepository
+import com.greenrobotdev.lordofthelinks.model.repository.TagRepository
 import com.greenrobotdev.lordofthelinks.utils.MoleculeViewModel
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
@@ -48,12 +46,12 @@ class LibraryTabViewModel : MoleculeViewModel<LibraryTabEvent, LibraryTabState>(
         }
         LaunchedEffect(Unit) {
             categoryRepository.getCategoriesWithCounts().collect { result ->
-                result.onSuccess { rows -> state = state.copy(categories = rows.map { it.toCategory() }) }
+                result.onSuccess { rows -> state = state.copy(categories = rows) }
             }
         }
         LaunchedEffect(Unit) {
             tagRepository.getTags().collect { result ->
-                result.onSuccess { tags -> state = state.copy(tags = tags.map { it.toTag() }) }
+                result.onSuccess { tags -> state = state.copy(tags = tags) }
             }
         }
 

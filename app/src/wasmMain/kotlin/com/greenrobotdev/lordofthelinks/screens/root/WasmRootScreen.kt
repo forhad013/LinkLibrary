@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
-import com.greenrobotdev.lordofthelinks.bookmarks.model.SharedContent
+import com.greenrobotdev.lordofthelinks.model.SharedContent
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.add.AddLinkScreen
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.addCollection.AddCollectionScreen
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.addTag.AddTagScreen

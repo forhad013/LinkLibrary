@@ -1,6 +1,6 @@
 package com.greenrobotdev.lordofthelinks.bookmarks.screens.library
 
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Link
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

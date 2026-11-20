@@ -6,10 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Category
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toCategory
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toEntity
-import com.greenrobotdev.lordofthelinks.database.repository.CategoryRepository
+import com.greenrobotdev.lordofthelinks.model.Category
+import com.greenrobotdev.lordofthelinks.model.repository.CategoryRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -45,7 +43,7 @@ fun CategoryPickerPresenter(
         categoryRepository.getCategoriesWithCounts().collect { result ->
             result.fold(
                 onSuccess = { rows ->
-                    val categories = rows.map { it.toCategory() }
+                    val categories = rows
                     state = if (state.isLoading) {
                         val selected = initialSelection
                             ?: linkId?.let { id -> categoryRepository.getCategoryForLink(id).first().getOrNull()?.id }
@@ -68,7 +66,7 @@ fun CategoryPickerPresenter(
 
     LaunchedEffect(Unit) {
         categoryRepository.getRecentCategories().first()
-            .onSuccess { state = state.copy(recent = it.map { e -> e.toCategory() }) }
+            .onSuccess { state = state.copy(recent = it) }
     }
 
     LaunchedEffect(Unit) {
@@ -104,7 +102,7 @@ fun CategoryPickerPresenter(
                     if (error != null) {
                         state = state.copy(error = error)
                     } else {
-                        val entity = Category(id = "", name = name, parentId = parent).toEntity()
+                        val entity = Category(id = "", name = name, parentId = parent)
                         categoryRepository.addCategory(entity).first().fold(
                             onSuccess = { created ->
                                 state = state.copy(
@@ -147,7 +145,7 @@ fun CategoryPickerPresenter(
                             if (error != null) {
                                 state = state.copy(error = error)
                             } else {
-                                val entity = Category(id = "", name = name, parentId = parent).toEntity()
+                                val entity = Category(id = "", name = name, parentId = parent)
                                 categoryRepository.addCategory(entity).first().fold(
                                     onSuccess = { created ->
                                         state = state.copy(
@@ -251,7 +249,7 @@ fun CategoryPickerPresenter(
                         result.fold(
                             onSuccess = {
                                 categoryRepository.getRecentCategories().first()
-                                    .onSuccess { r -> state = state.copy(recent = r.map { it.toCategory() }) }
+                                    .onSuccess { r -> state = state.copy(recent = r) }
                                 state = state.copy(applied = true)
                             },
                             onFailure = { state = state.copy(error = it.message ?: "Could not assign") }

@@ -8,14 +8,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.greenrobotdev.lordofthelinks.bookmarks.service.MetadataFetchService
-import com.greenrobotdev.lordofthelinks.database.repository.CategoryRepository
-import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
-import com.greenrobotdev.lordofthelinks.database.repository.TagRepository
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toCategory
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toEntity
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Tag
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toTag
+import com.greenrobotdev.lordofthelinks.model.repository.CategoryRepository
+import com.greenrobotdev.lordofthelinks.model.repository.LinkRepository
+import com.greenrobotdev.lordofthelinks.model.repository.TagRepository
+import com.greenrobotdev.lordofthelinks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Tag
 import com.greenrobotdev.lordofthelinks.bookmarks.domain.isSameLink
 import com.greenrobotdev.lordofthelinks.bookmarks.domain.isValidLink
 import com.greenrobotdev.lordofthelinks.bookmarks.domain.linkTypeOf
@@ -52,7 +49,7 @@ fun AddLinkPresenter(
     LaunchedEffect(Unit) {
         // Subscribe to tags changes reactively
         tagRepository.getTagsWithCounts().collect { result ->
-            val tags = result.getOrElse { emptyList() }.map { it.toTag() }
+            val tags = result.getOrElse { emptyList() }
             state = state.copy(
                 availableTags = tags,
                 isLoadingTagsAndCategories = false
@@ -63,7 +60,7 @@ fun AddLinkPresenter(
     LaunchedEffect(Unit) {
         // Subscribe to categoryNames changes reactively
         categoryRepository.getCategories().collect { result ->
-            val categoryNames = result.getOrElse { emptyList() }.map { it.toCategory() }
+            val categoryNames = result.getOrElse { emptyList() }
             state = state.copy(
                 availableCategories = categoryNames,
                 isLoadingTagsAndCategories = false
@@ -72,7 +69,7 @@ fun AddLinkPresenter(
     }
     LaunchedEffect(Unit) {
         categoryRepository.getRecentCategories().first()
-            .onSuccess { rows -> state = state.copy(recentCategories = rows.map { it.toCategory() }) }
+            .onSuccess { rows -> state = state.copy(recentCategories = rows) }
     }
 
     // Builds the stored row from the form; notes go in description, the page text in fetchedDescription
@@ -86,7 +83,7 @@ fun AddLinkPresenter(
         fetchedDescription = state.fetchedMetadata?.description?.takeIf { it.isNotBlank() },
         createdAt = state.createdAt,
         imageUrl = state.fetchedMetadata?.let { it.imageUrl.orEmpty() }, // "": fetched, no image
-    ).toEntity()
+    )
 
     fun stampCreatedAt() {
         if (state.createdAt == null) state = state.copy(createdAt = Clock.System.now().toEpochMilliseconds())
@@ -275,7 +272,7 @@ fun AddLinkPresenter(
                         if (existing != null) {
                             state = state.copy(selectedTags = state.selectedTags + existing.id)
                         } else {
-                            tagRepository.addTag(Tag(id = "", name = name, count = 0).toEntity()).first().fold(
+                            tagRepository.addTag(Tag(id = "", name = name, count = 0)).first().fold(
                                 onSuccess = { created -> state = state.copy(selectedTags = state.selectedTags + created.id) },
                                 onFailure = { state = state.copy(error = it.message ?: "Could not create tag") },
                             )

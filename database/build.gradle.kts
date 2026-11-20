@@ -12,6 +12,9 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                // Domain models and the repository interfaces this module implements
+                implementation(project(":core:model"))
+
                 // Room Database (KMP)
                 implementation(libs.androidx.room.runtime)
                 implementation(libs.androidx.sqlite.bundled)

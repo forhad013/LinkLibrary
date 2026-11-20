@@ -3,10 +3,11 @@ package com.greenrobotdev.lordofthelinks.database.repository
 import com.greenrobotdev.lordofthelinks.database.room.LinkTagDao
 import com.greenrobotdev.lordofthelinks.database.room.LinkTagEntity
 import com.greenrobotdev.lordofthelinks.database.room.TagDao
-import com.greenrobotdev.lordofthelinks.database.room.TagEntity
-import com.greenrobotdev.lordofthelinks.database.room.TagWithCount
+import com.greenrobotdev.lordofthelinks.model.Tag
+import com.greenrobotdev.lordofthelinks.model.repository.TagRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlin.uuid.ExperimentalUuidApi
@@ -17,56 +18,45 @@ class RoomTagRepository(
     private val linkTagDao: LinkTagDao
 ) : TagRepository {
 
-    override suspend fun getTags(): Flow<Result<List<TagEntity>>> {
+    override suspend fun getTags(): Flow<Result<List<Tag>>> = getTagsWithCounts()
+
+    override suspend fun getTagsWithCounts(): Flow<Result<List<Tag>>> {
         return tagDao.getAllTagsWithCounts()
-            .map { tagWithCounts ->
-                val tags = tagWithCounts.map { tagWithCount ->
-                    TagEntity(
-                        id = tagWithCount.id,
-                        name = tagWithCount.name,
-                        description = tagWithCount.description,
-                        iconType = tagWithCount.iconType,
-                        createdAt = tagWithCount.createdAt,
-                        updatedAt = tagWithCount.updatedAt
-                    )
-                }
-                Result.success(tags)
-            }
+            .map { rows -> Result.success(rows.map { it.toTag() }) }
             .catch { e -> emit(Result.failure(e)) }
     }
 
-    override suspend fun getTagsWithCounts(): Flow<Result<List<TagWithCount>>> {
-        return tagDao.getAllTagsWithCounts()
-            .map { Result.success(it) }
-            .catch { e -> emit(Result.failure(e)) }
-    }
-
-    override suspend fun getTagById(id: String): Flow<Result<TagEntity?>> {
+    override suspend fun getTagById(id: String): Flow<Result<Tag?>> {
         return tagDao.getTagById(id)
-            .map { entity -> Result.success(entity) }
+            .map { entity -> Result.success(entity?.toTag()) }
             .catch { e -> emit(Result.failure(e)) }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun addTag(tag: TagEntity): Flow<Result<TagEntity>> {
+    override suspend fun addTag(tag: Tag): Flow<Result<Tag>> {
         return try {
             // Generate new ID if not provided
             val tagToSave = if (tag.id.isEmpty()) {
-                tag.copy(id = Uuid.random().toString())
+                tag.toEntity().copy(id = Uuid.random().toString())
             } else {
-                tag
+                tag.toEntity()
             }
 
             tagDao.insertTag(tagToSave)
-            flow { emit(Result.success(tagToSave)) }
+            flow { emit(Result.success(tagToSave.toTag())) }
         } catch (e: Exception) {
             flow { emit(Result.failure(e)) }
         }
     }
 
-    override suspend fun updateTag(tag: TagEntity): Flow<Result<TagEntity>> {
+    override suspend fun updateTag(tag: Tag): Flow<Result<Tag>> {
         return try {
-            tagDao.updateTag(tag)
+            // Keeps the stored createdAt; the domain Tag doesn't carry it
+            val stored = tagDao.getTagById(tag.id).first()
+                ?: return flow { emit(Result.failure(Exception("Tag not found: ${tag.id}"))) }
+            tagDao.updateTag(
+                stored.copy(name = tag.name, description = tag.description, iconType = tag.iconType, updatedAt = System.currentTimeMillis())
+            )
             flow { emit(Result.success(tag)) }
         } catch (e: Exception) {
             flow { emit(Result.failure(e)) }
@@ -82,9 +72,9 @@ class RoomTagRepository(
         }
     }
 
-    override suspend fun getTagsForLink(linkId: String): Flow<Result<List<TagEntity>>> {
+    override suspend fun getTagsForLink(linkId: String): Flow<Result<List<Tag>>> {
         return tagDao.getTagsForLink(linkId)
-            .map { entities -> Result.success(entities) }
+            .map { entities -> Result.success(entities.map { it.toTag() }) }
             .catch { e -> emit(Result.failure(e)) }
     }
 

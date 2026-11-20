@@ -286,8 +286,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toDomain
+import com.greenrobotdev.lordofthelinks.model.repository.LinkRepository
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -362,7 +361,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
+import com.greenrobotdev.lordofthelinks.model.repository.LinkRepository
 import kotlinx.coroutines.flow.Flow
 
 @Composable

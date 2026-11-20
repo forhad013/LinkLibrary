@@ -1,6 +1,6 @@
 package com.greenrobotdev.lordofthelinks.screens.home
 
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Link
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -1,9 +1,9 @@
 package com.greenrobotdev.lordofthelinks.bookmarks.screens.details
 
 import androidx.compose.runtime.Composable
-import com.greenrobotdev.lordofthelinks.database.repository.CategoryRepository
-import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
-import com.greenrobotdev.lordofthelinks.database.repository.TagRepository
+import com.greenrobotdev.lordofthelinks.model.repository.CategoryRepository
+import com.greenrobotdev.lordofthelinks.model.repository.LinkRepository
+import com.greenrobotdev.lordofthelinks.model.repository.TagRepository
 import com.greenrobotdev.lordofthelinks.utils.MoleculeViewModel
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent

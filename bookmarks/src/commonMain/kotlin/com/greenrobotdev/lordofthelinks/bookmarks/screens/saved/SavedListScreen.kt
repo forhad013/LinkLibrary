@@ -51,8 +51,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Category
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Category
+import com.greenrobotdev.lordofthelinks.model.Link
 import com.greenrobotdev.lordofthelinks.bookmarks.motion.sharedScope
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.library.FeedLinkCard
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.library.FeedSectionHeader

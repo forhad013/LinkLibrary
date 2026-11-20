@@ -89,7 +89,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.greenrobotdev.lordofthelinks.bookmarks.domain.hostOf
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Link
 import com.greenrobotdev.lordofthelinks.bookmarks.motion.sharedThumb
 import com.greenrobotdev.lordofthelinks.bookmarks.motion.sharedTitle
 import com.greenrobotdev.lordofthelinks.design.foundation.icon.AppIcon

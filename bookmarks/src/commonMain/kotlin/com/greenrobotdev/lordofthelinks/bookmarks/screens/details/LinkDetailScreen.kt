@@ -83,7 +83,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import com.greenrobotdev.lordofthelinks.bookmarks.domain.hostOf
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Link
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.add.components.CategoryField
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.categoryPicker.CategoryPickerSheet
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.library.savedAtLabel

@@ -1,14 +1,12 @@
 package com.greenrobotdev.lordofthelinks.bookmarks.backup
 
 import com.greenrobotdev.lordofthelinks.bookmarks.export.bookmarksHtml
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toCategory
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toDomain
-import com.greenrobotdev.lordofthelinks.database.repository.CategoryRepository
-import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
-import com.greenrobotdev.lordofthelinks.database.repository.TagRepository
-import com.greenrobotdev.lordofthelinks.database.room.CategoryEntity
-import com.greenrobotdev.lordofthelinks.database.room.LinkEntity
-import com.greenrobotdev.lordofthelinks.database.room.TagEntity
+import com.greenrobotdev.lordofthelinks.model.repository.CategoryRepository
+import com.greenrobotdev.lordofthelinks.model.repository.LinkRepository
+import com.greenrobotdev.lordofthelinks.model.repository.TagRepository
+import com.greenrobotdev.lordofthelinks.model.Category
+import com.greenrobotdev.lordofthelinks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Tag
 import kotlinx.coroutines.flow.first
 
 /** A file ready to save, and how many links it holds. */
@@ -24,15 +22,15 @@ class LinksBackupService(
     private val tagRepository: TagRepository,
 ) {
     private class Library(
-        val links: List<com.greenrobotdev.lordofthelinks.bookmarks.model.Link>,
-        val categories: List<com.greenrobotdev.lordofthelinks.bookmarks.model.Category>,
+        val links: List<Link>,
+        val categories: List<Category>,
         val linkCategoryIds: Map<String, String>,
-        val tags: List<TagEntity>,
+        val tags: List<Tag>,
     )
 
     private suspend fun library() = Library(
-        links = linkRepository.getLinksWithTags().first().getOrThrow().map { it.toDomain() },
-        categories = categoryRepository.getCategories().first().getOrThrow().map { it.toCategory() },
+        links = linkRepository.getLinksWithTags().first().getOrThrow(),
+        categories = categoryRepository.getCategories().first().getOrThrow(),
         linkCategoryIds = categoryRepository.getLinkCategoryIds().first().getOrThrow(),
         tags = tagRepository.getTags().first().getOrThrow(),
     )
@@ -64,7 +62,7 @@ class LinksBackupService(
         var categoriesCreated = 0
         plan.categoriesToCreate.forEach { c ->
             val parent = c.parentId?.let(categoryIds::get)
-            categoryRepository.addCategory(CategoryEntity(id = "", name = c.name, parentId = parent)).first()
+            categoryRepository.addCategory(Category(id = "", name = c.name, parentId = parent)).first()
                 .onSuccess { categoryIds[c.id] = it.id; categoriesCreated++ }
             // A category the tree can't take (too deep) is left out; its links stay uncategorized
         }
@@ -72,14 +70,14 @@ class LinksBackupService(
         val tagIds = lib.tags.associate { it.name.lowercase() to it.id }.toMutableMap()
         var tagsCreated = 0
         plan.tagsToCreate.forEach { name ->
-            tagRepository.addTag(TagEntity(id = "", name = name)).first()
+            tagRepository.addTag(Tag(id = "", name = name, count = 0)).first()
                 .onSuccess { tagIds[name.lowercase()] = it.id; tagsCreated++ }
         }
 
         var added = 0
         plan.linksToAdd.forEach { link ->
             val saved = linkRepository.addLink(
-                LinkEntity(
+                Link(
                     id = "", title = link.title, url = link.url, description = link.description,
                     isFavorite = link.isFavorite, isOpened = link.isOpened, isArchived = link.isArchived,
                     type = link.type, fetchedDescription = link.fetchedDescription,

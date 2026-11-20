@@ -1,8 +1,9 @@
 package com.greenrobotdev.lordofthelinks.database.repository
 
 import com.greenrobotdev.lordofthelinks.database.room.CategoryDao
-import com.greenrobotdev.lordofthelinks.database.room.CategoryEntity
-import com.greenrobotdev.lordofthelinks.database.room.CategoryWithCount
+import com.greenrobotdev.lordofthelinks.model.Category
+import com.greenrobotdev.lordofthelinks.model.SmartListCounts
+import com.greenrobotdev.lordofthelinks.model.repository.CategoryRepository
 import com.greenrobotdev.lordofthelinks.database.room.LinkCategoryEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -15,22 +16,23 @@ class RoomCategoryRepository(
     private val categoryDao: CategoryDao
 ) : CategoryRepository {
 
-    override suspend fun getCategories(): Flow<Result<List<CategoryEntity>>> =
+    override suspend fun getCategories(): Flow<Result<List<Category>>> =
         categoryDao.getAllCategories()
-            .map { Result.success(it) }
+            .map { rows -> Result.success(rows.map { it.toCategory() }) }
             .catch { emit(Result.failure(it)) }
 
-    override suspend fun getCategoryById(id: String): Flow<Result<CategoryEntity?>> =
+    override suspend fun getCategoryById(id: String): Flow<Result<Category?>> =
         categoryDao.getCategoryById(id)
-            .map { Result.success(it) }
+            .map { Result.success(it?.toCategory()) }
             .catch { emit(Result.failure(it)) }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun addCategory(category: CategoryEntity): Flow<Result<CategoryEntity>> = flow {
+    override suspend fun addCategory(category: Category): Flow<Result<Category>> = flow {
         try {
-            val toSave = if (category.id.isEmpty()) category.copy(id = Uuid.random().toString()) else category
+            val entity = category.toEntity()
+            val toSave = if (entity.id.isEmpty()) entity.copy(id = Uuid.random().toString()) else entity
             categoryDao.insertCategory(toSave)
-            emit(Result.success(toSave))
+            emit(Result.success(toSave.toCategory()))
         } catch (e: kotlin.coroutines.cancellation.CancellationException) {
             // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
             throw e
@@ -104,9 +106,9 @@ class RoomCategoryRepository(
     }
 
 
-    override suspend fun getCategoryForLink(linkId: String): Flow<Result<CategoryEntity?>> = flow {
+    override suspend fun getCategoryForLink(linkId: String): Flow<Result<Category?>> = flow {
         try {
-            emit(Result.success(categoryDao.getCategoryForLink(linkId)))
+            emit(Result.success(categoryDao.getCategoryForLink(linkId)?.toCategory()))
         } catch (e: kotlin.coroutines.cancellation.CancellationException) {
             // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
             throw e
@@ -144,9 +146,9 @@ class RoomCategoryRepository(
             .map { rows -> Result.success(rows.associate { it.linkId to it.categoryId }) }
             .catch { e -> emit(Result.failure(e)) }
 
-    override suspend fun getRecentCategories(): Flow<Result<List<CategoryEntity>>> = flow {
+    override suspend fun getRecentCategories(): Flow<Result<List<Category>>> = flow {
         try {
-            emit(Result.success(categoryDao.getRecentCategories()))
+            emit(Result.success(categoryDao.getRecentCategories().map { it.toCategory() }))
         } catch (e: kotlin.coroutines.cancellation.CancellationException) {
             // cancellation (incl. first() AbortFlow) must propagate, not become Result.failure
             throw e
@@ -155,13 +157,13 @@ class RoomCategoryRepository(
         }
     }
 
-    override suspend fun getCategoriesWithCounts(): Flow<Result<List<CategoryWithCount>>> =
+    override suspend fun getCategoriesWithCounts(): Flow<Result<List<Category>>> =
         categoryDao.getAllCategoriesWithCounts()
-            .map { Result.success(it) }
+            .map { rows -> Result.success(rows.map { it.toCategory() }) }
             .catch { emit(Result.failure(it)) }
 
-    override suspend fun getSmartListCounts(): Flow<Result<CategoryDao.SmartListCounts>> =
+    override suspend fun getSmartListCounts(): Flow<Result<SmartListCounts>> =
         categoryDao.getSmartListCounts()
-            .map { Result.success(it) }
+            .map { Result.success(it.toDomain()) }
             .catch { emit(Result.failure(it)) }
 }

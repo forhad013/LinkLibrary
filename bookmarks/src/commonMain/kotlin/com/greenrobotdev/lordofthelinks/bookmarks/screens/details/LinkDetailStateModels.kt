@@ -1,8 +1,8 @@
 package com.greenrobotdev.lordofthelinks.bookmarks.screens.details
 
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Category
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Tag
+import com.greenrobotdev.lordofthelinks.model.Category
+import com.greenrobotdev.lordofthelinks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Tag
 
 /** Link details (design: Link details). Every edit writes straight to the DB; there is no Save. */
 data class LinkDetailState(

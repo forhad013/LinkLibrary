@@ -1,7 +1,7 @@
 package com.greenrobotdev.lordofthelinks.bookmarks.screens.saved
 
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Category
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Category
+import com.greenrobotdev.lordofthelinks.model.Link
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.categoryPicker.subtreeIds
 
 /** Which saved links a list shows: one of the Library's smart lists, a category or a tag. */

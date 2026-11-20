@@ -6,12 +6,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Tag
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toEntity
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toTag
+import com.greenrobotdev.lordofthelinks.model.Tag
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.categoryPicker.DELETE_UNDO_MS
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.categoryPicker.DeletePhase
-import com.greenrobotdev.lordofthelinks.database.repository.TagRepository
+import com.greenrobotdev.lordofthelinks.model.repository.TagRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -36,7 +34,7 @@ fun TagPickerPresenter(
         tagRepository.getTagsWithCounts().collect { result ->
             result.fold(
                 onSuccess = { rows ->
-                    state = state.copy(isLoading = false, allTags = rows.map { it.toTag() })
+                    state = state.copy(isLoading = false, allTags = rows)
                 },
                 onFailure = { state = state.copy(isLoading = false, error = it.message) },
             )
@@ -123,7 +121,7 @@ private typealias Update = (TagPickerState) -> TagPickerState
 private suspend fun create(snapshot: TagPickerState, rawName: String, repo: TagRepository, multiSelect: Boolean): Update {
     val name = rawName.trim()
     validateTagName(name, snapshot.allTags)?.let { msg -> return { it.copy(error = msg) } }
-    return repo.addTag(Tag(id = "", name = name, count = 0).toEntity()).first().fold(
+    return repo.addTag(Tag(id = "", name = name, count = 0)).first().fold(
         onSuccess = { created ->
             { state -> state.copy(
                 creating = false,

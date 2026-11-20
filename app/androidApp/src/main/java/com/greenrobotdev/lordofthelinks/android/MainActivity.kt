@@ -17,7 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import android.os.Build
-import com.greenrobotdev.lordofthelinks.bookmarks.model.SharedContent
+import com.greenrobotdev.lordofthelinks.model.SharedContent
 import com.greenrobotdev.lordofthelinks.design.theme.LinkLibraryTheme
 import com.greenrobotdev.lordofthelinks.screens.root.RootScreen
 import com.greenrobotdev.lordofthelinks.utils.settings.SettingsFactory

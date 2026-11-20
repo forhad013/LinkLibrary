@@ -1,7 +1,7 @@
 // shortcut: not runnable until bookmarks jvm() target matches core/utils jvm("desktop") — run after GRE-42 follow-up fixes target naming
 package com.greenrobotdev.lordofthelinks.bookmarks
 
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Category
+import com.greenrobotdev.lordofthelinks.model.Category
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

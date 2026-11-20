@@ -1,4 +1,4 @@
-package com.greenrobotdev.lordofthelinks.bookmarks.model
+package com.greenrobotdev.lordofthelinks.model
 
 /**
  * Common data model for shared content from external apps

@@ -1,7 +1,7 @@
 package com.greenrobotdev.lordofthelinks.screens.share
 
 import androidx.compose.runtime.Composable
-import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
+import com.greenrobotdev.lordofthelinks.model.repository.LinkRepository
 import com.greenrobotdev.lordofthelinks.utils.MoleculeViewModel
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent

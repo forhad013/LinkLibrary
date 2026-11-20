@@ -55,8 +55,11 @@ kotlin {
                 // Utils module (MoleculeViewModel and utilities)
                 implementation(project(":core:utils"))
 
-                // Bookmarks module (shared models and screens)
+                // Bookmarks module (screens)
                 implementation(project(":bookmarks"))
+
+                // Domain models and repository interfaces
+                implementation(project(":core:model"))
             }
         }
 

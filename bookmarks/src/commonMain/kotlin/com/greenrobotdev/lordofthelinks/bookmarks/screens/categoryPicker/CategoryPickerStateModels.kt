@@ -1,6 +1,6 @@
 package com.greenrobotdev.lordofthelinks.bookmarks.screens.categoryPicker
 
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Category
+import com.greenrobotdev.lordofthelinks.model.Category
 import kotlinx.serialization.Serializable
 
 @Serializable

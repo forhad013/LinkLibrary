@@ -6,14 +6,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toCategory
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toDomain
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toEntity
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toTag
-import com.greenrobotdev.lordofthelinks.database.repository.CategoryRepository
-import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
-import com.greenrobotdev.lordofthelinks.database.repository.TagRepository
+import com.greenrobotdev.lordofthelinks.model.Link
+import com.greenrobotdev.lordofthelinks.model.repository.CategoryRepository
+import com.greenrobotdev.lordofthelinks.model.repository.LinkRepository
+import com.greenrobotdev.lordofthelinks.model.repository.TagRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -43,7 +39,7 @@ fun LinkDetailPresenter(
         linkRepository.getLinksWithTags().collect { result ->
             result.fold(
                 onSuccess = { entities ->
-                    val link = entities.firstOrNull { it.id == linkId }?.toDomain()
+                    val link = entities.firstOrNull { it.id == linkId }
                     state = if (link == null && !state.isLoading) state.copy(isDeleted = true) // deleted elsewhere
                     else state.copy(
                         isLoading = false,
@@ -57,12 +53,12 @@ fun LinkDetailPresenter(
     }
     LaunchedEffect(linkId) {
         tagRepository.getTagsForLink(linkId).collect { result ->
-            result.onSuccess { rows -> state = state.copy(linkTags = rows.map { it.toTag() }) }
+            result.onSuccess { rows -> state = state.copy(linkTags = rows) }
         }
     }
     LaunchedEffect(Unit) {
         categoryRepository.getCategories().collect { result ->
-            result.onSuccess { rows -> state = state.copy(categories = rows.map { it.toCategory() }) }
+            result.onSuccess { rows -> state = state.copy(categories = rows) }
         }
     }
     LaunchedEffect(linkId) {
@@ -78,7 +74,7 @@ fun LinkDetailPresenter(
             val link = state.link ?: return
             val updated = update(link)
             state = state.copy(link = updated) // instant UI; the links flow confirms
-            linkRepository.updateLink(updated.toEntity()).first()
+            linkRepository.updateLink(updated).first()
                 .onFailure { state = state.copy(link = link, error = it.message ?: "Could not save") }
         }
 
@@ -116,7 +112,7 @@ fun LinkDetailPresenter(
                     noteJob = launch {
                         delay(NOTE_SAVE_DELAY_MS)
                         val link = state.link ?: return@launch
-                        linkRepository.updateLink(link.copy(description = event.note).toEntity()).first()
+                        linkRepository.updateLink(link.copy(description = event.note)).first()
                             .onFailure { state = state.copy(error = it.message ?: "Could not save note") }
                         if (pendingNote == event.note) pendingNote = null
                         state = state.copy(noteSaving = false)

@@ -1,8 +1,8 @@
 package com.greenrobotdev.lordofthelinks.bookmarks.backup
 
 import com.greenrobotdev.lordofthelinks.bookmarks.domain.isSameLink
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Category
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Category
+import com.greenrobotdev.lordofthelinks.model.Link
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 

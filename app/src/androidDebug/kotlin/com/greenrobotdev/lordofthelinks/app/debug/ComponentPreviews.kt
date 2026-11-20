@@ -19,8 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Tag
+import com.greenrobotdev.lordofthelinks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Tag
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.library.ModernLinkCard
 import com.greenrobotdev.lordofthelinks.design.theme.AppTheme
 import com.greenrobotdev.lordofthelinks.design.components.advanced.TagChipsSelector

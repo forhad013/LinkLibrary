@@ -33,7 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.greenrobotdev.lordofthelinks.bookmarks.model.SharedContent
+import com.greenrobotdev.lordofthelinks.model.SharedContent
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.add.sheet.AddLinkSheet
 import com.greenrobotdev.lordofthelinks.screens.library.navigation.LibraryNavRoutes
 import com.greenrobotdev.lordofthelinks.screens.library.navigation.LibraryTabNavigation

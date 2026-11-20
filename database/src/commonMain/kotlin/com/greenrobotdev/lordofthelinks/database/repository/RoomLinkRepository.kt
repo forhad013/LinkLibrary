@@ -2,8 +2,9 @@ package com.greenrobotdev.lordofthelinks.database.repository
 
 import com.greenrobotdev.lordofthelinks.database.room.CategoryDao
 import com.greenrobotdev.lordofthelinks.database.room.LinkDao
-import com.greenrobotdev.lordofthelinks.database.room.LinkEntity
 import com.greenrobotdev.lordofthelinks.database.room.TagDao
+import com.greenrobotdev.lordofthelinks.model.Link
+import com.greenrobotdev.lordofthelinks.model.repository.LinkRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -21,12 +22,12 @@ class RoomLinkRepository(
     private val categoryDao: CategoryDao
 ) : LinkRepository {
 
-    override suspend fun getLinks(): Flow<Result<List<LinkEntity>>> =
+    override suspend fun getLinks(): Flow<Result<List<Link>>> =
         linkDao.getAllLinks()
-            .map { Result.success(it) }
+            .map { entities -> Result.success(entities.map { it.toDomain() }) }
             .catch { emit(Result.failure(it)) }
 
-    override suspend fun getLinksWithTags(): Flow<Result<List<LinkEntity>>> {
+    override suspend fun getLinksWithTags(): Flow<Result<List<Link>>> {
         return flow {
             try {
                 // tag counts change with link_tags, so tags assigned after a save re-emit too
@@ -34,7 +35,7 @@ class RoomLinkRepository(
                     val enriched = entities.map { entity ->
                         val tagNames = tagDao.getTagsForLink(entity.id).first()
                             .map { it.name }
-                        entity.copy(tags = tagNames)
+                        entity.copy(tags = tagNames).toDomain()
                     }
                     emit(Result.success(enriched))
                 }
@@ -47,11 +48,11 @@ class RoomLinkRepository(
         }
     }
 
-    override suspend fun toggleFavorite(linkId: String): Flow<Result<LinkEntity>> {
+    override suspend fun toggleFavorite(linkId: String): Flow<Result<Link>> {
         return try {
             linkDao.toggleFavorite(linkId)
             val entity = linkDao.getLinkById(linkId)
-            entity?.let { flow { emit(Result.success(it)) } }
+            entity?.let { flow { emit(Result.success(it.toDomain())) } }
                 ?: flow { emit(Result.failure(Exception("Link not found"))) }
         } catch (e: Exception) {
             flow { emit(Result.failure(e)) }
@@ -59,21 +60,22 @@ class RoomLinkRepository(
     }
 
     @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
-    override suspend fun addLink(link: LinkEntity): Flow<Result<LinkEntity>> {
+    override suspend fun addLink(link: Link): Flow<Result<Link>> {
         return try {
-            val withId = if (link.id.isEmpty()) link.copy(id = Uuid.random().toString()) else link
+            val entity = link.toEntity()
+            val withId = if (entity.id.isEmpty()) entity.copy(id = Uuid.random().toString()) else entity
             val linkToSave = if (withId.createdAt == null) withId.copy(createdAt = Clock.System.now().toEpochMilliseconds()) else withId
             linkDao.insertLink(linkToSave)
-            flow { emit(Result.success(linkToSave)) }
+            flow { emit(Result.success(linkToSave.toDomain())) }
         } catch (e: Exception) {
             flow { emit(Result.failure(e)) }
         }
     }
 
     /** Plain UPDATE: unlike addLink's REPLACE it keeps the link's tag/category rows (FK cascade). */
-    override suspend fun updateLink(link: LinkEntity): Flow<Result<LinkEntity>> {
+    override suspend fun updateLink(link: Link): Flow<Result<Link>> {
         return try {
-            linkDao.updateLink(link)
+            linkDao.updateLink(link.toEntity())
             flow { emit(Result.success(link)) }
         } catch (e: Exception) {
             flow { emit(Result.failure(e)) }

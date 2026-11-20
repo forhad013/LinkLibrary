@@ -63,7 +63,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Link
 import com.greenrobotdev.lordofthelinks.design.components.button.IconButton as DesignIconButton
 import com.greenrobotdev.lordofthelinks.design.components.card.ElevatedCard
 import com.greenrobotdev.lordofthelinks.design.components.progress.CircularProgress

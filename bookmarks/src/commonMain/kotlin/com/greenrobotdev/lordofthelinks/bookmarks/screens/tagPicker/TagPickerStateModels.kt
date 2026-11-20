@@ -1,6 +1,6 @@
 package com.greenrobotdev.lordofthelinks.bookmarks.screens.tagPicker
 
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Tag
+import com.greenrobotdev.lordofthelinks.model.Tag
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.categoryPicker.DeletePhase
 
 /**

@@ -1,8 +1,8 @@
 package com.greenrobotdev.lordofthelinks.bookmarks.screens.library
 
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Category
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Tag
+import com.greenrobotdev.lordofthelinks.model.Category
+import com.greenrobotdev.lordofthelinks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Tag
 import com.greenrobotdev.lordofthelinks.bookmarks.screens.categoryPicker.subtreeIds
 import kotlinx.datetime.DatePeriod
 import kotlinx.serialization.Serializable
@@ -76,7 +76,7 @@ data class LibraryState(
      */
     fun resurfaceCandidates(nowMs: Long): List<Link> =
         unopenedLinks.drop(PICK_UP_COUNT)
-            .filter { it.createdAt == null || nowMs - it.createdAt >= 7 * DAY_MS }
+            .filter { link -> link.createdAt.let { it == null || nowMs - it >= 7 * DAY_MS } }
             .asReversed()
     fun categoryOf(link: Link): Category? = linkCategoryIds[link.id]?.let { id -> categories.firstOrNull { it.id == id } }
 }

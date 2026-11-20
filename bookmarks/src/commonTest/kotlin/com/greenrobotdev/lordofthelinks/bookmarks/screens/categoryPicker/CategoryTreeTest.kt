@@ -1,7 +1,7 @@
 // shortcut: not runnable until bookmarks jvm target compiles the screens (pre-existing viewModel{} JVM failures); logic is also covered by review
 package com.greenrobotdev.lordofthelinks.bookmarks.screens.categoryPicker
 
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Category
+import com.greenrobotdev.lordofthelinks.model.Category
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

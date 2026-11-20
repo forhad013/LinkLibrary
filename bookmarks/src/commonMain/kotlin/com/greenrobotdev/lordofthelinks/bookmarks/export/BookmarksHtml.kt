@@ -1,7 +1,7 @@
 package com.greenrobotdev.lordofthelinks.bookmarks.export
 
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Category
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Category
+import com.greenrobotdev.lordofthelinks.model.Link
 
 /**
  * Links as a browser bookmarks file (Netscape format): Chrome, Firefox, Safari and most read-later

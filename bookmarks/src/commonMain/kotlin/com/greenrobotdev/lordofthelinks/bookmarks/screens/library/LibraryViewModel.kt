@@ -6,15 +6,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toCategory
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toDomain
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toEntity
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toTag
 import com.greenrobotdev.lordofthelinks.bookmarks.service.HttpStatusException
 import com.greenrobotdev.lordofthelinks.bookmarks.service.MetadataFetchService
-import com.greenrobotdev.lordofthelinks.database.repository.CategoryRepository
-import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
-import com.greenrobotdev.lordofthelinks.database.repository.TagRepository
+import com.greenrobotdev.lordofthelinks.model.repository.CategoryRepository
+import com.greenrobotdev.lordofthelinks.model.repository.LinkRepository
+import com.greenrobotdev.lordofthelinks.model.repository.TagRepository
 import com.greenrobotdev.lordofthelinks.utils.MoleculeViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -53,7 +49,7 @@ fun LibraryPresenter(
 
     LaunchedEffect(Unit) {
         linkRepository.getLinksWithTags().collect { result ->
-            result.onSuccess { entities -> state = state.copy(links = entities.map { it.toDomain() }, isLoading = false) }
+            result.onSuccess { entities -> state = state.copy(links = entities, isLoading = false) }
                 .onFailure { state = state.copy(isLoading = false) }
         }
     }
@@ -72,7 +68,7 @@ fun LibraryPresenter(
         categoryRepository.getCategories().collect { result ->
             result.onSuccess { rows ->
                 // Drop picks whose category was deleted, or the Feed would stay empty with no chip to remove
-                val categories = rows.map { it.toCategory() }
+                val categories = rows
                 state = state.copy(categories = categories, filters = state.filters.copy(categoryIds = state.filters.categoryIds.filterTo(mutableSetOf()) { id -> categories.any { it.id == id } }))
             }
         }
@@ -85,7 +81,7 @@ fun LibraryPresenter(
     LaunchedEffect(Unit) {
         tagRepository.getTagsWithCounts().collect { result ->
             result.onSuccess { rows ->
-                val tags = rows.map { it.toTag() }
+                val tags = rows
                 state = state.copy(tags = tags, filters = state.filters.copy(tagIds = state.filters.tagIds.filterTo(mutableSetOf()) { id -> tags.any { it.id == id } }))
             }
         }
@@ -102,7 +98,7 @@ fun LibraryPresenter(
                 is LibraryEvent.Archive -> {
                     // the links flow re-emits with isArchived = true, which hides it from the Feed
                     state.links.firstOrNull { it.id == event.linkId }
-                        ?.let { linkRepository.updateLink(it.copy(isArchived = true).toEntity()).first() }
+                        ?.let { linkRepository.updateLink(it.copy(isArchived = true)).first() }
                     state
                 }
                 is LibraryEvent.Delete -> {
@@ -111,7 +107,7 @@ fun LibraryPresenter(
                     state
                 }
                 is LibraryEvent.Restore -> {
-                    linkRepository.updateLink(event.link.toEntity()).first()
+                    linkRepository.updateLink(event.link).first()
                     state
                 }
                 is LibraryEvent.Opened -> {

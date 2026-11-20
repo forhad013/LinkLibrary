@@ -6,8 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
-import com.greenrobotdev.lordofthelinks.bookmarks.model.toDomain
+import com.greenrobotdev.lordofthelinks.model.repository.LinkRepository
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.ExperimentalTime
 
@@ -29,7 +28,7 @@ fun HomePresenter(
             isLoading = false
             result.onSuccess {
                 // Show only recent 20 links, sorted by createdAt descending
-                links = it.map { it.toDomain() }
+                links = it
                     .sortedByDescending { it.createdAt }
                     .take(20)
             }
@@ -46,7 +45,7 @@ fun HomePresenter(
                         isLoading = false
                         result.onSuccess {
                             // Show only recent 20 links, sorted by createdAt descending
-                            links = it.map { it.toDomain() }
+                            links = it
                                 .sortedByDescending { entity -> entity.createdAt }
                                 .take(20)
                         }
@@ -56,7 +55,7 @@ fun HomePresenter(
                 is HomeEvent.ToggleFavorite -> {
                     linkRepository.toggleFavorite(event.id).collect { result ->
                         result.onSuccess { updatedLink ->
-                            val domainLink = updatedLink.toDomain()
+                            val domainLink = updatedLink
                             links = links?.map { link ->
                                 if (link.id == domainLink.id) domainLink else link
                             }

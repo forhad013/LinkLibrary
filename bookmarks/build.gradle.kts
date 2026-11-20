@@ -53,8 +53,8 @@ kotlin {
                 implementation(project(":core:utils"))
                 implementation(libs.multiplatform.settings) // FeedFilterStore
 
-                // Database module (for repositories and entities)
-                implementation(project(":database"))
+                // Domain models and repository interfaces (the Room implementations live in :database, wired by the app)
+                implementation(project(":core:model"))
             }
         }
 
@@ -68,8 +68,6 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                // Database module (only for targets that support it)
-                implementation(project(":database"))
                 // Ktor HTTP client engine for Android
                 implementation(libs.ktor.client.okhttp)
                 // Molecule for Android
@@ -80,8 +78,6 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                // Database module (only for targets that support it)
-                implementation(project(":database"))
                 // Ktor HTTP client engine for JVM
                 implementation(libs.ktor.client.java)
                 // Molecule for JVM

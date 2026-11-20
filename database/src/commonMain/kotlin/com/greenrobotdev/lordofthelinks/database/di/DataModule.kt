@@ -1,11 +1,11 @@
 package com.greenrobotdev.lordofthelinks.database.di
 
-import com.greenrobotdev.lordofthelinks.database.repository.CategoryRepository
-import com.greenrobotdev.lordofthelinks.database.repository.LinkRepository
+import com.greenrobotdev.lordofthelinks.model.repository.CategoryRepository
+import com.greenrobotdev.lordofthelinks.model.repository.LinkRepository
 import com.greenrobotdev.lordofthelinks.database.repository.RoomCategoryRepository
 import com.greenrobotdev.lordofthelinks.database.repository.RoomLinkRepository
 import com.greenrobotdev.lordofthelinks.database.repository.RoomTagRepository
-import com.greenrobotdev.lordofthelinks.database.repository.TagRepository
+import com.greenrobotdev.lordofthelinks.model.repository.TagRepository
 import com.greenrobotdev.lordofthelinks.database.room.DatabaseBuilder
 import com.greenrobotdev.lordofthelinks.database.room.LinkDatabase
 import org.koin.core.module.Module

@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":bookmarks"))
     implementation(project(":core:design"))
     implementation(project(":core:utils"))
+    implementation(project(":core:model"))
     implementation(project(":database"))
     implementation(libs.koin.android)
     implementation(libs.koin.core)

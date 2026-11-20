@@ -105,7 +105,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greenrobotdev.lordofthelinks.design.components.utils.PlatformAsyncImage
 import com.greenrobotdev.lordofthelinks.design.components.button.AppButton
 import androidx.navigation3.runtime.NavKey
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Link
+import com.greenrobotdev.lordofthelinks.model.Link
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 

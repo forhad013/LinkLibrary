@@ -47,7 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.greenrobotdev.lordofthelinks.bookmarks.model.Category
+import com.greenrobotdev.lordofthelinks.model.Category
 import com.greenrobotdev.lordofthelinks.design.theme.LordsExtraColors
 
 /**
