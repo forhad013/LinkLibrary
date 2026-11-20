@@ -1,0 +1,37 @@
+name: CI Check
+
+# Runs on every pull request: does it compile, do the tests pass.
+# Coverage, lint and static analysis get added here as later steps.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Compile & test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 21, not 17: the Android app compiles with Java 21 (compileOptions in app/androidApp)
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Unit tests
+        run: ./gradlew :app:jvmTest :bookmarks:jvmTest :database:jvmTest
+
+      # Debug only: no signing secrets needed, so it also works on PRs from forks
+      - name: Compile Android and desktop
+        run: ./gradlew :app:androidApp:assembleDebug :app:desktopApp:compileKotlinJvm
