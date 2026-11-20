@@ -48,7 +48,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 // AndroidX Lifecycle ViewModel for Android
-                implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
+                implementation(libs.androidx.lifecycle.viewmodel.ktx)
                 // Molecule Runtime for Android
                 implementation(libs.molecule.runtime)
                 // Multiplatform Settings - ensure Android implementation is available
@@ -59,7 +59,7 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 // Multiplatform ViewModel, so screens' viewModel { } works on desktop/JVM like on Android
-                api("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:${libs.versions.lifecycle.viewmodel.navigation3.get()}")
+                api(libs.jetbrains.lifecycle.viewmodel)
                 // Molecule Runtime for Desktop
                 implementation(libs.molecule.runtime)
             }

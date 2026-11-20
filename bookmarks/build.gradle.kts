@@ -61,7 +61,7 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             // In-memory Settings (MapSettings) for FeedFilterStoreTest
-            implementation("com.russhwolf:multiplatform-settings-test:${libs.versions.multiplatform.settings.get()}")
+            implementation(libs.multiplatform.settings.test)
             implementation(kotlin("test-common"))
             implementation(kotlin("test-annotations-common"))
         }
