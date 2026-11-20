@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.convention.android.room)
+    alias(libs.plugins.kover)
 }
 
 kotlin {

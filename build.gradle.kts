@@ -11,6 +11,8 @@ plugins {
     alias(libs.plugins.compose.compiler).apply(false)
     alias(libs.plugins.androidx.room).apply(false)
     alias(libs.plugins.ksp).apply(false)
+    // Code coverage: the root report merges the modules listed in dependencies { kover(...) }
+    alias(libs.plugins.kover)
 
 }
 repositories {
@@ -28,4 +30,11 @@ allprojects {
         maven("https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven")
         maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     }
+}
+
+// Coverage of every module with tests; ./gradlew koverHtmlReport / koverXmlReport (build/reports/kover)
+dependencies {
+    kover(project(":app"))
+    kover(project(":bookmarks"))
+    kover(project(":database"))
 }

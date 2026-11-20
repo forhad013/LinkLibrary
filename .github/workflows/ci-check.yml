@@ -1,7 +1,7 @@
 name: CI Check
 
 # Runs on every pull request: does it compile, do the tests pass.
-# Coverage, lint and static analysis get added here as later steps.
+# Coverage report is uploaded as an artifact; lint and static analysis come later.
 
 on:
   pull_request:
@@ -31,6 +31,20 @@ jobs:
 
       - name: Unit tests
         run: ./gradlew :app:jvmTest :bookmarks:jvmTest :database:jvmTest
+
+      # Reuses the test results above; merged report for app, bookmarks and database
+      - name: Coverage report
+        run: ./gradlew koverXmlReport koverHtmlReport
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            build/reports/kover/html
+            build/reports/kover/report.xml
+          retention-days: 14
+          if-no-files-found: error
 
       # Debug only: no signing secrets needed, so it also works on PRs from forks
       - name: Compile Android and desktop
