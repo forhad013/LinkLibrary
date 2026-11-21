@@ -1,7 +1,8 @@
 name: CI Check
 
 # Runs on every pull request: does it compile, do the tests pass.
-# detekt findings annotate the PR; coverage and detekt reports are uploaded as artifacts.
+# detekt posts one summary comment on the PR (updated each run) and fails the check on new findings.
+# Coverage and detekt reports are uploaded as artifacts.
 
 on:
   pull_request:
@@ -17,7 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      security-events: write # detekt findings as inline PR annotations (code scanning)
+      pull-requests: write # detekt summary comment
+    env:
+      # Shown in the PR comment when detekt finds nothing new; swap in any GIF URL you like
+      DETEKT_PASS_GIF: https://media.giphy.com/media/111ebonMs90YLu/giphy.gif
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,18 +36,40 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # Fails on findings not in detekt-baseline.xml; the steps below still upload the report
+      # Findings not in detekt-baseline.xml make this fail; the job carries on so the PR gets the
+      # comment and the tests still run, then "Fail on detekt findings" at the end fails the check
       - name: Static analysis (detekt)
+        id: detekt
+        continue-on-error: true
         run: ./gradlew detekt
 
-      - name: Annotate PR with detekt findings
-        if: ${{ !cancelled() }}
-        # Needs GitHub code scanning (public repo or Advanced Security); fork PRs can't write it either
+      - name: Write detekt comment
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        run: |
+          if [ "${{ steps.detekt.outcome }}" = "success" ]; then
+            printf '## detekt ✅\n\nNo new findings. Clean code, nice work!\n\n![All clear](%s)\n' "$DETEKT_PASS_GIF" > detekt-comment.md
+          else
+            {
+              echo '## detekt ❌'
+              echo
+              echo 'New findings below block the merge. Fix them and push; this comment updates itself.'
+              echo 'Findings that existed before are listed in `detekt-baseline.xml`.'
+              echo
+              sed -n '/^## Issues/,$p' build/reports/detekt/detekt.md 2>/dev/null | grep . >/dev/null \
+                && sed -n '/^## Issues/,$p' build/reports/detekt/detekt.md \
+                || echo 'detekt failed before writing a report; see the "Static analysis (detekt)" step log.'
+            } > detekt-comment.md
+          fi
+
+      # One comment per PR, edited on every run instead of adding new ones
+      - name: Post detekt comment
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        # PRs from forks get a read-only token and can't comment; the check result still counts
         continue-on-error: true
-        uses: github/codeql-action/upload-sarif@v3
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
-          sarif_file: build/reports/detekt/detekt.sarif
-          category: detekt
+          header: detekt
+          path: detekt-comment.md
 
       - name: Upload detekt report
         if: ${{ !cancelled() }}
@@ -74,3 +100,10 @@ jobs:
       # Debug only: no signing secrets needed, so it also works on PRs from forks
       - name: Compile Android and desktop
         run: ./gradlew :app:androidApp:assembleDebug :app:desktopApp:compileKotlinJvm
+
+      # Last, so the tests and builds above still report; this is what blocks the merge
+      - name: Fail on detekt findings
+        if: ${{ !cancelled() && steps.detekt.outcome == 'failure' }}
+        run: |
+          echo "detekt found new issues; see the PR comment or the detekt-report artifact."
+          exit 1
