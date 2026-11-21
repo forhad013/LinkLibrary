@@ -1,8 +1,9 @@
 name: CI Check
 
-# Runs on every pull request: does it compile, do the tests pass.
-# detekt, Android Lint and the unit tests each post one summary comment on the PR (updated each run) and fail the check.
-# Coverage and detekt reports are uploaded as artifacts.
+# Runs on every pull request, as four parallel jobs so each shows as its own check on the PR:
+# detekt, Android Lint, unit tests (with coverage) and the Android/desktop build.
+# detekt, lint and the tests each post one summary comment on the PR (updated each run).
+# PRs from forks get a read-only token and can't comment or create checks; the job result still counts.
 
 on:
   pull_request:
@@ -12,37 +13,25 @@ concurrency:
   group: ci-check-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Shown in the PR comments when everything passes; swap in any GIF URL you like
+  DETEKT_PASS_GIF: https://media.giphy.com/media/111ebonMs90YLu/giphy.gif
+  TESTS_PASS_GIF: https://media.giphy.com/media/111ebonMs90YLu/giphy.gif
+
 jobs:
-  check:
-    name: Compile & test
+  detekt:
+    name: detekt
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write # detekt, lint and unit test summary comments
-      checks: write # per-test report from dorny/test-reporter
-    env:
-      # Shown in the PR comments when everything passes; swap in any GIF URL you like
-      DETEKT_PASS_GIF: https://media.giphy.com/media/111ebonMs90YLu/giphy.gif
-      TESTS_PASS_GIF: https://media.giphy.com/media/111ebonMs90YLu/giphy.gif
+      pull-requests: write # summary comment
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-build
 
-      # 21, not 17: the Android app compiles with Java 21 (compileOptions in app/androidApp)
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      # Findings not in detekt-baseline.xml make this fail; the job carries on so the PR gets the
-      # comment and the tests still run, then "Fail on detekt findings" at the end fails the check
+      # Fails on findings not in detekt-baseline.xml; the steps below still post the comment
       - name: Static analysis (detekt)
         id: detekt
-        continue-on-error: true
         run: ./gradlew detekt
 
       - name: Write detekt comment
@@ -66,7 +55,6 @@ jobs:
       # One comment per PR, edited on every run instead of adding new ones
       - name: Post detekt comment
         if: ${{ !cancelled() && github.event_name == 'pull_request' }}
-        # PRs from forks get a read-only token and can't comment; the check result still counts
         continue-on-error: true
         uses: marocchino/sticky-pull-request-comment@v2
         with:
@@ -82,11 +70,20 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
+  lint:
+    name: Android Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # summary comment
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-build
+
       # Errors fail, warnings are only listed. Library modules are linted one by one because the app's
-      # checkDependencies crashes lint on AGP 9. Same pattern as detekt: "Fail on lint errors" fails the check
+      # checkDependencies crashes lint on AGP 9
       - name: Android Lint
         id: lint
-        continue-on-error: true
         run: >-
           ./gradlew --continue :app:androidApp:lintDebug :app:lintAndroidMain :bookmarks:lintAndroidMain
           :core:design:lintAndroidMain :core:utils:lintAndroidMain
@@ -116,17 +113,24 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
-      # Same pattern as detekt: carry on so the PR gets the comment, "Fail on test failures" fails the check
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # summary comment
+      checks: write # per-test report from dorny/test-reporter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-build
+
       - name: Unit tests
-        id: tests
-        continue-on-error: true
         run: ./gradlew :app:jvmTest :bookmarks:jvmTest :database:jvmTest --continue
 
       # Full report: a "Unit test results" check on the PR with every test, passed and failed, grouped by class
       - name: Unit test report
         id: test-report
         if: ${{ !cancelled() }}
-        # PRs from forks get a read-only token and can't create checks; the test result still counts
         continue-on-error: true
         uses: dorny/test-reporter@v2
         with:
@@ -135,7 +139,7 @@ jobs:
           reporter: java-junit
           list-suites: all
           list-tests: all
-          fail-on-error: false # "Fail on test failures" below decides
+          fail-on-error: false # the "Unit tests" step already fails the job
 
       - name: Write unit test comment
         if: ${{ !cancelled() && github.event_name == 'pull_request' }}
@@ -152,7 +156,7 @@ jobs:
           path: test-comment.md
 
       - name: Upload test report
-        if: ${{ !cancelled() && steps.tests.outcome == 'failure' }}
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: test-report
@@ -162,14 +166,11 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
-      # Reuses the test results above; merged report for app, bookmarks and database.
-      # Skipped when tests fail: Kover would re-run them and fail the same way
+      # Only after green tests (Kover would re-run failing ones); merged report for app, bookmarks and database
       - name: Coverage report
-        if: ${{ steps.tests.outcome == 'success' }}
         run: ./gradlew koverXmlReport koverHtmlReport
 
       - name: Upload coverage report
-        if: ${{ steps.tests.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -179,25 +180,15 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-build
+
       # Debug only: no signing secrets needed, so it also works on PRs from forks
       - name: Compile Android and desktop
         run: ./gradlew :app:androidApp:assembleDebug :app:desktopApp:compileKotlinJvm
-
-      # Last, so the tests and builds above still report; these are what block the merge
-      - name: Fail on test failures
-        if: ${{ !cancelled() && steps.tests.outcome == 'failure' }}
-        run: |
-          echo "Unit tests failed; see the PR comment or the test-report artifact."
-          exit 1
-
-      - name: Fail on lint errors
-        if: ${{ !cancelled() && steps.lint.outcome == 'failure' }}
-        run: |
-          echo "Android Lint found errors; see the PR comment or the lint-report artifact."
-          exit 1
-
-      - name: Fail on detekt findings
-        if: ${{ !cancelled() && steps.detekt.outcome == 'failure' }}
-        run: |
-          echo "detekt found new issues; see the PR comment or the detekt-report artifact."
-          exit 1
