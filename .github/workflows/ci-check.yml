@@ -1,7 +1,7 @@
 name: CI Check
 
 # Runs on every pull request: does it compile, do the tests pass.
-# detekt posts one summary comment on the PR (updated each run) and fails the check on new findings.
+# detekt and the unit tests each post one summary comment on the PR (updated each run) and fail the check.
 # Coverage and detekt reports are uploaded as artifacts.
 
 on:
@@ -18,10 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write # detekt summary comment
+      pull-requests: write # detekt and unit test summary comments
     env:
-      # Shown in the PR comment when detekt finds nothing new; swap in any GIF URL you like
+      # Shown in the PR comments when everything passes; swap in any GIF URL you like
       DETEKT_PASS_GIF: https://media.giphy.com/media/111ebonMs90YLu/giphy.gif
+      TESTS_PASS_GIF: https://media.giphy.com/media/111ebonMs90YLu/giphy.gif
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -80,14 +81,43 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
+      # Same pattern as detekt: carry on so the PR gets the comment, "Fail on test failures" fails the check
       - name: Unit tests
-        run: ./gradlew :app:jvmTest :bookmarks:jvmTest :database:jvmTest
+        id: tests
+        continue-on-error: true
+        run: ./gradlew :app:jvmTest :bookmarks:jvmTest :database:jvmTest --continue
 
-      # Reuses the test results above; merged report for app, bookmarks and database
+      - name: Write unit test comment
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        run: python3 .github/scripts/test_summary.py app/build/test-results bookmarks/build/test-results database/build/test-results > test-comment.md
+
+      - name: Post unit test comment
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        continue-on-error: true
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: unit-tests
+          path: test-comment.md
+
+      - name: Upload test report
+        if: ${{ !cancelled() && steps.tests.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: |
+            */build/reports/tests
+            */build/test-results
+          retention-days: 14
+          if-no-files-found: ignore
+
+      # Reuses the test results above; merged report for app, bookmarks and database.
+      # Skipped when tests fail: Kover would re-run them and fail the same way
       - name: Coverage report
+        if: ${{ steps.tests.outcome == 'success' }}
         run: ./gradlew koverXmlReport koverHtmlReport
 
       - name: Upload coverage report
+        if: ${{ steps.tests.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -101,7 +131,13 @@ jobs:
       - name: Compile Android and desktop
         run: ./gradlew :app:androidApp:assembleDebug :app:desktopApp:compileKotlinJvm
 
-      # Last, so the tests and builds above still report; this is what blocks the merge
+      # Last, so the tests and builds above still report; these are what block the merge
+      - name: Fail on test failures
+        if: ${{ !cancelled() && steps.tests.outcome == 'failure' }}
+        run: |
+          echo "Unit tests failed; see the PR comment or the test-report artifact."
+          exit 1
+
       - name: Fail on detekt findings
         if: ${{ !cancelled() && steps.detekt.outcome == 'failure' }}
         run: |
