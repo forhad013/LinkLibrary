@@ -18,7 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write # detekt and unit test summary comments
+      pull-requests: write # detekt, lint and unit test summary comments
+      checks: write # per-test report from dorny/test-reporter
     env:
       # Shown in the PR comments when everything passes; swap in any GIF URL you like
       DETEKT_PASS_GIF: https://media.giphy.com/media/111ebonMs90YLu/giphy.gif
@@ -121,8 +122,25 @@ jobs:
         continue-on-error: true
         run: ./gradlew :app:jvmTest :bookmarks:jvmTest :database:jvmTest --continue
 
+      # Full report: a "Unit test results" check on the PR with every test, passed and failed, grouped by class
+      - name: Unit test report
+        id: test-report
+        if: ${{ !cancelled() }}
+        # PRs from forks get a read-only token and can't create checks; the test result still counts
+        continue-on-error: true
+        uses: dorny/test-reporter@v2
+        with:
+          name: Unit test results
+          path: '*/build/test-results/**/TEST-*.xml'
+          reporter: java-junit
+          list-suites: all
+          list-tests: all
+          fail-on-error: false # "Fail on test failures" below decides
+
       - name: Write unit test comment
         if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        env:
+          TEST_REPORT_URL: ${{ steps.test-report.outputs.url_html }}
         run: python3 .github/scripts/test_summary.py app/build/test-results bookmarks/build/test-results database/build/test-results > test-comment.md
 
       - name: Post unit test comment

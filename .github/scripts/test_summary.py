@@ -9,6 +9,12 @@ import xml.etree.ElementTree as ET
 
 MAX_FAILURES = 30  # PR comments cap out at 64 KB; the test-report artifact has everything
 PASS_GIF = os.environ.get("TESTS_PASS_GIF")
+REPORT_URL = os.environ.get("TEST_REPORT_URL")  # the per-test check run, when the reporter step made one
+
+
+def report_link():
+    if REPORT_URL:
+        print(f"\n📋 [Every test, passed and failed]({REPORT_URL})")
 
 
 def suites(dirs):
@@ -39,6 +45,7 @@ def main():
     counts = f"**{passed}** passed, **{len(failures)}** failed, **{skipped}** skipped"
     if not failures:
         print(f"## Unit tests ✅\n\n{counts}. All green!")
+        report_link()
         if PASS_GIF:
             print(f"\n![All green]({PASS_GIF})")
         return
@@ -51,6 +58,7 @@ def main():
         print(f"| `{short}.{name}` | {message[:200].replace('|', chr(92) + '|')} |")
     if len(failures) > MAX_FAILURES:
         print(f"\n…and {len(failures) - MAX_FAILURES} more in the `test-report` artifact.")
+    report_link()
 
 
 if __name__ == "__main__":
