@@ -88,18 +88,19 @@ jobs:
           ./gradlew --continue :app:androidApp:lintDebug :app:lintAndroidMain :bookmarks:lintAndroidMain
           :core:design:lintAndroidMain :core:utils:lintAndroidMain
 
-      # Every finding on the run's Summary page; the PR comment has counts per rule and a link to it
+      # Every finding on the run's Summary page; the PR comment only has the counts and a link to it
       - name: Write lint report
         if: ${{ !cancelled() }}
         run: |
           python3 .github/scripts/lint_summary.py . $(find . -path '*/build/reports/lint-results-*.xml') > lint-report.md
           cat lint-report.md >> "$GITHUB_STEP_SUMMARY"
           {
-            python3 .github/scripts/lint_summary.py --brief . $(find . -path '*/build/reports/lint-results-*.xml')
+            head -n 2 lint-report.md
             if [ "${{ steps.lint.outcome }}" != "success" ]; then
               printf '\n❌ Lint errors block the merge. Fix them and push; this comment updates itself.\n'
             fi
-            printf '\n📋 [Full lint report](%s/%s/actions/runs/%s)\n' "${{ github.server_url }}" "${{ github.repository }}" "${{ github.run_id }}"
+            # #summary-<job id> scrolls the run's Summary page to this job's section
+            printf '\n📋 [Full lint report](%s/%s/actions/runs/%s#summary-%s)\n' "${{ github.server_url }}" "${{ github.repository }}" "${{ github.run_id }}" "${{ job.check_run_id }}"
           } > lint-comment.md
 
       - name: Post lint comment
