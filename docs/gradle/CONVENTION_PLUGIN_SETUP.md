@@ -39,7 +39,7 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.greenrobotdev.linklibrary.database"
+        namespace = "com.greenrobotdev.lordofthelinks.database"
         compileSdk = 36
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
@@ -69,7 +69,7 @@ plugins {
 }
 
 android {
-    namespace = "com.greenrobotdev.linklibrary.database"
+    namespace = "com.greenrobotdev.lordofthelinks.database"
 }
 
 room {
@@ -106,7 +106,7 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.greenrobotdev.linklibrary.design"
+        namespace = "com.greenrobotdev.lordofthelinks.design"
     }
 }
 
@@ -128,7 +128,7 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "com.greenrobotdev.linklibrary.utils"
+        namespace = "com.greenrobotdev.lordofthelinks.utils"
     }
     
     // iOS targets still need explicit configuration

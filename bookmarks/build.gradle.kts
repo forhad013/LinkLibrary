@@ -3,12 +3,14 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 plugins {
     alias(libs.plugins.convention.kmp.library)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.kover)
 }
 
 kotlin {
     android {
-        namespace = "com.greenrobotdev.linklibrary.bookmarks"
+        namespace = "com.greenrobotdev.lordofthelinks.bookmarks"
         compileSdk = 37
+        minSdk = 28 // same as app/androidApp
     }
 
     jvm()
@@ -53,23 +55,21 @@ kotlin {
                 implementation(project(":core:utils"))
                 implementation(libs.multiplatform.settings) // FeedFilterStore
 
-                // Database module (for repositories and entities)
-                implementation(project(":database"))
+                // Domain models and repository interfaces (the Room implementations live in :database, wired by the app)
+                implementation(project(":core:model"))
             }
         }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             // In-memory Settings (MapSettings) for FeedFilterStoreTest
-            implementation("com.russhwolf:multiplatform-settings-test:${libs.versions.multiplatform.settings.get()}")
+            implementation(libs.multiplatform.settings.test)
             implementation(kotlin("test-common"))
             implementation(kotlin("test-annotations-common"))
         }
 
         val androidMain by getting {
             dependencies {
-                // Database module (only for targets that support it)
-                implementation(project(":database"))
                 // Ktor HTTP client engine for Android
                 implementation(libs.ktor.client.okhttp)
                 // Molecule for Android
@@ -80,8 +80,6 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                // Database module (only for targets that support it)
-                implementation(project(":database"))
                 // Ktor HTTP client engine for JVM
                 implementation(libs.ktor.client.java)
                 // Molecule for JVM

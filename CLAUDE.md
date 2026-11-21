@@ -9,7 +9,8 @@ Kotlin Multiplatform link/bookmark manager (Android, JVM, WASM). Room KMP + SQLi
 - `bookmarks/` — bookmark screens (add, addTag, addCollection, library, details, tags, collections)
 - `core/design/` — design system (cards, icons, textfields, selection, theme)
 - `core/utils/` — MoleculeViewModel
-- `database/` — Room entities/DAOs, repositories, `di/DataModule.kt`
+- `core/model/` — domain models (`Link`, `Tag`, `Category`, …) and repository interfaces; no Room, so web can use it
+- `database/` — Room entities/DAOs and the Room repository implementations (entity ↔ model mapping), `di/DataModule.kt`. Only the app entry points depend on it; `bookmarks` uses `core/model`
 - `build-logic/` — convention plugins
 
 ## Versions
@@ -20,8 +21,8 @@ See `docs/architecture/AGP9_AND_PATTERNS.md`. Highlights: KMP modules use `com.a
 
 ## Device automation (adb on the owner's real phone)
 The test device is the owner's personal Pixel. A blind tap once opened the Camera app from the home screen, so these rules are mandatory:
-- **Package id is `com.greenrobotdev.linklibrary.android`.** Launch with `adb shell am start -n com.greenrobotdev.linklibrary.android/.MainActivity` and check the output for errors. Never silence launch output (`>/dev/null`).
-- **Check before every tap batch:** `adb shell dumpsys window | grep mCurrentFocus` must show `com.greenrobotdev.linklibrary.android`. If it shows the launcher, lock screen, or any other app: stop. Don't tap.
+- **Package id is `com.greenrobotdev.lordofthelinks.android`.** Launch with `adb shell am start -n com.greenrobotdev.lordofthelinks.android/.MainActivity` and check the output for errors. Never silence launch output (`>/dev/null`).
+- **Check before every tap batch:** `adb shell dumpsys window | grep mCurrentFocus` must show `com.greenrobotdev.lordofthelinks.android`. If it shows the launcher, lock screen, or any other app: stop. Don't tap.
 - **Tap by element, not guesswork:** take bounds from `uiautomator dump` for the current screen; never reuse coordinates from an earlier run without re-checking the screen.
 - **Never open, tap into, or act in other apps** (camera, settings, messages, …). Don't send global keys that can launch apps (`KEYCODE_CAMERA`, double `KEYCODE_POWER`, `KEYCODE_HOME` followed by taps).
 - **Never try to unlock the phone** (no swipe/keyevent 82/`wm dismiss-keyguard`, never type a PIN). If it's locked, ask the owner and wait.
@@ -29,7 +30,7 @@ The test device is the owner's personal Pixel. A blind tap once opened the Camer
 
 # Design System (TheLordsOfLinks — authoritative)
 
-Material 3 Expressive, Royal Purple `#6D28D9` + Gold `#F59E0B`. Source of truth: `core/design/src/commonMain/kotlin/com/greenrobotdev/linklibrary/design/theme/Color.kt`.
+Material 3 Expressive, Royal Purple `#6D28D9` + Gold `#F59E0B`. Source of truth: `core/design/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/design/theme/Color.kt`.
 
 ## Mandatory
 - **Cards**: always use templates from `:core:design` (`FormCard`, `ContentCard`, `SectionContentCard`, `ToggleCard`, `InputCard`). Never use raw `androidx.compose.material3.Card` in feature modules.

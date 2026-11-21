@@ -1,0 +1,19 @@
+# Tweaks on top of detekt's default rules (buildUponDefaultConfig = true).
+# Existing findings are in detekt-baseline.xml; regenerate it with ./gradlew detektBaseline only on purpose.
+
+naming:
+  FunctionNaming:
+    # Composables are PascalCase by convention
+    ignoreAnnotated: ['Composable']
+
+style:
+  MagicNumber:
+    # UI code is full of dp/alpha/duration literals; naming each would hurt readability
+    active: false
+  MaxLineLength:
+    maxLineLength: 160
+
+complexity:
+  LongMethod:
+    # A screen's Composable is long by nature; complexity checks still apply to it
+    ignoreAnnotated: ['Composable']

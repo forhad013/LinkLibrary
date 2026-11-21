@@ -1,4 +1,4 @@
-package com.greenrobotdev.linklibrary.design.components
+package com.greenrobotdev.lordofthelinks.design.components
 
 /**
  * Component Template - Use this template for creating new design system components

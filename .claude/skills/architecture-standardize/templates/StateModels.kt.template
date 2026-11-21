@@ -33,7 +33,7 @@ sealed interface {{EVENT_CLASS_NAME}} {
 
 ### 1. Replace Placeholders
 
-- `{{PACKAGE}}`: Your screen's package (e.g., `com.greenrobotdev.linklibrary.screens.home`)
+- `{{PACKAGE}}`: Your screen's package (e.g., `com.greenrobotdev.lordofthelinks.screens.home`)
 - `{{FEATURE_NAME}}`: Human-readable feature name (e.g., "Home", "Link Detail")
 - `{{STATE_CLASS_NAME}}`: State class name (e.g., `HomeState`, `LinkDetailState`)
 - `{{EVENT_CLASS_NAME}}`: Event class name (e.g., `HomeEvent`, `LinkDetailEvent`)
@@ -154,9 +154,9 @@ data class LinkDetailState(
 
 #### List Screen Example (HomeStateModels.kt)
 ```kotlin
-package com.greenrobotdev.linklibrary.screens.home
+package com.greenrobotdev.lordofthelinks.screens.home
 
-import com.greenrobotdev.linklibrary.model.Link
+import com.greenrobotdev.lordofthelinks.model.Link
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -175,7 +175,7 @@ sealed interface HomeEvent {
 
 #### Form Screen Example (AddLinkStateModels.kt)
 ```kotlin
-package com.greenrobotdev.linklibrary.screens.add
+package com.greenrobotdev.lordofthelinks.screens.add
 
 import kotlinx.serialization.Serializable
 
@@ -203,9 +203,9 @@ sealed interface AddLinkEvent {
 
 #### Detail Screen Example (LinkDetailStateModels.kt)
 ```kotlin
-package com.greenrobotdev.linklibrary.screens.detail
+package com.greenrobotdev.lordofthelinks.screens.detail
 
-import com.greenrobotdev.linklibrary.model.Link
+import com.greenrobotdev.lordofthelinks.model.Link
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -39,7 +39,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "com.greenrobotdev.linklibrary.desktop.MainKt"
+        mainClass = "com.greenrobotdev.lordofthelinks.desktop.MainKt"
 
         nativeDistributions {
             targetFormats = setOf(
@@ -49,13 +49,13 @@ compose.desktop {
                 org.jetbrains.compose.desktop.application.dsl.TargetFormat.Rpm
             )
 
-            packageVersion = "1.0.0"
+            packageVersion = providers.gradleProperty("app.versionName").get()
             description = "Link Library - Manage your bookmarks"
             copyright = "© 2025 Green Robot Dev. All rights reserved."
             vendor = "Green Robot Dev"
 
             macOS {
-                bundleID = "com.greenrobotdev.linklibrary.desktop"
+                bundleID = "com.greenrobotdev.lordofthelinks.desktop"
                 // iconFile = project.file("src/jvmMain/resources/icon.icns")
             }
 

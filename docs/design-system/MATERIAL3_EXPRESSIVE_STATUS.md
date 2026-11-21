@@ -56,8 +56,8 @@ cd "/Volumes/Projects/KMP project/LinkLibrary"
 ### 3. Component Integration
 Make sure you're using the enhanced components:
 ```kotlin
-import com.greenrobotdev.linklibrary.design.components.button.FilledButton
-import com.greenrobotdev.linklibrary.design.components.card.ElevatedCard
+import com.greenrobotdev.lordofthelinks.design.components.button.FilledButton
+import com.greenrobotdev.lordofthelinks.design.components.card.ElevatedCard
 
 // Use these instead of standard Material3 components
 FilledButton("Click me", onClick = { })

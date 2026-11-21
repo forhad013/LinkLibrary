@@ -35,7 +35,7 @@ The Link Library KMP project has been successfully enhanced to implement **Mater
 - ✅ Dynamic color support architecture
 
 **Evidence:**
-- `core/design/src/commonMain/kotlin/com/greenrobotdev/linklibrary/design/theme/Color.kt`
+- `core/design/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/design/theme/Color.kt`
 - All components use `MaterialTheme.colorScheme.*` tokens
 - No hardcoded color values found in component implementations
 
@@ -58,7 +58,7 @@ The Link Library KMP project has been successfully enhanced to implement **Mater
 - ✅ Proper font weight, size, line-height, and tracking
 
 **Evidence:**
-- `core/design/src/commonMain/kotlin/com/greenrobotdev/linklibrary/design/theme/Type.kt`
+- `core/design/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/design/theme/Type.kt`
 - All screens use `MaterialTheme.typography.*` for consistent text styling
 - Custom font integration with Plus Jakarta Sans and Be Vietnam Pro
 

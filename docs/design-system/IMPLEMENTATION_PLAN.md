@@ -25,7 +25,7 @@ Convert HTML Material 3 design specification into reusable Compose UI components
 
 ```
 core/design/
-└── src/commonMain/kotlin/com/greenrobotdev/linklibrary/design/
+└── src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/design/
     ├── theme/                    # ✅ Keep existing
     ├── tokens/                   # ✅ Keep + extend
     ├── foundation/              # 🆕 Basic composables (Layer 1)
@@ -327,7 +327,7 @@ import androidx.compose.material3.Button
 
 **After**:
 ```kotlin
-import com.greenrobotdev.linklibrary.design.components.button.FilledButton
+import com.greenrobotdev.lordofthelinks.design.components.button.FilledButton
 ```
 
 ---

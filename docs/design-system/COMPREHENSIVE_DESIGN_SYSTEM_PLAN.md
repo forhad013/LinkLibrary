@@ -15,7 +15,7 @@
 ### ✅ **What's Already Working**
 
 #### Design System Foundation
-- **Material 3 Expressive Theme** ([`MaterialExpressiveTheme.kt`](core/design/src/commonMain/kotlin/com/greenrobotdev/linklibrary/design/theme/MaterialExpressiveTheme.kt))
+- **Material 3 Expressive Theme** ([`MaterialExpressiveTheme.kt`](core/design/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/design/theme/MaterialExpressiveTheme.kt))
   - Official KMP Expressive APIs implemented
   - Spring-based motion physics
   - Dynamic color schemes
@@ -38,7 +38,7 @@
 - Empty States: `EmptyState`
 
 #### Expressive Features
-- **Animation System**: [`ExpressiveMotion.kt`](core/design/src/commonMain/kotlin/com/greenrobotdev/linklibrary/design/expressive/animation/ExpressiveMotion.kt)
+- **Animation System**: [`ExpressiveMotion.kt`](core/design/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/design/expressive/animation/ExpressiveMotion.kt)
 - **Visual Effects**: `ShimmerEffect`, `ElevationEffect`, `RippleEffect`
 - **Interaction States**: `InteractionState` management
 
@@ -100,7 +100,7 @@
 ### **Phase 1: Essential Screen Updates (High Priority)**
 
 #### 1.1 Enhanced Add Link Screen ⭐⭐⭐
-**Current**: [`AddLinkScreen.kt`](bookmarks/src/commonMain/kotlin/com/greenrobotdev/linklibrary/bookmarks/screens/add/AddLinkScreen.kt)
+**Current**: [`AddLinkScreen.kt`](bookmarks/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/bookmarks/screens/add/AddLinkScreen.kt)
 **Design**: [`save_link_to_app.html`](design/save_link_to_app.html) + Expressive version
 
 **Required Features:**
@@ -124,7 +124,7 @@
 ---
 
 #### 1.2 Advanced Tags Management Screen ⭐⭐⭐
-**Current**: [`TagsScreen.kt`](bookmarks/src/commonMain/kotlin/com/greenrobotdev/linklibrary/bookmarks/screens/tags/TagsScreen.kt)
+**Current**: [`TagsScreen.kt`](bookmarks/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/bookmarks/screens/tags/TagsScreen.kt)
 **Design**: [`tags.html`](design/tags.html) + Expressive version
 
 **Required Features:**
@@ -148,7 +148,7 @@
 ---
 
 #### 1.3 Modern Library Screen ⭐⭐
-**Current**: [`LibraryScreen.kt`](bookmarks/src/commonMain/kotlin/com/greenrobotdev/linklibrary/bookmarks/screens/library/LibraryScreen.kt)
+**Current**: [`LibraryScreen.kt`](bookmarks/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/bookmarks/screens/library/LibraryScreen.kt)
 **Design**: [`library.html`](design/library.html) + Expressive version
 
 **Required Features:**
@@ -172,7 +172,7 @@
 ---
 
 #### 1.4 Enhanced Link Details Screen ⭐⭐
-**Current**: [`LinkDetailScreen.kt`](bookmarks/src/commonMain/kotlin/com/greenrobotdev/linklibrary/bookmarks/screens/details/LinkDetailScreen.kt)
+**Current**: [`LinkDetailScreen.kt`](bookmarks/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/bookmarks/screens/details/LinkDetailScreen.kt)
 **Design**: [`link_details.html`](design/link_details.html) + Expressive version
 
 **Required Features:**
@@ -290,7 +290,7 @@
 ### **Enhanced Component Library Structure**
 
 ```
-core/design/src/commonMain/kotlin/com/greenrobotdev/linklibrary/design/
+core/design/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/design/
 ├── components/
 │   ├── advanced/              # New advanced components
 │   │   ├── AutoFetchButton.kt

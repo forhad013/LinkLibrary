@@ -55,7 +55,7 @@ The Link Library KMP project has been successfully migrated to AGP 9.1.0 with al
 
 ### 6. Project Organization
 - ✅ Created `docs/gradle/` for Gradle documentation
-- ✅ Moved temporary files to `docs/archive/`
+- ✅ Removed temporary migration files (see git history)
 - ✅ Cleaned up redundant configuration files
 - ✅ Established version catalog as single source of truth
 

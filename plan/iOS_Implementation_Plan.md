@@ -163,7 +163,7 @@ fun MainViewController(): UIViewController = ComposeUIViewController {
 (`ThemePreferenceManager.isDarkModeEnabled()` is the suspend API MainActivity uses — check its exact signature; it exists in `core/utils` commonMain.)
 
 ### Phase C — cleanup
-- Delete `app/src/iosTest/kotlin/com/greenrobotdev/linklibrary/IosGreetingTest.kt` (references nonexistent `Greeting`; compiles the moment an iOS target exists).
+- Delete `app/src/iosTest/kotlin/com/greenrobotdev/lordofthelinks/IosGreetingTest.kt` (references nonexistent `Greeting`; compiles the moment an iOS target exists).
 
 ### Phase D — Xcode project (`app/iosApp/iosApp.xcodeproj/project.pbxproj` + Swift)
 1. Build phase shell script →
@@ -189,7 +189,7 @@ fun MainViewController(): UIViewController = ComposeUIViewController {
        var body: some View { ComposeView().ignoresSafeArea() }
    }
    ```
-5. In Xcode (manual, once): set `PRODUCT_BUNDLE_IDENTIFIER` to a real id (suggest `com.greenrobotdev.linklibrary.ios`), select your signing team, set the app icon in `Assets.xcassets`.
+5. In Xcode (manual, once): set `PRODUCT_BUNDLE_IDENTIFIER` to a real id (suggest `com.greenrobotdev.lordofthelinks.ios`), select your signing team, set the app icon in `Assets.xcassets`.
 6. `IPHONEOS_DEPLOYMENT_TARGET = 16.0` already set at target level — fine for Compose MP.
 
 ### Phase E — build & run

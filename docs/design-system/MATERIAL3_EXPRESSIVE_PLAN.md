@@ -138,7 +138,7 @@ Enhance existing 26 components with Material 3 Expressive features including dyn
 ## 📁 Implementation Structure
 
 ```
-core/design/src/commonMain/kotlin/com/greenrobotdev/linklibrary/design/
+core/design/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/design/
 ├── expressive/
 │   ├── animation/           # Animation specs and tokens
 │   │   ├── ExpressiveMotion.kt

@@ -16,3 +16,9 @@ xcuserdata
 graphify-out/
 database/test.db*
 di/teds
+
+# Release signing key and local release builds
+keys/
+app/androidApp/release/
+*.jks
+*.keystore

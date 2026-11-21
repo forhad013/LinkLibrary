@@ -70,7 +70,7 @@
 
 ## 📁 File Structure
 ```
-core/design/src/commonMain/kotlin/com/greenrobotdev/linklibrary/design/
+core/design/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/design/
 ├── foundation/          # Foundation components
 │   ├── icon/           # AppIcon, ErrorIcon
 │   ├── layout/         # AppSpacer, AppDivider

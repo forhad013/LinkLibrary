@@ -1,5 +1,7 @@
 [versions]
 agp = "9.1.0"
+kover = "0.9.11"
+detekt = "2.0.0-alpha.6"
 koin = "4.0.0"
 koinsistCore = "0.17.3"
 kotestRunnerJunit5 = "5.9.1"
@@ -7,6 +9,8 @@ kotlin = "2.4.10"
 serializtion = "2.4.10"
 compose = "1.12.0"
 compose-material3 = "1.5.0-alpha27"
+# JetBrains Material 3 alpha: Expressive APIs (MotionScheme, ExperimentalMaterial3ExpressiveApi) are internal in the plugin's stable default
+jetbrains-material3 = "1.9.0-alpha04"
 androidx-activityCompose = "1.9.0"
 kotlinxSerializationJson = "1.7.0"
 kotlinxDatetime = "0.7.1"
@@ -20,6 +24,7 @@ compose-plugin = "1.12.0"
 molecule = "1.4.3"
 navigation3 = "1.1.1"
 lifecycle-viewmodel-navigation3 = "2.11.0"
+androidx-lifecycle-viewmodel = "2.8.0"
 adaptive-navigation3 = "1.3.0"
 room = "2.8.4"
 sqlite = "2.6.1"
@@ -44,6 +49,7 @@ compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = 
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
+jetbrains-compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "jetbrains-material3" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
@@ -60,6 +66,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
 multiplatform-settings-argonaut = { module = "com.russhwolf:multiplatform-settings-argonaut", version.ref = "multiplatform-settings" }
+multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatform-settings" }
 
 # Coil for Image Loading (Compose support)
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
@@ -79,6 +86,9 @@ molecule-gradle-plugin = { module = "app.cash.molecule:molecule-gradle-plugin", 
 molecule-runtime = { module = "app.cash.molecule:molecule-runtime", version.ref = "molecule" }
 navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 lifecycle-viewmodel-navigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle-viewmodel-navigation3" }
+# Multiplatform ViewModel, same release train as lifecycle-viewmodel-navigation3
+jetbrains-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle-viewmodel-navigation3" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle-viewmodel" }
 adaptive-navigation3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "adaptive-navigation3" }
 
 [plugins]
@@ -93,6 +103,8 @@ kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = 
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 androidx-room = { id = "androidx.room", version.ref = "room" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
 molecule = { id = "app.cash.molecule", version.ref = "molecule" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 

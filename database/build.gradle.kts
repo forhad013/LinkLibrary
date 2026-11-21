@@ -1,10 +1,11 @@
 plugins {
     alias(libs.plugins.convention.android.room)
+    alias(libs.plugins.kover)
 }
 
 kotlin {
     android {
-        namespace = "com.greenrobotdev.linklibrary.database"
+        namespace = "com.greenrobotdev.lordofthelinks.database"
         compileSdk = 37
     }
     jvm()
@@ -12,6 +13,9 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                // Domain models and the repository interfaces this module implements
+                implementation(project(":core:model"))
+
                 // Room Database (KMP)
                 implementation(libs.androidx.room.runtime)
                 implementation(libs.androidx.sqlite.bundled)

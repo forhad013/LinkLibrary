@@ -6,14 +6,14 @@ plugins {
 }
 
 android {
-    namespace = "com.greenrobotdev.linklibrary.android"
+    namespace = "com.greenrobotdev.lordofthelinks.android"
     compileSdk = 37
     defaultConfig {
-        applicationId = "com.greenrobotdev.linklibrary.android"
+        applicationId = "com.greenrobotdev.lordofthelinks.android"
         minSdk = 28
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = providers.gradleProperty("app.versionCode").get().toInt()
+        versionName = providers.gradleProperty("app.versionName").get()
     }
     buildFeatures {
         compose = true
@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":bookmarks"))
     implementation(project(":core:design"))
     implementation(project(":core:utils"))
+    implementation(project(":core:model"))
     implementation(project(":database"))
     implementation(libs.koin.android)
     implementation(libs.koin.core)

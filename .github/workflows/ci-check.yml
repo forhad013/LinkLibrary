@@ -1,0 +1,201 @@
+name: CI Check
+
+# Runs on every pull request, as four parallel jobs so each shows as its own check on the PR:
+# detekt, Android Lint, unit tests (with coverage) and the Android/desktop build.
+# detekt, lint and the tests each post one summary comment on the PR (updated each run).
+# PRs from forks get a read-only token and can't comment or create checks; the job result still counts.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-check-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Shown in the PR comments when everything passes; swap in any GIF URL you like
+  DETEKT_PASS_GIF: https://media.giphy.com/media/111ebonMs90YLu/giphy.gif
+  TESTS_PASS_GIF: https://media.giphy.com/media/111ebonMs90YLu/giphy.gif
+
+jobs:
+  detekt:
+    name: detekt
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # summary comment
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-build
+
+      # Fails on findings not in detekt-baseline.xml; the steps below still post the comment
+      - name: Static analysis (detekt)
+        id: detekt
+        run: ./gradlew detekt
+
+      - name: Write detekt comment
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        run: |
+          if [ "${{ steps.detekt.outcome }}" = "success" ]; then
+            printf '## detekt ✅\n\nNo new findings. Clean code, nice work!\n\n![All clear](%s)\n' "$DETEKT_PASS_GIF" > detekt-comment.md
+          else
+            {
+              echo '## detekt ❌'
+              echo
+              echo 'New findings below block the merge. Fix them and push; this comment updates itself.'
+              echo 'Findings that existed before are listed in `detekt-baseline.xml`.'
+              echo
+              sed -n '/^## Issues/,$p' build/reports/detekt/detekt.md 2>/dev/null | grep . >/dev/null \
+                && sed -n '/^## Issues/,$p' build/reports/detekt/detekt.md \
+                || echo 'detekt failed before writing a report; see the "Static analysis (detekt)" step log.'
+            } > detekt-comment.md
+          fi
+
+      # One comment per PR, edited on every run instead of adding new ones
+      - name: Post detekt comment
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        continue-on-error: true
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: detekt
+          path: detekt-comment.md
+
+      - name: Upload detekt report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: detekt-report
+          path: build/reports/detekt
+          retention-days: 14
+          if-no-files-found: ignore
+
+  lint:
+    name: Android Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # summary comment
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-build
+
+      # Errors fail, warnings are only listed. Library modules are linted one by one because the app's
+      # checkDependencies crashes lint on AGP 9
+      - name: Android Lint
+        id: lint
+        run: >-
+          ./gradlew --continue :app:androidApp:lintDebug :app:lintAndroidMain :bookmarks:lintAndroidMain
+          :core:design:lintAndroidMain :core:utils:lintAndroidMain
+
+      # Every finding on the run's Summary page; the PR comment only has the counts and a link to it
+      - name: Write lint report
+        if: ${{ !cancelled() }}
+        run: |
+          python3 .github/scripts/lint_summary.py . $(find . -path '*/build/reports/lint-results-*.xml') > lint-report.md
+          cat lint-report.md >> "$GITHUB_STEP_SUMMARY"
+          {
+            head -n 2 lint-report.md
+            if [ "${{ steps.lint.outcome }}" != "success" ]; then
+              printf '\n❌ Lint errors block the merge. Fix them and push; this comment updates itself.\n'
+            fi
+            # #summary-<job id> scrolls the run's Summary page to this job's section
+            printf '\n📋 [Full lint report](%s/%s/actions/runs/%s#summary-%s)\n' "${{ github.server_url }}" "${{ github.repository }}" "${{ github.run_id }}" "${{ job.check_run_id }}"
+          } > lint-comment.md
+
+      - name: Post lint comment
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        continue-on-error: true
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: android-lint
+          path: lint-comment.md
+
+      - name: Upload lint report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: '*/**/build/reports/lint-results-*.html'
+          retention-days: 14
+          if-no-files-found: ignore
+
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # summary comment
+      checks: write # per-test report from dorny/test-reporter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-build
+
+      - name: Unit tests
+        run: ./gradlew :app:jvmTest :bookmarks:jvmTest :database:jvmTest --continue
+
+      # Full report: a "Unit test results" check on the PR with every test, passed and failed, grouped by class
+      - name: Unit test report
+        id: test-report
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        uses: dorny/test-reporter@v2
+        with:
+          name: Unit test results
+          path: '*/build/test-results/**/TEST-*.xml'
+          reporter: java-junit
+          list-suites: all
+          list-tests: all
+          fail-on-error: false # the "Unit tests" step already fails the job
+
+      - name: Write unit test comment
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        env:
+          TEST_REPORT_URL: ${{ steps.test-report.outputs.url_html }}
+        run: python3 .github/scripts/test_summary.py app/build/test-results bookmarks/build/test-results database/build/test-results > test-comment.md
+
+      - name: Post unit test comment
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        continue-on-error: true
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: unit-tests
+          path: test-comment.md
+
+      - name: Upload test report
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: |
+            */build/reports/tests
+            */build/test-results
+          retention-days: 14
+          if-no-files-found: ignore
+
+      # Only after green tests (Kover would re-run failing ones); merged report for app, bookmarks and database
+      - name: Coverage report
+        run: ./gradlew koverXmlReport koverHtmlReport
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            build/reports/kover/html
+            build/reports/kover/report.xml
+          retention-days: 14
+          if-no-files-found: error
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-build
+
+      # Debug only: no signing secrets needed, so it also works on PRs from forks
+      - name: Compile Android and desktop
+        run: ./gradlew :app:androidApp:assembleDebug :app:desktopApp:compileKotlinJvm

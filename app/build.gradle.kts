@@ -3,12 +3,14 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 plugins {
     alias(libs.plugins.convention.kmp.library)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.kover)
 }
 
 kotlin {
     android {
-        namespace = "com.greenrobotdev.linklibrary.app"
+        namespace = "com.greenrobotdev.lordofthelinks.app"
         compileSdk = 37
+        minSdk = 28 // same as app/androidApp
     }
 
     jvm()
@@ -55,8 +57,11 @@ kotlin {
                 // Utils module (MoleculeViewModel and utilities)
                 implementation(project(":core:utils"))
 
-                // Bookmarks module (shared models and screens)
+                // Bookmarks module (screens)
                 implementation(project(":bookmarks"))
+
+                // Domain models and repository interfaces
+                implementation(project(":core:model"))
             }
         }
 

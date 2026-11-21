@@ -15,23 +15,20 @@ Before you write code, read:
 | What | Path |
 |---|---|
 | Screenshot (the target look) | `design/screens/Category picker search, recent, browse.png` |
-| Standalone HTML mock (layout, spacing, states) | `design/extracted/category_picker.html` |
 | UI text strings | `design/text/category_picker.txt` |
-| Full design bundle (all screens; large packed file, read-only) | `design/Lords of Links UI.html` |
-| Related: delete-confirm dialog design | `design/extracted/manage_categories_amp_tags.html` |
 
-Open the screenshot and the extracted HTML first. Match the layout, order, spacing and states. Do **not** copy the mock's hex colors: map every color to `MaterialTheme.colorScheme`.
+Open the screenshot first. Match the layout, order, spacing and states. Do **not** copy the mock's hex colors: map every color to `MaterialTheme.colorScheme`.
 
 ## Existing code to build on (don't start from scratch)
 
-- Screen: `bookmarks/src/commonMain/kotlin/com/greenrobotdev/linklibrary/bookmarks/screens/categoryPicker/CategoryPickerScreen.kt`
+- Screen: `bookmarks/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/bookmarks/screens/categoryPicker/CategoryPickerScreen.kt`
 - State/events: `.../categoryPicker/CategoryPickerStateModels.kt` (`CategoryPickerState`, `CategoryPickerEvent`)
 - ViewModel: `.../categoryPicker/CategoryPickerViewModel.kt`
-- Domain model: `bookmarks/src/commonMain/kotlin/com/greenrobotdev/linklibrary/bookmarks/model/Category.kt` (has `path(categories)` for breadcrumbs)
-- Repository: `database/src/commonMain/kotlin/com/greenrobotdev/linklibrary/database/repository/CategoryRepository.kt`. It already has `getCategoriesWithCounts`, `addCategory`, `renameCategory`, `moveCategory`, `deleteCategory`, `getCategoryForLink` and `assignLinkToCategory`. Reuse these. Add a repository method only when one is truly missing.
+- Domain model: `bookmarks/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/bookmarks/model/Category.kt` (has `path(categories)` for breadcrumbs)
+- Repository: `database/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/database/repository/CategoryRepository.kt`. It already has `getCategoriesWithCounts`, `addCategory`, `renameCategory`, `moveCategory`, `deleteCategory`, `getCategoryForLink` and `assignLinkToCategory`. Reuse these. Add a repository method only when one is truly missing.
 - Delete logic to share: `bookmarks/.../screens/manage/ManageViewModel.kt` (`PendingDelete`)
 - Sheet pattern to copy (keyboard/IME handling, sheet behaviour): `bookmarks/.../screens/add/sheet/AddLinkSheet.kt`, `ImeNestedScroll.kt`
-- Current navigation entry: `app/src/commonMain/kotlin/com/greenrobotdev/linklibrary/screens/organize/navigation/OrganizeTabNavigation.kt`
+- Current navigation entry: `app/src/commonMain/kotlin/com/greenrobotdev/lordofthelinks/screens/organize/navigation/OrganizeTabNavigation.kt`
 - Design system: `core/design/...`, including `components/textfield/SearchField.kt`, `components/selection/SelectionPill.kt`, `components/button/*`, `components/cards/FormCards.kt`, and `theme/Color.kt`
 
 ---

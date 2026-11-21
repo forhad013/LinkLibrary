@@ -28,6 +28,7 @@ include(":app")
 include(":database")
 include(":core:design")
 include(":core:utils")
+include(":core:model")
 include(":bookmarks")
 //include(":konsistTest")
 

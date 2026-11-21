@@ -5,7 +5,7 @@
 # kotlinx.serialization: keep generated serializers of app models
 -keepattributes *Annotation*, InnerClasses
 -keepclassmembers class kotlinx.serialization.json.** { *** Companion; }
--keepclasseswithmembers class com.greenrobotdev.linklibrary.** {
+-keepclasseswithmembers class com.greenrobotdev.lordofthelinks.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 -dontwarn kotlinx.serialization.**

@@ -51,7 +51,7 @@ cd "/Volumes/Projects/KMP project/LinkLibrary"
 Replace standard `MaterialTheme` with `MaterialExpressiveTheme`:
 
 ```kotlin
-import com.greenrobotdev.linklibrary.design.theme.MaterialExpressiveTheme
+import com.greenrobotdev.lordofthelinks.design.theme.MaterialExpressiveTheme
 
 MaterialExpressiveTheme {
     // Your app content
@@ -62,8 +62,8 @@ MaterialExpressiveTheme {
 ### Enhanced Components
 Use the expressive components:
 ```kotlin
-import com.greenrobotdev.linklibrary.design.components.button.FilledButton
-import com.greenrobotdev.linklibrary.design.components.card.ElevatedCard
+import com.greenrobotdev.lordofthelinks.design.components.button.FilledButton
+import com.greenrobotdev.lordofthelinks.design.components.card.ElevatedCard
 
 FilledButton("Save", onClick = { }, icon = Icons.Default.Save)
 ElevatedCard(onClick = { }) { /* content */ }

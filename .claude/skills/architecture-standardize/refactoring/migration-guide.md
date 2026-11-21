@@ -108,7 +108,7 @@ sealed interface MyEvent {
 
 ```kotlin
 // File: screens/myfeature/MyStateModels.kt
-package com.greenrobotdev.linklibrary.screens.myfeature
+package com.greenrobotdev.lordofthelinks.screens.myfeature
 
 import kotlinx.serialization.Serializable
 
@@ -217,7 +217,7 @@ LaunchedEffect(Unit) {
 
 ```kotlin
 // File: screens/myfeature/MyUseCase.kt
-package com.greenrobotdev.linklibrary.screens.myfeature
+package com.greenrobotdev.lordofthelinks.screens.myfeature
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -267,7 +267,7 @@ private val repository: MyRepository by inject()
 
 ```kotlin
 // File: screens/myfeature/MyViewModel.kt
-package com.greenrobotdev.linklibrary.screens.myfeature
+package com.greenrobotdev.lordofthelinks.screens.myfeature
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
