@@ -120,7 +120,7 @@ fun LinkCard(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
                 .clickable(
-                    interactionSource = androidx.compose.foundation.interaction.MutableInteractionSource(),
+                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
                     indication = null
                 ) {
                     isHovered = !isHovered

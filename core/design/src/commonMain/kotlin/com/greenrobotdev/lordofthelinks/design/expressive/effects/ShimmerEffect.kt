@@ -121,7 +121,5 @@ fun Modifier.shimmer(
 ): Modifier {
     val shimmerBrush = rememberShimmerBrush(shimmerWidth, isDark)
 
-    return this.then(
-        background(shimmerBrush)
-    )
+    return background(shimmerBrush)
 }

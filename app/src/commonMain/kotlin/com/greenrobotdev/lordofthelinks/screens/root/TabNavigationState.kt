@@ -75,7 +75,7 @@ class TabNavigator(val state: TabNavigationState) {
         if (state.backStack.isNotEmpty()) {
             val lastRoute = state.backStack.last()
             if (lastRoute::class == route::class) {
-                state.backStack.removeLast()
+                state.backStack.removeAt(state.backStack.lastIndex) // removeLast() is API 35+ on Android
             }
         }
 
@@ -88,7 +88,7 @@ class TabNavigator(val state: TabNavigationState) {
      */
     fun goBack() {
         if (state.backStack.size > 1) {
-            state.backStack.removeLast()
+            state.backStack.removeAt(state.backStack.lastIndex) // removeLast() is API 35+ on Android
             state.currentRoute = state.backStack.last()
         }
     }
