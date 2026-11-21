@@ -16,6 +16,8 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
             apply(plugin = "com.android.kotlin.multiplatform.library")
             apply(plugin = "org.jetbrains.compose")
             apply(plugin = "org.jetbrains.kotlin.plugin.compose")
+            // Android Lint isn't built into the KMP library plugin; this lets the app's lint check these modules
+            apply(plugin = "com.android.lint")
 
             // Note: Android configuration and targets are configured in individual module build.gradle.kts files
             // This convention plugin only applies the required plugins
