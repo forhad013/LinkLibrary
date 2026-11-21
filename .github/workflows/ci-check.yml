@@ -88,13 +88,19 @@ jobs:
           ./gradlew --continue :app:androidApp:lintDebug :app:lintAndroidMain :bookmarks:lintAndroidMain
           :core:design:lintAndroidMain :core:utils:lintAndroidMain
 
-      - name: Write lint comment
-        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+      # Full table on the run's Summary page; the PR comment only has the counts and a link to it
+      - name: Write lint report
+        if: ${{ !cancelled() }}
         run: |
-          python3 .github/scripts/lint_summary.py . $(find . -path '*/build/reports/lint-results-*.xml') > lint-comment.md
-          if [ "${{ steps.lint.outcome }}" != "success" ]; then
-            printf '\n❌ Lint errors block the merge. Fix them and push; this comment updates itself.\n' >> lint-comment.md
-          fi
+          python3 .github/scripts/lint_summary.py . $(find . -path '*/build/reports/lint-results-*.xml') > lint-report.md
+          cat lint-report.md >> "$GITHUB_STEP_SUMMARY"
+          {
+            head -n 2 lint-report.md
+            if [ "${{ steps.lint.outcome }}" != "success" ]; then
+              printf '\n❌ Lint errors block the merge. Fix them and push; this comment updates itself.\n'
+            fi
+            printf '\n📋 [Full lint report](%s/%s/actions/runs/%s)\n' "${{ github.server_url }}" "${{ github.repository }}" "${{ github.run_id }}"
+          } > lint-comment.md
 
       - name: Post lint comment
         if: ${{ !cancelled() && github.event_name == 'pull_request' }}
