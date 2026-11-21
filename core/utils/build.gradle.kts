@@ -8,6 +8,7 @@ kotlin {
     android {
         namespace = "com.greenrobotdev.lordofthelinks.utils"
         compileSdk = 37
+        minSdk = 28 // same as app/androidApp
     }
 
     jvm("desktop")

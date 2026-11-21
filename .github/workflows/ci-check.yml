@@ -1,7 +1,7 @@
 name: CI Check
 
 # Runs on every pull request: does it compile, do the tests pass.
-# detekt and the unit tests each post one summary comment on the PR (updated each run) and fail the check.
+# detekt, Android Lint and the unit tests each post one summary comment on the PR (updated each run) and fail the check.
 # Coverage and detekt reports are uploaded as artifacts.
 
 on:
@@ -81,6 +81,40 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
+      # Errors fail, warnings are only listed. Library modules are linted one by one because the app's
+      # checkDependencies crashes lint on AGP 9. Same pattern as detekt: "Fail on lint errors" fails the check
+      - name: Android Lint
+        id: lint
+        continue-on-error: true
+        run: >-
+          ./gradlew --continue :app:androidApp:lintDebug :app:lintAndroidMain :bookmarks:lintAndroidMain
+          :core:design:lintAndroidMain :core:utils:lintAndroidMain
+
+      - name: Write lint comment
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        run: |
+          python3 .github/scripts/lint_summary.py . $(find . -path '*/build/reports/lint-results-*.xml') > lint-comment.md
+          if [ "${{ steps.lint.outcome }}" != "success" ]; then
+            printf '\n❌ Lint errors block the merge. Fix them and push; this comment updates itself.\n' >> lint-comment.md
+          fi
+
+      - name: Post lint comment
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        continue-on-error: true
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: android-lint
+          path: lint-comment.md
+
+      - name: Upload lint report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: '*/**/build/reports/lint-results-*.html'
+          retention-days: 14
+          if-no-files-found: ignore
+
       # Same pattern as detekt: carry on so the PR gets the comment, "Fail on test failures" fails the check
       - name: Unit tests
         id: tests
@@ -136,6 +170,12 @@ jobs:
         if: ${{ !cancelled() && steps.tests.outcome == 'failure' }}
         run: |
           echo "Unit tests failed; see the PR comment or the test-report artifact."
+          exit 1
+
+      - name: Fail on lint errors
+        if: ${{ !cancelled() && steps.lint.outcome == 'failure' }}
+        run: |
+          echo "Android Lint found errors; see the PR comment or the lint-report artifact."
           exit 1
 
       - name: Fail on detekt findings

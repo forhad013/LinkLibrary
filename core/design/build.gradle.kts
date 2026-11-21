@@ -8,6 +8,7 @@ kotlin {
     android {
         namespace = "com.greenrobotdev.lordofthelinks.design"
         compileSdk = 37
+        minSdk = 28 // same as app/androidApp
         androidResources { enable = true } // required for Compose resources on the KMP Android library plugin
     }
 
