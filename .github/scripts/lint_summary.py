@@ -1,6 +1,7 @@
 """Android Lint XML reports -> Markdown for the GitHub Actions run summary.
 
-Usage: python3 lint_summary.py <repo root> <lint-results.xml>... >> "$GITHUB_STEP_SUMMARY"
+Usage: python3 lint_summary.py [--brief] <repo root> <lint-results.xml>... >> "$GITHUB_STEP_SUMMARY"
+--brief: counts per rule instead of every finding (for the PR comment)
 """
 import collections
 import os
@@ -28,7 +29,11 @@ def rows(root, paths):
 
 
 def main():
-    root, paths = sys.argv[1], sys.argv[2:]
+    args = sys.argv[1:]
+    brief = args[:1] == ["--brief"]
+    if brief:
+        args = args[1:]
+    root, paths = args[0], args[1:]
     found = sorted(set(rows(root, paths)), key=lambda r: (ORDER.get(r[0], 9), r[1], r[2]))
     counts = collections.Counter(r[0] for r in found)
     print("## Android Lint")
@@ -37,6 +42,13 @@ def main():
         return
     print(", ".join(f"**{counts[s]}** {s.lower()}" for s in sorted(counts, key=lambda s: ORDER.get(s, 9))))
     print()
+    if brief:
+        per_rule = collections.Counter((r[0], r[1]) for r in found)  # found is already in severity order
+        print("| Severity | Rule | Count |")
+        print("|---|---|---|")
+        for (severity, rule), n in per_rule.items():
+            print(f"| {severity} | `{rule}` | {n} |")
+        return
     print("| Severity | Rule | Where | Message |")
     print("|---|---|---|---|")
     for severity, rule, where, message in found[:MAX_ROWS]:
